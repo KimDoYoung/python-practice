@@ -15,29 +15,40 @@ def read_config(config_path):
             config[key.strip()] = value.strip()
     return config
 
-def filter_files(files, exclude_patterns):
-    # 제외할 파일 필터링
-    filtered_files = []
-    for file in files:
-        exclude = any(glob.fnmatch.fnmatch(file, pattern) for pattern in exclude_patterns)
-        if not exclude:
-            filtered_files.append(file)
-    return filtered_files
 
-def is_excluded(file_path, exclude_patterns, exclude_dirs):
-    # 파일 패턴으로 배제
+#
+#  만약 file_path가 dir이고 exclude_dirs에 포함되면  True
+# 
+def is_exclude_file(file_path, exclude_patterns):
+    # 파일 이름 추출
+    file_name = os.path.basename(file_path)
+    
+    # exclude_patterns 리스트를 순회하며 패턴 매칭 확인
     for pattern in exclude_patterns:
-        if file_path.startswith("."):
-            return True
-        if fnmatch.fnmatch(file_path, pattern):
-            return True
-    # 디렉토리 경로로 배제
-    for dir_path in exclude_dirs:
-        if dir_path.startswith("."):
-            return True
-        if dir_path in file_path:
-            return True
-    return False
+        if fnmatch.fnmatch(file_name, pattern):
+            return True  # 패턴에 일치하는 경우 True 반환
+    return False  # 모든 패턴에 대해 일치하지 않는 경우 False 반환
+
+def is_include_file(file_path, patterns):
+    # 파일 이름 추출
+    file_name = os.path.basename(file_path)
+    
+    # 주어진 패턴들과 파일 이름이 일치하는지 확인
+    for pattern in patterns:
+        if fnmatch.fnmatch(file_name, pattern):
+            return True  # 패턴 중 하나라도 일치하면 True 반환
+    return False  # 모든 패턴에 대해 일치하지 않으면 False 반환
+
+def is_text_file(file_path):
+    try:
+        with open(file_path, 'rb') as file:
+            # 파일의 첫 1024바이트를 읽어서 확인
+            data = file.read(1024)
+            # 텍스트 파일로 간주할 수 있는 문자와 제어 문자를 제외한 것들
+            text_chars = bytearray({7,8,9,10,12,13,27} | set(range(0x20, 0x100)) - {0x7f})
+            return bool(data) and not bool(data.translate(None, text_chars))
+    except IOError:
+        return False  # 파일을 열 수 없는 경우
 
 def gather_files(target_folder, target_patterns, exclude_files, output_file):
     print(f"target_folder : {target_folder}")
@@ -46,10 +57,13 @@ def gather_files(target_folder, target_patterns, exclude_files, output_file):
     
     files_to_merge = [] # 골라서 합칠 파일들 목록
     for root, dirs, files in os.walk(target_folder):
+        # 디렉토리 배제
+        dirs[:] = [d for d in dirs if d not in exclude_dirs]
         for file in files:
             file_path = os.path.join(root, file)
-            print(f"file : {file_path}")
-            if not is_excluded(file_path, exclude_patterns, exclude_dirs):
+            if is_exclude_file(file_path, exclude_patterns):
+                continue
+            if is_include_file(file_path, target_patterns):
                 files_to_merge.append(file_path)
 
     for selectedFile in files_to_merge:
@@ -57,8 +71,13 @@ def gather_files(target_folder, target_patterns, exclude_files, output_file):
 
     with open(output_file, 'w', encoding='utf-8') as outfile:
         for file in files_to_merge:
+            if not is_text_file(file):
+                continue
             print(f"파일 {file} 읽는 중...")
             with open(file, 'r', encoding='utf-8') as infile:
+                outfile.write("-" * 80 + "\n")
+                outfile.write(file+"\n");
+                outfile.write("-" * 80 + "\n")
                 outfile.write(infile.read() + "\n\n") # 파일 구분을 위해 두 줄 띄움
 
 if __name__ == "__main__":
