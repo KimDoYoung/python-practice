@@ -2,6 +2,7 @@
 
 ## diary_to_html.py
 
+### prompt
 1. mysql 데이터베이스에 접속
 2. "select * from diary" sql 수행
 3. sql의 결과를 html 파일로 write
