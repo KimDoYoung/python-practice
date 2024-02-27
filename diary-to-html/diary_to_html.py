@@ -46,9 +46,12 @@ def generate_html_footer():
     <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"></script>
     <script>
         $(document).ready(function(){
-           $("#SummaryToggle").click(function(){
-               $('.content).toggle();
-           });
+            $("#SummaryToggle").click(function(){
+               $('.content').toggle();
+            });
+            $('.date-summary').click(function() {
+                $(this).parent().find('.content').toggle();
+            });           
         });
     </script>
     </body></html>'''
@@ -66,15 +69,18 @@ def str_to_html(s):
     # 모든 줄바꿈 문자를 <br/>로 바꾸기
     return trimmed
 
-def format_diary_entry(entry):
+def format_diary_entry(entry,i):
     """Formats a diary entry as HTML."""
     ymd = format_date(entry[0]) 
     dayName = get_weekday_korean(entry[0]) 
     ymdFormat = f"{ymd} ({dayName})"
     content = str_to_html(entry[2])
+    className = 'style="color: #000080; background-color: #F5F5DC;"'
+    if i % 2 == 1 :
+        className = 'style="color: #000000; background-color: #F6F6F5;"'
     entry_html = f"""
     <div class="diary-entry">
-        <div class="date-summary bg-warning fw-bold">{ymdFormat} : {entry[1]}</div>
+        <div class="date-summary  fw-bold" {className}>{ymdFormat} : {entry[1]}</div>
         <div class="content">{content}</div>
     </div>
     """
@@ -107,9 +113,10 @@ def connect_fetch_write(f, frYmd, toYmd):
             cursor = connection.cursor()
             cursor.execute(f"SELECT ymd,summary,content FROM dairy WHERE ymd BETWEEN {frYmd} AND {toYmd}")
             records = cursor.fetchall()
-           
+            i=0
             for row in records:
-                f.write(format_diary_entry(row))
+                f.write(format_diary_entry(row,i))
+                i=i+1
                 
     except Error as e:
         print("Error while connecting to MySQL", e)
