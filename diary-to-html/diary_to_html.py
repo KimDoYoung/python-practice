@@ -101,7 +101,7 @@ def parse_arguments():
 
 def connect_fetch_write(f, frYmd, toYmd):
     """Connect to MySQL database, fetch data, and write to an HTML file."""
-    try:
+    try: 
         connection = mysql.connector.connect(
             host='jskn.iptime.org',
             database='kalpadb',
