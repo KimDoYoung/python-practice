@@ -19,9 +19,28 @@
     . ./env/Scripts/activate
 ```
 
+### 라이브러리 설치
+
+```
+pip install fastapi uvicorn
+pip install matplotlib
+```
+
 ### 실행
 
 ```
 uvicorn main:app --reload --port 8989
 ```
 
+ ### 테스트
+ ```
+ http://localhost:8989/docs
+
+{
+  "type": "url",
+  "width": 300,
+  "height": 200,
+  "x": ["2024-01","2024-02","2024-03","2024-04","2024-05"],
+  "y": [23,45,53,32,65]
+}
+```
