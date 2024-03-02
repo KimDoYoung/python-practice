@@ -24,12 +24,33 @@
 ```
 pip install fastapi uvicorn
 pip install matplotlib
+pip install jinja2
+pip install -e .
 ```
 
 ### 실행
 
 ```
 uvicorn main:app --reload --port 8989
+uvicorn eliana.main:app --reload --port 8989
+```
+
+### 폴더구조
+```
+project/
+│
+├── static/
+│   ├── css/
+│   │   └── style.css
+│   ├── js/
+│   │   └── script.js
+│   └── images/
+│       └── logo.png
+│
+├── templates/
+│   └── index.html
+│
+└── main.py
 ```
 
  ### 테스트
