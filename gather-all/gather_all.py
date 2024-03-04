@@ -50,7 +50,7 @@ def is_text_file(file_path):
     except IOError:
         return False  # 파일을 열 수 없는 경우
 
-def gather_files(target_folder, target_patterns, exclude_files, output_file):
+def gather_files(method, target_folder, target_patterns, exclude_files, output_file):
     print(f"target_folder : {target_folder}")
     exclude_patterns = [pattern for pattern in exclude_files if not pattern.endswith('/')]
     exclude_dirs = [pattern.rstrip('/') for pattern in exclude_files if pattern.endswith('/')]
@@ -69,6 +69,8 @@ def gather_files(target_folder, target_patterns, exclude_files, output_file):
     for selectedFile in files_to_merge:
         print(f"file: {selectedFile}")
 
+    if method == 'list':
+        return
     with open(output_file, 'w', encoding='utf-8') as outfile:
         for file in files_to_merge:
             if not is_text_file(file):
@@ -89,6 +91,7 @@ if __name__ == "__main__":
     config_file = sys.argv[1]
     config = read_config(config_file)
     
+    method = config.get('method')
     target_folder = config.get('target-folder')
     target_patterns = config.get('target-files').split(';')
     exclude_files = config.get('exclude-files').split(';')
@@ -104,4 +107,6 @@ if __name__ == "__main__":
         os.remove(output_file)
 
     
-    gather_files(target_folder, target_patterns, exclude_files, output_file)
+    gather_files(method, target_folder, target_patterns, exclude_files, output_file)
+    if method == 'merge':
+        print(f"{output_file} created")
