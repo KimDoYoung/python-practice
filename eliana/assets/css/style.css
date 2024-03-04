@@ -1,0 +1,11 @@
+.sidebar {
+    float: left;
+    width: 20%;
+    height: 100vh; /* Full-height */
+}
+
+#content {
+    float: left;
+    width: 80%;
+    padding: 20px;
+}

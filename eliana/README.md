@@ -31,8 +31,8 @@ pip install -e .
 ### 실행
 
 ```
+uvicorn --app-dir src main:app --reload --port 8989
 uvicorn main:app --reload --port 8989
-uvicorn eliana.main:app --reload --port 8989
 ```
 
 ### 폴더구조

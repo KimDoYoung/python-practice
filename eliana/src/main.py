@@ -35,7 +35,7 @@ templates = Jinja2Templates(directory="templates")
 @app.get("/", response_class=HTMLResponse)
 def read_root(request: Request):
     # 템플릿 변수에 전달할 데이터
-    data = {"title": "Hello FastAPI", "description": "FastAPI with Jinja2 template."}
+    data = {"title": "Creating charts via an API.", "description": "FastAPI with Jinja2 template."}
     # 템플릿 렌더링
     return templates.TemplateResponse("index.html", {"request": request, **data})
 
