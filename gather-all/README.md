@@ -33,3 +33,8 @@ exclude-files=.vscode/;__pychache__/;env/;venv/;.gitignore
 output-file=c:\tmp\eliana-all-source.py  
 ```
 
+### 사용법
+
+```
+python gather_all test1.config
+```
