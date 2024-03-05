@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- =================================================== -->
+{% include 'common/meta-css.html' %}
+<!-- =================================================== -->
+<style>
+.container-flex {
+    display: flex;
+}
+
+.main-content {
+    flex-grow: 1;
+}
+.nav-link:hover {
+    background-color: #0056b3; /* active 상태의 배경색과 유사한 색 */
+    color: white; /* 텍스트 색상 */
+}
+
+/* 선택된 .nav-link에 대한 스타일 */
+.nav-link.active {
+    background-color: #007bff; /* Bootstrap에서 기본적으로 사용하는 active 상태의 배경색 */
+    color: white;
+}
+</style>
+<title>Eliana-chart maker</title>
+</head>
+<body>
+    <div class="container-flex">
+        {% include 'common/left-menu.html' %}
+        <div class="main-content">
+            <main class="container text-center">
+                <h1 id="chartTypeName"></h1>
+                <div class="row">
+                    <div class="col-6 left-side bg-light"></div>
+                    <div class="col-6 right-side"></div>
+                </div>
+            </main>
+        </div>
+    </div>
+<!-- =================================================== -->
+{% include 'common/footer.html' %}
+<!-- -================================================== -->
+<script>
+$( document ).ready(function() {
+    console.log('ready...');
+    $('.nav-link').on('click', function(e) {
+        e.preventDefault(); // 링크의 기본 동작을 방지합니다.
+        $('.nav-link').removeClass('active'); // 모든 nav-link에서 active 클래스를 제거합니다.
+        $(this).addClass('active'); // 클릭된 nav-link에만 active 클래스를 추가합니다.
+        var chartType = $(this).data('chart-type');
+        fetchFormAndDisplay(chartType);
+    });    
+    function fetchFormAndDisplay(chartType){
+        
+        console.log(chartType)
+        var url = `form/${chartType}`;
+        JuliaUtil.ajax(url, null, {
+            method: 'GET',
+            success: function(response) {
+                console.log(response);
+                var handlebar_template = response.template;
+                var handlebar_function = Handlebars.compile(handlebar_template);
+                var html = handlebar_function(response.data);
+                $('#chartTypeName').text(response.data.chartTypeName);
+                $('.left-side').html(html);
+            }
+        });        
+    }
+    // $('.nav-link[data-chart-type="linebar"]').on('click', function(e) {
+    // e.preventDefault();
+    // var chartType = $(this).data('chart-type');
+    // JuliaUtil.ajax('/form/linebar', {}, {
+    //     method: 'GET',
+    //     success: function(response) {
+    //         // 서버에서 받은 데이터를 사용하여 Handlebars 템플릿 렌더링
+    //         // 예시로, response.data에 데이터가 있다고 가정하고 Handlebars 템플릿을 컴파일 및 렌더링하는 코드를 작성할 수 있습니다.
+    //         // var template = Handlebars.compile($("#linebar-template").html());
+    //         // var html = template(response.data);
+    //         // $('.left-side').html(html);
+    //     }
+    // });
+    // });
+
+});
+</script>	
+</body>
+</html>
