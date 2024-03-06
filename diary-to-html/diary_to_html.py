@@ -106,7 +106,7 @@ def connect_fetch_write(f, frYmd, toYmd):
             host='jskn.iptime.org',
             database='kalpadb',
             user='kdy987',
-            password='kalpa987!'
+            password=''
         )
 
         if connection.is_connected():
