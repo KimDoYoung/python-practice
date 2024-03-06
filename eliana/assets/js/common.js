@@ -184,6 +184,10 @@ var JuliaUtil = (function(){
 				}
             }
         );
+
+        if (url.startsWith("/")) {
+            url =  url.substring(1);
+        }
         //console.log('data:' + JSON.stringify(data));
         //console.log(options);
         data = JSON.stringify(data);

@@ -32,8 +32,8 @@
             <main class="container text-center">
                 <h1 id="chartTypeName"></h1>
                 <div class="row">
-                    <div class="col-6 left-side bg-light"></div>
-                    <div class="col-6 right-side"></div>
+                    <div class="col-6 form-area left-side bg-light"></div>
+                    <div class="col-6 chart-area right-side"></div>
                 </div>
             </main>
         </div>
@@ -67,20 +67,78 @@ $( document ).ready(function() {
             }
         });        
     }
-    // $('.nav-link[data-chart-type="linebar"]').on('click', function(e) {
-    // e.preventDefault();
-    // var chartType = $(this).data('chart-type');
-    // JuliaUtil.ajax('/form/linebar', {}, {
-    //     method: 'GET',
-    //     success: function(response) {
-    //         // 서버에서 받은 데이터를 사용하여 Handlebars 템플릿 렌더링
-    //         // 예시로, response.data에 데이터가 있다고 가정하고 Handlebars 템플릿을 컴파일 및 렌더링하는 코드를 작성할 수 있습니다.
-    //         // var template = Handlebars.compile($("#linebar-template").html());
-    //         // var html = template(response.data);
-    //         // $('.left-side').html(html);
-    //     }
-    // });
-    // });
+    $('.main-content').on('submit', '.form-area form', function(event) {
+        event.preventDefault(); // Prevent the default form submission behavior
+        
+        var formData = {
+            width: parseInt($('#width').val(), 10),
+            height: parseInt($('#height').val(), 10),
+            chart_type: $('#chart_type').val(),
+            title: $('#title').val(),
+            x_data: $('#x_data').val().split(',').map(Number),
+            y_data: $('#y_data').val().split('\n').map(function(line) { return line.split(',').map(Number); }),
+            x_label: $('#x_label').val(),
+            y_label: $('#y_label').val(),
+            line_colors: [$('#line_color').val()], // 예제에는 다중 색상 처리 방법이 명시되어 있지 않아 단일 색상으로 처리
+            line_styles: [$('#line_style').val()], // 예제에는 다중 스타일 처리 방법이 명시되어 있지 않아 단일 스타일로 처리
+            line_widths: [parseFloat($('#line_width').val())], // 예제에는 다중 두께 처리 방법이 명시되어 있지 않아 단일 두께로 처리
+            legend_labels: [$('#legend_label').val()], // 예제에는 다중 범례 처리 방법이 명시되어 있지 않아 단일 범례로 처리
+            axis_range: $('#axis_range').val().split(',').map(Number),
+            marker_styles: [$('#marker_style').val()], // 예제에는 다중 마커 스타일 처리 방법이 명시되어 있지 않아 단일 스타일로 처리
+            grid: $('#grid').val() === "true",
+            text_labels: $('#text_labels').val().split(',').map(function(item) { return item.split(',').map(function(value, index) { return index < 2 ? parseFloat(value) : value; }); })
+        };
+        formData ={
+  "result_type": "url",
+  "chart_type": "line",
+  "width": 800,
+  "height": 600,
+  "title": "Line Chart 샘플",
+  "x_data": [1.0, 2.0, 3.0, 4.0, 5.0],
+  "y_data": [
+    [2.0, 4.0, 6.0, 8.0, 10.0],
+    [3.0, 6.0, 9.0, 12.0, 15.0]
+  ],
+  "x_label": "X-axis",
+  "y_label": "Y-axis 온도축",
+  "line_colors": ["blue", "red"],
+  "line_styles": ["solid", "dashed"],
+  "line_widths": [2.0, 1.5],
+  "legend_labels": ["Data 1", "Data 2"],
+  "axis_range": [[0.0, 6.0], [0.0, 16.0]],
+  "marker_styles": ["o", "s"],
+  "grid": true,
+  "text_labels": [
+    [
+      [2.0, 4.0, "Point 2, 4"],
+      [4.0, 8.0, "Point 4, 8"]
+    ],
+    [
+      [2.0, 6.0, "Point 2, 6"],
+      [4.0, 12.0, "Point 4, 12"],
+      [5.0, 10.0, "확인!"]
+    ]
+  ]
+}
+;
+        // JSON 객체를 콘솔에 출력합니다.
+        console.log(JSON.stringify(formData));
+        var url = $(this).attr('action');
+    
+        // Using JuliaUtil.ajax to send the data
+        JuliaUtil.ajax(url, formData, {
+            method: "POST", // Specify the method
+            success: function(response, status, xhr) {
+                console.log("Success", response);
+                var url = response.url;
+                $('.main-content').find('.chart-area').empty().append(`<img src="${url}"/>`);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error", error);
+            }
+        });
+    });
+
 
 });
 </script>	

@@ -32,8 +32,16 @@ app.include_router(form.router)
 app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 app.mount("/charts", StaticFiles(directory="charts"), name="charts")
 
-
+# html template
 templates = Jinja2Templates(directory="templates")
+
+# fonts
+# 현재 파일의 디렉토리 경로를 구함
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+font_path = os.path.join(parent_dir, 'assets', 'fonts', 'NanumGothic.ttf')
+fm.fontManager.addfont(font_path)
+plt.rcParams['font.family'] = 'NanumGothic'
 
 @app.get("/", response_class=HTMLResponse)
 def read_root(request: Request):
