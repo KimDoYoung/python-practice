@@ -11,6 +11,7 @@
 
 .main-content {
     flex-grow: 1;
+    width : 100%;
 }
 .nav-link:hover {
     background-color: #0056b3; /* active 상태의 배경색과 유사한 색 */
@@ -71,6 +72,7 @@ $( document ).ready(function() {
         event.preventDefault(); // Prevent the default form submission behavior
         
         var formData = {
+            user_id :'kdy97',
             width: parseInt($('#width').val(), 10),
             height: parseInt($('#height').val(), 10),
             chart_type: $('#chart_type').val(),
@@ -89,6 +91,7 @@ $( document ).ready(function() {
             text_labels: $('#text_labels').val().split(',').map(function(item) { return item.split(',').map(function(value, index) { return index < 2 ? parseFloat(value) : value; }); })
         };
         formData ={
+            "user_id" : "kdy987",
   "result_type": "url",
   "chart_type": "line",
   "width": 800,

@@ -11,6 +11,7 @@ router = APIRouter()
 @router.get("/form/{chart_type}", response_class=JSONResponse)
 async def form_chart(request: Request, chart_type: str):
 
+    chartTypeNames = {'line' : '라인 챠트' }
     # HTML 파일 열기 및 읽기
     html_file = f"templates/form/{chart_type}.html"
     with open(html_file, 'r', encoding='utf-8') as file:
@@ -20,6 +21,6 @@ async def form_chart(request: Request, chart_type: str):
     start = html_content.find('<body>') + len('<body>')
     end = html_content.find('</body>')
     body_content = html_content[start:end].strip()
+
     # handlebar 템플릿과 데이터를 반환
-    return JSONResponse(content={"template": body_content, "data": {"chartTypeName" : "라인 챠트"} })
-    #return templates.TemplateResponse(body_content, {"request": request, "data": data})
+    return JSONResponse(content={"template": body_content, "data": {"chartTypeName" : chartTypeNames[chart_type]} })

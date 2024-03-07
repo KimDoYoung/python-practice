@@ -5,6 +5,7 @@ from typing import List, Tuple, Optional
 
 
 class ChartBase(BaseModel):
+    user_id: str
     result_type: str = 'url'  # url과 stream 두 가지
     chart_type: str
     width: int = 800
