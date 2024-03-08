@@ -11,7 +11,7 @@ router = APIRouter()
 @router.get("/form/{chart_type}", response_class=JSONResponse)
 async def form_chart(request: Request, chart_type: str):
 
-    chartTypeNames = {'line' : '라인 챠트' }
+    chartTypeNames = {'line' : '라인 챠트', 'bar' : '막대 챠트' }
     # HTML 파일 열기 및 읽기
     html_file = f"templates/form/{chart_type}.html"
     with open(html_file, 'r', encoding='utf-8') as file:

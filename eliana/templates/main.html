@@ -23,18 +23,83 @@
     background-color: #007bff; /* Bootstrap에서 기본적으로 사용하는 active 상태의 배경색 */
     color: white;
 }
+/* 축소된 aside의 너비를 조정합니다. */
+.aside.collapsed {
+    width: 80px; /* 축소된 너비 */
+    transition: width 0.3s ease; /* 부드러운 전환 효과 */
+}
+
+/* 축소된 상태에서는 nav-link 내의 텍스트를 숨깁니다. */
+.aside.collapsed .nav-link span {
+    display: none;
+}
+
+/* 아이콘과 텍스트 간격을 조정합니다. */
+.nav-link i {
+    margin-right: 8px; /* 아이콘과 텍스트 사이의 간격 */
+}
+
+/* 타이틀 옆의 토글 버튼 스타일 조정 */
+#toggle-aside-btn {
+    margin-left: auto; /* 타이틀 바 내에서 오른쪽으로 정렬 */
+}
+/* JSON 표시를 위한 스타일 */
+.json-area {
+    white-space: pre-wrap; /* 개행 및 공백을 유지합니다 */
+    background-color: #f4f4f4; /* 배경색 */
+    border: 1px solid #ddd; /* 테두리 */
+    padding: 10px; /* 내부 여백 */
+    margin-top: 20px; /* 위쪽 여백 */
+}
+
 </style>
 <title>Eliana-chart maker</title>
 </head>
 <body>
     <div class="container-flex">
-        {% include 'common/left-menu.html' %}
+        <aside class="bg-dark text-white" style="height: 100vh; width: 200px;">
+            <div class="d-flex flex-column p-3 text-white" style="width: 200px;">
+              <div class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                <span class="fs-4">Chart Maker</span>
+                <button id="toggle-aside-btn" class="btn btn-primary btn-sm">
+                    <i class="bi bi-list"></i>
+                </button>
+            </div>
+              <ul class="nav nav-pills flex-column mb-auto">
+                <li>
+                  <a href="#" class="nav-link text-white" data-chart-type="line">
+                    <i class="bi bi-graph-up"></i> 라인(line) 챠트
+                  </a>
+                </li>    
+                <li>
+                  <a href="#" class="nav-link text-white" data-chart-type="bar">
+                    <i class="bi bi-bar-chart-line"></i>막대(bar) 챠트
+                  </a>
+                </li>
+              </ul>
+            </div>
+        </aside>
         <div class="main-content">
             <main class="container text-center">
                 <h1 id="chartTypeName"></h1>
                 <div class="row">
                     <div class="col-6 form-area left-side bg-light"></div>
-                    <div class="col-6 chart-area right-side"></div>
+                    <div class="col-6 right-side">
+                        <ul class="nav nav-tabs" id="myTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                              <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#resultChart" type="button" role="tab" aria-controls="home" aria-selected="true">Chart</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                              <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#resultJson" type="button" role="tab" aria-controls="profile" aria-selected="false">Json</button>
+                            </li>
+                          </ul>
+                          
+                          <div class="tab-content" id="myTabContent">
+                            <div class="tab-pane fade chart-area show active" id="resultChart" role="tabpanel" aria-labelledby="home-tab"></div>
+                            <div class="tab-pane fade text-start json-area" id="resultJson" role="tabpanel" aria-labelledby="profile-tab">
+                            </div>
+                          </div>
+                    </div>
                 </div>
             </main>
         </div>
@@ -42,12 +107,23 @@
 <!-- =================================================== -->
 {% include 'common/footer.html' %}
 <!-- -================================================== -->
+<script src="/assets/js/test-data.js"></script>
 <script>
 $( document ).ready(function() {
     console.log('ready...');
+    $('.right-side').hide();
+    $('#toggle-aside-btn').on('click', function() {
+        console.log('toggle-aside-btn clickec...');
+        $('aside').toggleClass('collapsed');
+    });
+
     $('.nav-link').on('click', function(e) {
         e.preventDefault(); // 링크의 기본 동작을 방지합니다.
+        
+        if($(this).hasClass('active')) return; //현재 자신이 active이면 아무동작을 하지 않음.
+
         $('.nav-link').removeClass('active'); // 모든 nav-link에서 active 클래스를 제거합니다.
+        
         $(this).addClass('active'); // 클릭된 nav-link에만 active 클래스를 추가합니다.
         var chartType = $(this).data('chart-type');
         fetchFormAndDisplay(chartType);
@@ -71,70 +147,23 @@ $( document ).ready(function() {
     $('.main-content').on('submit', '.form-area form', function(event) {
         event.preventDefault(); // Prevent the default form submission behavior
         
-        var formData = {
-            user_id :'kdy97',
-            width: parseInt($('#width').val(), 10),
-            height: parseInt($('#height').val(), 10),
-            chart_type: $('#chart_type').val(),
-            title: $('#title').val(),
-            x_data: $('#x_data').val().split(',').map(Number),
-            y_data: $('#y_data').val().split('\n').map(function(line) { return line.split(',').map(Number); }),
-            x_label: $('#x_label').val(),
-            y_label: $('#y_label').val(),
-            line_colors: [$('#line_color').val()], // 예제에는 다중 색상 처리 방법이 명시되어 있지 않아 단일 색상으로 처리
-            line_styles: [$('#line_style').val()], // 예제에는 다중 스타일 처리 방법이 명시되어 있지 않아 단일 스타일로 처리
-            line_widths: [parseFloat($('#line_width').val())], // 예제에는 다중 두께 처리 방법이 명시되어 있지 않아 단일 두께로 처리
-            legend_labels: [$('#legend_label').val()], // 예제에는 다중 범례 처리 방법이 명시되어 있지 않아 단일 범례로 처리
-            axis_range: $('#axis_range').val().split(',').map(Number),
-            marker_styles: [$('#marker_style').val()], // 예제에는 다중 마커 스타일 처리 방법이 명시되어 있지 않아 단일 스타일로 처리
-            grid: $('#grid').val() === "true",
-            text_labels: $('#text_labels').val().split(',').map(function(item) { return item.split(',').map(function(value, index) { return index < 2 ? parseFloat(value) : value; }); })
-        };
-        formData ={
-            "user_id" : "kdy987",
-  "result_type": "url",
-  "chart_type": "line",
-  "width": 800,
-  "height": 600,
-  "title": "Line Chart 샘플",
-  "x_data": [1.0, 2.0, 3.0, 4.0, 5.0],
-  "y_data": [
-    [2.0, 4.0, 6.0, 8.0, 10.0],
-    [3.0, 6.0, 9.0, 12.0, 15.0]
-  ],
-  "x_label": "X-axis",
-  "y_label": "Y-axis 온도축",
-  "line_colors": ["blue", "red"],
-  "line_styles": ["solid", "dashed"],
-  "line_widths": [2.0, 1.5],
-  "legend_labels": ["Data 1", "Data 2"],
-  "axis_range": [[0.0, 6.0], [0.0, 16.0]],
-  "marker_styles": ["o", "s"],
-  "grid": true,
-  "text_labels": [
-    [
-      [2.0, 4.0, "Point 2, 4"],
-      [4.0, 8.0, "Point 4, 8"]
-    ],
-    [
-      [2.0, 6.0, "Point 2, 6"],
-      [4.0, 12.0, "Point 4, 12"],
-      [5.0, 10.0, "확인!"]
-    ]
-  ]
-}
-;
-        // JSON 객체를 콘솔에 출력합니다.
+        var chartType = $(this).find("button[type=submit]").data('chart-type')
+        var formData = testData[chartType];
+
+
         console.log(JSON.stringify(formData));
         var url = $(this).attr('action');
-    
+
+        $('.right-side').show();
+        $('#home-tab').addClass('active');
         // Using JuliaUtil.ajax to send the data
         JuliaUtil.ajax(url, formData, {
             method: "POST", // Specify the method
             success: function(response, status, xhr) {
                 console.log("Success", response);
                 var url = response.url;
-                $('.main-content').find('.chart-area').empty().append(`<img src="${url}"/>`);
+                $('.main-content').find('.chart-area').empty().append(`<img src="${url}"/><div><a href="${url}" target="_blank">${url}</a></div>`);
+                $('.main-content').find('.json-area').empty().append('<pre>'+ JSON.stringify(formData, null, 2) + '</pre>');
             },
             error: function(xhr, status, error) {
                 console.error("Error", error);
