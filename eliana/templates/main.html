@@ -96,7 +96,7 @@
                           
                           <div class="tab-content" id="myTabContent">
                             <div class="tab-pane fade chart-area show active" id="resultChart" role="tabpanel" aria-labelledby="home-tab"></div>
-                            <div class="tab-pane fade text-start json-area" id="resultJson" role="tabpanel" aria-labelledby="profile-tab">
+                            <div class="tab-pane fade json-area text-start " id="resultJson" role="tabpanel" aria-labelledby="profile-tab">
                             </div>
                           </div>
                     </div>
@@ -116,7 +116,8 @@ $( document ).ready(function() {
         console.log('toggle-aside-btn clickec...');
         $('aside').toggleClass('collapsed');
     });
-
+    
+    // aside 메뉴 클릭
     $('.nav-link').on('click', function(e) {
         e.preventDefault(); // 링크의 기본 동작을 방지합니다.
         
@@ -126,8 +127,16 @@ $( document ).ready(function() {
         
         $(this).addClass('active'); // 클릭된 nav-link에만 active 클래스를 추가합니다.
         var chartType = $(this).data('chart-type');
+        clearJsonArea();
+        clearChartArea();
         fetchFormAndDisplay(chartType);
     });    
+    function clearJsonArea(){
+        $('.json-area').empty();
+    }
+    function clearChartArea(){
+        $('.chart-area').empty();
+    }
     function fetchFormAndDisplay(chartType){
         
         console.log(chartType)

@@ -4,6 +4,8 @@ from fastapi import APIRouter
 from model.ChartRequest import LineChartRequest
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
+from utils.chart_history import ChartHistory
+from utils.db_utils import add_chart_history
 
 from utils.file_utils import get_file_path
 #from models import Item
@@ -56,4 +58,8 @@ async def chart_line(request: LineChartRequest):
 
     # 생성된 이미지 파일의 URL 반환
     url = f"http://localhost:8989/{file_path}"
+    
+    new_chart_history = ChartHistory()
+    #add_chart_history(engine, new_chart_history)
+
     return {"url": url}

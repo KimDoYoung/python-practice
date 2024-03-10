@@ -1,7 +1,8 @@
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates  # StaticFiles 임포트 추가
+from fastapi.templating import Jinja2Templates
+from utils.db_utils import create_database  # StaticFiles 임포트 추가
 import uvicorn
 import matplotlib
 
@@ -17,6 +18,10 @@ import sys
 from pathlib import Path
 from routers import line, bar
 from routers import form
+
+
+# database
+engine = create_database()
 
 
 src_path = str(Path(__file__).parent)

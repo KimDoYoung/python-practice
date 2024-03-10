@@ -39,7 +39,7 @@ uvicorn main:app --reload --port 8989
 ```
 project/
 │
-├── static/
+├── assets/
 │   ├── css/
 │   │   └── style.css
 │   ├── js/
