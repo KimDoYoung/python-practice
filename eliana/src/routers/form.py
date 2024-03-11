@@ -3,9 +3,12 @@ from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 
+from logger_config import get_logger
+
 
 templates = Jinja2Templates(directory="../templates")
 
+logger = get_logger(__name__)
 router = APIRouter()
 
 @router.get("/form/{chart_type}", response_class=JSONResponse)

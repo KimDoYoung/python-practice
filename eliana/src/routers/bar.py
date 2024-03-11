@@ -1,6 +1,7 @@
 import json
 import os
 from fastapi import APIRouter, Depends
+from logger_config import get_logger
 
 from model.ChartRequest import BarChartRequest
 import matplotlib.pyplot as plt
@@ -11,15 +12,18 @@ from utils.file_utils import get_file_path
 #from models import Item
 
 router = APIRouter()
+logger = get_logger(__name__)
 
 @router.post("/chart/bar")
 async def chart_bar(request: BarChartRequest, db: Session = Depends(get_db)):
+    logger.debug(f"/chart/bar start : {request}")
     # hash를 구해서 
     request_hash = calculate_request_hash(request);
     chart_history = db.query(ChartHistory).filter(ChartHistory.json_hash == request_hash).first()
 
     # 존재하면 url을 리턴
     if chart_history:
+        logger.debug(f"already exists in chart_history table : {request_hash}")
         return {"url": chart_history.url}
         
     # 파일 경로 생성

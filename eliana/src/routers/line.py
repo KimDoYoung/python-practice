@@ -1,6 +1,7 @@
 import json
 import os
 from fastapi import APIRouter, Depends
+from logger_config import get_logger
 
 from model.ChartRequest import LineChartRequest
 import matplotlib.pyplot as plt
@@ -9,6 +10,8 @@ from utils.db_utils import ChartHistory, Session, add_chart_history, calculate_r
 
 from utils.file_utils import get_file_path
 #from models import Item
+
+logger = get_logger(__name__)
 
 router = APIRouter()
 
