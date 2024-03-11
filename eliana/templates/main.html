@@ -153,12 +153,15 @@ $( document ).ready(function() {
             }
         });        
     }
+    //
+    // submit 버튼 클릭
+    //
     $('.main-content').on('submit', '.form-area form', function(event) {
         event.preventDefault(); // Prevent the default form submission behavior
         
         var chartType = $(this).find("button[type=submit]").data('chart-type')
         var formData = testData[chartType];
-
+        
 
         console.log(JSON.stringify(formData));
         var url = $(this).attr('action');

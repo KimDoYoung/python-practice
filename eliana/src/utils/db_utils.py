@@ -1,6 +1,8 @@
 
+import hashlib
+import json
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import UniqueConstraint, create_engine
+from sqlalchemy import Index, UniqueConstraint, create_engine
 from sqlalchemy.orm import sessionmaker
 # chart_history.py
 from sqlalchemy import DateTime,  Column, Integer, String, Text,  func
@@ -20,18 +22,39 @@ class ChartHistory(Base):
     user_id = Column(String(50), nullable=False, default='ELIANA', comment="사용자id")
     chart_type = Column(String(20), nullable=False, comment="chart 종류")
     json = Column(Text, nullable=False, comment="입력 json")
+    json_hash = Column(String(100), nullable=False, comment="json hashcode")
     url = Column(String(200), nullable=False, comment="생성된 url")
     created_on = Column(DateTime, nullable=False, default=func.now(), comment="생성일시")
-    __table_args__ = (UniqueConstraint('user_id', 'json', name='_user_id_json_uc'),)
+    __table_args__ = (
+        UniqueConstraint('json_hash', name='_json_uc'),
+        Index('ix_json_hash', 'json_hash'),  # 인덱스 추가
+    )
 
-    def __init__(self, user_id, chart_type, json, url):
+    def __init__(self, user_id, chart_type, json, json_hash, url):
         self.user_id = user_id
         self.chart_type = chart_type
         self.json = json
+        self.json_hash = json_hash
         self.url = url
 
     def __repr__(self):
-        return f"User ID: {self.user_id}, Chart Type: {self.chart_type}, JSON: {self.json}, URL: {self.url}, Created On: {self.created_on}"
+        return f"User ID: {self.user_id}, Chart Type: {self.chart_type}, JSON: {self.json}, JSON_HASH: {self.json_hash}, URL: {self.url}, Created On: {self.created_on}"
+
+class ChartSmaple(Base):
+    __tablename__ = 'chart_sample'
+    id = Column(Integer, primary_key=True, comment="자동증가")
+    chart_type = Column(String(20), nullable=False, comment="chart 종류")
+    json = Column(Text, nullable=False, comment="입력 json")
+    note = Column(String(1000), nullable=False, comment="chart 설명")
+    created_on = Column(DateTime, nullable=False, default=func.now(), comment="생성일시")
+
+    def __init__(self, chart_type, json, note):
+        self.chart_type = chart_type
+        self.json = json
+        self.note = note
+
+    def __repr__(self):
+        return f"Chart Type: {self.chart_type}, JSON: {self.json}, Note: {self.note}, Created On: {self.created_on}"
 
 
 def get_db():
@@ -52,5 +75,16 @@ def add_chart_history(chart_history):
         print("이미 존재하는 user_id와 JSON 조합입니다.")
     finally:
         session.close()
+
+def calculate_request_hash(chart_request):
+    # Pydantic 객체를 dict로 변환
+    request_dict = chart_request.dict()
+    # dict를 JSON 문자열로 변환. 키 정렬 옵션을 사용해 순서를 보장
+    request_json = json.dumps(request_dict, sort_keys=True)
+    # JSON 문자열의 SHA-256 해시를 계산
+    hash_object = hashlib.sha256(request_json.encode())
+    hex_dig = hash_object.hexdigest()
+    
+    return hex_dig
 
 Base.metadata.create_all(engine)

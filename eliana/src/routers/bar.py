@@ -1,11 +1,11 @@
 import json
 import os
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from model.ChartRequest import BarChartRequest
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
-from utils.db_utils import ChartHistory, add_chart_history
+from utils.db_utils import ChartHistory, Session, add_chart_history, calculate_request_hash, get_db
 
 from utils.file_utils import get_file_path
 #from models import Item
@@ -13,7 +13,15 @@ from utils.file_utils import get_file_path
 router = APIRouter()
 
 @router.post("/chart/bar")
-async def chart_bar(request: BarChartRequest):
+async def chart_bar(request: BarChartRequest, db: Session = Depends(get_db)):
+    # hash를 구해서 
+    request_hash = calculate_request_hash(request);
+    chart_history = db.query(ChartHistory).filter(ChartHistory.json_hash == request_hash).first()
+
+    # 존재하면 url을 리턴
+    if chart_history:
+        return {"url": chart_history.url}
+        
     # 파일 경로 생성
     file_path = get_file_path(request.width, request.height)
 
@@ -51,9 +59,10 @@ async def chart_bar(request: BarChartRequest):
     # 생성된 이미지 파일의 URL 반환
     url = f"http://localhost:8989/{file_path}"
 
-        # db에 저장
+
+    # db에 저장   
     request_json = json.dumps(vars(request), indent=2)
-    new_chart_history = ChartHistory(user_id= request.user_id, chart_type=request.chart_type,json=request_json,url=url )
+    new_chart_history = ChartHistory(user_id= request.user_id, chart_type=request.chart_type,json=request_json, json_hash= request_hash, url=url )
     add_chart_history(new_chart_history)
 
     return {"url": url}
