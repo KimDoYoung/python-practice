@@ -3,13 +3,15 @@
 ## 개요
 
 1. chart server
-   1. 사용자로부터 chart를 그리는 데이터를 받아서 그것으로 chart 이미지를 만들고 url 또는 stream을 리턴한다.
+   1. 사용자로부터 chart를 그리는 데이터(json)를 받아서 그것으로 chart 이미지를 만들고 url 또는 stream을 리턴한다.
+   2. 사용자는 화면에서 테스트 데이터로 만들어질 챠트를 확인하고.
+   3. 자신이 작성하는 application에서 json데이터를 Eliana로 보내서 챠트 이미지를 만들게 하고 url또는 stream을 리턴받아서 표현한다.
    
 2. 기술스택
    * FastAPI
    * Matplotlib
-   * PostgreSQL
-   * JWT
+   * SqlLite
+  
 
 ## 개발환경
 
@@ -27,6 +29,9 @@ pip install matplotlib
 pip install jinja2
 pip install -e .
 ```
+## 데이터베이스
+
+* sqlite 를 사용 : eliana.db 
 
 ### 실행
 

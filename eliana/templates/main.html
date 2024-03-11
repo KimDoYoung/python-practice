@@ -175,7 +175,10 @@ $( document ).ready(function() {
                 $('.main-content').find('.json-area').empty().append('<pre>'+ JSON.stringify(formData, null, 2) + '</pre>');
             },
             error: function(xhr, status, error) {
-                console.error("Error", error);
+                var statusNo = xhr.status;
+                var message = xhr.responseJSON.message;
+                $('.main-content').find('.chart-area').empty().append(`<h3 class="text-danger">${statusNo}</h3><div>${message}</div>`);
+                console.error("statusNo: "+ statusNo + " message: " + message);
             }
         });
     });

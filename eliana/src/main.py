@@ -1,10 +1,12 @@
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from utils.db_utils import create_database  # StaticFiles 임포트 추가
 import uvicorn
 import matplotlib
+from exception.exception_handler import custom_404_exception_handler, general_exception_handler, http_exception_handler, validation_exception_handler
 
 from utils.file_utils import get_file_path
 matplotlib.use('Agg')  # GUI 백엔드를 'Agg'로 설정하여 GUI를 사용하지 않도록 함
@@ -19,9 +21,6 @@ from pathlib import Path
 from routers import line, bar
 from routers import form
 
-
-# database
-engine = create_database()
 
 
 src_path = str(Path(__file__).parent)
@@ -38,6 +37,11 @@ app.include_router(form.router)
 app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 app.mount("/charts", StaticFiles(directory="charts"), name="charts")
 
+# exception handler
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(HTTPException, http_exception_handler)
+app.add_exception_handler(Exception, general_exception_handler)
+app.add_exception_handler(StarletteHTTPException, custom_404_exception_handler)
 # html template
 templates = Jinja2Templates(directory="templates")
 
