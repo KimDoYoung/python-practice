@@ -40,21 +40,23 @@ class ChartHistory(Base):
     def __repr__(self):
         return f"User ID: {self.user_id}, Chart Type: {self.chart_type}, JSON: {self.json}, JSON_HASH: {self.json_hash}, URL: {self.url}, Created On: {self.created_on}"
 
-class ChartSmaple(Base):
+class ChartSample(Base):
     __tablename__ = 'chart_sample'
     id = Column(Integer, primary_key=True, comment="자동증가")
     chart_type = Column(String(20), nullable=False, comment="chart 종류")
+    title = Column(String(100), nullable=False, comment="chart 제목")
     json = Column(Text, nullable=False, comment="입력 json")
     note = Column(String(1000), nullable=False, comment="chart 설명")
     created_on = Column(DateTime, nullable=False, default=func.now(), comment="생성일시")
 
-    def __init__(self, chart_type, json, note):
+    def __init__(self, chart_type, title, json, note):
         self.chart_type = chart_type
+        self.title = title
         self.json = json
         self.note = note
 
     def __repr__(self):
-        return f"Chart Type: {self.chart_type}, JSON: {self.json}, Note: {self.note}, Created On: {self.created_on}"
+        return f"Chart Type: {self.chart_type}, Title : {self.title}, JSON: {self.json}, Note: {self.note}, Created On: {self.created_on}"
 
 
 def get_db():

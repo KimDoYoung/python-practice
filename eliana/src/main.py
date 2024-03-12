@@ -19,7 +19,7 @@ import os
 import sys
 from pathlib import Path
 from routers import line, bar
-from routers import form
+from routers import form, sample
 
 
 
@@ -32,6 +32,7 @@ app = FastAPI()
 app.include_router(bar.router)
 app.include_router(line.router)
 app.include_router(form.router)
+app.include_router(sample.router)
 
 # charts 폴더를 정적 파일로 서빙하기 위해 애플리케이션에 마운트
 app.mount("/assets", StaticFiles(directory="assets"), name="assets")

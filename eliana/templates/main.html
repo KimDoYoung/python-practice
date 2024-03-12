@@ -65,17 +65,25 @@
                     <i class="bi bi-list"></i>
                 </button>
             </div>
-              <ul class="nav nav-pills flex-column mb-auto">
-                <li>
-                  <a href="#" class="nav-link text-white" data-chart-type="line">
-                    <i class="bi bi-graph-up"></i> 라인(line) 챠트
-                  </a>
-                </li>    
-                <li>
-                  <a href="#" class="nav-link text-white" data-chart-type="bar">
-                    <i class="bi bi-bar-chart-line"></i>막대(bar) 챠트
-                  </a>
-                </li>
+                <ul class="nav nav-pills flex-column mb-auto">
+                    <li>
+                        <a href="#" class="nav-link text-white btnChart" data-chart-type="line">
+                            <i class="bi bi-graph-up"></i> 라인(line) 챠트
+                        </a>
+                    </li>    
+                    <li>
+                        <a href="#" class="nav-link text-white btnChart" data-chart-type="bar">
+                            <i class="bi bi-bar-chart-line"></i>막대(bar) 챠트
+                        </a>
+                    </li>
+                    <li>
+                        <hr>
+                    </li>
+                    <li>
+                        <a href="/sample/insert/form" class="nav-link text-white btnSample">
+                            <i class="bi bi-bar-chart-line"></i>샘플저장
+                        </a>
+                    </li>
               </ul>
             </div>
         </aside>
@@ -118,7 +126,7 @@ $( document ).ready(function() {
     });
     
     // aside 메뉴 클릭
-    $('.nav-link').on('click', function(e) {
+    $('.btnChart').on('click', function(e) {
         e.preventDefault(); // 링크의 기본 동작을 방지합니다.
         
         if($(this).hasClass('active')) return; //현재 자신이 active이면 아무동작을 하지 않음.

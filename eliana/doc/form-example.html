@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- =================================================== -->
+{% include 'common/meta-css.html' %}
+<!-- =================================================== -->    
+<title>{{title}}</title>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="alert alert-success" role="alert">
+            <h4 class="alert-heading">성공!</h4>
+            <p>차트 데이터가 성공적으로 입력되었습니다.</p>
+            <hr>
+            <p class="mb-0">다른 차트 데이터를 입력하고 싶으시면, <a href="/sample/insert/form" class="alert-link">여기</a>를 클릭하여 폼으로 돌아가세요.</p>
+        </div>
+    </div>
+<!-- =================================================== -->
+{% include 'common/footer.html' %}
+<!-- -================================================== -->
+<script>
+    $( document ).ready(function() {
+    });
+</script>
+</body>
+</html>

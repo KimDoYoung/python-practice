@@ -1,5 +1,5 @@
 # ChartRequest.py
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List
 from typing import List, Tuple, Optional
 
@@ -38,3 +38,10 @@ class BarChartRequest(ChartBase):
     legend_labels: Optional[List[str]] = None
     axis_range: Optional[List[Tuple[float, float]]] = None
     grid: Optional[bool] = None
+
+class ChartSampleRequest(BaseModel):
+    chart_type: str
+    title: str
+    #data_json: str = Field(..., alias="json")  # `json` 대신 `data_json` 사용
+    json: str
+    note: str
