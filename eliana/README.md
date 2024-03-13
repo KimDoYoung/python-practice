@@ -11,6 +11,7 @@
    * FastAPI
    * Matplotlib
    * SqlLite
+   * tailwind
   
 
 ## 개발환경

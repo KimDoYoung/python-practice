@@ -1,29 +1,37 @@
 # Jinja2Templates 인스턴스 생성
-from fastapi import APIRouter, Request
+import os
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from logger_config import get_logger
+from utils.db_utils import Session, get_chart_samples_by_type, get_db
 
 
-templates = Jinja2Templates(directory="../templates")
+# templates = Jinja2Templates(directory="../templates")
+
+# 이 파일의 디렉토리로부터 두 레벨을 올라가 프로젝트의 루트 디렉토리를 결정합니다.
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+env = Environment(loader=FileSystemLoader(os.path.join(BASE_DIR, 'templates')), autoescape=select_autoescape(['html', 'xml']))
+
 
 logger = get_logger(__name__)
 router = APIRouter()
 
 @router.get("/form/{chart_type}", response_class=JSONResponse)
-async def form_chart(request: Request, chart_type: str):
+async def form_chart(request: Request, chart_type: str,  db: Session = Depends(get_db)):
 
-    chartTypeNames = {'line' : '라인 챠트', 'bar' : '막대 챠트' }
-    # HTML 파일 열기 및 읽기
-    html_file = f"templates/form/{chart_type}.html"
-    with open(html_file, 'r', encoding='utf-8') as file:
-        html_content = file.read()
+    html_file = f"form/{chart_type}.html"
+    samples = get_chart_samples_by_type(db, chart_type);
+    logger.debug("sample size: " + str( len(samples)))
+    # 템플릿 렌더링을 위한 데이터
+    data = {"samples": samples}
+    
+    # 템플릿 불러오기 및 렌더링
+    template = env.get_template(html_file)
+    html_content = template.render(request=request, **data)
 
-    # <body> 태그 사이의 내용 추출
-    start = html_content.find('<body>') + len('<body>')
-    end = html_content.find('</body>')
-    body_content = html_content[start:end].strip()
 
     # handlebar 템플릿과 데이터를 반환
-    return JSONResponse(content={"template": body_content, "data": {"chartTypeName" : chartTypeNames[chart_type]} })
+    return JSONResponse(content={"template": html_content })

@@ -1,12 +1,14 @@
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 from starlette.exceptions import HTTPException as StarletteHTTPException
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import uvicorn
 import matplotlib
 from exception.exception_handler import custom_404_exception_handler, general_exception_handler, http_exception_handler, validation_exception_handler
+from utils.db_utils import ChartSample, Session, get_db
 
 from utils.file_utils import get_file_path
 matplotlib.use('Agg')  # GUI 백엔드를 'Agg'로 설정하여 GUI를 사용하지 않도록 함
@@ -44,7 +46,7 @@ app.add_exception_handler(HTTPException, http_exception_handler)
 app.add_exception_handler(Exception, general_exception_handler)
 app.add_exception_handler(StarletteHTTPException, custom_404_exception_handler)
 # html template
-templates = Jinja2Templates(directory="templates")
+#templates = Jinja2Templates(directory="templates")
 
 # fonts
 # 현재 파일의 디렉토리 경로를 구함
@@ -54,12 +56,45 @@ font_path = os.path.join(parent_dir, 'assets', 'fonts', 'NanumGothic.ttf')
 fm.fontManager.addfont(font_path)
 plt.rcParams['font.family'] = 'NanumGothic'
 
+
+# Jinja2 환경 설정
+env = Environment(
+    loader=FileSystemLoader('templates'),
+    autoescape=select_autoescape(['html', 'xml'])
+)
+
+
 @app.get("/", response_class=HTMLResponse)
-def read_root(request: Request):
+def root_page(request: Request):
     # 템플릿 변수에 전달할 데이터
     data = {"title": "Creating charts via an API.", "description": "FastAPI with Jinja2 template."}
     # 템플릿 렌더링
-    return templates.TemplateResponse("main.html", {"request": request, **data})
+    template = env.get_template('main.html')
+    html_content = template.render(data)
+    return html_content
+
+@app.get("/chart", response_class=JSONResponse)
+def chart_page(request: Request):
+    
+    # 템플릿 데이터
+    data = {"title": "Chart", "description": "This is a chart rendered by Jinja2."}
+    
+    # 템플릿 불러오기 및 렌더링
+    template = env.get_template('form/chart.html')
+    html_content = template.render(data)
+    
+    # 렌더링된 HTML 내용을 JSONResponse의 일부로 반환
+    return JSONResponse(content={"template": html_content})
+
+@app.get("/sample", response_class=JSONResponse)
+def chart_page(request: Request, db: Session = Depends(get_db)):
+    chart_samples = db.query(ChartSample).order_by(ChartSample.created_on.desc()).limit(20).all()
+    # 템플릿 불러오기 및 렌더링
+    template = env.get_template('sample/sample-list.html')
+    html_content = template.render(request=request, chart_samples=chart_samples)
+   
+    # 렌더링된 HTML 내용을 JSONResponse의 일부로 반환
+    return JSONResponse(content={"template": html_content})
 
 
 if __name__ == "__main__":

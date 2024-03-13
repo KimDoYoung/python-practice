@@ -1,48 +1,45 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
-    <title>Sample Form with Search Icon</title>
-</head>
-<body>
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col">
-                <label for="sampleSelectBox" class="form-label">Sample Select Box</label>
-                <div class="input-group mb-3">
-                    <select class="form-select" id="sampleSelectBox">
-                        <option selected>Choose...</option>
-                        <option value="1">Option 1</option>
-                        <option value="2">Option 2</option>
-                        <option value="3">Option 3</option>
-                    </select>
-                    <button class="btn btn-primary text-black btn-outline-secondary" type="button" id="btnSampleSearch">
-                        <i class="bi bi-search"></i> 검색
-                    </button>
-                </div>
-            </div>
+<div class="flex flex-1 min-h-screen">
+    <!-- 왼쪽 영역: 입력 폼 -->
+    <div class="w-1/2 flex flex-col p-5 gap-4">
+        <div class="flex flex-col gap-2">
+            <label for="sample-select">샘플:</label>
+            <select id="sample-select" class="border p-2">
+                <option value="">옵션 선택...</option>
+                {% for sample in samples %}
+                <option value="{{sample.id}}">{{sample.title}}</option>
+                {% endfor %}
+            </select>
         </div>
-        <div class="row">
-            <div class="col">
-                <label for="jsonTextarea" class="form-label">JSON</label>
-                <textarea class="form-control" id="jsonTextarea" name="json" rows="13"></textarea>
-            </div>
+        <div class="flex flex-col gap-2">
+            <label for="json-data">Json 데이터:</label>
+            <textarea id="json-data" class="border p-2" rows="20"></textarea>
+        </div>
+        <div>
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                제출
+            </button>
         </div>
     </div>
 
-    <!-- Optional JavaScript; choose one of the two! -->
+    <!-- 오른쪽 영역 -->
+    <div class="w-1/2 flex flex-col p-5 gap-4" id="right-area">
+        <div class="flex border-b">
+            <button class="tab tab-charts flex-1 text-xl font-bold text-center p-2">챠트</button>
+            <button class="tab tab-json flex-1 text-xl font-bold text-center p-2">Json</button>
+        </div>
 
-    <!-- Option 1: Bootstrap Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- 챠트 탭 내용 -->
+        <div class="tab-content content-charts text-center hidden">
+            <div class="text-left">
+                <a href="https://example.com" target="_blank" class="text-blue-500 hover:underline">임의의 URL</a>
+            </div>    
+            <img src="https://via.placeholder.com/800" alt="임의의 이미지">
+        </div>
 
-    <!-- Option 2: Separate Popper and Bootstrap JS -->
-    <!--
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
-    -->
-</body>
-</html>
+        <!-- Json 탭 내용 -->
+        <div class="tab-content content-json hidden">
+            <!-- Json 관련 내용을 여기에 추가 -->
+            <p>Json 데이터가 여기에 표시됩니다.</p>
+        </div>
+    </div>
+</div>    

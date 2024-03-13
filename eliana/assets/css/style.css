@@ -1,11 +1,22 @@
-.sidebar {
-    float: left;
-    width: 20%;
-    height: 100vh; /* Full-height */
+body, button {
+    font-family: 'Nanum Gothic', sans-serif;
 }
-
-#content {
-    float: left;
-    width: 80%;
-    padding: 20px;
+.nav-custom {
+    background-color: #87CEEB; /* 하늘색 */
+    color: white;
+}
+#sidebar.custom-aside {
+    background-color: #dcd4d4; /* 회색 */
+    color: black;
+    height: 100vh; /* 브라우저의 높이를 꽉 채우도록 설정 */
+}
+#sidebar.custom-aside li {
+    margin: 8px 0;
+}
+#sidebar.custom-aside li:hover {
+    background-color: rgb(108, 108, 238); /* 파란색 */
+    color: yellow; /* 노란색 */
+    padding: 10px;
+    border-radius: 5px;
+    width: calc(100% - 20px); /* padding을 고려한 너비 조정 */
 }

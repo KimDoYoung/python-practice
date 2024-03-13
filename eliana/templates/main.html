@@ -4,121 +4,36 @@
 <!-- =================================================== -->
 {% include 'common/meta-css.html' %}
 <!-- =================================================== -->
-<style>
-.container-flex {
-    display: flex;
-}
-
-.main-content {
-    flex-grow: 1;
-    width : 100%;
-}
-.nav-link:hover {
-    background-color: #0056b3; /* active 상태의 배경색과 유사한 색 */
-    color: white; /* 텍스트 색상 */
-}
-
-/* 선택된 .nav-link에 대한 스타일 */
-.nav-link.active {
-    background-color: #007bff; /* Bootstrap에서 기본적으로 사용하는 active 상태의 배경색 */
-    color: white;
-}
-/* 축소된 aside의 너비를 조정합니다. */
-.aside.collapsed {
-    width: 80px; /* 축소된 너비 */
-    transition: width 0.3s ease; /* 부드러운 전환 효과 */
-}
-
-/* 축소된 상태에서는 nav-link 내의 텍스트를 숨깁니다. */
-.aside.collapsed .nav-link span {
-    display: none;
-}
-
-/* 아이콘과 텍스트 간격을 조정합니다. */
-.nav-link i {
-    margin-right: 8px; /* 아이콘과 텍스트 사이의 간격 */
-}
-
-/* 타이틀 옆의 토글 버튼 스타일 조정 */
-#toggle-aside-btn {
-    margin-left: auto; /* 타이틀 바 내에서 오른쪽으로 정렬 */
-}
-/* JSON 표시를 위한 스타일 */
-.json-area {
-    white-space: pre-wrap; /* 개행 및 공백을 유지합니다 */
-    background-color: #f4f4f4; /* 배경색 */
-    border: 1px solid #ddd; /* 테두리 */
-    padding: 10px; /* 내부 여백 */
-    margin-top: 20px; /* 위쪽 여백 */
-}
-
-</style>
 <title>Eliana-chart maker</title>
 </head>
 <body>
-    <div class="container-flex">
-        <aside class="bg-dark text-white" style="height: 100vh; width: 200px;">
-            <div class="d-flex flex-column p-3 text-white" style="width: 200px;">
-              <div class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-                <span class="fs-4">Chart Maker</span>
-                <button id="toggle-aside-btn" class="btn btn-primary btn-sm">
-                    <i class="bi bi-list"></i>
-                </button>
-            </div>
-                <ul class="nav nav-pills flex-column mb-auto">
-                    <li>
-                        <a href="#" class="nav-link text-white btnChart" data-chart-type="line">
-                            <i class="bi bi-graph-up"></i> 라인(line) 챠트
-                        </a>
-                    </li>    
-                    <li>
-                        <a href="#" class="nav-link text-white btnChart" data-chart-type="bar">
-                            <i class="bi bi-bar-chart-line"></i>막대(bar) 챠트
-                        </a>
-                    </li>
-                    <li>
-                        <hr>
-                    </li>
-                    <li>
-                        <a href="/sample/insert/form" class="nav-link text-white btnSample">
-                            <i class="bi bi-bar-chart-line"></i>샘플저장
-                        </a>
-                    </li>
-              </ul>
-            </div>
-        </aside>
-        <div class="main-content">
-            <main class="container text-center">
-                <h1 id="chartTypeName"></h1>
-                <div class="row">
-                    <div class="col-6 form-area left-side bg-light"></div>
-                    <div class="col-6 right-side">
-                        <ul class="nav nav-tabs" id="myTab" role="tablist">
-                            <li class="nav-item" role="presentation">
-                              <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#resultChart" type="button" role="tab" aria-controls="home" aria-selected="true">Chart</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                              <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#resultJson" type="button" role="tab" aria-controls="profile" aria-selected="false">Json</button>
-                            </li>
-                          </ul>
-                          
-                          <div class="tab-content" id="myTabContent">
-                            <div class="tab-pane fade chart-area show active" id="resultChart" role="tabpanel" aria-labelledby="home-tab"></div>
-                            <div class="tab-pane fade json-area text-start " id="resultJson" role="tabpanel" aria-labelledby="profile-tab">
-                            </div>
-                          </div>
-                    </div>
-                </div>
-            </main>
-        </div>
-    </div>
+    <nav class="nav-custom h-8 flex items-center px-4" style="height: 1cm;">
+        <span class="font-bold">Eliana-Chart Server</span>
+        <a href="#" data-url="chart" class="menu-main mx-2">챠트</a>
+        <a href="#" data-url="sample" class="menu-main mx-2">샘플</a>
+    </nav>    
+    <section id="page">
+    </section>
 <!-- =================================================== -->
 {% include 'common/footer.html' %}
 <!-- -================================================== -->
 <script src="/assets/js/test-data.js"></script>
+<script src="/assets/js/eliana.js"></script>
 <script>
 $( document ).ready(function() {
-    console.log('ready...');
+    $('.menu-main').on('click', function(e){
+        e.stopPropagation();
+        var url = $(this).data('url');
+        JuliaUtil.ajax("/" + url,{}, {
+            success : function(response){
+                var html = response.template;
+                $('#page').html(html);
+                if(url == 'chart') {init_chart_html();}
+                else if(url == 'sample'){init_sample_list_html();}
+            }
+        })
+    });
+    //-------------------------------------------------------
     $('.right-side').hide();
     $('#toggle-aside-btn').on('click', function() {
         console.log('toggle-aside-btn clickec...');

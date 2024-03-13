@@ -1,0 +1,37 @@
+<div class="max-w-4xl mx-auto p-5">
+    <h1 class="text-center text-lg font-bold">샘플 챠트 데이터 입력</h1>
+    <form id="chartForm" class="flex flex-col gap-4" action="/sample/insert" method="post">
+        <div>
+            <label for="chartType" class="block text-sm font-medium text-gray-700">차트 종류</label>
+            <select id="chartType" name="chart-type" required class="mt-1 block w-full p-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                <option value="">선택하세요</option>
+                <option value="line">라인 차트</option>
+                <option value="bar">막대 차트</option>
+                <!-- 추가 차트 종류 -->
+            </select>
+        </div>
+
+        <div>
+            <label for="chartTitle" class="block text-sm font-medium text-gray-700">차트 제목</label>
+            <input type="text" id="title" name="chartTitle" required class="mt-1 block w-full p-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+        </div>
+
+        <div>
+            <label for="jsonData" class="block text-sm font-medium text-gray-700">JSON</label>
+            <textarea id="jsonData" name="json" required rows="4" class="mt-1 block w-full p-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
+        </div>
+
+        <div>
+            <label for="chartDescription" class="block text-sm font-medium text-gray-700">차트 설명</label>
+            <textarea id="chartDescription" name="note" required rows="4" class="mt-1 block w-full p-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
+        </div>
+
+        <button type="submit" class="inline-flex w-32 justify-center py-2 px-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-500 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            제출
+        </button>
+    </form>
+
+    <div id="messageArea" class="hidden mt-5 p-4 bg-gray-50 border border-gray-200 rounded-md">
+        <!-- 메시지 출력 영역 -->
+    </div>
+</div>

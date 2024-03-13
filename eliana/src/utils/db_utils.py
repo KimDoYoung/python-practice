@@ -89,4 +89,12 @@ def calculate_request_hash(chart_request):
     
     return hex_dig
 
+
+def get_chart_samples_by_type(db: Session, chart_type: str):
+    chart_samples = db.query(ChartSample)\
+                      .filter(ChartSample.chart_type == chart_type)\
+                      .order_by(ChartSample.created_on.desc())\
+                      .all()
+    return chart_samples
+
 Base.metadata.create_all(engine)

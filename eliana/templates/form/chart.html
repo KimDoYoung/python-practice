@@ -1,0 +1,21 @@
+<div class="flex">    
+    <!-- aside 메뉴 -->
+    <aside class="custom-aside w-64 p-4" id="sidebar">
+        <div class="flex justify-between items-center">
+            <h2 class="text-lg" id="menuText">메뉴</h2>
+            <i class="fas fa-bars cursor-pointer" id="toggleSidebar"></i>
+        </div>
+        <ul class="mt-4">
+            <li class="menu-form flex items-center mt-2"  data-chart-type="line">
+                <i class="fas fa-chart-line mr-2"></i>
+                <a href="#"   class="sidebar-link">라인 챠트</a>
+            </li>
+            <li class="menu-form flex items-center mt-2"   data-chart-type="bar">
+                <i class="fas fa-chart-bar mr-2"></i>
+                <a href="#"  class="sidebar-link">막대 챠트</a>
+            </li>
+        </ul>
+    </aside>
+    <!-- 메인 콘텐츠 영역 -->
+    <div id="chart-page" class="w-100"></div>
+</div>

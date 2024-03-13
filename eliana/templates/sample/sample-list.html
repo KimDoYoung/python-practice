@@ -1,0 +1,46 @@
+<div class="max-w-7xl mx-auto p-5">
+    <div class="flex items-center mb-4">
+        <select class="p-2 border border-gray-300 rounded mr-2" id="chartType">
+            <option value="">차트 종류 선택</option>
+            <option value="line">라인 차트</option>
+            <option value="bar">막대 차트</option>
+            <!-- 추가 차트 종류 -->
+        </select>
+        <input type="text" placeholder="검색어" class="p-2 border border-gray-300 rounded mr-2">
+        <button class="p-2 border border-gray-300 rounded mr-2 bg-blue-500 text-white">
+            <i class="fas fa-search"></i>
+        </button>
+        <button id="btnSampleInsert" class="p-2 border border-gray-300 rounded bg-green-500 text-white">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+
+    <table class="w-full table-auto">
+        <thead>
+            <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                <th class="py-3 px-6 text-left w-1/6">차트종류</th>
+                <th class="py-3 px-6 text-left w-1/3">제목</th>
+                <th class="py-3 px-6 text-left w-1/3">설명</th>
+                <th class="py-3 px-6 text-left w-1/6">작성일시</th>
+                <th class="py-3 px-6 text-center w-12"></th>
+            </tr>
+        </thead>
+        <tbody class="text-gray-600 text-sm font-light">
+            <!-- 반복되는 행 부분chart_samples -->
+            {% for sample in chart_samples %}            
+            <tr class="border-b border-gray-200 hover:bg-gray-100">
+                <td class="py-3 px-6 text-left whitespace-nowrap">{{sample.chart_type}}</td>
+                <td class="py-3 px-6 text-left">{{sample.title}}</td>
+                <td class="py-3 px-6 text-left">{{sample.note}}</td>
+                <td class="py-3 px-6 text-left">{{sample.created_on}}</td>
+                <td class="py-3 px-6 text-center">
+                    <button class="btn-delete text-red-500" data-id="{{sample.id}}" >
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+            <!-- 행 반복 종료 -->
+        </tbody>
+    </table>
+</div>
