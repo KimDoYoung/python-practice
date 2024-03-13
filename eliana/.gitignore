@@ -1,4 +1,4 @@
 env/
 charts/
 __pycache__/
-eliana.db
+*.db

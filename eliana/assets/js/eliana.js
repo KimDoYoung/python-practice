@@ -72,6 +72,23 @@ function init_sample_list_html(){
             }
         })        
     });
+    $('.btn-edit').on('click', function(e){
+        e.stopPropagation();
+        var id = $(this).data('id');
+        var url = "/sample/edit/form/" + id
+        JuliaUtil.ajax(url,{}, {
+            method:'GET',
+            success : function(response){
+                var html = response.template;
+                $('#page').html(html);
+                init_sample_edit_html();
+            },
+            error : function(xhr){
+                //debugger;
+                console.log(xhr);
+            }
+        })        
+    });    
 }
 
 function init_sample_form_html(){
@@ -88,7 +105,8 @@ function init_sample_form_html(){
             method:'POST',
             success : function(response){
                 var html = response.template;
-                $('a[data-url="sample"]').trigger('click');
+                $('#page').html(html);
+                init_sample_edit_html();
             }, 
             error : function(xhr){
                 debugger;
@@ -97,4 +115,31 @@ function init_sample_form_html(){
         })  
         return false;
     });
+}
+function init_sample_edit_html(){
+    console.log("sample edit initialize...");
+    $('#sampleEditForm').on('submit', function(){
+        console.log("sample eidt submit...");
+        $('#messageArea').hide();
+        var url = "/sample/edit";
+        var data = {
+            id : $('#chartId').val(),
+            chart_type : $('#chartType').val(),
+            title : $('#title').val(),
+            json : $('#jsonData').val(),
+            note : $('#chartDescription').val(),
+        };
+        // debugger;
+        // console.log(data);
+        JuliaUtil.ajax(url,data, {
+            method:'POST',
+            success : function(response){
+                $('a[data-url="sample"]').trigger('click');
+            }, 
+            error : function(xhr){
+                $('#messageArea').show().html(xhr.responseJSON.message);
+            }
+        })     
+        return false;
+    })
 }
