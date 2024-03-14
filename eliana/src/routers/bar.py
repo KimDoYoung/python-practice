@@ -69,4 +69,4 @@ async def chart_bar(request: BarChartRequest, db: Session = Depends(get_db)):
     new_chart_history = ChartHistory(user_id= request.user_id, chart_type=request.chart_type,json=request_json, json_hash= request_hash, url=url )
     add_chart_history(new_chart_history)
 
-    return {"url": url}
+    return {"url": url, "title": request.title}

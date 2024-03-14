@@ -1,4 +1,9 @@
+var defaultResult = {
+    url : 'http://localhost:8989/assets/image/noimage.png',
+    title : 'Not Avable'
+};
 
+//처음 페이지
 function init_chart_html(){
     // aside 크기 토글 버튼
     $('#toggleSidebar').click(function() {
@@ -20,6 +25,7 @@ function init_chart_html(){
     });
     
 }
+//차트 테스트 오른쪽 화면 
 function init_chart_form_html(){
     //탭 click
     $('#right-area .tab').click(function() {
@@ -37,11 +43,77 @@ function init_chart_form_html(){
         // 현재 탭 활성화
         $(this).addClass('bg-blue-500 text-white');
     });
+    //샘플이 선택시
+    $('#sample-select').on('click', function(){
+        $('#messageArea').hide();
+        var id = $(this).val();
+        if(id == false) return;
+        var url = "/sample/"+id;
+        JuliaUtil.ajax(url,{}, {
+            method : 'GET',
+            success : function(response){
+                var json = response.jsonData;
+                $('#json-data').html(json);
+            },
+            error : function(xhr){
+                $('#messageArea').show().html(xhr.responseJSON.message);
+            }
+        })
+    });
+    //챠트생성 버튼 click
+    $('#btnCreateChart').on('click',function(){
+        var chart_type = $(this).data('chart-type');
+        var url = "/chart/"+chart_type;
+        var jsonStr = $('#json-data').val();
+        try {
+            var jsonObject = JSON.parse(jsonStr);    
+        } catch (error) {
+            showResult(defaultResult);
+            $('#messageArea').show().html('Json데이터 검증 실패: '+error);
+            return;
+        }
+        JuliaUtil.ajax(url,jsonObject, {
+            method : 'POST',
+            success : function(response){
+                //debugger;
+                //$('#resultChart').show();
+                $('#messageArea').hide()
+                var data = {url : response.url, title: response.url};
+                showResult(data);
+                // $('#resultChart').find("a").attr("href", data.url);
+                // $('#resultChart').find("a").text(data.url);
+                // $('#resultChart').find("img").attr("src", data.url);
+            },
+            error : function(xhr){
+                //$('#resultChart').hide();
+                // $('#resultChart').find("a").attr("href", "");
+                // $('#resultChart').find("a").text("");
+                // $('#resultChart').find("img").attr("src", "");
+                showResult(defaultResult);
+                $('#messageArea').show().html(xhr.responseJSON.message);
+            }
+        })
+    });
+    $('#btnClear').on('click', function(){
+        $('#messageArea').hide();
+        $('#sample-select').val('');
+
+        $('#json-data').val('');
+        showResult(defaultResult);
+    });
+    function showResult(data){
+        $('#resultChart').find("a").attr("href", data.url);
+        $('#resultChart').find("a").text(data.url);
+        $('#resultChart').find("img").attr("src", data.url);
+    }
+
     // 기본적으로 첫 번째 탭 활성화
-    $('.tab-charts').click();  
+    $('.tab-charts').click(); 
+    showResult(defaultResult); 
 
 }
 
+//샘플 리스트 화면
 function init_sample_list_html(){
     $('#btnSampleInsert').on('click', function(e){
         e.stopPropagation();
@@ -90,8 +162,11 @@ function init_sample_list_html(){
         })        
     });    
 }
-
+//샘플 입력(insert) 화면
 function init_sample_form_html(){
+    //error 표시영역 감추기
+    $('#messageArea').hide();
+    //저장 insert버튼 클릭
     $('#chartForm').submit(function(){
         console.log('form submit...');
         var url = "/sample/insert";
@@ -99,31 +174,38 @@ function init_sample_form_html(){
             chart_type : $('#chartType').val(),
             title : $('#title').val(),
             json : $('#jsonData').val(),
-            note : $('#chartDescription').val(),
+            note : $('#chartDescription').val()
         };
+        console.log(data)
         JuliaUtil.ajax(url,data, {
             method:'POST',
             success : function(response){
-                var html = response.template;
-                $('#page').html(html);
-                init_sample_edit_html();
+                $('a[data-url="sample"]').trigger('click');
+                // var html = response.template;
+                // $('#page').html(html);
+                // init_sample_edit_html();
             }, 
             error : function(xhr){
-                debugger;
-                console.log(xhr);
+                $('#messageArea').show().html(xhr.responseJSON.message);
             }
         })  
         return false;
     });
+    //목록으로 돌아가기
+    $('#btnCancel').on('click',function(){
+        $('a[data-url="sample"]').trigger('click');
+    });
 }
+
+//샘플 수정(edit=update) 화면
 function init_sample_edit_html(){
     console.log("sample edit initialize...");
+    $('#messageArea').hide();
     $('#sampleEditForm').on('submit', function(){
         console.log("sample eidt submit...");
-        $('#messageArea').hide();
-        var url = "/sample/edit";
+        var id = $('#chartId').val();
+        var url = "/sample/edit/" + id;
         var data = {
-            id : $('#chartId').val(),
             chart_type : $('#chartType').val(),
             title : $('#title').val(),
             json : $('#jsonData').val(),
@@ -141,5 +223,9 @@ function init_sample_edit_html(){
             }
         })     
         return false;
-    })
+    });
+    $('#btnCancel').on('click', function(){
+        $('a[data-url="sample"]').trigger('click');
+    });
+
 }

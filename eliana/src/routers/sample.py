@@ -34,7 +34,7 @@ async def sample_insert_form(request: Request, db: Session = Depends(get_db) ):
     template = env.get_template(html_file)
     html_content = template.render(request=request, **data)
     
-    logger.debug(html_content)
+    #logger.debug(html_content)
     
     # HTML 내용을 JSON 응답의 일부로 반환
     return JSONResponse(content={"template": html_content})
@@ -98,11 +98,11 @@ async def sample_edit_form(id:int, db: Session = Depends(get_db) ):
     # HTML 내용을 JSON 응답의 일부로 반환
     return JSONResponse(content={"template": html_content})
 
-@router.post("/sample/edit", response_class=JSONResponse)
-async def sample_edit(request: Request, chart_sample_request: ChartSampleRequest, db: Session = Depends(get_db) ):
+@router.post("/sample/edit/{id}", response_class=JSONResponse)
+async def sample_edit(id:int, request: Request, chart_sample_request: ChartSampleRequest, db: Session = Depends(get_db) ):
 
     # chart_sample_request에서 id를 이용하여 DB에서 해당 레코드 조회
-    chart_sample = db.query(ChartSample).filter(ChartSample.id == chart_sample_request.id).first()
+    chart_sample = db.query(ChartSample).filter(ChartSample.id == id).first()
     
     if chart_sample is None:
         raise HTTPException(status_code=404, detail="Sample not found")
@@ -121,3 +121,13 @@ async def sample_edit(request: Request, chart_sample_request: ChartSampleRequest
 
     # 응답 반환
     return {"result": "OK"}
+
+# 샘플선택이 되었을 때 1개를 찾아서 가져온 후 json데이터를 보내준다.
+@router.get("/sample/{id}", response_class=JSONResponse)
+async def delete_chart_sample(id: int, db: Session = Depends(get_db)):
+    # ID를 사용하여 ChartSample 레코드 조회
+    chart_sample = db.query(ChartSample).filter(ChartSample.id == id).first()
+    if chart_sample is None:
+        raise HTTPException(status_code=404, detail="ChartSample not found")
+    jsonData = chart_sample.json;
+    return JSONResponse(content={"jsonData": jsonData})

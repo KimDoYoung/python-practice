@@ -18,6 +18,8 @@ router = APIRouter()
 @router.post("/chart/line")
 async def chart_line(request: LineChartRequest, db: Session = Depends(get_db)):
 
+    logger.debug(request)
+    title = request.title
     # hash를 구해서 
     request_hash = calculate_request_hash(request);
     chart_history = db.query(ChartHistory).filter(ChartHistory.json_hash == request_hash).first()
@@ -75,4 +77,4 @@ async def chart_line(request: LineChartRequest, db: Session = Depends(get_db)):
     new_chart_history = ChartHistory(user_id= request.user_id, chart_type=request.chart_type,json=request_json, json_hash= request_hash, url=url )
     add_chart_history(new_chart_history)
 
-    return {"url": url}
+    return {"url": url, "title": title }

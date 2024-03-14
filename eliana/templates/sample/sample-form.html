@@ -25,13 +25,18 @@
             <label for="chartDescription" class="block text-sm font-medium text-gray-700">차트 설명</label>
             <textarea id="chartDescription" name="note" required rows="4" class="mt-1 block w-full p-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
         </div>
+        <div class="flex justify-center">
+            <button type="submit" class="inline-flex w-32 justify-center py-2 px-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-500 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                저장
+            </button>
+            <button id="btnCancel" class="inline-flex ml-5 w-32 justify-center py-2 px-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-300 hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                취소
+            </button>
+        </div>
 
-        <button type="submit" class="inline-flex w-32 justify-center py-2 px-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-500 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-            저장
-        </button>
     </form>
 
-    <div id="messageArea" class="hidden mt-5 p-4 bg-gray-50 border border-gray-200 rounded-md">
+    <div id="messageArea" class="hidden mt-5 p-4 bg-gray-50 border border-gray-200 rounded-md text-red-500">
         <!-- 메시지 출력 영역 -->
     </div>
 </div>
