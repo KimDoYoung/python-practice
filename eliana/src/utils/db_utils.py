@@ -66,7 +66,7 @@ def get_db():
     try:
         yield db
     finally:
-        db.close();
+        db.close()
 
 def add_chart_history(chart_history):
     session = Session()

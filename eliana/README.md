@@ -50,8 +50,9 @@ pytest -W ignore::DeprecationWarning
 ELIANA_MODE=local
 uvicorn --app-dir src main:app --reload --port 8989
 #uvicorn main:app --reload --port 8989
-.env
-uvicorn app:app --port $ELINA_PORT
+
+source .env
+uvicorn main:app --port $ELINA_PORT
 ```
 
 ## 환경설정
@@ -114,7 +115,21 @@ class LineChartRequest(ChartBase):
     grid: Optional[bool] = None
     text_labels: Optional[List[List[Tuple[float, float, str]]]] = None
 ```
-
+* json
+```json
+{
+  "user_id": "user123",
+  "result_type": "url",
+  "chart_type": "pie",
+  "title": "Example Pie Chart",
+  "data": [25, 35, 20, 15, 5],
+  "labels": ["Category A", "Category B", "Category C", "Category D", "Category E"],
+  "colors": ["red", "green", "blue", "orange", "purple"],
+  "explode": [0, 0.1, 0, 0, 0],  // Category B 조각만 조금 돌출시킴
+  "startangle": 90,
+  "autopct": "%1.1f%%"
+}
+```
 
 ## 폴더 구조
 ```
