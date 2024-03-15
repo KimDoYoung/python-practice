@@ -85,5 +85,4 @@ def create_line_chart(request):
     plt.close()
 
     # 생성된 이미지 파일의 URL 반환
-    url = f"http://localhost:8989/{file_path}"
-    return url
+    return f"{CHART_BASE_URL}/{file_path}"
