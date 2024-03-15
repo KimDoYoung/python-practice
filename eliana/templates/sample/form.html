@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
 <!-- =================================================== -->
-{% include 'common/meta-css.html' %}
+(% include 'common/meta-css.html' %)
 <!-- =================================================== -->    
-<title>{{title}}</title>
+<title>((title))</title>
 </head>
 <body>
     <div class="container mt-5">
@@ -20,7 +20,7 @@
             </div>
             <div class="mb-3">
                 <label for="jsonInput" class="form-label">입력 JSON</label>
-                <textarea class="form-control" id="jsonInput" name="json" rows="10" required></textarea>
+                <textarea class="form-control" id="jsonInput" name="json_data" rows="10" required></textarea>
             </div>
             <div class="mb-3">
                 <label for="note" class="form-label">차트 설명</label>
@@ -33,7 +33,7 @@
     </div>    
 
 <!-- =================================================== -->
-{% include 'common/footer.html' %}
+(% include 'common/footer.html' %)
 <!-- -================================================== -->
 <script>
     $( document ).ready(function() {

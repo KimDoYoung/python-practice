@@ -6,7 +6,7 @@ from fastapi.templating import Jinja2Templates
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from pydantic import ValidationError
 
-from logger_config import get_logger
+from logger import get_logger
 from model.ChartRequest import ChartSampleRequest
 from utils.db_utils import ChartSample, Session, get_db
 from utils.eliana_util import chartTypeName
@@ -14,11 +14,15 @@ from utils.eliana_util import chartTypeName
 
 # 이 파일의 디렉토리로부터 두 레벨을 올라가 프로젝트의 루트 디렉토리를 결정합니다.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-env = Environment(loader=FileSystemLoader(os.path.join(BASE_DIR, 'templates')), autoescape=select_autoescape(['html', 'xml']))
+env = Environment(
+    loader=FileSystemLoader(os.path.join(BASE_DIR, 'templates')),
+    autoescape=select_autoescape(['html', 'xml']),
+    block_start_string='(%', block_end_string='%)',
+    variable_start_string='((', variable_end_string='))'
+)
 
 logger = get_logger(__name__)
 router = APIRouter()
-logger.debug(f"BASE_DIR : {BASE_DIR} ")
 
 @router.get("/sample/insert/form", response_class=JSONResponse)
 async def sample_insert_form(request: Request, db: Session = Depends(get_db) ):
@@ -47,7 +51,7 @@ async def sample_insert(request: Request, chart_sample_request: ChartSampleReque
     chart_sample = ChartSample(
         chart_type=chart_sample_request.chart_type,
         title=chart_sample_request.title,
-        json=chart_sample_request.json,  # 'json' 필드에 'data_json' 값을 할당
+        json_data=chart_sample_request.json_data,  # 'json' 필드에 'data_json' 값을 할당
         note=chart_sample_request.note
     )
 
@@ -110,7 +114,7 @@ async def sample_edit(id:int, request: Request, chart_sample_request: ChartSampl
     # 조회된 인스턴스의 속성을 업데이트
     chart_sample.chart_type = chart_sample_request.chart_type
     chart_sample.title = chart_sample_request.title
-    chart_sample.json = chart_sample_request.json  # 'json' 필드에 'data_json' 값을 할당하려면, 해당 스키마에서 이 필드를 처리하는 방식을 확인해야 합니다.
+    chart_sample.json_data = chart_sample_request.json_data  # 'json' 필드에 'data_json' 값을 할당하려면, 해당 스키마에서 이 필드를 처리하는 방식을 확인해야 합니다.
     chart_sample.note = chart_sample_request.note
 
     # 데이터베이스에 변경 사항을 커밋
@@ -129,5 +133,5 @@ async def delete_chart_sample(id: int, db: Session = Depends(get_db)):
     chart_sample = db.query(ChartSample).filter(ChartSample.id == id).first()
     if chart_sample is None:
         raise HTTPException(status_code=404, detail="ChartSample not found")
-    jsonData = chart_sample.json;
+    jsonData = chart_sample.json_data;
     return JSONResponse(content={"jsonData": jsonData})

@@ -1,15 +1,13 @@
 import json
 import os
 from fastapi import APIRouter, Depends
-from logger_config import get_logger
+from logger import get_logger
 
 from model.ChartRequest import LineChartRequest
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 from utils.db_utils import ChartHistory, Session, add_chart_history, calculate_request_hash, get_db
-
 from utils.file_utils import get_file_path
-#from models import Item
 
 logger = get_logger(__name__)
 
@@ -74,7 +72,7 @@ async def chart_line(request: LineChartRequest, db: Session = Depends(get_db)):
     
     # db에 저장
     request_json = json.dumps(vars(request), indent=2)
-    new_chart_history = ChartHistory(user_id= request.user_id, chart_type=request.chart_type,json=request_json, json_hash= request_hash, url=url )
+    new_chart_history = ChartHistory(user_id= request.user_id, chart_type=request.chart_type,json_data=request_json, json_hash= request_hash, url=url )
     add_chart_history(new_chart_history)
 
     return {"url": url, "title": title }

@@ -27,22 +27,22 @@
         </thead>
         <tbody class="text-gray-600 text-sm font-light">
             <!-- 반복되는 행 부분chart_samples -->
-            {% for sample in chart_samples %}            
+            (% for sample in chart_samples %)
             <tr class="border-b border-gray-200 hover:bg-gray-100">
-                <td class="py-3 px-6 text-left whitespace-nowrap">{{sample.chart_type}}</td>
-                <td class="py-3 px-6 text-left">{{sample.title}}</td>
-                <td class="py-3 px-6 text-left">{{sample.note}}</td>
-                <td class="py-3 px-6 text-left">{{sample.created_on}}</td>
+                <td class="py-3 px-6 text-left whitespace-nowrap">((sample.chart_type))</td>
+                <td class="py-3 px-6 text-left">((sample.title))</td>
+                <td class="py-3 px-6 text-left">((sample.note))</td>
+                <td class="py-3 px-6 text-left">((sample.created_on))</td>
                 <td class="py-3 px-3 text-center flex justify-center">
-                    <button class="btn-edit text-red-500" data-id="{{sample.id}}" >
+                    <button class="btn-edit text-red-500" data-id="((sample.id))" >
                         <i class="fas fa-edit"></i>
                     </button>                    
-                    <button class="btn-delete text-red-500 ml-2" data-id="{{sample.id}}" >
+                    <button class="btn-delete text-red-500 ml-2" data-id="((sample.id))" >
                         <i class="fas fa-trash-alt"></i>
                     </button>
                 </td>
             </tr>
-            {% endfor %}
+            (% endfor %)
             <!-- 행 반복 종료 -->
         </tbody>
     </table>

@@ -5,9 +5,9 @@
             <label for="sample-select">라인챠트 샘플:</label>
             <select id="sample-select" class="border p-2">
                 <option value="">샘플 선택...</option>
-                {% for sample in samples %}
-                <option value="{{sample.id}}">{{sample.title}}</option>
-                {% endfor %}
+                (% for sample in samples %)
+                <option value="((sample.id))">((sample.title))</option>
+                (% endfor %)
             </select>
         </div>
         <div id="messageArea" class="hidden mt-5 p-4 bg-gray-50 border border-gray-200 rounded-md text-red-500">

@@ -1,3 +1,4 @@
+.env
 env/
 charts/
 __pycache__/

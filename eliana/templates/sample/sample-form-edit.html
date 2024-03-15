@@ -2,24 +2,24 @@
     <h1 class="text-center text-lg font-bold">샘플 챠트 데이터 수정</h1>
     <form id="sampleEditForm" class="flex flex-col gap-4" >
         <div>
-            챠트 종류 : <b>{{chartTypeName}}</b>
-            <input type="hidden" id="chartType" value="{{sample.chart_type}}" />
-            <input type="hidden" id="chartId" value="{{sample.id}}" />
+            챠트 종류 : <b>((chartTypeName))</b>
+            <input type="hidden" id="chartType" value="((sample.chart_type))" />
+            <input type="hidden" id="chartId" value="((sample.id))" />
         </div>
 
         <div>
             <label for="chartTitle" class="block text-sm font-medium text-gray-700">차트 제목</label>
-            <input type="text" id="title" name="chartTitle" required value="{{sample.title}}" class="mt-1 block w-full p-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            <input type="text" id="title" name="chartTitle" required value="((sample.title))" class="mt-1 block w-full p-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
         </div>
 
         <div>
             <label for="jsonData" class="block text-sm font-medium text-gray-700">JSON</label>
-            <textarea id="jsonData" name="json" required rows="4"  class="mt-1 block w-full p-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">{{sample.json}}</textarea>
+            <textarea id="jsonData" name="json_data" required rows="7"  class="mt-1 block w-full p-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">((sample.json))</textarea>
         </div>
 
         <div>
             <label for="chartDescription" class="block text-sm font-medium text-gray-700">차트 설명</label>
-            <textarea id="chartDescription" name="note" required rows="4"  class="mt-1 block w-full p-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">{{sample.note}}</textarea>
+            <textarea id="chartDescription" name="note" required rows="4"  class="mt-1 block w-full p-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">((sample.note))</textarea>
         </div>
 
 

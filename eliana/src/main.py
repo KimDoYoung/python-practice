@@ -4,7 +4,6 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 import uvicorn
 import matplotlib
 from exception.exception_handler import custom_404_exception_handler, general_exception_handler, http_exception_handler, validation_exception_handler
@@ -22,8 +21,6 @@ import sys
 from pathlib import Path
 from routers import line, bar
 from routers import form, sample
-
-
 
 src_path = str(Path(__file__).parent)
 if src_path not in sys.path:
@@ -45,11 +42,8 @@ app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(HTTPException, http_exception_handler)
 app.add_exception_handler(Exception, general_exception_handler)
 app.add_exception_handler(StarletteHTTPException, custom_404_exception_handler)
-# html template
-#templates = Jinja2Templates(directory="templates")
 
 # fonts
-# 현재 파일의 디렉토리 경로를 구함
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 font_path = os.path.join(parent_dir, 'assets', 'fonts', 'NanumGothic.ttf')
@@ -60,9 +54,10 @@ plt.rcParams['font.family'] = 'NanumGothic'
 # Jinja2 환경 설정
 env = Environment(
     loader=FileSystemLoader('templates'),
-    autoescape=select_autoescape(['html', 'xml'])
+    autoescape=select_autoescape(['html', 'xml']),
+    block_start_string='(%', block_end_string='%)',
+    variable_start_string='((', variable_end_string='))'
 )
-
 
 @app.get("/", response_class=HTMLResponse)
 def root_page(request: Request):
@@ -98,4 +93,4 @@ def chart_page(request: Request, db: Session = Depends(get_db)):
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8989)
+    uvicorn.run(app, host="localhost", port=8989)

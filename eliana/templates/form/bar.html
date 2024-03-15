@@ -5,9 +5,9 @@
                 <label for="sample-select">막대챠트 샘플:</label>
                 <select id="sample-select" class="border p-2">
                     <option value="">샘플 선택...</option>
-                    {% for sample in samples %}
-                    <option value="{{sample.id}}">{{sample.title}}</option>
-                    {% endfor %}
+                    (% for sample in samples %)
+                    <option value="((sample.id))">((sample.title))</option>
+                    (% endfor %)
                     <!-- 옵션 추가 -->
                 </select>
             </div>

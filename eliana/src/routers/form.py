@@ -1,19 +1,21 @@
 # Jinja2Templates 인스턴스 생성
 import os
 from fastapi import APIRouter, Depends, Request
-from fastapi.responses import HTMLResponse, JSONResponse
-from fastapi.templating import Jinja2Templates
+from fastapi.responses import  JSONResponse
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from logger_config import get_logger
+from logger import get_logger
 from utils.db_utils import Session, get_chart_samples_by_type, get_db
 
 
-# templates = Jinja2Templates(directory="../templates")
-
 # 이 파일의 디렉토리로부터 두 레벨을 올라가 프로젝트의 루트 디렉토리를 결정합니다.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-env = Environment(loader=FileSystemLoader(os.path.join(BASE_DIR, 'templates')), autoescape=select_autoescape(['html', 'xml']))
+env = Environment(
+    loader=FileSystemLoader(os.path.join(BASE_DIR, 'templates')), 
+    autoescape=select_autoescape(['html', 'xml']),
+    block_start_string='(%', block_end_string='%)',
+    variable_start_string='((', variable_end_string='))',    
+)
 
 
 logger = get_logger(__name__)

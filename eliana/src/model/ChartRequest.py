@@ -43,6 +43,5 @@ class ChartSampleRequest(BaseModel):
     # id : int
     chart_type: str
     title: str
-    #data_json: str = Field(..., alias="json")  # `json` 대신 `data_json` 사용
-    json: str
+    json_data: str
     note: str

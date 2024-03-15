@@ -43,8 +43,9 @@ function init_chart_form_html(){
         // 현재 탭 활성화
         $(this).addClass('bg-blue-500 text-white');
     });
-    //샘플이 선택시
-    $('#sample-select').on('click', function(){
+    //샘플이 콥보 선택시
+    $('#sample-select').on('change', function(e){
+        e.stopPropagation();
         $('#messageArea').hide();
         var id = $(this).val();
         if(id == false) return;
@@ -80,27 +81,22 @@ function init_chart_form_html(){
                 $('#messageArea').hide()
                 var data = {url : response.url, title: response.url};
                 showResult(data);
-                // $('#resultChart').find("a").attr("href", data.url);
-                // $('#resultChart').find("a").text(data.url);
-                // $('#resultChart').find("img").attr("src", data.url);
             },
             error : function(xhr){
-                //$('#resultChart').hide();
-                // $('#resultChart').find("a").attr("href", "");
-                // $('#resultChart').find("a").text("");
-                // $('#resultChart').find("img").attr("src", "");
                 showResult(defaultResult);
                 $('#messageArea').show().html(xhr.responseJSON.message);
             }
         })
     });
+
     $('#btnClear').on('click', function(){
         $('#messageArea').hide();
         $('#sample-select').val('');
 
-        $('#json-data').val('');
+        $('#json-data').text('');
         showResult(defaultResult);
     });
+
     function showResult(data){
         $('#resultChart').find("a").attr("href", data.url);
         $('#resultChart').find("a").text(data.url);
@@ -173,7 +169,7 @@ function init_sample_form_html(){
         var data = {
             chart_type : $('#chartType').val(),
             title : $('#title').val(),
-            json : $('#jsonData').val(),
+            json_data : $('#jsonData').val(),
             note : $('#chartDescription').val()
         };
         console.log(data)
@@ -181,9 +177,6 @@ function init_sample_form_html(){
             method:'POST',
             success : function(response){
                 $('a[data-url="sample"]').trigger('click');
-                // var html = response.template;
-                // $('#page').html(html);
-                // init_sample_edit_html();
             }, 
             error : function(xhr){
                 $('#messageArea').show().html(xhr.responseJSON.message);
@@ -208,11 +201,10 @@ function init_sample_edit_html(){
         var data = {
             chart_type : $('#chartType').val(),
             title : $('#title').val(),
-            json : $('#jsonData').val(),
+            json_data : $('#jsonData').val(),
             note : $('#chartDescription').val(),
         };
-        // debugger;
-        // console.log(data);
+ 
         JuliaUtil.ajax(url,data, {
             method:'POST',
             success : function(response){
@@ -224,6 +216,7 @@ function init_sample_edit_html(){
         })     
         return false;
     });
+    //취소 버튼 클릭
     $('#btnCancel').on('click', function(){
         $('a[data-url="sample"]').trigger('click');
     });

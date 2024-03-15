@@ -1,19 +1,5 @@
-import json
-import os
-from fastapi import APIRouter, Depends
-from constants import CHART_BASE_URL
-from logger import get_logger
 
-from model.ChartRequest import BarChartRequest
-import matplotlib.pyplot as plt
-import matplotlib.font_manager as fm
-from utils.db_utils import ChartHistory, Session, add_chart_history, calculate_request_hash, get_db
-
-from utils.file_utils import get_file_path
-#from models import Item
-
-router = APIRouter()
-logger = get_logger(__name__)
+```
 
 @router.post("/chart/bar")
 async def chart_bar(request: BarChartRequest, db: Session = Depends(get_db)):
@@ -62,7 +48,7 @@ async def chart_bar(request: BarChartRequest, db: Session = Depends(get_db)):
     plt.close()
 
     # 생성된 이미지 파일의 URL 반환
-    url = f"{CHART_BASE_URL}/{file_path}"
+    url = f"http://localhost:8989/{file_path}"
 
 
     # db에 저장   
@@ -71,3 +57,31 @@ async def chart_bar(request: BarChartRequest, db: Session = Depends(get_db)):
     add_chart_history(new_chart_history)
 
     return {"url": url, "title": request.title}
+```    
+막대그래프를 이미지 파일로 만드는 controller입니다. 좀 더 나은 코드로 만들고 싶어요. 어떻게 수정하면 좋을까요?
+
+
+
+
+# chart_utils.py
+def create_bar_chart(request, file_path):
+    # 차트 생성 로직...
+    return file_path
+
+def save_chart_history(db, request, url):
+    # 데이터베이스 저장 로직...
+    pass
+
+# constants.py
+CHART_BASE_URL = "http://localhost:8989/"
+
+# chart_controller.py
+from chart_utils import create_bar_chart, save_chart_history
+from constants import CHART_BASE_URL
+
+@router.post("/chart/bar")
+async def chart_bar(request: BarChartRequest, db: Session = Depends(get_db)):
+    # 기능별 로직 분리...
+    chart_url = CHART_BASE_URL + file_path
+    save_chart_history(db, request, chart_url)
+    return {"url": chart_url, "title": request.title}

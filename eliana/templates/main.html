@@ -2,7 +2,7 @@
 <html>
 <head>
 <!-- =================================================== -->
-{% include 'common/meta-css.html' %}
+(% include 'common/meta-css.html' %)
 <!-- =================================================== -->
 <title>Eliana-chart maker</title>
 </head>
@@ -15,7 +15,7 @@
     <section id="page">
     </section>
 <!-- =================================================== -->
-{% include 'common/footer.html' %}
+(% include 'common/footer.html' %)
 <!-- -================================================== -->
 <script src="/assets/js/test-data.js"></script>
 <script src="/assets/js/eliana.js"></script>
@@ -33,84 +33,7 @@ $( document ).ready(function() {
             }
         })
     });
-    //-------------------------------------------------------
-    $('.right-side').hide();
-    $('#toggle-aside-btn').on('click', function() {
-        console.log('toggle-aside-btn clickec...');
-        $('aside').toggleClass('collapsed');
-    });
-    
-    // aside 메뉴 클릭
-    $('.btnChart').on('click', function(e) {
-        e.preventDefault(); // 링크의 기본 동작을 방지합니다.
-        
-        if($(this).hasClass('active')) return; //현재 자신이 active이면 아무동작을 하지 않음.
-
-        $('.nav-link').removeClass('active'); // 모든 nav-link에서 active 클래스를 제거합니다.
-        
-        $(this).addClass('active'); // 클릭된 nav-link에만 active 클래스를 추가합니다.
-        var chartType = $(this).data('chart-type');
-        clearJsonArea();
-        clearChartArea();
-        fetchFormAndDisplay(chartType);
-    });    
-    function clearJsonArea(){
-        $('.json-area').empty();
-    }
-    function clearChartArea(){
-        $('.chart-area').empty();
-    }
-    function fetchFormAndDisplay(chartType){
-        
-        console.log(chartType)
-        var url = `form/${chartType}`;
-        JuliaUtil.ajax(url, null, {
-            method: 'GET',
-            success: function(response) {
-                console.log(response);
-                var handlebar_template = response.template;
-                var handlebar_function = Handlebars.compile(handlebar_template);
-                var html = handlebar_function(response.data);
-                $('#chartTypeName').text(response.data.chartTypeName);
-                $('.left-side').html(html);
-            }
-        });        
-    }
-    //
-    // submit 버튼 클릭
-    //
-    $('.main-content').on('submit', '.form-area form', function(event) {
-        event.preventDefault(); // Prevent the default form submission behavior
-        
-        var chartType = $(this).find("button[type=submit]").data('chart-type')
-        var formData = testData[chartType];
-        
-
-        console.log(JSON.stringify(formData));
-        var url = $(this).attr('action');
-
-        $('.right-side').show();
-        $('#home-tab').addClass('active');
-        // Using JuliaUtil.ajax to send the data
-        JuliaUtil.ajax(url, formData, {
-            method: "POST", // Specify the method
-            success: function(response, status, xhr) {
-                console.log("Success", response);
-                var url = response.url;
-                $('.main-content').find('.chart-area').empty().append(`<img src="${url}"/><div><a href="${url}" target="_blank">${url}</a></div>`);
-                $('.main-content').find('.json-area').empty().append('<pre>'+ JSON.stringify(formData, null, 2) + '</pre>');
-            },
-            error: function(xhr, status, error) {
-                var statusNo = xhr.status;
-                var message = xhr.responseJSON.message;
-                $('.main-content').find('.chart-area').empty().append(`<h3 class="text-danger">${statusNo}</h3><div>${message}</div>`);
-                console.error("statusNo: "+ statusNo + " message: " + message);
-            }
-        });
-    });
-
-
-});
+});//end document ready
 </script>	
 </body>
 </html>

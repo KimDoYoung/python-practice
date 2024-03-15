@@ -29,6 +29,16 @@ pip install fastapi uvicorn
 pip install matplotlib
 pip install jinja2
 pip install -e .
+
+## pip관련 명령어
+```
+pip freeze > requirements.txt
+pip install -r requirements.txt
+pip install --upgrade fastapi httpx
+pytest > ~/tmp/eliana_test_results.txt 2>&1
+pytest -W ignore::DeprecationWarning
+```
+
 ```
 ## 데이터베이스
 
@@ -39,7 +49,16 @@ pip install -e .
 ```
 ELIANA_MODE=local
 uvicorn --app-dir src main:app --reload --port 8989
-uvicorn main:app --reload --port 8989
+#uvicorn main:app --reload --port 8989
+.env
+uvicorn app:app --port $ELINA_PORT
+```
+
+## 환경설정
+
+### .env
+```
+ELINA_MODE=LOCAL
 ```
 
 
@@ -67,16 +86,6 @@ uvicorn main:app --reload --port 8989
    
 2. 환경변수 : ELIANA_MODE 사용
 3. log폴더 안에 eliana.log 생성
-
-
-## pip관련 명령어
-```
-pip freeze > requirements.txt
-pip install -r requirements.txt
-pip install --upgrade fastapi httpx
-pytest > ~/tmp/eliana_test_results.txt 2>&1
-pytest -W ignore::DeprecationWarning
-```
 
 
 

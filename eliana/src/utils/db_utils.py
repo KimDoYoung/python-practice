@@ -1,4 +1,6 @@
-
+#
+# 데이데베이스
+#
 import hashlib
 import json
 from sqlalchemy.exc import IntegrityError
@@ -21,7 +23,7 @@ class ChartHistory(Base):
     id = Column(Integer, primary_key=True, comment="자동증가")
     user_id = Column(String(50), nullable=False, default='ELIANA', comment="사용자id")
     chart_type = Column(String(20), nullable=False, comment="chart 종류")
-    json = Column(Text, nullable=False, comment="입력 json")
+    json_data = Column(Text, nullable=False, comment="입력 json")
     json_hash = Column(String(100), nullable=False, comment="json hashcode")
     url = Column(String(200), nullable=False, comment="생성된 url")
     created_on = Column(DateTime, nullable=False, default=func.now(), comment="생성일시")
@@ -30,33 +32,33 @@ class ChartHistory(Base):
         Index('ix_json_hash', 'json_hash'),  # 인덱스 추가
     )
 
-    def __init__(self, user_id, chart_type, json, json_hash, url):
+    def __init__(self, user_id, chart_type, json_data, json_hash, url):
         self.user_id = user_id
         self.chart_type = chart_type
-        self.json = json
+        self.json_data = json_data
         self.json_hash = json_hash
         self.url = url
 
     def __repr__(self):
-        return f"User ID: {self.user_id}, Chart Type: {self.chart_type}, JSON: {self.json}, JSON_HASH: {self.json_hash}, URL: {self.url}, Created On: {self.created_on}"
+        return f"User ID: {self.user_id}, Chart Type: {self.chart_type}, JSON: {self.json_data}, JSON_HASH: {self.json_hash}, URL: {self.url}, Created On: {self.created_on}"
 
 class ChartSample(Base):
     __tablename__ = 'chart_sample'
     id = Column(Integer, primary_key=True, comment="자동증가")
     chart_type = Column(String(20), nullable=False, comment="chart 종류")
     title = Column(String(100), nullable=False, comment="chart 제목")
-    json = Column(Text, nullable=False, comment="입력 json")
+    json_data = Column(Text, nullable=False, comment="입력 json")
     note = Column(String(1000), nullable=False, comment="chart 설명")
     created_on = Column(DateTime, nullable=False, default=func.now(), comment="생성일시")
 
-    def __init__(self, chart_type, title, json, note):
+    def __init__(self, chart_type, title, json_data, note):
         self.chart_type = chart_type
         self.title = title
-        self.json = json
+        self.json_data = json_data
         self.note = note
 
     def __repr__(self):
-        return f"Chart Type: {self.chart_type}, Title : {self.title}, JSON: {self.json}, Note: {self.note}, Created On: {self.created_on}"
+        return f"Chart Type: {self.chart_type}, Title : {self.title}, JSON: {self.json_data}, Note: {self.note}, Created On: {self.created_on}"
 
 
 def get_db():
