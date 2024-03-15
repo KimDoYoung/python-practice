@@ -87,6 +87,33 @@ ELINA_MODE=LOCAL
 2. 환경변수 : ELIANA_MODE 사용
 3. log폴더 안에 eliana.log 생성
 
+## 새로은 챠트의 추가
+
+1. 아래 line chart를 위한 클래스를  참조하여 pie챠트의 클래스를 만들어 주세요
+```
+class ChartBase(BaseModel):
+    user_id: str
+    result_type: str = 'url'  # url과 stream 두 가지
+    chart_type: str
+    width: int = 800
+    height: int = 600
+    title: Optional[str] = None
+
+class LineChartRequest(ChartBase):
+    chart_type: str = 'line'
+    x_data: List[float]
+    y_data: List[List[float]]
+    x_label: Optional[str] = None
+    y_label: Optional[str] = None
+    line_colors: Optional[List[str]] = None
+    line_styles: Optional[List[str]] = None
+    line_widths: Optional[List[float]] = None
+    legend_labels: Optional[List[str]] = None
+    axis_range: Optional[List[Tuple[float, float]]] = None
+    marker_styles: Optional[List[str]] = None
+    grid: Optional[bool] = None
+    text_labels: Optional[List[List[Tuple[float, float, str]]]] = None
+```
 
 
 ## 폴더 구조

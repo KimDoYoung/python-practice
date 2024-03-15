@@ -39,6 +39,16 @@ class BarChartRequest(ChartBase):
     axis_range: Optional[List[Tuple[float, float]]] = None
     grid: Optional[bool] = None
 
+class PieChartRequest(ChartBase):
+    chart_type: str = 'pie'
+    data: List[float]  # 파이 차트의 각 조각에 해당하는 데이터
+    labels: List[str]  # 각 데이터 조각의 라벨
+    colors: Optional[List[str]] = None  # 파이 차트 조각의 색상 (선택 사항)
+    explode: Optional[List[float]] = None  # 파이 차트의 조각을 돌출시키는 정도 (선택 사항)
+    startangle: Optional[float] = 140  # 파이 차트 시작 각도 (선택 사항)
+    autopct: Optional[str] = '%1.1f%%'  # 파이 조각의 백분율 표시 형식 (선택 사항)
+
+# sample table을 위한 class
 class ChartSampleRequest(BaseModel):
     # id : int
     chart_type: str
