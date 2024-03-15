@@ -54,10 +54,11 @@ function init_chart_form_html(){
             method : 'GET',
             success : function(response){
                 var json = response.jsonData;
-                $('#json-data').html(json);
+                $('#json-data').val(json);
             },
             error : function(xhr){
-                $('#messageArea').show().html(xhr.responseJSON.message);
+                var error = xhr.responseJSON.message.error;
+                $('#messageArea').show().html(error);
             }
         })
     });
@@ -66,13 +67,27 @@ function init_chart_form_html(){
         var chart_type = $(this).data('chart-type');
         var url = "/chart/"+chart_type;
         var jsonStr = $('#json-data').val();
+        var jsonObject = undefined;
+        //json객체가 맞는가?
         try {
-            var jsonObject = JSON.parse(jsonStr);    
+            jsonObject = JSON.parse(jsonStr);    
         } catch (error) {
             showResult(defaultResult);
             $('#messageArea').show().html('Json데이터 검증 실패: '+error);
             return;
         }
+        //검증
+        var errors = validationFunctions[chart_type](jsonObject);
+        if( errors.length > 0){
+            var listItems = errors.map(function(error) {
+                return `<li>${error}</li>`; 
+            }).join(''); 
+        
+            var html =  `<ul>${listItems}</ul>`; // 전체를 ul 태그로 감싼다.
+            $('#messageArea').show().html(html);
+            return;
+        }
+
         JuliaUtil.ajax(url,jsonObject, {
             method : 'POST',
             success : function(response){
@@ -84,7 +99,8 @@ function init_chart_form_html(){
             },
             error : function(xhr){
                 showResult(defaultResult);
-                $('#messageArea').show().html(xhr.responseJSON.message);
+                var error = xhr.responseJSON.message.error;
+                $('#messageArea').show().html(error);
             }
         })
     });
@@ -93,7 +109,7 @@ function init_chart_form_html(){
         $('#messageArea').hide();
         $('#sample-select').val('');
 
-        $('#json-data').text('');
+        $('#json-data').val('');
         showResult(defaultResult);
     });
 

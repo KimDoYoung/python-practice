@@ -1,11 +1,20 @@
+import os
 from fastapi import HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 # 템플릿 인스턴스 생성
-templates = Jinja2Templates(directory="templates")
+# 이 파일의 디렉토리로부터 두 레벨을 올라가 프로젝트의 루트 디렉토리를 결정합니다.
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+env = Environment(
+    loader=FileSystemLoader(os.path.join(BASE_DIR, 'templates')),
+    autoescape=select_autoescape(['html', 'xml']),
+    block_start_string='(%', block_end_string='%)',
+    variable_start_string='((', variable_end_string='))'
+)
 
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     return JSONResponse(
@@ -34,7 +43,9 @@ async def custom_404_exception_handler(request: Request, exc: StarletteHTTPExcep
     if exc.status_code == 404:
         accept = request.headers.get("Accept")
         if "text/html" in accept:
-            return templates.TemplateResponse("common/error-404.html", {"request": request})
+            template = env.get_template("common/error-404.html")
+            html = template.render(request=request)
+            return HTMLResponse(content=html, status_code=exc.status_code)
         else:
             return JSONResponse(
                 status_code=404,

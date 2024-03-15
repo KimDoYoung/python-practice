@@ -75,8 +75,6 @@ def add_chart_history(chart_history):
         session.commit()
     except IntegrityError:
         session.rollback()
-        # 유니크 제약 조건 위반 처리 로직
-        print("이미 존재하는 user_id와 JSON 조합입니다.")
     finally:
         session.close()
 
