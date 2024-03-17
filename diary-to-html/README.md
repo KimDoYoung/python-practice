@@ -7,10 +7,14 @@
 2. "select * from diary" sql 수행
 3. sql의 결과를 html 파일로 write
 
+## package 
+pip install mysql-connector-python
+
 ## 사용법
 
 ```
 python ./diary_to_html.py 202203.html 20220301 20220331
+
 ```
 
 > 참고로 
