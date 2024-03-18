@@ -38,3 +38,20 @@ output-file=c:\tmp\eliana-all-source.py
 ```
 python gather_all test1.config
 ```
+
+## 로직의 흐름 
+```mermaid
+graph TD
+    A[시작] --> B[설정 파일 읽기]
+    B --> C{파일이 dir인지 확인}
+    C -->|아니오| D[대상 폴더 검증 실패]
+    C -->|예| E[파일/폴더 필터링]
+    E --> F{파일이 텍스트인지 확인}
+    F -->|아니오| G[다음 파일로]
+    F -->|예| H[파일 내용 병합]
+    H --> I{모든 파일 처리 완료?}
+    I -->|아니오| E
+    I -->|예| J[병합 파일 저장]
+    D --> K[종료]
+    J --> K
+```
