@@ -1,0 +1,25 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Eliana: Uvicorn",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "uvicorn",
+            "args": [
+                "main:app",
+                "--reload",
+                "--port",
+                "8989",
+                "--app-dir",
+                "${workspaceFolder}/src"
+            ],
+            "jinja": true,
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "ELIANA_MODE": "local"
+            },
+            "console": "integratedTerminal"
+        }
+    ]
+}

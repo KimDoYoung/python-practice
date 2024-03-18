@@ -73,7 +73,7 @@ function init_chart_form_html(){
             jsonObject = JSON.parse(jsonStr);    
         } catch (error) {
             showResult(defaultResult);
-            $('#messageArea').show().html('Json데이터 검증 실패: '+error);
+            $('#messageArea').show().html('Json데이터 검증 실패: '+ xhr.responseJSON.message);
             return;
         }
         //검증
@@ -152,7 +152,8 @@ function init_sample_list_html(){
             },
             error : function(xhr){
                 //debugger;
-                console.log(xhr);
+                console.log(xhr.responseJSON.message);
+                alert(xhr.responseJSON.message);
             }
         })        
     });
@@ -169,7 +170,8 @@ function init_sample_list_html(){
             },
             error : function(xhr){
                 //debugger;
-                console.log(xhr);
+                console.log(xhr.responseJSON.message);
+                alert(xhr.responseJSON.message);
             }
         })        
     });    

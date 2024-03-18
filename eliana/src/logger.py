@@ -2,20 +2,9 @@
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import os
-from constants import ELIANA_MODE
+from constants import ELIANA_MODE, LOG_FILE_NAME
 
-# 환경별 로그 디렉토리 설정
-if ELIANA_MODE == "LOCAL":
-    log_directory = os.path.join("c:", os.sep, "tmp", "logs") # c:/tmp/logs
-else:  # ELIANA_MODE가 "REAL"이거나 다른 값일 경우
-    log_directory = "/log/real"
-
-log_file_name = "eliana.log"
-log_file_path = os.path.join(log_directory, log_file_name)
-
-# log 폴더가 없으면 생성
-if not os.path.exists(log_directory):
-    os.makedirs(log_directory)
+log_file_path = LOG_FILE_NAME
 
 def get_logger(name):
     logger = logging.getLogger(name)

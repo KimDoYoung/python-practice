@@ -52,7 +52,7 @@ uvicorn --app-dir src main:app --reload --port 8989
 #uvicorn main:app --reload --port 8989
 
 source .env
-uvicorn main:app --port $ELINA_PORT
+uvicorn main:app --reload --port $ELINA_PORT
 ```
 
 ## 환경설정
@@ -77,6 +77,9 @@ ELINA_MODE=LOCAL
   "y": [23,45,53,32,65]
 }
 ```
+
+### debugging
+
 
 ## 개발 내용
 

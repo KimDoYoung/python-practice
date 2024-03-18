@@ -30,7 +30,7 @@
             (% for sample in chart_samples %)
             <tr class="border-b border-gray-200 hover:bg-gray-100">
                 <td class="py-3 px-6 text-left whitespace-nowrap">((sample.chart_type))</td>
-                <td class="py-3 px-6 text-left">((sample.title))</td>
+                <td class="py-3 px-6 text-left"><a href="#" class="btn-edit" data-id="((sample.id))">((sample.title))</a></td>
                 <td class="py-3 px-6 text-left">((sample.note))</td>
                 <td class="py-3 px-6 text-left">((sample.created_on))</td>
                 <td class="py-3 px-3 text-center flex justify-center">
