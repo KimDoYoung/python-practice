@@ -106,13 +106,23 @@ def parse_arguments():
 def connect_fetch_write(f, frYmd, toYmd):
 
     """Connect to MySQL database, fetch data, and write to an HTML file."""
+    # 환경 변수 값을 읽어오면서 앞뒤 공백을 제거
+    host = os.getenv('D_HOST').strip()
+    database = os.getenv('D_DATABASE').strip()
+    user = os.getenv('D_USER').strip()
+    password = os.getenv('D_PASSWORD').strip()
+    port = os.getenv('D_PORT').strip()
+
+    print("=============================================")
+    print(f"HOST:{host}, DATABASE:{database}, USER:{user}, PASSWORD:xxxx123!, PORT:{port}")    
+    print("=============================================")
     try: 
         connection = mysql.connector.connect(
-            host = os.getenv("HOST"),
-            database = os.getenv("DATABASE"),
-            user = os.getenv("USER"),
-            password= os.getenv("PASSWORD"),
-            port = os.getenv("PORT")
+            host = host,
+            database = database,
+            user = user,
+            password= password,
+            port = port
         )
 
         if connection.is_connected():
