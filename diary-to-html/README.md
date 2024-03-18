@@ -15,12 +15,23 @@
 pip install mysql-connector-python
 pip install python-dotenv
 
-## 사용법
+## .env
+```
+D_HOST="jskn.iptime.org"
+D_DATABASE="kalpadb"
+D_USER="kdy987"
+D_PASSWORD="xxxx123!"
+D_PORT=3306
+```
 
+## 사용법
+1. 직접실행
 ```
 python ./diary_to_html.py 202203.html 20220301 20220331
 
 ```
+2. run_diary_to_html.sh
+
 
 > 참고로 
 >    1. diary은 ymd,summary,content 3개의 필드로 되어 있음.
