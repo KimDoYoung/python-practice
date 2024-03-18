@@ -2,6 +2,10 @@
 
 ## diary_to_html.py
 
+* diary테이블의 내용을 가져와서 html파일로 만든다. 
+* 만들어질 파일명, 날짜 범위를 가진다.
+* .env에 db접속 정보를 넣어둔다.
+
 ### prompt
 1. mysql 데이터베이스에 접속
 2. "select * from diary" sql 수행
@@ -9,6 +13,7 @@
 
 ## package 
 pip install mysql-connector-python
+pip install python-dotenv
 
 ## 사용법
 

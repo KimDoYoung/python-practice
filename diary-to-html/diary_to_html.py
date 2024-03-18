@@ -8,10 +8,14 @@
 
 import datetime
 import html
+import os
 import re
 import mysql.connector
 from mysql.connector import Error
 import argparse
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Define format_diary_entry, generate_html_header, and generate_html_footer functions here...
 
@@ -25,7 +29,7 @@ def generate_html_header(range):
 </head>
 <body>
     <div class='container'>
-    <h1>나의 일지 <span class="text-muted" style="font-size: 1.5rem;">''' + range +'''</span></h1>
+    <h1>KDY 일지 <span class="text-muted" style="font-size: 1.5rem;">''' + range +'''</span></h1>
     <div>
         <button id="SummaryToggle" class="btn btn-primary">Summary</button>
     </div>'''
@@ -47,7 +51,7 @@ def generate_html_footer():
     <script>
         $(document).ready(function(){
             $("#SummaryToggle").click(function(){
-               $('.content').toggle();
+                $('.content').toggle();
             });
             $('.date-summary').click(function() {
                 $(this).parent().find('.content').toggle();
@@ -100,13 +104,15 @@ def parse_arguments():
     return args.output_file, args.frYmd, args.toYmd
 
 def connect_fetch_write(f, frYmd, toYmd):
+
     """Connect to MySQL database, fetch data, and write to an HTML file."""
     try: 
         connection = mysql.connector.connect(
-            host='jskn.iptime.org',
-            database='kalpadb',
-            user='kdy987',
-            password=''
+            host = os.getenv("HOST"),
+            database = os.getenv("DATABASE"),
+            user = os.getenv("USER"),
+            password= os.getenv("PASSWORD"),
+            port = os.getenv("PORT")
         )
 
         if connection.is_connected():
@@ -142,4 +148,7 @@ def run(output_file,frYmd, toYmd):
 if __name__ == '__main__':
     output_file_name, frYmd, toYmd = parse_arguments()
     print(f"output file is {output_file_name}")
-    run(output_file_name, frYmd, toYmd)
+    try:
+        run(output_file_name, frYmd, toYmd)
+    except Exception as e:
+        print(f"An error occurred: {e}")
