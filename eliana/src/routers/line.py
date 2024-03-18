@@ -9,7 +9,8 @@ import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 from utils.charts_util import create_line_chart
 from utils.db_utils import ChartHistory, Session, add_chart_history, calculate_request_hash, get_db
-from utils.file_utils import get_file_path
+
+# TODO 이 파일을 없애자 
 
 logger = get_logger(__name__)
 
@@ -20,7 +21,7 @@ async def chart_line(request: LineChartRequest, db: Session = Depends(get_db)):
 
     logger.debug(f"/chart/line start : {request}")
     # hash를 구해서 
-    request_hash = calculate_request_hash(request);
+    request_hash = calculate_request_hash(request)
     chart_history = db.query(ChartHistory).filter(ChartHistory.json_hash == request_hash).first()
 
     # 존재하면 url을 리턴

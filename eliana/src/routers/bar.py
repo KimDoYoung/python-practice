@@ -17,7 +17,7 @@ logger = get_logger(__name__)
 async def chart_bar(request: BarChartRequest, db: Session = Depends(get_db)):
     logger.debug(f"/chart/bar start : {request}")
     # hash를 구해서 db에 있는지 찾아본다.
-    request_hash = calculate_request_hash(request);
+    request_hash = calculate_request_hash(request)
     chart_history = db.query(ChartHistory).filter(ChartHistory.json_hash == request_hash).first()
 
     # 존재하면 url을 리턴

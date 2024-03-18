@@ -65,7 +65,7 @@ function init_chart_form_html(){
     //챠트생성 버튼 click
     $('#btnCreateChart').on('click',function(){
         var chart_type = $(this).data('chart-type');
-        var url = "/chart/"+chart_type;
+        var url = "/chart";
         var jsonStr = $('#json-data').val();
         var jsonObject = undefined;
         //json객체가 맞는가?

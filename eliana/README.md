@@ -12,6 +12,7 @@
    * Matplotlib
    * SqlLite
    * tailwind
+   * jquery
   
 
 ## 개발환경
@@ -52,7 +53,7 @@ uvicorn --app-dir src main:app --reload --port 8989
 #uvicorn main:app --reload --port 8989
 
 source .env
-uvicorn main:app --reload --port $ELINA_PORT
+uvicorn main:app --reload --port $ELIANA_PORT
 ```
 
 ## 환경설정
@@ -90,6 +91,23 @@ ELINA_MODE=LOCAL
    
 2. 환경변수 : ELIANA_MODE 사용
 3. log폴더 안에 eliana.log 생성
+
+## 챠트 생성 로직
+* /chart 
+* POST방식으로 각 챠트에 대한 json 데이터 전송
+```mermaid
+graph TD
+    A[Start /chart Endpoint] --> B{Request Data}
+    B --> C[Parse Request to Chart Class]
+    C --> D{Check Chart History}
+    D -- Not found --> E[Create Chart]
+    D -- Found --> F[Return Existing URL]
+    E --> G{Chart Creation Successful?}
+    G -- Yes --> H[Save Chart Info in DB]
+    G -- No --> I[Raise Chart Creation Error]
+    H --> J[Return New Chart URL]
+    I --> K[Return Error Response]
+```
 
 ## 새로은 챠트의 추가
 
@@ -135,25 +153,16 @@ class LineChartRequest(ChartBase):
 ```
 
 ## 폴더 구조
-```
-.vscode: Visual Studio Code 설정 파일이 저장되는 디렉토리입니다. 이 폴더에는 에디터 설정, 디버깅 구성 등 VS Code를 위한 설정 파일이 포함될 수 있습니다.
+| 디렉토리   | 설명                                                                                     |
+|----------|----------------------------------------------------------------------------------------|
+| `.vscode` | Visual Studio Code 설정 파일이 저장되는 디렉토리입니다. 에디터 설정, 디버깅 구성 등을 포함합니다. |
+| `assets`  | 웹 프로젝트에서 사용되는 정적 자원들을 저장하는 디렉토리입니다. `css`, `fonts`, `image`, `js` 서브디렉토리 포함. |
+| `charts`  | 생성된 차트 이미지 파일들을 저장하는 디렉토리입니다. 예: `2024/03`과 같은 연도/월별 서브디렉토리 구조. |
+| `doc`     | 프로젝트 문서화 파일들을 저장하는 디렉토리입니다. 프로젝트 설명, 사용 방법, API 문서 등 포함. |
+| `env`     | Python 가상 환경 디렉토리입니다. 프로젝트를 위해 설치된 Python 인터프리터와 라이브러리가 포함됩니다. |
+| `log`     | 애플리케이션 로그 파일들을 저장하는 디렉토리입니다.                                          |
+| `src`     | 소스 코드를 포함하는 주 디렉토리입니다. `exception`, `model`, `routers`, `utils` 등의 서브디렉토리 포함. |
+| `templates` | HTML 템플릿 파일들을 저장하는 디렉토리입니다. `Jinja2` 같은 템플릿 엔진 사용 시. `common`, `form`, `sample` 등 서브디렉토리 포함. |
+| `__pycache__` | Python 인터프리터가 생성하는 컴파일된 바이트코드 파일들을 저장하는 디렉토리입니다. 실행 속도 향상을 위함. |
 
-assets: 웹 프로젝트에서 사용되는 정적 자원들을 저장하는 디렉토리입니다. 이 안에는 css, fonts, image, js 등의 서브디렉토리가 있어, 각각 스타일시트, 폰트 파일, 이미지 파일, 자바스크립트 파일을 관리합니다.
-
-charts: 생성된 차트 이미지 파일들을 저장하는 디렉토리입니다. 예를 들어 2024/03 같은 서브디렉토리 구조를 통해, 연도와 월별로 차트 이미지를 분류할 수 있습니다.
-
-doc: 프로젝트 문서화 파일들을 저장하는 디렉토리입니다. 여기에는 프로젝트 설명, 사용 방법, API 문서 등이 포함될 수 있습니다.
-
-env: Python 가상 환경 디렉토리입니다. 이 폴더에는 프로젝트를 위해 설치된 Python 인터프리터와 라이브러리가 포함됩니다. Lib/site-packages에는 프로젝트 의존성이 저장되어 있습니다.
-
-log: 애플리케이션 로그 파일들을 저장하는 디렉토리입니다.
-
-src: 소스 코드를 포함하는 주 디렉토리입니다. 이 안에는 FastAPI 애플리케이션의 실제 Python 코드가 포함되어 있으며, exception, model, routers, utils 등의 서브디렉토리로 구성될 수 있습니다. 각 디렉토리는 애플리케이션의 다른 부분을 담당합니다.
-
-templates: Jinja2 같은 템플릿 엔진을 사용할 때 HTML 템플릿 파일들을 저장하는 디렉토리입니다. common, form, sample 등의 서브디렉토리로 구성될 수 있으며, 웹 페이지의 레이아웃이나 구성 요소를 정의합니다.
-
-__pycache__: Python 인터프리터가 자동으로 생성하는 컴파일된 바이트코드 파일들을 저장하는 디렉토리입니다. 이 파일들은 Python 코드의 실행 속도를 향상시키기 위해 사용됩니다.
-
-프로젝트 구조는 잘 구성되어 있으며, 각 구성 요소가 명확한 역할을 하고 있습니다. 이 구조를 기반으로 개발을 진행하면서 필요에 따라 추가적인 디렉토리나 파일을 생성하거나 조정할 수 있습니다.
-```
 

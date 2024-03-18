@@ -80,7 +80,8 @@ def add_chart_history(chart_history):
 
 def calculate_request_hash(chart_request):
     # Pydantic 객체를 dict로 변환
-    request_dict = chart_request.dict()
+    # request_dict = chart_request.dict()
+    request_dict = chart_request
     # dict를 JSON 문자열로 변환. 키 정렬 옵션을 사용해 순서를 보장
     request_json = json.dumps(request_dict, sort_keys=True)
     # JSON 문자열의 SHA-256 해시를 계산
