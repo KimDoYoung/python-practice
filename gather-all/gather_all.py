@@ -105,7 +105,10 @@ if __name__ == "__main__":
     if os.path.exists(output_file):
         os.remove(output_file)
 
-    
-    gather_files(method, target_folder, target_patterns, exclude_files, output_file)
-    if method == 'merge':
-        print(f"{output_file} created")
+    try:
+        gather_files(method, target_folder, target_patterns, exclude_files, output_file)
+        if method == 'merge':
+            print(f"{output_file} created")
+    except Exception as e:
+        print(f"Error: {e}")
+        sys.exit(1)
