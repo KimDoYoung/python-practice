@@ -2,6 +2,41 @@ from matplotlib import pyplot as plt
 from constants import CHART_BASE_URL
 from utils.file_utils import get_file_path
 
+def create_pie_chart(request):
+    # 파일 경로 생성
+    file_path = get_file_path(request.width, request.height)
+
+    # 차트 생성 로직 (matplotlib 사용)
+    plt.figure(figsize=(request.width / 100, request.height / 100))
+
+    # 파이차트 그리기
+    plt.pie(request.sizes,
+            labels=request.labels if request.labels else None,
+            colors=request.colors if request.colors else None,
+            autopct=request.autopct if request.autopct else '%1.1f%%',
+            startangle=request.startangle if request.startangle else 90,
+            explode=request.explode if request.explode else None,
+            shadow=request.shadow if request.shadow else False,
+            counterclock=request.counterclock if hasattr(request, 'counterclock') else True,
+            wedgeprops=request.wedgeprops if request.wedgeprops else None)
+    
+    # 제목 설정
+    if request.title:
+        plt.title(request.title)
+
+    # 범례 추가
+    if request.legend_labels:
+        plt.legend(request.legend_labels, loc=request.legend_loc if request.legend_loc else 'best')
+    
+    # 도표가 원형을 유지하도록 설정
+    plt.axis('equal')
+
+    # 차트를 이미지 파일로 저장
+    plt.savefig(file_path)
+    plt.close()
+
+    # 생성된 이미지 파일의 URL 반환
+    return f"{CHART_BASE_URL}/{file_path}"
 
 def create_bar_chart(request):
             

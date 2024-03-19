@@ -171,3 +171,13 @@ class LineChartRequest(ChartBase):
 | `__pycache__` | Python 인터프리터가 생성하는 컴파일된 바이트코드 파일들을 저장하는 디렉토리입니다. 실행 속도 향상을 위함. |
 
 
+## 새로운 챠트의 생성
+
+* 예를 들어 PIE챠트를 만들려고 한다.
+* 주요 수정 파일 : eliana_util.py, ChartRequest.py, chart_util.py
+1. "Matplotlib 로 파이챠트를 만들 때 데이터를 최대한 많은 옵션을 넣어서 json으로 만들어 주세요
+2. 이 JSON 데이터를 FASTApi에서 받았다고 할때 Pydantic 모델 클래스를 만들어 주세요
+   이때 설명을 필드 옆에 주석으로 넣어주세요.
+3. 이 모델에 해당하는 임의의 데이터를 채워주세요. option 필드들도 모두 채워주세요
+4. 챠트 생성로직에 준해서 pie chart생성해 주세요
+5. chart-aside.h tml 수정

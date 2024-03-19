@@ -19,6 +19,7 @@ from pathlib import Path
 from routers import chart
 from routers import form, sample
 from sqlalchemy.orm import Session
+from utils.eliana_util import chart_names
 
 src_path = str(Path(__file__).parent)
 if src_path not in sys.path:
@@ -80,13 +81,13 @@ def chart_page(request: Request):
     # 렌더링된 HTML 내용을 JSONResponse의 일부로 반환
     return JSONResponse(content={"template": html_content})
 
-# FIXME: Session 왜 warning이 뜨는지 확인 필요
 @app.get("/sample", response_class=JSONResponse) 
 def chart_page(request: Request, db: Session = Depends(get_db)):
     chart_samples = db.query(ChartSample).order_by(ChartSample.created_on.desc()).limit(20).all()
     # 템플릿 불러오기 및 렌더링
     template = env.get_template('sample/sample-list.html')
-    html_content = template.render(request=request, chart_samples=chart_samples)
+    data = {"chart_names" : chart_names, "title":"샘플 리스트"}
+    html_content = template.render(request=request, chart_samples=chart_samples, **data)
    
     # 렌더링된 HTML 내용을 JSONResponse의 일부로 반환
     return JSONResponse(content={"template": html_content})

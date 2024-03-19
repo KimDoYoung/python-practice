@@ -1,10 +1,10 @@
 <div class="max-w-7xl mx-auto p-5">
     <div class="flex items-center mb-4">
         <select class="p-2 border border-gray-300 rounded mr-2" id="chartType">
-            <option value="">차트 종류 선택</option>
-            <option value="line">라인 차트</option>
-            <option value="bar">막대 차트</option>
-            <!-- 추가 차트 종류 -->
+            <option value="">[전체챠트]</option>
+            (% for ename, kname in chart_names.items() %)
+            <option value="((ename))">((kname)) 차트</option>
+            (% endfor %)            
         </select>
         <input type="text" placeholder="검색어" class="p-2 border border-gray-300 rounded mr-2">
         <button class="p-2 border border-gray-300 rounded mr-2 bg-blue-500 text-white">

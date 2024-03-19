@@ -72,6 +72,11 @@ function init_chart_form_html(){
         var url = "/chart";
         var jsonStr = $('#json-data').val();
         var jsonObject = undefined;
+        
+        if(jsonStr.trim().length < 1){
+            $('#messageArea').show().html('Json데이터를 입력해주세요.');
+            return;
+        }
         //json객체가 맞는가?
         try {
             jsonObject = JSON.parse(jsonStr);    

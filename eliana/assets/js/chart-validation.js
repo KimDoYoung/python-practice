@@ -2,7 +2,8 @@
 // 차트 유형에 따른 검증 함수 매핑
 var validationFunctions = {
     'bar': validation_bar_chart_data,
-    'line': validation_line_chart_data
+    'line': validation_line_chart_data,
+    'pie': validation_pie_chart_data
 };
 function validation_common(json_data) {
         var errors = [];
@@ -125,6 +126,61 @@ function validation_bar_chart_data(json_data) {
     }
     if (typeof json_data.grid !== 'boolean') {
         errors.push("grid는 불리언이어야 합니다.");
+    }
+
+    return errors;
+}
+
+function validation_pie_chart_data(json) {
+    var errors = [];
+
+    // 필수 필드 검증
+    if (!json.labels || !Array.isArray(json.labels) || json.labels.length === 0) {
+        errors.push("labels must be a non-empty array.");
+    }
+    if (!json.sizes || !Array.isArray(json.sizes) || json.sizes.length === 0) {
+        errors.push("sizes must be a non-empty array.");
+    }
+    if (json.labels && json.sizes && json.labels.length !== json.sizes.length) {
+        errors.push("labels and sizes arrays must have the same length.");
+    }
+
+    // 선택 필드 검증
+    if (json.colors && (!Array.isArray(json.colors) || json.colors.length !== json.labels.length)) {
+        errors.push("colors must be an array with the same length as labels.");
+    }
+    if (json.explode && (!Array.isArray(json.explode) || json.explode.length !== json.labels.length)) {
+        errors.push("explode must be an array with the same length as labels.");
+    }
+    if (json.shadow !== undefined && typeof json.shadow !== "boolean") {
+        errors.push("shadow must be a boolean.");
+    }
+    if (json.startangle !== undefined && typeof json.startangle !== "number") {
+        errors.push("startangle must be a number.");
+    }
+    if (json.autopct !== undefined && typeof json.autopct !== "string") {
+        errors.push("autopct must be a string.");
+    }
+    if (json.pctdistance !== undefined && typeof json.pctdistance !== "number") {
+        errors.push("pctdistance must be a number.");
+    }
+    if (json.labeldistance !== undefined && typeof json.labeldistance !== "number") {
+        errors.push("labeldistance must be a number.");
+    }
+    if (json.wedgeprops !== undefined && typeof json.wedgeprops !== "object") {
+        errors.push("wedgeprops must be an object.");
+    }
+    if (json.textprops !== undefined && typeof json.textprops !== "object") {
+        errors.push("textprops must be an object.");
+    }
+    if (json.radius !== undefined && typeof json.radius !== "number") {
+        errors.push("radius must be a number.");
+    }
+    if (json.counterclock !== undefined && typeof json.counterclock !== "boolean") {
+        errors.push("counterclock must be a boolean.");
+    }
+    if (json.frame !== undefined && typeof json.frame !== "boolean") {
+        errors.push("frame must be a boolean.");
     }
 
     return errors;

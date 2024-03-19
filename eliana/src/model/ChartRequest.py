@@ -41,12 +41,23 @@ class BarChartRequest(ChartBase):
 
 class PieChartRequest(ChartBase):
     chart_type: str = 'pie'
-    data: List[float]  # 파이 차트의 각 조각에 해당하는 데이터
-    labels: List[str]  # 각 데이터 조각의 라벨
-    colors: Optional[List[str]] = None  # 파이 차트 조각의 색상 (선택 사항)
-    explode: Optional[List[float]] = None  # 파이 차트의 조각을 돌출시키는 정도 (선택 사항)
-    startangle: Optional[float] = 140  # 파이 차트 시작 각도 (선택 사항)
-    autopct: Optional[str] = '%1.1f%%'  # 파이 조각의 백분율 표시 형식 (선택 사항)
+    labels: List[str] = Field(...)  # 파이차트의 각 섹션을 나타내는 레이블 목록
+    sizes: List[int] = Field(...)  # 각 레이블의 값(크기)을 나타내는 목록, 파이차트에서의 비율을 결정
+    colors: List[str] = Field(...)  # 파이차트의 각 섹션에 적용될 색상 목록
+    explode: List[float] = Field(default_factory=lambda: [0.0 for _ in range(len(self.labels))])  # 특정 섹션을 중심에서 돌출시키는 값의 목록
+    shadow: Optional[bool] = False  # 파이차트에 그림자 표시 여부
+    startangle: Optional[int] = 90  # 파이차트의 시작 각도
+    autopct: Optional[str] = "%1.1f%%"  # 파이차트의 각 섹션에 표시될 비율의 문자열 포맷
+    pctdistance: Optional[float] = 0.85  # 비율 텍스트가 중심에서 떨어진 거리 (반지름 대비 비율)
+    labeldistance: Optional[float] = 1.1  # 레이블이 중심에서 떨어진 거리 (반지름 대비 비율)
+    wedgeprops: Optional[dict] = Field(default_factory=lambda: {"linewidth": 1, "edgecolor": "black"})  # 파이 섹션 스타일 설정 (예: 테두리 두께, 색상)
+    textprops: Optional[dict] = Field(default_factory=lambda: {"fontsize": 12})  # 텍스트 스타일 설정 (예: 폰트 크기)
+    radius: Optional[float] = 1.0  # 파이차트의 반지름
+    counterclock: Optional[bool] = False  # 파이차트의 조각들을 시계 반대 방향으로 배치할지 여부
+    frame: Optional[bool] = False  # 차트 주변에 프레임 표시 여부
+    legend_labels: Optional[List[str]] = None  # 범례 레이블 목록 (추가됨)
+    legend_loc: Optional[str] = 'best'  # 범례의 위치를 지정하는 속성 추가
+
 
 # sample table을 위한 class
 class ChartSampleRequest(BaseModel):

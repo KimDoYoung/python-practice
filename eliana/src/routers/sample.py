@@ -7,7 +7,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from logger import get_logger
 from model.ChartRequest import ChartSampleRequest
 from utils.db_utils import ChartSample,  get_db
-from utils.eliana_util import chartTypeName
+from utils.eliana_util import chart_names, chartTypeName
 from sqlalchemy.orm import Session
 
 
@@ -32,7 +32,7 @@ async def sample_insert_form(request: Request, db: Session = Depends(get_db) ):
     html_file = "sample/sample-form.html"
 
     # 템플릿 렌더링을 위한 데이터
-    data = {"title": "Sample Json", "description": "FastAPI with Jinja2 template."}
+    data = {"chart_names" : chart_names, "title":"샘플 등록"}
     
     # 템플릿 불러오기 및 렌더링
     template = env.get_template(html_file)
