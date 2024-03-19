@@ -19,7 +19,6 @@ from datetime import datetime
 import os
 import sys
 from pathlib import Path
-from routers import line, bar
 from routers import chart
 from routers import form, sample
 
@@ -77,13 +76,14 @@ def chart_page(request: Request):
     data = {"title": "Chart", "description": "This is a chart rendered by Jinja2."}
     
     # 템플릿 불러오기 및 렌더링
-    template = env.get_template('form/chart.html')
+    template = env.get_template('form/chart-aside.html')
     html_content = template.render(data)
     
     # 렌더링된 HTML 내용을 JSONResponse의 일부로 반환
     return JSONResponse(content={"template": html_content})
 
-@app.get("/sample", response_class=JSONResponse)
+# FIXME: Session 왜 warning이 뜨는지 확인 필요
+@app.get("/sample", response_class=JSONResponse) 
 def chart_page(request: Request, db: Session = Depends(get_db)):
     chart_samples = db.query(ChartSample).order_by(ChartSample.created_on.desc()).limit(20).all()
     # 템플릿 불러오기 및 렌더링
@@ -93,6 +93,13 @@ def chart_page(request: Request, db: Session = Depends(get_db)):
     # 렌더링된 HTML 내용을 JSONResponse의 일부로 반환
     return JSONResponse(content={"template": html_content})
 
+
+@app.get("/test", response_class=JSONResponse) 
+def chart_page():
+    pass
+    # raise RequestValidationError(["This is a test error message","21222"])
+    # raise HTTPException(status_code=404, detail="Item not found")
+    # raise Exception("This is a test error message")
 
 if __name__ == "__main__":
     uvicorn.run(app, host="localhost", port=8989)

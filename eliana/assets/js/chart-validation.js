@@ -4,31 +4,36 @@ var validationFunctions = {
     'bar': validation_bar_chart_data,
     'line': validation_line_chart_data
 };
+function validation_common(json_data) {
+        var errors = [];
+        // user_id 필수 검증
+        if (typeof json_data.user_id !== 'string' || json_data.user_id.trim() === '') {
+            errors.push("user_id는 필수이며, 비어있지 않은 문자열이어야 합니다.");
+        }
+        
+        // result_type 필수 검증 및 값 확인
+        if (!['url', 'stream'].includes(json_data.result_type)) {
+            errors.push("result_type은 필수이며, 'url' 또는 'stream' 중 하나이어야 합니다.");
+        }
+        
+        // chart_type 검증
+        if (json_data.chart_type !== 'line') {
+            errors.push("chart_type은 'line'이어야 합니다.");
+        }
+        
+        // width, height 검증
+        if (typeof json_data.width !== 'number' || json_data.width <= 0) {
+            errors.push("width는 양의 정수여야 합니다.");
+        }
+        if (typeof json_data.height !== 'number' || json_data.height <= 0) {
+            errors.push("height는 양의 정수여야 합니다.");
+        }
+        return errors;
+    }
 function validation_line_chart_data(json_data) {
     var errors = [];
     
-    // user_id 필수 검증
-    if (typeof json_data.user_id !== 'string' || json_data.user_id.trim() === '') {
-        errors.push("user_id는 필수이며, 비어있지 않은 문자열이어야 합니다.");
-    }
-    
-    // result_type 필수 검증 및 값 확인
-    if (!['url', 'stream'].includes(json_data.result_type)) {
-        errors.push("result_type은 필수이며, 'url' 또는 'stream' 중 하나이어야 합니다.");
-    }
-    
-    // chart_type 검증
-    if (json_data.chart_type !== 'line') {
-        errors.push("chart_type은 'line'이어야 합니다.");
-    }
-    
-    // width, height 검증
-    if (typeof json_data.width !== 'number' || json_data.width <= 0) {
-        errors.push("width는 양의 정수여야 합니다.");
-    }
-    if (typeof json_data.height !== 'number' || json_data.height <= 0) {
-        errors.push("height는 양의 정수여야 합니다.");
-    }
+    errors.push(...validation_common(json_data));
     
     // x_data 검증
     if (!Array.isArray(json_data.x_data) || !json_data.x_data.every(x => typeof x === 'number')) {
@@ -91,26 +96,8 @@ function validation_line_chart_data(json_data) {
 function validation_bar_chart_data(json_data) {
     var errors = [];
 
-    // user_id 검증
-    if (typeof json_data.user_id !== 'string' || json_data.user_id.trim() === '') {
-        errors.push("user_id는 필수이며, 비어있지 않은 문자열이어야 합니다.");
-    }
-
-    // result_type 검증
-    if (!['url', 'stream'].includes(json_data.result_type)) {
-        errors.push("result_type은 'url' 또는 'stream' 중 하나여야 합니다.");
-    }
-
-    // 기타 검증 로직은 이전과 동일하게 유지됩니다...
-    if (json_data.chart_type !== 'bar') {
-        errors.push("chart_type은 'bar'이어야 합니다.");
-    }
-    if (typeof json_data.width !== 'number' || json_data.width <= 0) {
-        errors.push("width는 양의 정수여야 합니다.");
-    }
-    if (typeof json_data.height !== 'number' || json_data.height <= 0) {
-        errors.push("height는 양의 정수여야 합니다.");
-    }
+    errors.push(...validation_common(json_data));
+    
     ['title', 'x_label', 'y_label'].forEach(label => {
         if (json_data[label] && typeof json_data[label] !== 'string') {
             errors.push(`${label}은(는) 문자열이어야 합니다.`);

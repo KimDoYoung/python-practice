@@ -11,6 +11,7 @@
         <span class="font-bold">Eliana-Chart Server</span>
         <a href="#" data-url="chart" class="menu-main mx-2">챠트</a>
         <a href="#" data-url="sample" class="menu-main mx-2">샘플</a>
+        <!-- <a href="#" data-url="test" class="menu-main mx-2">test</a> -->
     </nav>    
     <section id="page">
     </section>
@@ -25,13 +26,29 @@ $( document ).ready(function() {
         e.stopPropagation();
         var url = $(this).data('url');
         JuliaUtil.ajax("/" + url,{}, {
+            method : 'GET',
             success : function(response){
                 var html = response.template;
                 $('#page').html(html);
                 if(url == 'chart') {init_chart_html();}
                 else if(url == 'sample'){init_sample_list_html();}
+            },
+            error : function(xhr){
+                console.log(xhr.responseJSON.message);
+                alert(xhr.responseJSON.message);
+                if(xhr.responseJSON.details) {
+                    var details = xhr.responseJSON.details;
+                    if(  $.isArray(details) ){
+                        var details = xhr.responseJSON.details.map(function(detail) {
+                            return detail + '\n';
+                        }).join('');
+                        console.log(details);
+                    }else{
+                        console.log(xhr.responseJSON.details);
+                    }
+                }
             }
-        })
+        });
     });
 });//end document ready
 </script>	

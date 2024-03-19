@@ -20,6 +20,10 @@ function init_chart_html(){
                 var html = response.template;
                 $('#chart-page').html(html);
                 init_chart_form_html();
+            },
+            error : function(xhr){
+                console.log(xhr.responseJSON.message);
+                alert(xhr.responseJSON.message);
             }
         })
     });

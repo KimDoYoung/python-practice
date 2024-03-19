@@ -25,7 +25,6 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 async def http_exception_handler(request: Request, exc: HTTPException):
     accept = request.headers.get("Accept")
     if "text/html" in accept:
-        content = f"<html><body><h2>{exc.detail}</h2></body></html>"
         return HTMLResponse(content=content, status_code=exc.status_code)
     else:
         return JSONResponse(
@@ -36,7 +35,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 async def general_exception_handler(request: Request, exc: Exception):
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={"message": "서버 오류가 발생했습니다."}
+        content={"message": "서버 오류가 발생했습니다.","details": str(exc)}
     )
 
 async def custom_404_exception_handler(request: Request, exc: StarletteHTTPException):
@@ -51,7 +50,6 @@ async def custom_404_exception_handler(request: Request, exc: StarletteHTTPExcep
                 status_code=404,
                 content={"message": "Page not found"},
             )
-    # For other HTTP errors, you can extend this handler by adding more conditions
     return JSONResponse(
         status_code=exc.status_code,
         content={"message": exc.detail},

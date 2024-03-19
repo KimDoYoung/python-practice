@@ -1,4 +1,3 @@
-# Jinja2Templates 인스턴스 생성
 import os
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import  JSONResponse
@@ -6,6 +5,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from logger import get_logger
 from utils.db_utils import Session, get_chart_samples_by_type, get_db
+from utils.eliana_util import chartTypeName
 
 
 # 이 파일의 디렉토리로부터 두 레벨을 올라가 프로젝트의 루트 디렉토리를 결정합니다.
@@ -24,11 +24,13 @@ router = APIRouter()
 @router.get("/form/{chart_type}", response_class=JSONResponse)
 async def form_chart(request: Request, chart_type: str,  db: Session = Depends(get_db)):
 
-    html_file = f"form/{chart_type}.html"
-    samples = get_chart_samples_by_type(db, chart_type);
+    # html_file = f"form/{chart_type}.html"
+    html_file = f"form/chart-main.html"
+    samples = get_chart_samples_by_type(db, chart_type)
     logger.debug("sample size: " + str( len(samples)))
     # 템플릿 렌더링을 위한 데이터
-    data = {"samples": samples}
+    chartName = chartTypeName(chart_type)
+    data = {"samples": samples, "chartType" : chart_type, "chartName" : chartName}
     
     # 템플릿 불러오기 및 렌더링
     template = env.get_template(html_file)

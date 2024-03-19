@@ -1,9 +1,8 @@
-    <!-- TODO 이파일을 없애자 그리고 chart.html 로 통일하자 -->
     <div class="flex flex-1 min-h-screen">
         <!-- 왼쪽 영역: 입력 폼 -->
         <div class="w-1/2 flex flex-col p-5 gap-4">
             <div class="flex flex-col gap-2">
-                <label for="sample-select">막대챠트 샘플:</label>
+                <label for="sample-select">((chartName))챠트 샘플:</label>
                 <select id="sample-select" class="border p-2">
                     <option value="">샘플 선택...</option>
                     (% for sample in samples %)
@@ -20,7 +19,7 @@
                 <textarea id="json-data" class="border p-2" rows="20"></textarea>
             </div>
             <div class="flex justify-center">
-                <button id="btnCreateChart" data-chart-type="bar" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                <button id="btnCreateChart" data-chart-type="((chartType))" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     챠트 생성
                 </button>
                 <button id="btnClear" class="inline-flex ml-5 w-32 justify-center py-2 px-1 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-300 hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">

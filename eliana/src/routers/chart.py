@@ -5,42 +5,44 @@ from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 from logger import get_logger
 
-from model.ChartRequest import BarChartRequest, ChartBase, LineChartRequest, PieChartRequest
+from model.ChartRequest import  ChartBase
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 from utils.charts_util import create_bar_chart, create_line_chart
 from utils.db_utils import ChartHistory, Session, add_chart_history, calculate_request_hash, get_db
 from typing import Dict
-
+from utils.eliana_util import chart_creator, get_chart_request
 
 logger = get_logger(__name__)
 
 router = APIRouter()
 
-# 차트 타입에 따라 요청 클래스 매핑
-chart_type_to_class = {
-    "line": LineChartRequest,
-    "bar": BarChartRequest,
-    "pie": PieChartRequest,
-}
-# 챠트 그리를 함수들
-chart_creator = {
-    "line": create_line_chart,
-    "bar": create_bar_chart
-}
+# # 차트 타입에 따라 요청 클래스 매핑
+# chart_type_to_class = {
+#     "line": LineChartRequest,
+#     "bar": BarChartRequest,
+#     "pie": PieChartRequest,
+# }
+# # 챠트 그리를 함수들
+# chart_creator = {
+#     "line": create_line_chart,
+#     "bar": create_bar_chart
+# }
+# 챠트 생성 요청데이터를 챠트클래스로 변환
 
-def get_chart_request(request: Dict) -> ChartBase:
-    chart_type = request.get("chart_type")
-    chart_class = chart_type_to_class.get(chart_type)
-    if not chart_class:
-        raise HTTPException(status_code=400, detail=f"Unsupported chart type: {chart_type}")
-    try:
-        return chart_class(**request)
-    except ValidationError as e:
-        raise HTTPException(status_code=422, detail=f"Validation error for {chart_type} chart: {e}")
 
 @router.post("/chart")
 async def chart_line(request: Dict = Body(...), db: Session = Depends(get_db)):
+    
+    """ 
+        챠트를 생성하는 로직 
+        1. 입력으로 받은 데이터로 chart_history 테이블에서 찾아본다.
+        2. 존재하면 url을 리턴 끝
+        3. 없으면 입력으로 받는 request를 챠트 타입에 맞는 요청 객체로 변환
+        4. 챠트 생성 함수를 호출해서 챠트를 생성한다.
+        5. 생성된 챠트 url을 리턴한다.
+        6. 에러시 400 에러를 리턴한다.
+    """
 
     # 차트 타입에 맞는 요청 객체로 변환
     chart_class = get_chart_request(request)
