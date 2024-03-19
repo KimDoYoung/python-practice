@@ -1,6 +1,7 @@
 #
 # 데이데베이스
 #
+from contextlib import contextmanager
 import hashlib
 import json
 from typing import Iterator
@@ -10,7 +11,8 @@ from sqlalchemy import Index, UniqueConstraint, create_engine
 from sqlalchemy.orm import sessionmaker
 # chart_history.py
 from sqlalchemy import DateTime,  Column, Integer, String, Text,  func
-from sqlalchemy.ext.declarative import declarative_base
+# from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import Session as SQLAlchemySession
 
 # from sqlalchemy.orm import declarative_base
@@ -72,6 +74,18 @@ def get_db() -> Iterator[SQLAlchemySession]:
     finally:
         db.close()
 
+# `get_db` 함수를 사용하여 데이터베이스 세션을 관리하는 컨텍스트 매니저를 정의합니다.
+@contextmanager
+def db_session():
+    db = next(get_db())
+    try:
+        yield db
+    except Exception as e:
+        db.rollback()
+        raise
+    finally:
+        db.close()
+
 def add_chart_history(chart_history):
     session = SessionLocal ()
     try:
@@ -97,9 +111,32 @@ def calculate_request_hash(chart_request):
 
 def get_chart_samples_by_type(chart_type: str,db: SQLAlchemySession = Depends(get_db) ):
     chart_samples = db.query(ChartSample)\
-                      .filter(ChartSample.chart_type == chart_type)\
-                      .order_by(ChartSample.created_on.desc())\
-                      .all()
+                    .filter(ChartSample.chart_type == chart_type)\
+                    .order_by(ChartSample.created_on.desc())\
+                    .all()
     return chart_samples
+
+def delete_chart_histories(db: SQLAlchemySession, user_id: str = None, chart_type: str = None):
+    try:
+        query = db.query(ChartHistory)
+        
+        # `user_id`가 제공된 경우, 쿼리에 필터 추가
+        if user_id:
+            query = query.filter(ChartHistory.user_id == user_id)
+        
+        # `chart_type`이 제공된 경우, 쿼리에 필터 추가
+        if chart_type:
+            query = query.filter(ChartHistory.chart_type == chart_type)
+
+        # 조건에 맞는 레코드를 삭제
+        query.delete(synchronize_session=False)
+        
+        # 변경사항을 데이터베이스에 커밋
+        db.commit()
+    except Exception as e:
+        # 에러가 발생한 경우, 롤백
+        db.rollback()
+        raise e
+
 
 Base.metadata.create_all(engine)

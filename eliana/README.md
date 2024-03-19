@@ -70,6 +70,11 @@ ELIANA_PORT=8989
 
  ### 테스트
  * pytest
+```
+pytest
+pytest -s test_module1.py
+pytest --capture=no  -W ignore::DeprecationWarning
+```
  * swagger 
  ```
  http://localhost:8989/docs
@@ -180,4 +185,4 @@ class LineChartRequest(ChartBase):
    이때 설명을 필드 옆에 주석으로 넣어주세요.
 3. 이 모델에 해당하는 임의의 데이터를 채워주세요. option 필드들도 모두 채워주세요
 4. 챠트 생성로직에 준해서 pie chart생성해 주세요
-5. chart-aside.h tml 수정
+5. chart-aside.html 수정
