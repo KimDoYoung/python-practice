@@ -16,9 +16,11 @@ function validation_common(json_data) {
             errors.push("result_type은 필수이며, 'url' 또는 'stream' 중 하나이어야 합니다.");
         }
         
+        var chart_types = Object.keys(validationFunctions);
+
         // chart_type 검증
-        if (json_data.chart_type !== 'line') {
-            errors.push("chart_type은 'line'이어야 합니다.");
+        if (!chart_types.includes(json_data.chart_type)) {
+            errors.push("chart_type은 " + chart_types.join(",") + " 중 하나여야 합니다.");
         }
         
         // width, height 검증
