@@ -44,6 +44,9 @@ pytest -W ignore::DeprecationWarning
 ## 데이터베이스
 
 * sqlite 를 사용 : eliana.db 
+* 테이블들
+  * chart_sample : chart type에 따라서 사용자들에게 json 데이터이 형식을 제공
+  * chart_history : chart가 만들어 질 때마다 레코드가 추가되며 똑같은 데이터에 대해서는 이미 만들어진 chart의 url을 제공
 
 ### 실행
 
@@ -60,7 +63,8 @@ uvicorn main:app --reload --port $ELIANA_PORT
 
 ### .env
 ```
-ELINA_MODE=LOCAL
+ELIANA_MODE=LOCAL
+ELIANA_PORT=8989
 ```
 
 
@@ -96,13 +100,14 @@ ELINA_MODE=LOCAL
 * /chart 
 * POST방식으로 각 챠트에 대한 json 데이터 전송
 ```mermaid
-graph TD
-    A[Start /chart Endpoint] --> B{Request Data}
+%%{ init: { 'flowchart': { 'curve': 'stepAfter' } } }%% 
+flowchart-elk TD
+    A[Start /chart Endpoint] --> B[Request Data]
     B --> C[Parse Request to Chart Class]
-    C --> D{Check Chart History}
+    C --> D{exists in history}
     D -- Not found --> E[Create Chart]
     D -- Found --> F[Return Existing URL]
-    E --> G{Chart Creation Successful?}
+    E --> G{Chart Create OK ?}
     G -- Yes --> H[Save Chart Info in DB]
     G -- No --> I[Raise Chart Creation Error]
     H --> J[Return New Chart URL]
