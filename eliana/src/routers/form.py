@@ -4,9 +4,9 @@ from fastapi.responses import  JSONResponse
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from logger import get_logger
-from utils.db_utils import Session, get_chart_samples_by_type, get_db
+from utils.db_utils import  get_chart_samples_by_type, get_db
 from utils.eliana_util import chartTypeName
-
+from sqlalchemy.orm import Session
 
 # 이 파일의 디렉토리로부터 두 레벨을 올라가 프로젝트의 루트 디렉토리를 결정합니다.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -26,7 +26,7 @@ async def form_chart(request: Request, chart_type: str,  db: Session = Depends(g
 
     # html_file = f"form/{chart_type}.html"
     html_file = f"form/chart-main.html"
-    samples = get_chart_samples_by_type(db, chart_type)
+    samples = get_chart_samples_by_type(chart_type, db)
     logger.debug("sample size: " + str( len(samples)))
     # 템플릿 렌더링을 위한 데이터
     chartName = chartTypeName(chart_type)

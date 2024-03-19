@@ -9,9 +9,10 @@ from model.ChartRequest import  ChartBase
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 from utils.charts_util import create_bar_chart, create_line_chart
-from utils.db_utils import ChartHistory, Session, add_chart_history, calculate_request_hash, get_db
+from utils.db_utils import ChartHistory,  add_chart_history, calculate_request_hash, get_db
 from typing import Dict
 from utils.eliana_util import chart_creator, get_chart_request
+from sqlalchemy.orm import Session
 
 logger = get_logger(__name__)
 

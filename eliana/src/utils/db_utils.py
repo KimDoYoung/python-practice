@@ -3,20 +3,24 @@
 #
 import hashlib
 import json
+from typing import Iterator
+from fastapi import Depends
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import Index, UniqueConstraint, create_engine
 from sqlalchemy.orm import sessionmaker
 # chart_history.py
 from sqlalchemy import DateTime,  Column, Integer, String, Text,  func
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import Session as SQLAlchemySession
+
+# from sqlalchemy.orm import declarative_base
 
 DATABASE_URL = "sqlite:///eliana.db"
 engine = create_engine(DATABASE_URL, echo=True)
 
 Base = declarative_base()
 
-Session = sessionmaker(autoflush=False, bind=engine)
+SessionLocal  = sessionmaker(autoflush=False, bind=engine)
 
 class ChartHistory(Base):
     __tablename__ = 'chart_history'
@@ -61,15 +65,15 @@ class ChartSample(Base):
         return f"Chart Type: {self.chart_type}, Title : {self.title}, JSON: {self.json_data}, Note: {self.note}, Created On: {self.created_on}"
 
 
-def get_db():
-    db = Session()
+def get_db() -> Iterator[SQLAlchemySession]:
+    db = SessionLocal ()
     try:
         yield db
     finally:
         db.close()
 
 def add_chart_history(chart_history):
-    session = Session()
+    session = SessionLocal ()
     try:
         session.add(chart_history)
         session.commit()
@@ -91,7 +95,7 @@ def calculate_request_hash(chart_request):
     return hex_dig
 
 
-def get_chart_samples_by_type(db: Session, chart_type: str):
+def get_chart_samples_by_type(chart_type: str,db: SQLAlchemySession = Depends(get_db) ):
     chart_samples = db.query(ChartSample)\
                       .filter(ChartSample.chart_type == chart_type)\
                       .order_by(ChartSample.created_on.desc())\

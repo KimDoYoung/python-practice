@@ -1,15 +1,15 @@
 # Jinja2Templates 인스턴스 생성
 import os
-from fastapi import APIRouter, Depends, Form, HTTPException, Request
-from fastapi.responses import HTMLResponse, JSONResponse
-from fastapi.templating import Jinja2Templates
+from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.responses import  JSONResponse
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-from pydantic import ValidationError
 
 from logger import get_logger
 from model.ChartRequest import ChartSampleRequest
-from utils.db_utils import ChartSample, Session, get_db
+from utils.db_utils import ChartSample,  get_db
 from utils.eliana_util import chartTypeName
+from sqlalchemy.orm import Session
+
 
 
 # 이 파일의 디렉토리로부터 두 레벨을 올라가 프로젝트의 루트 디렉토리를 결정합니다.

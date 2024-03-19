@@ -7,20 +7,18 @@ from fastapi.staticfiles import StaticFiles
 import uvicorn
 import matplotlib
 from exception.exception_handler import custom_404_exception_handler, general_exception_handler, http_exception_handler, validation_exception_handler
-from utils.db_utils import ChartSample, Session, get_db
+from utils.db_utils import ChartSample,  get_db
 
 from utils.file_utils import get_file_path
 matplotlib.use('Agg')  # GUI 백엔드를 'Agg'로 설정하여 GUI를 사용하지 않도록 함
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
-import base64
-from io import BytesIO
-from datetime import datetime
 import os
 import sys
 from pathlib import Path
 from routers import chart
 from routers import form, sample
+from sqlalchemy.orm import Session
 
 src_path = str(Path(__file__).parent)
 if src_path not in sys.path:
