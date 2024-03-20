@@ -27,8 +27,6 @@ if src_path not in sys.path:
 
 app = FastAPI()
 
-# app.include_router(bar.router)
-# app.include_router(line.router)
 app.include_router(chart.router)
 app.include_router(form.router)
 app.include_router(sample.router)
