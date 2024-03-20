@@ -30,3 +30,7 @@ def test_chart():
         data = load_test_data(f'{file_name}.json')
         response = client.post("/chart",  json=data)
         assert response.status_code == 200
+
+def test_chart_exception():
+    response = client.get("/chart/abc")
+    assert response.status_code == 404
