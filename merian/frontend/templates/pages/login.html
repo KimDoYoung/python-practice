@@ -13,12 +13,12 @@
             <div class="mb-4">
                 <label for="userId" class="block text-gray-700 text-sm font-bold mb-2">User ID</label>
                 <input type="text" id="username" name="username" required
-                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
             </div>
             <div class="mb-6">
                 <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password</label>
                 <input type="password" id="password" name="password" required
-                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline">
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline">
             </div>
             <div class="flex items-center justify-between">
                 <button type="submit"
@@ -30,6 +30,39 @@
                 </a>
             </div>
         </form>
+        <div id="error-message-area"></div>
     </div>
+    
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="/static/js/common.js"></script>
+<script>
+$(document).ready(function() {
+    $('form').submit(function(e){
+        e.preventDefault(); // 기본 제출 이벤트를 방지
+        var username = $('#username').val();
+        var password = $('#password').val();
+        var data = {
+            username: username,
+            password: password
+        };
+        JuliaUtil.ajax('/login', data ,{
+            method : 'POST',
+            success : function(data) {
+                // 로그인 성공 시, 받은 토큰을 localStorage에 저장
+                localStorage.setItem('token', response.access_token);
+                localStorage.setItem('token_type', response.token_type);
+                // /keyboard 페이지로 리디렉션
+                window.location.href = '/keyboard';                
+            },
+            error : function(xhr){
+                $('#error-message-area').html('<div class="text-red-500 text-sm mt-2">Error: ' + xhr.responseText + '</div>');
+            }
+        });
+        return false;
+    });
+});
+</script>
+
 </body>
-</html>
+</html>   
+
