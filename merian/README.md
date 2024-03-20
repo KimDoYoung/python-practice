@@ -13,6 +13,11 @@
 - python -m venv env
 - source .env/Scripts/activate
 
+## test data
+```
+INSERT INTO public.edi_user (id,pw,nm,email,created_by)values('user1','$2b$12$C/MeW1GIhMe/W1nK45g7u.B.MrPzg4xQQDWFXZdCXYCfIA1xkClP2','김도영','kdy987@gmail.com','system');
+```
+
 ## 실행환경
 ```
     source .env
