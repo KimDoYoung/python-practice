@@ -1,0 +1,37 @@
+from datetime import timedelta
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from sqlalchemy.orm import Session
+
+from backend.app.core.constants import ACCESS_TOKEN_EXPIRE_MINUTES
+from backend.app.services.db_utils import get_db
+
+from ...core.security import create_access_token, verify_password
+from ...schemas.user_schema import Token
+from ...models.user import User
+
+
+router = APIRouter()
+
+@router.post("/login", response_model=Token)
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = authenticate_user(db, form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.id}, expires_delta=access_token_expires
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+def authenticate_user(db: Session, username: str, password: str):
+    user = db.query(User).filter(User.id == username).first()
+    if not user:
+        return False
+    if not user.verify_password(password):
+        return False
+    return user

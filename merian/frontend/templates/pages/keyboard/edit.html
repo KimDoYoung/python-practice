@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>키보드 추가</title>
+    <!-- Tailwind CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mx-auto mt-5">
+        <h1 class="text-xl font-semibold mb-4">키보드 추가</h1>
+        <form action="/keyboard/insert" method="post" class="space-y-4">
+            <div>
+                <label for="product_name" class="block">제품명:</label>
+                <input type="text" id="product_name" name="product_name" class="border p-2 w-full">
+            </div>
+            <div>
+                <label for="manufacturer" class="block">제조사:</label>
+                <input type="text" id="manufacturer" name="manufacturer" class="border p-2 w-full">
+            </div>
+            <div>
+                <label for="purchase_date" class="block">구입일 (YYYYMMDD):</label>
+                <input type="text" id="purchase_date" name="purchase_date" class="border p-2 w-full">
+            </div>
+            <div>
+                <label for="purchase_amount" class="block">구입금액:</label>
+                <input type="number" id="purchase_amount" name="purchase_amount" class="border p-2 w-full">
+            </div>
+            <div>
+                <label for="key_type" class="block">키 타입:</label>
+                <input type="text" id="key_type" name="key_type" class="border p-2 w-full">
+            </div>
+            <div>
+                <label for="switch_type" class="block">스위치 타입:</label>
+                <input type="text" id="switch_type" name="switch_type" class="border p-2 w-full">
+            </div>
+            <div>
+                <label for="actuation_force" class="block">작동 압력:</label>
+                <input type="text" id="actuation_force" name="actuation_force" class="border p-2 w-full">
+            </div>
+            <div>
+                <label for="interface_type" class="block">인터페이스 타입:</label>
+                <input type="text" id="interface_type" name="interface_type" class="border p-2 w-full">
+            </div>
+            <div>
+                <label for="overall_rating" class="block">종합적 평가 (1~10):</label>
+                <input type="number" id="overall_rating" name="overall_rating" class="border p-2 w-full" min="1" max="10">
+            </div>
+            <div>
+                <label for="typing_feeling" class="block">타이핑 감각:</label>
+                <textarea id="typing_feeling" name="typing_feeling" class="border p-2 w-full"></textarea>
+            </div>
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                추가하기
+            </button>
+        </form>
+    </div>
+</body>
+</html>
