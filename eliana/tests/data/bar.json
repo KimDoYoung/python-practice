@@ -1,0 +1,17 @@
+{
+    "user_id": "kdy987",
+    "result_type": "url",
+    "chart_type": "bar",
+    "width": 800,
+    "height": 600,
+    "title": "Line Chart 샘플",
+    "x_data": [1, 2, 3, 4, 5],
+    "y_data": [[5, 7, 3, 8, 9], [2, 4, 6, 1, 3]],
+    "x_label": "X 축 라벨",
+    "y_label": "Y 축 라벨",
+    "bar_colors": ["blue", "green"],
+    "bar_widths": [0.4, 0.4],
+    "legend_labels": ["데이터 시리즈 1", "데이터 시리즈 2"],
+    "axis_range": [[0, 6], [0, 10]],
+    "grid": true
+}

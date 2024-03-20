@@ -101,6 +101,66 @@ pytest --capture=no  -W ignore::DeprecationWarning
 2. 환경변수 : ELIANA_MODE 사용
 3. log폴더 안에 eliana.log 생성
 
+## 챠트 클래스
+
+```mermaid
+classDiagram
+    class ChartBase {
+        +user_id: str
+        +result_type: str
+        +chart_type: str
+        +width: int
+        +height: int
+        +title: Optional[str]
+    }
+    class LineChartRequest {
+        +x_data: List[float]
+        +y_data: List[List[float]]
+        +x_label: Optional[str]
+        +y_label: Optional[str]
+        +line_colors: Optional[List[str]]
+        +line_styles: Optional[List[str]]
+        +line_widths: Optional[List[float]]
+        +legend_labels: Optional[List[str]]
+        +axis_range: Optional[List[Tuple[float, float]]]
+        +marker_styles: Optional[List[str]]
+        +grid: Optional[bool]
+        +text_labels: Optional[List[List[Tuple[float, float, str]]]]
+    }
+    class BarChartRequest {
+        +x_data: List[float]
+        +y_data: List[List[float]]
+        +x_label: Optional[str]
+        +y_label: Optional[str]
+        +bar_colors: Optional[List[str]]
+        +bar_widths: Optional[List[float]]
+        +legend_labels: Optional[List[str]]
+        +axis_range: Optional[List[Tuple[float, float]]]
+        +grid: Optional[bool]
+    }
+    class PieChartRequest {
+        +labels: List[str]
+        +sizes: List[int]
+        +colors: List[str]
+        +explode: List[float]
+        +shadow: Optional[bool]
+        +startangle: Optional[int]
+        +autopct: Optional[str]
+        +pctdistance: Optional[float]
+        +labeldistance: Optional[float]
+        +wedgeprops: Optional[dict]
+        +textprops: Optional[dict]
+        +radius: Optional[float]
+        +counterclock: Optional[bool]
+        +frame: Optional[bool]
+        +legend_labels: Optional[List[str]]
+        +legend_loc: Optional[str]
+    }
+    ChartBase <|-- LineChartRequest
+    ChartBase <|-- BarChartRequest
+    ChartBase <|-- PieChartRequest
+```
+
 ## 챠트 생성 로직
 * /chart 
 * POST방식으로 각 챠트에 대한 json 데이터 전송
