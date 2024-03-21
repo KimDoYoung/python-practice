@@ -8,8 +8,25 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body>
+    
     <div class="container mx-auto mt-5">
         <h1 class="text-xl font-semibold mb-4">키보드 리스트</h1>
+        <div class="flex space-x-2 items-center py-2">
+            <input type="text" name="search" placeholder="검색" class="border-2 border-gray-200 rounded-lg p-2 flex-grow">
+          
+            <button class="p-2 rounded-lg bg-blue-500 text-white flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </button>
+          
+            <button class="p-2 rounded-lg bg-green-500 text-white flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              추가
+            </button>
+          </div>
         <table class="table-auto w-full text-left whitespace-no-wrap">
             <thead>
                 <tr class="text-gray-800 border-b-2 border-gray-300">

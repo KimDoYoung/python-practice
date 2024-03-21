@@ -21,7 +21,7 @@ INSERT INTO public.edi_user (id,pw,nm,email,created_by)values('user1','$2b$12$C/
 ## 실행환경
 ```
     source .env
-    uvicorn backedn.main:app --reload --port $PORT
+    uvicorn backend.main:app --reload --port $PORT
 ```
 ## 디버깅
 

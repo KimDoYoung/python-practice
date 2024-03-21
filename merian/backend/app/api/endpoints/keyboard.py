@@ -1,13 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from typing import List
+
+from backend.app.schemas.keyboard_schema import KeyboardCreate, KeyboardUpdate
 from ...services.db_utils import get_db
 from ...models.keyboard import Keyboard  # Keyboard 모델 정의를 가정
-from ...schemas.keyboard import KeyboardCreate, KeyboardUpdate  # Keyboard 스키마 정의를 가정
+
 
 router = APIRouter()
 
-@router.get("/keyboard/", response_model=List[Keyboard])
+@router.get("/keyboard", response_model=List[Keyboard])
 async def read_keyboards(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     keyboards = db.query(Keyboard).offset(skip).limit(limit).all()
     return keyboards
