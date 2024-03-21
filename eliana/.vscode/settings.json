@@ -1,5 +1,6 @@
 {
     "python.analysis.extraPaths": [
         "./src"
-    ]
+    ],
+    "terminal.integrated.defaultProfile.windows": "Git Bash"
 }
