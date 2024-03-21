@@ -4,6 +4,6 @@
     ],
     "terminal.integrated.defaultProfile.windows": "Git Bash",
     "editor.codeActionsOnSave": {
-        "source.fixAll.markdownlint" : true
+        "source.fixAll.markdownlint" : "always"
     }
 }

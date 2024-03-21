@@ -102,7 +102,7 @@ pytest --capture=no  -W ignore::DeprecationWarning
 1. sqlite 사용
    * eliana.db : 같은 폴더에 생성
    * chart_history : 사용자가 생성한 chart history
-   * chart_sample  : 챠트  샘플들 즉 구현된 챠트종류, 사용자는 이것을 수정해서 사용할 수 있다.
+   * chart_sample  : 챠트 샘플들 즉 구현된 챠트종류, 사용자는 이것을 수정해서 사용할 수 있다.
 
 2. 환경변수 : ELIANA_MODE 사용
 3. log폴더 안에 eliana.log 생성
