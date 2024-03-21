@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>keyboard</title>
+    (% include 'common/header.html' %)
+</head>
+<body>
+    <nav class="bg-gray-800 text-white h-8 flex items-center px-4" style="height: 1cm;">
+        <a href="#" class="mx-2">키보드</a>
+    </nav>
+    <main class="m-3">
+        
+    </main>
+    (% include 'common/footer.html' %)
+    <!-- 핸들바 탬플릿 handlebar templates area -->
+    <script id="keyboard-list-template" type="text/x-handlebars-template">
+        ((keyboard_list | safe))
+    </script>
+    <script id="keyboard-insert-template" type="text/x-handlebars-template">
+        ((keyboard_insert | safe))
+    </script>
+    <script id="keyboard-insert-template" type="text/x-handlebars-template">
+        ((keyboard_edit | safe))
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@4.7.7/dist/handlebars.min.js"></script>
+    <script src="/static/js/common.js"></script>
+    <script src="/static/js/handlebar-helpers.js"></script>
+    <script src="/static/js/merian-keyboard.js"></script>
+    <script>
+        $(document).ready(function() {
+            MerianKeyboard.init();
+        });
+    </script>
+</body>
+</html>

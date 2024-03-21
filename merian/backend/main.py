@@ -31,11 +31,44 @@ templates = Environment(
     variable_start_string='((', variable_end_string='))'
 )
 
+def extract_body_content(html_content):
+    start = html_content.find('<body>')
+    end = html_content.find('</body>')
+    if start != -1 and end != -1:
+        return html_content[start+len('<body>'):end].strip()
+    return ""
+
+# HTML 파일을 읽고 내용을 추출하는 예시
+def read_html_content(file_path):
+    with open(file_path, 'r', encoding='utf-8') as file:
+        html_content = file.read()
+        body_content = extract_body_content(html_content)
+        return body_content
+
+def render_html_template(template_name: str, context: dict = None, request: Request = None) -> HTMLResponse:
+    context = context or {}
+    template = templates.get_template(template_name)
+    content = template.render(request=request, **context)
+    return HTMLResponse(content)
+    
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     template = templates.get_template('pages/login.html')
     return HTMLResponse(template.render(request=request))
+    
+@app.get("/main", response_class=HTMLResponse)
+async def read_root(request: Request):
+    keyboard_list = read_html_content('frontend/templates/pages/keyboard/list.html')
+    keyboard_insert = read_html_content('frontend/templates/pages/keyboard/insert.html')
+    keyboard_edit = read_html_content('frontend/templates/pages/keyboard/edit.html')
 
+    context = {
+        "keyboard_list": keyboard_list,
+        "keyboard_insert": keyboard_insert,
+        "keyboard_edit": keyboard_edit
+    }
+
+    return render_html_template('pages/main.html', context=context, request=request)    
 
 if __name__ == "__main__":
     import uvicorn
