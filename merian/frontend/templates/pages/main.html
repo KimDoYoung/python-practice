@@ -1,39 +1,49 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>keyboard</title>
-    (% include 'common/header.html' %)
-</head>
-<body>
-    <nav class="bg-gray-800 text-white h-8 flex items-center px-4" style="height: 1cm;">
-        <a href="#" class="mx-2">키보드</a>
-    </nav>
-    <main class="m-3">
-        
-    </main>
-    (% include 'common/footer.html' %)
-    <!-- 핸들바 탬플릿 handlebar templates area -->
-    <script id="keyboard-list-template" type="text/x-handlebars-template">
-        ((keyboard_list | safe))
-    </script>
-    <script id="keyboard-insert-template" type="text/x-handlebars-template">
-        ((keyboard_insert | safe))
-    </script>
-    <script id="keyboard-insert-template" type="text/x-handlebars-template">
-        ((keyboard_edit | safe))
-    </script>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>keyboard</title>
+        (% include 'common/header.html' %)
+    </head>
+    <body>
+        <nav class="bg-gray-800 text-white h-8 flex items-center px-4" style="height: 1cm">
+            <a href="/main?pageId=keyboard-list" class="mx-2">키보드</a>
+        </nav>
+        <main id="workspace" class="m-3"></main>
+        <div id="error-area" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <strong class="font-bold">오류!</strong>
+            <span class="block sm:inline" id="error-message-area"></span>
+            <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
+              <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>닫기</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.029a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.697z"/></svg>
+            </span>
+        </div>
+          
+        (% include 'common/footer.html' %)
+        <!-- 핸들바 탬플릿 handlebar templates area -->
+        <script id="keyboard-list-template" type="text/x-handlebars-template">
+            ((keyboard_list | safe))
+        </script>
+        <script id="keyboard-insert-template" type="text/x-handlebars-template">
+            ((keyboard_insert | safe))
+        </script>
+        <script id="keyboard-insert-template" type="text/x-handlebars-template">
+            ((keyboard_edit | safe))
+        </script>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/handlebars@4.7.7/dist/handlebars.min.js"></script>
-    <script src="/static/js/common.js"></script>
-    <script src="/static/js/handlebar-helpers.js"></script>
-    <script src="/static/js/merian-keyboard.js"></script>
-    <script>
-        $(document).ready(function() {
-            MerianKeyboard.init();
-        });
-    </script>
-</body>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/handlebars@4.7.7/dist/handlebars.min.js"></script>
+        <script src="/static/js/handlebar-helpers.js"></script>
+        <script src="/static/js/common.js" defer></script>    
+        <script src="/static/js/merian-keyboard.js" defer></script>
+        <script>
+            
+
+            $(document).ready(function () {
+                var pageId = '((pageId))';
+                console.log('document ready... ' + pageId)
+                displayWorkspace(pageId);
+            }); //end document read
+        </script>
+    </body>
 </html>

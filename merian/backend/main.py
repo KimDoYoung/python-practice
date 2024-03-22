@@ -1,16 +1,18 @@
 from dotenv import load_dotenv
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Query, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 import os
 from backend.app.api.endpoints.user import router as user_router
+from backend.app.api.endpoints.keyboard import router as keyboqrd_router
 
 load_dotenv()  # 환경변수 로드
 
 app = FastAPI()
 
 app.include_router(user_router)
+app.include_router(keyboqrd_router)
 
 # "static" 폴더를 "/static" 경로에 마운트합니다.
 # 이 예제에서는 프로젝트 루트 디렉토리에 "static" 폴더가 있고,
@@ -57,12 +59,13 @@ async def read_root(request: Request):
     return HTMLResponse(template.render(request=request))
     
 @app.get("/main", response_class=HTMLResponse)
-async def read_root(request: Request):
+async def read_root(request: Request, pageId: str = Query(default="keyboard-list")):
     keyboard_list = read_html_content('frontend/templates/pages/keyboard/list.html')
     keyboard_insert = read_html_content('frontend/templates/pages/keyboard/insert.html')
     keyboard_edit = read_html_content('frontend/templates/pages/keyboard/edit.html')
 
     context = {
+        "pageId": pageId,
         "keyboard_list": keyboard_list,
         "keyboard_insert": keyboard_insert,
         "keyboard_edit": keyboard_edit
