@@ -6,6 +6,7 @@
     1. 키보드 정보를 테이블 keyboard를 통해서 관리
     2. 키보드와 관련된 이미지 파일을 관리
 2. 최대한 chatGPT가 소스를 생성하게 한다
+3. python으로 open api사용법을 정립
 
 ## virtual 환경 설정
 
