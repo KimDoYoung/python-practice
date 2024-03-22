@@ -3,11 +3,11 @@ from fastapi import FastAPI, Query, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-import os
 from backend.app.api.endpoints.user import router as user_router
 from backend.app.api.endpoints.keyboard import router as keyboqrd_router
+import os
 
-load_dotenv()  # 환경변수 로드
+# load_dotenv()  # 환경변수 로드
 
 app = FastAPI()
 
@@ -60,6 +60,7 @@ async def read_root(request: Request):
     
 @app.get("/main", response_class=HTMLResponse)
 async def read_root(request: Request, pageId: str = Query(default="keyboard-list")):
+    
     keyboard_list = read_html_content('frontend/templates/pages/keyboard/list.html')
     keyboard_insert = read_html_content('frontend/templates/pages/keyboard/insert.html')
     keyboard_edit = read_html_content('frontend/templates/pages/keyboard/edit.html')

@@ -1,60 +1,3 @@
-# Merian
-
-## 개요
-
-1. 수집한 키보드  정보를 관리
-    1. 키보드 정보를 테이블 keyboard를 통해서 관리
-    2. 키보드와 관련된 이미지 파일을 관리
-2. 최대한 chatGPT가 소스를 생성하게 한다
-3. python으로 open api사용법을 정립
-
-## virtual 환경 설정
-
-- make_merian_folders.sh : 폴더 구조를 생성하는 bash shell 프로그램
-- python -m venv env
-- source .env/Scripts/activate
-
-## env 환경
-
-- .env_local, .env_real 로 설정
-- .gitignore에 설정
-- main.py, constants.py에서만 사용, 기타 프로그램에서는 constants것을 사용
-
-## 실행환경
-
-```bash
-    export MERIAN_MODE=local
-    uvicorn backend.main:app --reload --port $PORT
-```
-
-## 디버깅
-
-- launch.json
-
-```json
-{
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "FastAPI",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "uvicorn",
-            "args": [
-                "backend.main:app",
-                "--reload",
-                "--port",
-                "8686"  // 원하는 포트 번호로 변경
-            ],
-            "jinja": true
-        }
-    ]
-} 
-```
-
-## Table DDL & test data
-
-```sql
 -- collections 스키마에 키보드 정보를 저장하는 테이블 생성
 DROP TABLE IF EXISTS collections.keyboard;
 CREATE TABLE IF NOT EXISTS  collections.keyboard (
@@ -68,8 +11,8 @@ CREATE TABLE IF NOT EXISTS  collections.keyboard (
     interface_type VARCHAR(30), -- 인터페이스 타입 (예: USB, 블루투스)
     overall_rating INT, -- 종합적 평가 (1~10)
     typing_feeling TEXT, -- 타이핑 감각
-   create_on timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
- create_by varchar(30) NULL
+  	create_on timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	create_by varchar(30) NULL
 
 );
 
@@ -90,7 +33,7 @@ COMMENT ON COLUMN collections.keyboard.typing_feeling IS '타이핑 감각';
 COMMENT ON COLUMN collections.keyboard.create_on IS '생성일';
 COMMENT ON COLUMN collections.keyboard.create_by IS '생성자';
 
--- 
+
 DROP TABLE IF EXISTS public.file_collection_match;
 CREATE TABLE IF NOT EXISTS public.file_collection_match (
  category varchar(100) not NULL DEFAULT 'keyboard', --  'keyboard'
@@ -99,5 +42,6 @@ CREATE TABLE IF NOT EXISTS public.file_collection_match (
  PRIMARY KEY (category, id, file_id)
 );
 
+delete from public.edi_user where id='user1';
 INSERT INTO public.edi_user (id,pw,nm,email,created_by)values('user1','$2b$12$C/MeW1GIhMe/W1nK45g7u.B.MrPzg4xQQDWFXZdCXYCfIA1xkClP2','김도영','kdy987@gmail.com','system');
-```
+
