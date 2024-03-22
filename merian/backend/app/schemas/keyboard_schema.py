@@ -3,7 +3,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 # 키보드 데이터를 생성하기 위한 스키마
-class KeyboardCreate(BaseModel):
+class KeyboardCreateRequest(BaseModel):
     product_name: str
     manufacturer: str
     purchase_date: str
@@ -17,7 +17,7 @@ class KeyboardCreate(BaseModel):
 
 # 키보드 데이터를 업데이트하기 위한 스키마
 # 일부 필드는 업데이트 시 선택적일 수 있음
-class KeyboardUpdate(BaseModel):
+class KeyboardUpdateRequest(BaseModel):
     product_name: Optional[str] = None
     manufacturer: Optional[str] = None
     purchase_date: Optional[str] = None
@@ -31,7 +31,7 @@ class KeyboardUpdate(BaseModel):
 
 # 데이터베이스에서 읽어온 키보드 데이터를 응답으로 전송하기 위한 스키마
 # 모든 필드가 포함됨
-class Keyboard(BaseModel):
+class KeyboardRequest(BaseModel):
     id: int
     product_name: str
     manufacturer: str
@@ -47,4 +47,4 @@ class Keyboard(BaseModel):
     create_by: Optional[str] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True

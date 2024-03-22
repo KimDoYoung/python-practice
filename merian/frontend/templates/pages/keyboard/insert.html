@@ -10,51 +10,78 @@
 <body>
     <div class="container mx-auto mt-5">
         <h1 class="text-xl font-semibold mb-4">키보드 추가</h1>
-        <form action="/keyboard/insert" method="post" class="space-y-4">
-            <div>
-                <label for="product_name" class="block">제품명:</label>
-                <input type="text" id="product_name" name="product_name" class="border p-2 w-full">
+        <form id="keyboardInsertForm" action="/keyboard/insert" method="post" class="space-y-4">
+            <!-- 1. 제품명, 제조사 -->
+            <div class="flex space-x-4">
+                <div class="w-1/2">
+                    <label for="product_name" class="block">제품명:</label>
+                    <input type="text" id="product_name" name="product_name" class="border p-2 w-full">
+                </div>
+                <div class="w-1/2">
+                    <label for="manufacturer" class="block">제조사:</label>
+                    <input type="text" id="manufacturer" name="manufacturer" class="border p-2 w-full">
+                </div>
             </div>
-            <div>
-                <label for="manufacturer" class="block">제조사:</label>
-                <input type="text" id="manufacturer" name="manufacturer" class="border p-2 w-full">
+        
+            <!-- 2. 구입일, 구입금액 -->
+            <div class="flex space-x-4">
+                <div class="w-1/2">
+                    <label for="purchase_date" class="block">구입일 (YYYYMMDD):</label>
+                    <input type="text" id="purchase_date" name="purchase_date" class="border p-2 w-full">
+                </div>
+                <div class="w-1/2">
+                    <label for="purchase_amount" class="block">구입금액:</label>
+                    <input type="number" id="purchase_amount" name="purchase_amount" class="border p-2 w-full">
+                </div>
             </div>
-            <div>
-                <label for="purchase_date" class="block">구입일 (YYYYMMDD):</label>
-                <input type="text" id="purchase_date" name="purchase_date" class="border p-2 w-full">
+        
+            <!-- 3. 키 타입, 스위치 타입 -->
+            <div class="flex space-x-4">
+                <div class="w-1/2">
+                    <label for="key_type" class="block">키 타입:</label>
+                    <input type="text" id="key_type" name="key_type" class="border p-2 w-full">
+                </div>
+                <div class="w-1/2">
+                    <label for="switch_type" class="block">스위치 타입:</label>
+                    <input type="text" id="switch_type" name="switch_type" class="border p-2 w-full">
+                </div>
             </div>
-            <div>
-                <label for="purchase_amount" class="block">구입금액:</label>
-                <input type="number" id="purchase_amount" name="purchase_amount" class="border p-2 w-full">
+        
+            <!-- 4. 작동 압력, 인터페이스 타입 -->
+            <div class="flex space-x-4">
+                <div class="w-1/2">
+                    <label for="actuation_force" class="block">작동 압력:</label>
+                    <input type="text" id="actuation_force" name="actuation_force" class="border p-2 w-full">
+                </div>
+                <div class="w-1/2">
+                    <label for="interface_type" class="block">인터페이스 타입:</label>
+                    <input type="text" id="interface_type" name="interface_type" class="border p-2 w-full">
+                </div>
             </div>
-            <div>
-                <label for="key_type" class="block">키 타입:</label>
-                <input type="text" id="key_type" name="key_type" class="border p-2 w-full">
-            </div>
-            <div>
-                <label for="switch_type" class="block">스위치 타입:</label>
-                <input type="text" id="switch_type" name="switch_type" class="border p-2 w-full">
-            </div>
-            <div>
-                <label for="actuation_force" class="block">작동 압력:</label>
-                <input type="text" id="actuation_force" name="actuation_force" class="border p-2 w-full">
-            </div>
-            <div>
-                <label for="interface_type" class="block">인터페이스 타입:</label>
-                <input type="text" id="interface_type" name="interface_type" class="border p-2 w-full">
-            </div>
+        
+            <!-- 5. 종합적 평가 -->
             <div>
                 <label for="overall_rating" class="block">종합적 평가 (1~10):</label>
-                <input type="number" id="overall_rating" name="overall_rating" class="border p-2 w-full" min="1" max="10">
+                <input type="range" id="overall_rating" name="overall_rating" class="w-full" min="1" max="10">
             </div>
+        
+            <!-- 6. 타이핑 감각 -->
             <div>
                 <label for="typing_feeling" class="block">타이핑 감각:</label>
                 <textarea id="typing_feeling" name="typing_feeling" class="border p-2 w-full"></textarea>
             </div>
+        
+            <!-- 7. 첨부파일 -->
+            <div>
+                <label for="file_upload" class="block">첨부파일:</label>
+                <input type="file" id="file_upload" name="file_upload[]" class="border p-2 w-full" multiple>
+            </div>
+        
             <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                 추가하기
             </button>
         </form>
+        
     </div>
 </body>
 </html>
