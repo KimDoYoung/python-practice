@@ -36,7 +36,7 @@ COMMENT ON COLUMN collections.keyboard.create_by IS '생성자';
 
 DROP TABLE IF EXISTS public.file_collection_match;
 CREATE TABLE IF NOT EXISTS public.file_collection_match (
- category varchar(100) not NULL DEFAULT 'keyboard', --  'keyboard'
+ category varchar(100) not NULL DEFAULT 'keyboard', 
  id serial4 not null, -- keyboard id
  file_id serial4  not NULL, -- file_id
  PRIMARY KEY (category, id, file_id)
