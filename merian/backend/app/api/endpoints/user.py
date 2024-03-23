@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from backend.app.core.constants import ACCESS_TOKEN_EXPIRE_MINUTES
+from backend.app.core.configs import ACCESS_TOKEN_EXPIRE_MINUTES
 from backend.app.services.db_service import get_db
 
 from ...core.security import create_access_token, verify_password

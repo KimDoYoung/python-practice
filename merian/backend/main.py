@@ -1,4 +1,3 @@
-from dotenv import load_dotenv
 from fastapi import FastAPI, Query, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -7,7 +6,12 @@ from backend.app.api.endpoints.user import router as user_router
 from backend.app.api.endpoints.keyboard import router as keyboqrd_router
 import os
 
-# load_dotenv()  # 환경변수 로드
+from backend.app.core.configs import MERIAN_PORT
+
+# 환경 변수나 어플리케이션의 설정을 통해 현재 환경을 결정
+# profile = os.getenv('MERIAN_MODE', 'local')
+# env_path = f'.env.{profile}'
+# load_dotenv(dotenv_path=env_path)
 
 app = FastAPI()
 
@@ -76,4 +80,4 @@ async def read_root(request: Request, pageId: str = Query(default="keyboard-list
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8686)), reload=True)
+    uvicorn.run(app, host="0.0.0.0", port=MERIAN_PORT, reload=True)
