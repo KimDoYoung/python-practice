@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 # 키보드 데이터를 생성하기 위한 스키마
 class KeyboardCreateRequest(BaseModel):
-    product_name: str
+    product_name: Optional[str] = None
     manufacturer: str
     purchase_date: str
     purchase_amount: int

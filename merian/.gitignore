@@ -1,3 +1,1 @@
-.env_local
-.env_local
-.env_*
+.env.*

@@ -1,3 +1,4 @@
+from dotenv import load_dotenv
 from fastapi import FastAPI, Query, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -8,10 +9,6 @@ import os
 
 from backend.app.core.configs import MERIAN_PORT
 
-# 환경 변수나 어플리케이션의 설정을 통해 현재 환경을 결정
-# profile = os.getenv('MERIAN_MODE', 'local')
-# env_path = f'.env.{profile}'
-# load_dotenv(dotenv_path=env_path)
 
 app = FastAPI()
 

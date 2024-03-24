@@ -5,9 +5,9 @@ from sqlalchemy.orm import sessionmaker, Session as SQLAlchemySession
 from sqlalchemy.ext.declarative import declarative_base
 import os
 
-# 환경 변수 또는 설정 파일에서 데이터베이스 연결 정보를 로드합니다.
-# 예시로 직접 문자열을 입력했으나, 실제로는 보안을 위해 환경 변수에서 가져오는 것이 좋습니다.
-DATABASE_URL = os.getenv("DB_URL")
+from backend.app.core.configs import DATABASE_URL
+
+#DATABASE_URL = os.getenv("DB_URL")
 
 engine = create_engine(DATABASE_URL, echo=True)  # echo=True는 SQL 로그를 출력합니다. 개발 단계에서 유용할 수 있습니다.
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
