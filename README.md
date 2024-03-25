@@ -11,3 +11,6 @@
 3. eliana  : chart api 서버
    1. FastAPI, Matplotlib, PostgreSQL, 그리고 JWT
    2. 챠트관련 데이터를 json문자열로 받아서 그것으로 이미지파일을 만들고 url을 보내준다.
+4. mf-test
+   1. Makefiles 테스트
+

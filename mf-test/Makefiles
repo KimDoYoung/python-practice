@@ -1,0 +1,20 @@
+# Variables
+PYTHON = python
+SRC_DIR = src
+TEST_DIR = tests
+
+# Targets
+.PHONY: all clean test
+
+all: test
+
+setup:
+	@$(PYTHON) -m venv env
+
+clean:
+	@echo "Cleaning up..."
+	@rm -rf __pycache__ *.pyc
+
+test:
+	@echo "Running tests..."
+	@$(PYTHON) -m unittest discover -s $(TEST_DIR) -p "test_*.py"
