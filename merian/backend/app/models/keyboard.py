@@ -49,5 +49,5 @@ class FileCollectionMatch(Base):
 
     category = Column(String(100), primary_key=True, default='keyboard')
     id = Column(Integer, primary_key=True)
-    file_id = Column(Integer, ForeignKey('fb_file.file_id'), primary_key=True)
+    file_id = Column(Integer, ForeignKey('public.fb_file.file_id'), primary_key=True)
     file = relationship("FBFile")

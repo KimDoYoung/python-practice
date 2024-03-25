@@ -1,6 +1,7 @@
 -- collections 스키마에 키보드 정보를 저장하는 테이블 생성
 DROP TABLE IF EXISTS collections.keyboard;
 CREATE TABLE IF NOT EXISTS  collections.keyboard (
+    id serial4 PRIMARY KEY, -- 키보드 ID
     product_name VARCHAR(100), -- 제품명
     manufacturer VARCHAR(100), -- 제조사
     purchase_date VARCHAR(8), -- 구입일 (YYYYMMDD 형식)
@@ -20,6 +21,7 @@ CREATE TABLE IF NOT EXISTS  collections.keyboard (
 COMMENT ON TABLE collections.keyboard IS '키보드 정보를 저장하는 테이블';
 
 -- 각 열에 주석 추가
+COMMENT ON COLUMN collections.keyboard.id IS '자동생성키';
 COMMENT ON COLUMN collections.keyboard.product_name IS '제품명';
 COMMENT ON COLUMN collections.keyboard.manufacturer IS '제조사';
 COMMENT ON COLUMN collections.keyboard.purchase_date IS '구입일 (YYYYMMDD 형식)';
