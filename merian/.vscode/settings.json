@@ -2,5 +2,8 @@
     "terminal.integrated.defaultProfile.windows": "Git Bash",
     "editor.codeActionsOnSave": {
         "source.fixAll.markdownlint" : "always"
-    }   
+    },
+    "python.analysis.extraPaths": [
+        "./backend/app/core"
+    ]
 }

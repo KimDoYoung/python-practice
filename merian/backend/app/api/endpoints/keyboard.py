@@ -31,6 +31,7 @@ router = APIRouter()
 #         return JSONResponse(content={"list": keyboard_list, "skip": skip, "limit": limit})
 @router.get("/keyboard")
 async def read_keyboards(skip: int = 0, limit: int = 10, db: AsyncSession = Depends(get_db)):
+    
     async with db as session:
         result = await session.execute(select(KeyboardModel).offset(skip).limit(limit))
         keyboards = result.scalars().all()

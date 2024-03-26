@@ -8,12 +8,16 @@ from backend.app.api.endpoints.keyboard import router as keyboqrd_router
 import os
 
 from backend.app.core.configs import MERIAN_PORT
+from backend.app.core.exception_handler import add_exception_handlers
 
 
 app = FastAPI()
 
 app.include_router(user_router)
 app.include_router(keyboqrd_router)
+
+# 예외 핸들러를 추가하는 함수를 호출
+add_exception_handlers(app)
 
 # "static" 폴더를 "/static" 경로에 마운트합니다.
 # 이 예제에서는 프로젝트 루트 디렉토리에 "static" 폴더가 있고,
