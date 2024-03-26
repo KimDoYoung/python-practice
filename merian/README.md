@@ -16,15 +16,15 @@
 
 ## env 환경
 
-- .env_local, .env_real 로 설정
+- .env.local, .env.real 로 설정
 - .gitignore에 설정
 - main.py, constants.py에서만 사용, 기타 프로그램에서는 constants것을 사용
 
-- .env_local
+- .env.local
 
 ```text
 # Database URL
-DB_URL="postgresql://kdy987:kalpa987!@localhost:5432/fbhdb"
+DB_URL="postgresql+asyncpg://kdy987:kalpa987!@localhost:5432/fbhdb"
 
 # PORT
 PORT=8686

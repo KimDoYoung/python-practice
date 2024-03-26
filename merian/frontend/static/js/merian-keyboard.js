@@ -31,6 +31,11 @@ function displayError(xhr) {
     $('#error-message-area').text(message);
     $('#error-area').show();
 }
+function hideError() {
+    var message = '';
+    $('#error-message-area').text(message);
+    $('#error-area').hide();
+}
 function generateHtml(pageId,data) {
     
     var handlebarId = MappingInfo[pageId].handlebarTemplate;
@@ -40,10 +45,12 @@ function generateHtml(pageId,data) {
     return html;
 }
 function displayWorkspace(pageId) {
+    hideError();
     var url = MappingInfo[pageId].url;
     var method = MappingInfo[pageId].method;
     var initFunc = MappingInfo[pageId].init_function;
     var data = {};
+    
     JuliaUtil.ajax(url,data,{
         method : method,
         success: function (data) {
@@ -59,6 +66,7 @@ function displayWorkspace(pageId) {
 function init_keyboard_list(){
     $('#workspace').on('click', '#btnAddKeyboard', function(e) {
         e.stopPropagation();
+        
         var html = generateHtml('keyboard-insert',{});
         $('#workspace').html(html);
         init_keyboard_insert();
@@ -70,18 +78,22 @@ function init_keyboard_insert(){
     $('#workspace').on('submit', '#keyboardInsertForm', function(e) {
         e.preventDefault(); // 폼의 기본 제출 동작을 방지
 
-        //var formData = new FormData(this); // 현재 폼으로부터 FormData 객체 생성
         formData = new FormData();
-        formData.append('keyboardData', JSON.stringify({
-            product_name: $('#product_name').val()
-        }));
-        //formData.append('product_name', $('#product_name').val());
+        var data = JuliaUtil.formToJson($(this));
+        console.log(data);
+        formData.append('keyboardData',  JSON.stringify(data));
+        var $fileTag = $('#file_uploads');
+        $.each($fileTag.get(0).files, function(i, file) {
+            formData.append('files', file); // 'files' 키로 각 파일 추가
+        });
 
+        console.log(formData);     
         var token = localStorage.getItem('token');
         // Ajax 요청 설정
         $.ajax({
             url: '/keyboard/insert', // 요청을 보낼 서버의 URL
             type: 'POST', // HTTP 요청 방식 (GET, POST 등)
+            enctype: 'multipart/form-data',  
             data: formData, // 전송할 데이터
             processData: false, // jQuery가 데이터를 처리하지 않도록 설정
             contentType: false, // jQuery가 Content-Type 헤더를 설정하지 않도록 설정
