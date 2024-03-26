@@ -10,6 +10,8 @@ from backend.app.services.db_service import get_db
 from ...core.security import create_access_token, verify_password
 from ...schemas.user_schema import Token
 from ...models.user import User
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 
 
 router = APIRouter()
@@ -20,7 +22,7 @@ class LoginFormData(BaseModel):
     
 @router.post("/login", response_model=Token)
 async def login_for_access_token(form_data: LoginFormData, db: Session = Depends(get_db)):
-    user = authenticate_user(db, form_data.username, form_data.password)
+    user = await authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -33,10 +35,18 @@ async def login_for_access_token(form_data: LoginFormData, db: Session = Depends
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
-def authenticate_user(db: Session, username: str, password: str):
-    user = db.query(User).filter(User.id == username).first()
-    if not user:
-        return False
-    if not user.verify_password(password):
-        return False
-    return user
+# def authenticate_user(db: Session, username: str, password: str):
+#     user = db.query(User).filter(User.id == username).first()
+#     if not user:
+#         return False
+#     if not user.verify_password(password):
+#         return False
+#     return user
+# 사용자 인증 함수 - 비동기 함수로 변경
+async def authenticate_user(db: AsyncSession, username: str, password: str):
+    async with db as session:
+        user = await session.execute(select(User).filter(User.id == username))
+        user = user.scalars().first()
+        if user and user.verify_password(password):
+            return user
+    return False

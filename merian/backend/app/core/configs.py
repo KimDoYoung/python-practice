@@ -13,6 +13,7 @@ MERIAN_PORT=int(os.getenv('PORT', 8686))
 
 DATABASE_URL = os.getenv("DB_URL")
 
+
 if MERIAN_PROFILE == "local":
     LOG_FILE = "c:\\tmp\\logs\\merian\\merian.log"
     FILE_DIR="c:\\tmp\\files\\merian"

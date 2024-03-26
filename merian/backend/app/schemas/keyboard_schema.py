@@ -63,7 +63,8 @@ class KeyboardRequest(BaseModel):
     create_by: Optional[str] = None
 
 class KeyboardResponse(KeyboardRequest):
-    files: List[FBFileResponse] = []
+#    files: List[FBFileResponse] = []
 
-class Config:
-    orm_mode = True
+    class Config:
+        orm_mode = True
+        from_attributes = True  
