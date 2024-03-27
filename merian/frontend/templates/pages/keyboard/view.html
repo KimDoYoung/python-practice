@@ -6,29 +6,37 @@
         <title>Keyboard Collections</title>
         <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
     </head>
-    <body class="bg-gray-100">
-        <div class="container mx-auto mt-10">
-            <div class="bg-white p-6 rounded-lg shadow-lg">
-                <h2 class="text-2xl font-bold mb-4">Keyboard Details</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- Example of a keyboard item -->
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <h3 class="text-xl font-semibold">
-                            Product Name: <span class="text-gray-600">Mechanical Keyboard XYZ</span>
-                        </h3>
-                        <p>Manufacturer: <span class="text-gray-600">ABC Corp</span></p>
-                        <p>Purchase Date: <span class="text-gray-600">20240101</span></p>
-                        <p>Purchase Amount: <span class="text-gray-600">120</span></p>
-                        <p>Key Type: <span class="text-gray-600">Mechanical</span></p>
-                        <p>Switch Type: <span class="text-gray-600">Cherry MX Blue</span></p>
-                        <p>Actuation Force: <span class="text-gray-600">50g</span></p>
-                        <p>Interface Type: <span class="text-gray-600">USB</span></p>
-                        <p>Overall Rating: <span class="text-gray-600">8</span></p>
-                        <p>Typing Feeling: <span class="text-gray-600">Very responsive and clicky</span></p>
-                        <p>Created On: <span class="text-gray-600">2024-03-01 12:00:00</span></p>
-                        <p>Created By: <span class="text-gray-600">Admin</span></p>
+    <body>
+        <div class="container mx-auto mt-8">
+            <div class="bg-white p-5 rounded shadow">
+                <h1 class="text-2xl font-bold mb-4">Keyboard Details</h1>
+                <p><strong>Product Name:</strong> {{product_name}}</p>
+                <p><strong>Manufacturer:</strong> {{manufacturer}}</p>
+                <p><strong>Purchase Date:</strong> {{purchase_date}}</p>
+                <p><strong>Purchase Amount:</strong> {{purchase_amount}}</p>
+                <p><strong>Key Type:</strong> {{key_type}}</p>
+                <p><strong>Switch Type:</strong> {{switch_type}}</p>
+                <p><strong>Actuation Force:</strong> {{actuation_force}}</p>
+                <p><strong>Interface Type:</strong> {{interface_type}}</p>
+                <p><strong>Overall Rating:</strong> {{overall_rating}}</p>
+                <p><strong>Typing Feeling:</strong> {{typing_feeling}}</p>
+                <p><strong>Created On:</strong> {{create_on}}</p>
+                <p><strong>Created By:</strong> {{create_by}}</p>
+
+                <div class="mt-4">
+                    <h2 class="text-xl font-semibold mb-2">Related Files</h2>
+                    <div class="flex flex-wrap">
+                        {{#each files}}
+                        <div class="w-1/4 p-2">
+                            <img src="/file/{{this.file_id}}" alt="File Image" class="w-full h-auto rounded">
+                        </div>
+                        {{/each}}
                     </div>
-                    <!-- Repeat for each keyboard -->
+                </div>
+
+                <div class="mt-8">
+                    <a href="/keyboard" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">List로 가기</a>
+                    <a href="/keyboard/edit/{{id}}" class="ml-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">수정</a>
                 </div>
             </div>
         </div>

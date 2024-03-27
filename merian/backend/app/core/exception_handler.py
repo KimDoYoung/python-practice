@@ -5,13 +5,16 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from backend.app.core.configs import MERIAN_PROFILE
+from backend.app.core.logger import get_logger
 
+logger = get_logger(__name__)
 # 프로젝트 루트 디렉토리를 기반으로 템플릿 디렉토리 설정
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-templates_dir = os.path.join(BASE_DIR, 'templates')
+BASE_DIR = os.path.dirname( os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+logger.debug("BASE_DIR: %s", BASE_DIR)
 
 env = Environment(
-    loader=FileSystemLoader(templates_dir),
+    loader=FileSystemLoader(os.path.join(BASE_DIR, 'frontend/templates')),
     autoescape=select_autoescape(['html', 'xml']),
     block_start_string='(%', block_end_string='%)',
     variable_start_string='((', variable_end_string='))'
@@ -52,10 +55,16 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
 
 async def general_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     """일반 예외 처리"""
-    return JSONResponse(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={"message": "서버 오류가 발생했습니다.", "details": str(exc)}
-    )
+    if MERIAN_PROFILE == "local":
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={ "message" : f"서버 오류가 발생했습니다. {str(exc)}" }
+        )
+    else:
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"message": "서버 오류가 발생했습니다."}
+        )
 
 async def custom_404_exception_handler(request: Request, exc: StarletteHTTPException) -> HTMLResponse:
     """404 예외 처리"""
@@ -67,7 +76,7 @@ async def custom_404_exception_handler(request: Request, exc: StarletteHTTPExcep
         else:
             return JSONResponse(
                 status_code=status.HTTP_404_NOT_FOUND,
-                content={"message": "Page not found"},
+                content={"message": "요청하신 페이지를 찾을 수 없습니다."},
             )
     # 다른 HTTP 예외에 대한 기본 처리
     return JSONResponse(

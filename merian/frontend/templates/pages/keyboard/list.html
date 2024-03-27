@@ -32,34 +32,38 @@
                 <tr class="text-gray-800 border-b-2 border-gray-300">
                     <th class="px-4 py-3">제품명</th>
                     <th class="px-4 py-3">제조사</th>
-                    <th class="px-4 py-3">구입일</th>
-                    <th class="px-4 py-3">구입금액</th>
                     <th class="px-4 py-3">키 타입</th>
                     <th class="px-4 py-3">스위치 타입</th>
-                    <th class="px-4 py-3">작동 압력</th>
-                    <th class="px-4 py-3">인터페이스 타입</th>
-                    <th class="px-4 py-3">종합적 평가</th>
-                    <th class="px-4 py-3">타이핑 감각</th>
-                    <th class="px-4 py-3">생성일</th>
-                    <th class="px-4 py-3">생성자</th>
+                    <th class="px-4 py-3">구입일</th>
+                    <th class="px-4 py-3">구입금액</th>
+                    <th class="px-4 py-3">파일갯수</th>
+                    <th class="px-4 py-3">동작</th>
                 </tr>
             </thead>
             <tbody>
-
+              {{#each list}}
                 <tr class="border-b border-gray-300">
-                    <td class="px-4 py-3">메카닉 키보드</td>
-                    <td class="px-4 py-3">Logitech</td>
-                    <td class="px-4 py-3">20230320</td>
-                    <td class="px-4 py-3">150000</td>
-                    <td class="px-4 py-3">메카닉</td>
-                    <td class="px-4 py-3">Cherry MX Red</td>
-                    <td class="px-4 py-3">45g</td>
-                    <td class="px-4 py-3">USB</td>
-                    <td class="px-4 py-3">9</td>
-                    <td class="px-4 py-3">매우 부드럽고 조용함</td>
-                    <td class="px-4 py-3">2023-03-21</td>
-                    <td class="px-4 py-3">admin</td>
+                    <td class="px-4 py-3"><a href="#" data-id="{{this.id}}" class="btnView">{{this.product_name}}</a></td>
+                    <td class="px-4 py-3">{{this.manufacturer}}</td>
+                    <td class="px-4 py-3">{{this.key_type}}</td>
+                    <td class="px-4 py-3">{{this.switch_type}}</td>
+                    <td class="px-4 py-3">{{this.purchase_date}}</td>
+                    <td class="px-4 py-3">{{this.purchase_amount}}</td>
+                    <td class="px-4 py-3">{{this.file_count}}</td>
+                    <td class="px-4 py-3">
+                      <!-- 수정 버튼 -->
+                      <button  class="btnEdit bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" data-id="{{this.id}}">
+                        <i class="fas fa-edit"></i> 수정
+                      </button>
+
+                      <!-- 삭제 버튼 -->
+                      <button  class="btnDelete bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"  data-id="{{this.id}}">
+                        <i class="fas fa-trash"></i> 삭제
+                      </button>
+                    </td>
+                        
                 </tr>
+              {{/each}}                
             </tbody>
         </table>
     </div>

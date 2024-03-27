@@ -47,3 +47,32 @@ CREATE TABLE IF NOT EXISTS public.file_collection_match (
 delete from public.edi_user where id='user1';
 INSERT INTO public.edi_user (id,pw,nm,email,created_by)values('user1','$2b$12$C/MeW1GIhMe/W1nK45g7u.B.MrPzg4xQQDWFXZdCXYCfIA1xkClP2','김도영','kdy987@gmail.com','system');
 
+
+-- public.fb_file definition
+
+-- Drop table
+
+-- DROP TABLE public.fb_file;
+
+CREATE TABLE public.fb_file (
+	file_id serial4 NOT NULL,
+	node_id int4 NOT NULL,
+	phy_folder varchar(300) NOT NULL,
+	phy_name varchar(300) NOT NULL,
+	org_name varchar(300) NOT NULL,
+	mime_type varchar(100) NULL,
+	file_size int4 NULL,
+	ext varchar(50) NULL,
+	note varchar(1000) NULL,
+	width int4 NULL,
+	height int4 NULL,
+	status bpchar(1) NOT NULL DEFAULT 'N'::bpchar,
+	create_on timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	create_by varchar(30) NULL,
+	CONSTRAINT pk_fb_file PRIMARY KEY (file_id)
+);
+
+
+-- public.fb_file foreign keys
+
+ALTER TABLE public.fb_file ADD CONSTRAINT fk_node_id FOREIGN KEY (node_id) REFERENCES public.fb_node(node_id) ON DELETE RESTRICT;

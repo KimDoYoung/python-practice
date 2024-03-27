@@ -1,0 +1,137 @@
+모델
+````
+from sqlalchemy import CHAR, TIMESTAMP, Column, ForeignKey, Integer, String, BigInteger, Text, DateTime
+from sqlalchemy.sql import func
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
+
+Base = declarative_base()
+
+class KeyboardModel(Base):
+    __tablename__ = 'keyboard'
+    __table_args__ = {'schema': 'collections'}
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    product_name = Column(String(100))
+    manufacturer = Column(String(100))
+    purchase_date = Column(String(8))
+    purchase_amount = Column(BigInteger)
+    key_type = Column(String(10))
+    switch_type = Column(String(20))
+    actuation_force = Column(String(10))
+    interface_type = Column(String(30))
+    overall_rating = Column(Integer)
+    typing_feeling = Column(Text)
+    create_on = Column(DateTime, default=func.now())
+    create_by = Column(String(30), nullable=True)
+
+
+class FBFile(Base):
+    __tablename__ = 'fb_file'
+    __table_args__ = {'schema': 'public'}
+
+    file_id = Column(Integer, primary_key=True)
+    node_id = Column(Integer, nullable=False)
+    phy_folder = Column(String(300), nullable=False)
+    phy_name = Column(String(300), nullable=False)
+    org_name = Column(String(300), nullable=False)
+    mime_type = Column(String(100))
+    file_size = Column(Integer)
+    ext = Column(String(50))
+    note = Column(String(1000))
+    width = Column(Integer)
+    height = Column(Integer)
+    status = Column(CHAR(1), default='N', nullable=False)
+    create_on = Column(TIMESTAMP, nullable=False, server_default="CURRENT_TIMESTAMP")
+    create_by = Column(String(30))
+
+class FileCollectionMatch(Base):
+    __tablename__ = 'file_collection_match'
+    __table_args__ = {'schema': 'public'}
+
+    category = Column(String(100), primary_key=True, default='keyboard')
+    id = Column(Integer, primary_key=True)
+    file_id = Column(Integer, ForeignKey('public.fb_file.file_id'), primary_key=True)
+    file = relationship("FBFile")
+```
+
+스키마
+```
+from datetime import datetime
+from typing import Optional, List
+from pydantic import BaseModel, validator
+
+class FBFileResponse(BaseModel):
+    file_id: int
+    org_name: str
+    mime_type: Optional[str] = None
+    file_size: Optional[int] = None
+
+
+# 키보드 데이터를 생성하기 위한 스키마
+class KeyboardCreateRequest(BaseModel):
+    product_name: Optional[str] = None
+    manufacturer: str
+    purchase_date: str # 이제 이 필드는 문자열이며 YYYYMMDD 형식을 기대합니다.
+    purchase_amount: int
+    key_type: str
+    switch_type: str
+    actuation_force: str
+    interface_type: str
+    overall_rating: int
+    typing_feeling: Optional[str] = None
+
+    @validator('purchase_date')
+    def validate_purchase_date(cls, v):
+        try:
+            datetime.strptime(v, "%Y%m%d")
+        except ValueError:
+            raise ValueError("purchase_date must be in YYYYMMDD format")
+        return v
+
+# 키보드 데이터를 업데이트하기 위한 스키마
+# 일부 필드는 업데이트 시 선택적일 수 있음
+class KeyboardUpdateRequest(BaseModel):
+    product_name: Optional[str] = None
+    manufacturer: Optional[str] = None
+    purchase_date: Optional[str] = None
+    purchase_amount: Optional[int] = None
+    key_type: Optional[str] = None
+    switch_type: Optional[str] = None
+    actuation_force: Optional[str] = None
+    interface_type: Optional[str] = None
+    overall_rating: Optional[int] = None
+    typing_feeling: Optional[str] = None
+    delete_file_ids: Optional[List[int]] = None  # 삭제할 이미지 ID 배열
+
+# 데이터베이스에서 읽어온 키보드 데이터를 응답으로 전송하기 위한 스키마
+# 모든 필드가 포함됨
+class KeyboardRequest(BaseModel):
+    id: Optional[int] = None
+    product_name: str
+    manufacturer: str
+    purchase_date: str
+    purchase_amount: int
+    key_type: str
+    switch_type: str
+    actuation_force: str
+    interface_type: str
+    overall_rating: int
+    typing_feeling: Optional[str] = None
+    create_on: datetime
+    create_by: Optional[str] = None
+
+class KeyboardResponse(KeyboardRequest):
+#    files: List[FBFileResponse] = []
+    file_count: Optional[int] = None
+
+    class Config:
+        from_attributes = True  
+
+```
+
+위와 같은 상황에서
+현재 /keyboard/{id} 로 1개의 키보드 정보와 관련된 파일들 정보를 구해오는 함수를 만들고 싶어
+어떻게 코딩해야할까?  물론 async를 사용해야하고, 2가지를 argument로 받아야겠지
+db: AsyncSession = Depends(get_db),
+current_user_id: str = Depends(get_current_user),  # JWT 토큰에서 사용자 ID 추출

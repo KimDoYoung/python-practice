@@ -8,6 +8,8 @@ class FBFileResponse(BaseModel):
     mime_type: Optional[str] = None
     file_size: Optional[int] = None
 
+    class Config:
+        from_attributes = True  
 
 # 키보드 데이터를 생성하기 위한 스키마
 class KeyboardCreateRequest(BaseModel):
@@ -43,7 +45,7 @@ class KeyboardUpdateRequest(BaseModel):
     interface_type: Optional[str] = None
     overall_rating: Optional[int] = None
     typing_feeling: Optional[str] = None
-    delete_file_ids: Optional[List[int]] = None  # 삭제할 이미지 ID 배열
+    delete_file_ids: List[int] = []  # 삭제할 이미지 ID 배열
 
 # 데이터베이스에서 읽어온 키보드 데이터를 응답으로 전송하기 위한 스키마
 # 모든 필드가 포함됨
@@ -63,8 +65,8 @@ class KeyboardRequest(BaseModel):
     create_by: Optional[str] = None
 
 class KeyboardResponse(KeyboardRequest):
-#    files: List[FBFileResponse] = []
+    files: List[FBFileResponse] = []
+    file_count: Optional[int] = None
 
     class Config:
-        orm_mode = True
         from_attributes = True  

@@ -5,16 +5,18 @@ from fastapi.staticfiles import StaticFiles
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from backend.app.api.endpoints.user import router as user_router
 from backend.app.api.endpoints.keyboard import router as keyboqrd_router
+from backend.app.api.endpoints.fbfile import router as fbfile_router
+from backend.app.core.exception_handler import add_exception_handlers
+from backend.app.core.configs import MERIAN_PORT
 import os
 
-from backend.app.core.configs import MERIAN_PORT
-from backend.app.core.exception_handler import add_exception_handlers
 
 
 app = FastAPI()
 
 app.include_router(user_router)
 app.include_router(keyboqrd_router)
+app.include_router(fbfile_router)
 
 # 예외 핸들러를 추가하는 함수를 호출
 add_exception_handlers(app)
@@ -69,12 +71,14 @@ async def read_root(request: Request, pageId: str = Query(default="keyboard-list
     keyboard_list = read_html_content('frontend/templates/pages/keyboard/list.html')
     keyboard_insert = read_html_content('frontend/templates/pages/keyboard/insert.html')
     keyboard_edit = read_html_content('frontend/templates/pages/keyboard/edit.html')
+    keyboard_view = read_html_content('frontend/templates/pages/keyboard/view.html')
 
     context = {
         "pageId": pageId,
         "keyboard_list": keyboard_list,
         "keyboard_insert": keyboard_insert,
-        "keyboard_edit": keyboard_edit
+        "keyboard_edit": keyboard_edit,
+        "keyboard_view": keyboard_view 
     }
 
     return render_html_template('pages/main.html', context=context, request=request)    

@@ -7,14 +7,22 @@
         (% include 'common/header.html' %)
     </head>
     <body>
-        <nav class="bg-gray-800 text-white h-8 flex items-center px-4" style="height: 1cm">
+        <!-- <nav class="bg-gray-800 text-white h-8 flex items-center px-4" style="height: 1cm">
             <a href="/main?pageId=keyboard-list" class="mx-2">키보드</a>
+        </nav> -->
+        <nav class="bg-gray-800 text-white h-8 flex items-center px-4 justify-between" style="height: 1cm">
+            <a href="/main?pageId=keyboard-list" class="mx-2">키보드</a>
+            <div id="userArea" class="flex items-center">
+                <span class="mx-2">((username))</span>
+                <button onclick="logout()" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">로그아웃</button>
+            </div>
         </nav>
+        
         <main id="workspace" class="m-3"></main>
         <div id="error-area" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
             <strong class="font-bold">오류!</strong>
             <span class="block sm:inline" id="error-message-area"></span>
-            <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
+            <span id="btnErrorAreaClose" class="absolute top-0 bottom-0 right-0 px-4 py-3">
               <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>닫기</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.029a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.697z"/></svg>
             </span>
         </div>
@@ -27,9 +35,12 @@
         <script id="keyboard-insert-template" type="text/x-handlebars-template">
             ((keyboard_insert | safe))
         </script>
-        <script id="keyboard-insert-template" type="text/x-handlebars-template">
+        <script id="keyboard-edit-template" type="text/x-handlebars-template">
             ((keyboard_edit | safe))
         </script>
+        <script id="keyboard-view-template" type="text/x-handlebars-template">
+            ((keyboard_view | safe))
+        </script>        
 
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/handlebars@4.7.7/dist/handlebars.min.js"></script>
@@ -40,10 +51,18 @@
             
 
             $(document).ready(function () {
+                
+                $('#btnErrorAreaClose').on('click', function () {
+                    $('#error-area').addClass('hidden');
+                });
+
+                //프로그램 시작
                 var pageId = '((pageId))';
                 console.log('document ready... ' + pageId)
+                //debugger;
                 displayWorkspace(pageId);
             }); //end document read
+
         </script>
     </body>
 </html>

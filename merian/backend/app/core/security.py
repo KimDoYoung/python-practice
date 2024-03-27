@@ -38,6 +38,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> str:
         if user_id is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid JWT token")
         return user_id
-    except jwt.PyJWTError:
+    except JWTError as e:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid JWT token")
 
+# TODO 매 페이지마다 authorization을 확인하는 함수를 만들어야 함

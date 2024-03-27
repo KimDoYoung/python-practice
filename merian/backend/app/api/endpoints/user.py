@@ -21,7 +21,7 @@ class LoginFormData(BaseModel):
     password: str
     
 @router.post("/login", response_model=Token)
-async def login_for_access_token(form_data: LoginFormData, db: Session = Depends(get_db)):
+async def login_for_access_token(form_data: LoginFormData, db: AsyncSession = Depends(get_db)):
     user = await authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -31,9 +31,12 @@ async def login_for_access_token(form_data: LoginFormData, db: Session = Depends
         )
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"user_id": user.id, "name" : user.nm}, expires_delta=access_token_expires
+        data={"user_id": user.id, "name": user.nm}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+# TODO 로그아웃도 있어야하지 않겠는가?
 
 # def authenticate_user(db: Session, username: str, password: str):
 #     user = db.query(User).filter(User.id == username).first()

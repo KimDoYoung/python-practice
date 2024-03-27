@@ -17,5 +17,11 @@ def get_logger(name):
         formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
+        
+        if MERIAN_PROFILE == "local":
+            # 콘솔에도 로그 메시지 출력
+            console_handler = logging.StreamHandler()
+            console_handler.setFormatter(formatter)
+            logger.addHandler(console_handler)
 
     return logger
