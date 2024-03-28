@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <link rel="icon" href="/static/image/favicon.ico" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100 flex items-center justify-center h-screen">
@@ -29,34 +30,56 @@
         </form>
         <div id="error-message-area"></div>
     </div>
-    
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="/static/js/common.js"></script>
 <script>
-$(document).ready(function() {
-    $('form').submit(function(e){
-        e.preventDefault(); // 기본 제출 이벤트를 방지
-        var username = $('#username').val();
-        var password = $('#password').val();
-        var data = {
-            username: username,
-            password: password
-        };
-        console.log(data)
-        JuliaUtil.ajax('/login', data ,{
-            method : 'POST',
-            success : function(response) {
+document.addEventListener('DOMContentLoaded', function() {
+    // 모든 폼 요소에 대한 submit 이벤트 리스너 추가
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); // 기본 제출 이벤트 방지
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const data = {
+                username: username,
+                password: password
+            };
+
+            console.log(data);
+
+            // Fetch API를 사용한 로그인 요청
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw response; // 응답이 성공적이지 않으면 예외를 발생시킴
+                }
+                return response.json(); // 응답 본문을 JSON으로 파싱
+            })
+            .then(responseData => {
                 // 로그인 성공 시, 받은 토큰을 localStorage에 저장
-                localStorage.setItem('token', response.access_token);
-                localStorage.setItem('token_type', response.token_type);
-                // /keyboard 페이지로 리디렉션
-                window.location.href = '/main';                
-            },
-            error : function(xhr){
-                $('#error-message-area').html('<div class="text-red-500 text-sm mt-2">Error: ' + xhr.responseText + '</div>');
-            }
+                localStorage.setItem('token', responseData.access_token);
+                localStorage.setItem('token_type', responseData.token_type);
+                // /main 페이지로 리디렉션
+                window.location.href = '/main';
+            })
+            .catch(error => {
+                error.text().then(errorMessage => {
+                    // 오류 메시지를 화면에 표시
+                    const errorArea = document.getElementById('error-message-area');
+                    if (errorArea) {
+                        var err = JSON.parse(errorMessage);
+                        errorArea.innerHTML = `<div class="text-red-500 text-sm mt-2">Error: ${err.message}</div>`;
+                    }
+                });
+            });
+
+            return false;
         });
-        return false;
     });
 });
 </script>

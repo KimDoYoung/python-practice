@@ -2,6 +2,7 @@
  * merian-keyboard.js
  * 
  */
+
 console.log('merian-keyboard.js loaded');
 var MappingInfo = {
     "keyboard-list": {
@@ -28,241 +29,245 @@ var MappingInfo = {
     }
 };
             
-function displayError(xhr) {
-    var message = xhr.status + ' ' + xhr.statusText;
-    $('#error-message-area').text(message);
-    $('#error-area').show();
+function showError(xhr) {
+    var message = "에러 발생";
+    if(xhr.status){
+        message = xhr.status + ' ' + xhr.statusText;
+    }else{
+        message = typeof(xhr) == 'object' ? xhr.toString() : xhr;
+    }
+    // jQuery 대신 순수 자바스크립트를 사용하여 텍스트를 설정합니다.
+    document.getElementById('error-message-area').textContent = message;
+    // 'error-area' 요소를 보이게 합니다.
+    document.getElementById('error-area').style.display = 'block';
 }
+
 function hideError() {
-    var message = '';
-    $('#error-message-area').text(message);
-    $('#error-area').hide();
+    document.getElementById('error-message-area').textContent = '';
+    document.getElementById('error-area').style.display = 'none';
 }
-function generateHtml(pageId,data) {
-    
+
+// pageId로 templte를 찾고 data로 만들어서 화면에 보여준다.
+function changeWorkspace(pageId, data) {
+    hideError();
     var handlebarId = MappingInfo[pageId].handlebarTemplate;
-    var templateHtml = $(handlebarId).html()
+    var templateHtml = document.querySelector(handlebarId).innerHTML;
     var template = Handlebars.compile(templateHtml);
     var html = template(data);
-    return html;
-}
+    
+    document.getElementById('workspace').innerHTML = html;
+    var initFunc = MappingInfo[pageId].init_function;
+    if(initFunc){
+        initFunc();
+    }
+} 
+
 function logout() {
     // JWT를 저장하는 방식에 따라 다름 (예: localStorage, sessionStorage)
     localStorage.removeItem('token');
     // 사용자를 로그인 페이지로 리다이렉트
     window.location.href = '/';
 }
-function displayWorkspace(pageId) {
+async function fetchWorkspace(pageId, detailUrl) {
     hideError();
-    var url = MappingInfo[pageId].url;
-    var method = MappingInfo[pageId].method;
-    var initFunc = MappingInfo[pageId].init_function;
-    var data = {};
-    var token = localStorage.getItem('token');
+    const url = detailUrl || MappingInfo[pageId].url;
+    const method = MappingInfo[pageId].method;
+    const token = localStorage.getItem('token');
 
-    $.ajax({
-        url: url, // 요청을 보낼 서버의 URL
-        type: method, // HTTP 요청 방식 (GET, POST 등)
-        data: data, // 전송할 데이터
-        headers: { // 요청에 헤더를 추가
-            'Authorization': 'Bearer ' + token
-        },            
-        success: function(data) {
-            var html = generateHtml(pageId,data);
-            $('#workspace').html(html);
-            initFunc();
-        },
-        error: function(xhr) {
-            if(xhr.status == 401){
-                alert('로그인이 필요합니다.');
-                location.href = '/';
-            }else{
-                displayError(xhr);
+    try {
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
             }
-        }
-    });
+        });
 
-    // JuliaUtil.ajax(url,data,{
-    //     method : method,
-    //     headers: { // 요청에 헤더를 추가
-    //         'Authorization': 'Bearer ' + token
-    //     },    
-    //     success: function (data) {
-    //         var html = generateHtml(pageId,data);
-    //         $('#workspace').html(html);
-    //         initFunc();
-    //     },error:function(xhr){
-    //         if(xhr.status == 401){
-    //             alert('로그인이 필요합니다.');
-    //             location.href = '/';
-    //         }else{
-    //             displayError(xhr);
-    //         }
-    //     }
-    // })
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const responseData = await response.json();
+        changeWorkspace(pageId, responseData)
+    } catch (error) {
+        console.error('에러 발생:', error);
+        if (error.message.includes('401')) {
+            alert('로그인이 필요합니다.');
+            window.location.href = '/';
+        } else {
+            showError(error);
+        }
+    }
 }
+
+// view 화면 초기화
 function init_keyboard_view(){
     console.log('init_keyboard_view....');
+    addClickEvent('btnGoEdit', function() {
+        const id = this.getAttribute('data-id');
+        fetchWorkspace('keyboard-edit', '/keyboard/' + id);
+    });
+    addClickEvent('btnGoList', function() {
+        fetchWorkspace('keyboard-list');
+    });   
 }
+// edit(수정)화면 초기화
 function init_keyboard_edit(){
     console.log('init_keyboard_edit....');
-    $('#keyboardEditForm').on('submit', function(e) {
-        e.preventDefault(); // 폼의 기본 제출 동작을 방지 
-        var keyboardId = $('#keyboardId').val(); 
-
-        formData = new FormData();
-        var data = JuliaUtil.formToJson($(this));
-        var delete_file_ids = [];
-        $('input[type="checkbox"][name="delete_file_ids"]:checked').each(function() {
-            delete_file_ids.push($(this).val());
-        });
-        data['delete_file_ids'] = delete_file_ids;
-        console.log(data);
-        formData.append('keyboardData',  JSON.stringify(data));
-        // formData.append('delete_file_ids',  JSON.stringify(delete_file_ids));
-        var $fileTag = $('#file_uploads');
-        $.each($fileTag.get(0).files, function(i, file) {
-            formData.append('files', file); // 'files' 키로 각 파일 추가
-        });
-
-        console.log(formData);     
-        var token = localStorage.getItem('token');
-        // Ajax 요청 설정
-        $.ajax({
-            url: '/keyboard/'+keyboardId, // 요청을 보낼 서버의 URL
-            method: 'PUT', // HTTP 요청 방식 (GET, POST 등)
-            enctype: 'multipart/form-data',  
-            data: formData, // 전송할 데이터
-            processData: false, // jQuery가 데이터를 처리하지 않도록 설정
-            contentType: false, // jQuery가 Content-Type 헤더를 설정하지 않도록 설정
-            headers: { // 요청에 헤더를 추가
-                'Authorization': 'Bearer ' + token
-            },            
-            success: function(response) {
-                // 요청이 성공하면 실행될 코드
-                displayWorkspace('keyboard-list');
-            },
-            error: function(xhr, status, error) {
-                // 요청이 실패하면 실행될 코드
-                console.error('실패:', xhr, status, error);
-                displayError(xhr);
-            }
-        });
-
-        return false;
-    });
-}
-function init_keyboard_list(){
-    //추가버튼
-    $('#workspace').on('click', '#btnAddKeyboard', function(e) {
+    const form = document.getElementById('keyboardEditForm');
+    if(!form){
+        return;
+    }
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault(); // 폼의 기본 제출 동작을 방지
         e.stopPropagation();
-        
-        var html = generateHtml('keyboard-insert',{});
-        $('#workspace').html(html);
-        init_keyboard_insert();
-    });   
-    //View 버튼
-    $('#workspace').on('click', '.btnView', function(e) {
-        e.stopPropagation();
-        var id = $(this).data('id');
-        var token = localStorage.getItem('token');
-        $.ajax({
-            url: '/keyboard/'+id, // 요청을 보낼 서버의 URL
-            method: 'GET', // HTTP 요청 방식 (GET, POST 등)
-            headers: { // 요청에 헤더를 추가
-                'Authorization': 'Bearer ' + token
-            },
-            success: function (data) {
-                var func = MappingInfo['keyboard-view'].init_function;
-                var html = generateHtml('keyboard-view',data);
-                $('#workspace').html(html);
-                if(func){func();}
+        const keyboardId = document.getElementById('keyboardId').value;
+        const formData = new FormData(this);
 
-            },error:function(xhr){
-                displayError(xhr);
-            }
+        // delete_file_ids 처리
+        const deleteFileIds = [];
+        document.querySelectorAll('input[type="checkbox"][name="delete_file_ids"]:checked').forEach(function(checkbox) {
+            deleteFileIds.push(Number(checkbox.value));
         });
-    });     
-    //수정버튼
-    $('#workspace').on('click', '.btnEdit', function(e) {
-        e.stopPropagation();
-        var id = $(this).data('id');
-        var token = localStorage.getItem('token');
-        $.ajax({
-            url: '/keyboard/'+id, // 요청을 보낼 서버의 URL
-            method: 'GET', // HTTP 요청 방식 (GET, POST 등)
-            headers: { // 요청에 헤더를 추가
-                'Authorization': 'Bearer ' + token
-            },
-            success: function (data) {
-                var func = MappingInfo['keyboard-edit'].init_function;
-                var html = generateHtml('keyboard-edit',data);
-                $('#workspace').html(html);
-                if(func){func();}
 
-            },error:function(xhr){
-                displayError(xhr);
-            }
-        });
-    });   
-    //삭제버튼
-    $('#workspace').on('click', '.btnDelete', function(e) {
-        e.stopPropagation();
-        if(confirm('삭제하시겠습니까?')){
-            var keyboardId = $(this).data('id');
-            var token = localStorage.getItem('token');
-            JuliaUtil.ajax('/keyboard/'+keyboardId,{},{
-                method : 'DELETE',
-                headers: { // 요청에 헤더를 추가
-                    'Authorization': 'Bearer ' + token
-                },
-                success: function (data) {
-                    displayWorkspace('keyboard-list');
-                },error:function(xhr){
-                    displayError(xhr);
-                }
+        const data = Object.fromEntries(formData.entries());
+        data.delete_file_ids = deleteFileIds;
+
+        // 파일 처리
+        const fileTag = document.getElementById('file_uploads');
+        if (fileTag && fileTag.files.length > 0) {
+            Array.from(fileTag.files).forEach((file) => {
+                formData.append('files', file); // 'files' 키로 각 파일 추가
             });
         }
-    });       
+
+        // JSON 데이터를 'keyboardFormData' 키에 추가합니다.
+        formData.append('keyboardFormData', JSON.stringify(data));
+
+        const token = localStorage.getItem('token');
+
+        try {
+            const response = await fetch(`/keyboard/${keyboardId}`, {
+                method: 'PUT',
+                body: formData, // JSON.stringify을 사용하지 않고 formData 직접 전송
+                headers: {
+                    // 'Content-Type': 'multipart/form-data'는 자동으로 설정됩니다. Token만 직접 설정.
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            // 요청이 성공하면 실행될 코드
+            fetchWorkspace('keyboard-list');
+        } catch (error) {
+            // 요청이 실패하면 실행될 코드
+            console.error('실패:', error);
+            showError(error); 
+        }
+    });
+}    
+
+// list화면 초기화
+function init_keyboard_list(){
+    //추가버튼
+    addDelegatedClickEvent('#workspace', '#btnAddKeyboard', function(e, target) {
+        e.stopPropagation();
+        changeWorkspace('keyboard-insert');
+    });
+    //보기버튼
+    addDelegatedClickEvent('#workspace', '.btnView', function(e, target) {
+        e.stopPropagation();
+        const id = target.getAttribute('data-id');
+        fetchWorkspace('keyboard-view', '/keyboard/' + id);
+    });  
+    
+    //수정버튼
+    addDelegatedClickEvent('#workspace', '.btnEdit', function(e, target) {
+        e.stopPropagation();
+        const id = target.getAttribute('data-id');
+        fetchWorkspace('keyboard-edit', '/keyboard/' + id);
+    });
+
+    //삭제버튼 동작
+    addDelegatedClickEvent('#workspace', '.btnDelete', async function(e, target) {
+        e.stopPropagation();
+        if(confirm('삭제하시겠습니까?') == false){
+            return;
+        }
+        const id = target.getAttribute('data-id');
+        var token = localStorage.getItem('token');
+        var url = '/keyboard/' + id;
+        try {
+            const response = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Aiuthorization': 'Bearer ' + token
+                }
+            });
+            if(!response.ok){
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            // const responseData = await response.json();
+            // console.log(responseData);
+            fetchWorkspace('keyboard-list');
+        } catch (error) {
+            showError(error);
+        }
+    });
 }
+// insert화면 초기화
 function init_keyboard_insert(){
     console.log('init_keyboard_insert');
-    $('#workspace').on('submit', '#keyboardInsertForm', function(e) {
+
+    // 취소 버튼 동작
+    addDelegatedClickEvent('#workspace', '#btnInsertCancel', function(e, target) {
+        e.stopPropagation();
+        fetchWorkspace('keyboard-list');
+    });
+
+    // 추가버튼 동작
+    addDelegatedEvent('#workspace', '#keyboardInsertForm', 'submit', function (e, form) {
         e.preventDefault(); // 폼의 기본 제출 동작을 방지
+debugger;
+        const formData = new FormData(form);
+        formData.append('keyboardData', JSON.stringify(formToJson(formData))); // JSON 문자열로 변환하여 추가
 
-        formData = new FormData();
-        var data = JuliaUtil.formToJson($(this));
-        console.log(data);
-        formData.append('keyboardData',  JSON.stringify(data));
-        var $fileTag = $('#file_uploads');
-        $.each($fileTag.get(0).files, function(i, file) {
-            formData.append('files', file); // 'files' 키로 각 파일 추가
-        });
+        // 파일 처리
+        const fileTag = document.getElementById('file_uploads');
+        if (fileTag) {
+            Array.from(fileTag.files).forEach((file, index) => {
+                formData.append(`files[${index}]`, file); // 'files' 키로 각 파일 추가
+            });
+        }
+        
+        // JWT를 헤더에 추가
+        const token = localStorage.getItem('token');
 
-        console.log(formData);     
-        var token = localStorage.getItem('token');
-        // Ajax 요청 설정
-        $.ajax({
-            url: '/keyboard/insert', // 요청을 보낼 서버의 URL
-            type: 'POST', // HTTP 요청 방식 (GET, POST 등)
-            enctype: 'multipart/form-data',  
-            data: formData, // 전송할 데이터
-            processData: false, // jQuery가 데이터를 처리하지 않도록 설정
-            contentType: false, // jQuery가 Content-Type 헤더를 설정하지 않도록 설정
-            headers: { // 요청에 헤더를 추가
+        // Fetch API를 사용하여 서버로 비동기 POST 요청 보냄
+        fetch('/keyboard/insert', {
+            method: 'POST',
+            body: formData,
+            headers: {
                 'Authorization': 'Bearer ' + token
-            },            
-            success: function(response) {
-                // 요청이 성공하면 실행될 코드
-                displayWorkspace('keyboard-list');
             },
-            error: function(xhr, status, error) {
-                // 요청이 실패하면 실행될 코드
-                console.error('실패:', xhr, status, error);
-                displayError(xhr);
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
             }
+            return response.json();
+        })
+        .then(data => {
+            // 요청이 성공하면 실행될 코드
+            fetchWorkspace('keyboard-view', '/keyboard/' + data.id);
+        })
+        .catch(error => {
+            // 요청이 실패하면 실행될 코드
+            console.error('실패:', error);
+            // showError 함수는 오류를 표시하는 방법을 담당하는 별도의 함수로 정의되어야 함
         });
-
-        return false;
     });
 }

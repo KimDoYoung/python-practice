@@ -36,15 +36,6 @@ async def login_for_access_token(form_data: LoginFormData, db: AsyncSession = De
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-# TODO 로그아웃도 있어야하지 않겠는가?
-
-# def authenticate_user(db: Session, username: str, password: str):
-#     user = db.query(User).filter(User.id == username).first()
-#     if not user:
-#         return False
-#     if not user.verify_password(password):
-#         return False
-#     return user
 # 사용자 인증 함수 - 비동기 함수로 변경
 async def authenticate_user(db: AsyncSession, username: str, password: str):
     async with db as session:

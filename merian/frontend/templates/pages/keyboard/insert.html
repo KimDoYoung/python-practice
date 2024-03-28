@@ -74,15 +74,15 @@
             <!-- 7. 첨부파일 -->
             <div>
                 <label for="file_upload" class="block">첨부파일:</label>
-                <input type="file" id="file_uploads" name="files" class="border p-2 w-full" multiple>
+                <input type="file" id="file_uploads" name="file_uploads" class="border p-2 w-full" multiple>
             </div>
         
             <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                 추가하기
             </button>
-            <a href="/main?pageId=keyboard-list" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+            <button type="button" id="btnInsertCancel" class="bg-gray-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                 취소
-            </a>            
+            </button>            
         </form>
         
     </div>

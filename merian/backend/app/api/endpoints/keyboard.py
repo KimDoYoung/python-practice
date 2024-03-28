@@ -171,7 +171,7 @@ async def read_keyboard_with_files(
 #     return KeyboardResponse(**keyboard.__dict__, files=files_data)
 
 # keyboard DB에 추가
-@router.post("/keyboard/insert")
+@router.post("/keyboard/insert", response_model=KeyboardResponse)
 async def create_keyboard(
     keyboardData: str = Form(...),
     db: AsyncSession = Depends(get_db),  # 여기를 수정
@@ -182,7 +182,7 @@ async def create_keyboard(
         data = json.loads(keyboardData)
     except json.JSONDecodeError:
         raise HTTPException(status_code=400, detail="Invalid JSON data")
-
+    new_keyboard_id=None
     # 올바르게 세션을 얻기 위한 변경
     async with db as session:
         async with session.begin():
@@ -193,10 +193,11 @@ async def create_keyboard(
                 session.add(keyboard_db)
                 await session.flush()  # 트랜잭션 커밋으로 데이터베이스에 반영
                 print(keyboard_db.id)
+                new_keyboard_id = keyboard_db.id
                 if files:
                     for file in files:
                         # 파일 저장 및 파일 경로, 크기, MIME 타입 받기
-                        physical_folder, physical_filename, extension, file_size, mime_type =  save_upload_file(file)
+                        physical_folder, physical_filename, extension, file_size, mime_type = await save_upload_file(file)
                         org_name = file.filename
                         # 파일 메타데이터와 경로를 사용하여 FBFile 인스턴스 생성
                         db_file = FBFile(
@@ -225,7 +226,9 @@ async def create_keyboard(
             except Exception as e:
                 await session.rollback()  # 오류 발생 시 롤백
                 raise e
-    return {"message": "Keyboard and files added successfully"}
+    # 업데이트된 키보드 정보를 바탕으로 KeyboardResponse 생성
+    keyboard_response = await get_keyboard_response(session, new_keyboard_id)
+    return keyboard_response             
 
 #
 # keyboard 수정
@@ -233,60 +236,73 @@ async def create_keyboard(
 @router.put("/keyboard/{keyboard_id}", response_model=KeyboardResponse)
 async def update_keyboard(
     keyboard_id: int,
-    keyboardData: KeyboardUpdateRequest = Depends(),  # 수정할 필드
+    # keyboardData: KeyboardUpdateRequest = Depends(),  # 수정할 필드
+    keyboardFormData: str = Form(...),
 #    delete_file_ids: List[int] = Form(default=[]),  # 삭제할 파일 ID
-    files: List[UploadFile] = File(default=[]),  # 추가할 파일
+    files: List[UploadFile] = None, #File(default=[]),  # 추가할 파일
+    current_user_id: str = Depends(get_current_user),  # JWT 토큰에서 사용자 ID 추출
     db: AsyncSession = Depends(get_db)
 ):
+    try:
+        data = json.loads(keyboardFormData)
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail="Invalid JSON data")
+        
     # 트랜잭션 시작
-    delete_file_ids = keyboardData.delete_file_ids
+    keyboardData = KeyboardCreateRequest(**data)    
+    delete_file_ids = data['delete_file_ids']
     async with db as session:
         async with session.begin():
             # 1. 지워야 할 첨부파일들 삭제
             for file_id in delete_file_ids:
-                file_to_delete = db.query(FBFile).filter(FBFile.file_id == file_id).first()
+                result = await session.execute(select(FBFile).filter(FBFile.file_id == file_id))
+                file_to_delete = result.scalars().first()
                 if file_to_delete:
-                    db.delete(file_to_delete)
+                    await session.delete(file_to_delete)
             
             # 2. 추가해야 할 파일들 처리 및 추가
             for file in files:
                 # 파일 저장 및 파일 경로, 크기, MIME 타입 받기
-                    physical_folder, physical_filename, extension, file_size, mime_type = await save_upload_file(file)
+                    physical_folder, physical_filename, extension, file_size, mime_type =  await save_upload_file(file)
                     
                     # 파일 메타데이터와 경로를 사용하여 FBFile 인스턴스 생성
                     db_file = FBFile(
-                        file_id=keyboard_id,
+                        # file_id=keyboard_id,
+                        node_id=keyboard_id,   
                         phy_folder=physical_folder,
                         phy_name=physical_filename,
+                        org_name=file.filename,
                         ext=extension,
                         file_size=file_size,
                         mime_type=mime_type,  # 파일의 MIME 타입 추가
                         # 기타 필요한 메타데이터 필드 채우기
                         # create_by=current_user_id  # 현재 사용자 ID로 생성자 정보 추가
                     )
-                    db.add(db_file)
-                    await db.flush()  # db_file의 file_id를 생성하기 위해 flush 호출
+                    session.add(db_file)
+                    await session.flush()  # db_file의 file_id를 생성하기 위해 flush 호출
 
                     # file_collection_match 테이블에 데이터 추가
                     db_fcm = FileCollectionMatch(
                         id=keyboard_id, 
                         file_id=db_file.file_id,
                     )
-                    db.add(db_fcm)
-                
+                    session.add(db_fcm)
+                    await session.flush()
             # 3. keyboard 테이블 업데이트
-            keyboard = db.query(KeyboardModel).filter(KeyboardModel.id == keyboard_id).first()
+            result = await session.execute(select(KeyboardModel).filter(KeyboardModel.id == keyboard_id))
+            keyboard = result.scalars().first()
             if not keyboard:
-                db.rollback()
+                session.rollback()
                 raise HTTPException(status_code=404, detail="Keyboard not found")
             
             for var, value in vars(keyboardData).items():
                 if value is not None:
                     setattr(keyboard, var, value)  # 각 필드 업데이트
             
-            db.commit()
-        
-    return {"ok": True}
+            await session.commit()
+        # 업데이트된 키보드 정보를 바탕으로 KeyboardResponse 생성
+        keyboard_response = await get_keyboard_response(session, keyboard_id)
+        return keyboard_response            
 
 #
 # keyboard 삭제
@@ -318,6 +334,48 @@ async def delete_keyboard(keyboard_id: int, db: AsyncSession = Depends(get_db)):
             await session.delete(db_keyboard)
             await session.commit()
     return {"ok": True}
+
+async def get_keyboard_response(
+    session: AsyncSession, 
+    keyboard_id: int
+) -> Optional[KeyboardResponse]:
+    """업데이트된 키보드 정보와 관련 파일 정보를 조회하여 KeyboardResponse 객체를 생성합니다."""
+    updated_keyboard = await session.get(KeyboardModel, keyboard_id)
+    if updated_keyboard is None:
+        raise HTTPException(status_code=404, detail="Keyboard not found")
+
+    result = await session.execute(select(FBFile).filter(FBFile.file_id == keyboard_id))
+    files_info = result.scalars().all()
+
+    files_response = [
+        FBFileResponse(
+            file_id=file.file_id,
+            phy_folder=file.phy_folder,
+            phy_name=file.phy_name,
+            org_name=file.org_name,
+            ext=file.ext,
+            file_size=file.file_size,
+            mime_type=file.mime_type,
+        ) for file in files_info
+    ]
+
+    return KeyboardResponse(
+        id=updated_keyboard.id,
+        product_name=updated_keyboard.product_name,
+        manufacturer=updated_keyboard.manufacturer,
+        purchase_date=updated_keyboard.purchase_date, #.strftime('%Y-%m-%d'),  # 날짜 포맷 조정
+        purchase_amount=updated_keyboard.purchase_amount,
+        key_type=updated_keyboard.key_type,
+        switch_type=updated_keyboard.switch_type,
+        actuation_force=updated_keyboard.actuation_force,
+        interface_type=updated_keyboard.interface_type,
+        overall_rating=updated_keyboard.overall_rating,
+        typing_feeling=updated_keyboard.typing_feeling,
+        create_on=updated_keyboard.create_on,
+        create_by=updated_keyboard.create_by,
+        files=files_response,
+        file_count=len(files_response),
+    )
 # @router.delete("/keyboard/{keyboard_id}", status_code=status.HTTP_204_NO_CONTENT)
 # async def delete_keyboard(keyboard_id: int, db: Session = Depends(get_db)):
 #     # 트랜잭션 시작
