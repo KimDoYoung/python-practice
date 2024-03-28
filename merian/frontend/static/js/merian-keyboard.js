@@ -4,7 +4,7 @@
  */
 
 console.log('merian-keyboard.js loaded');
-var MappingInfo = {
+var PageData = {
     "keyboard-list": {
         method:'GET',
         url: "/keyboard",
@@ -36,9 +36,7 @@ function showError(xhr) {
     }else{
         message = typeof(xhr) == 'object' ? xhr.toString() : xhr;
     }
-    // jQuery 대신 순수 자바스크립트를 사용하여 텍스트를 설정합니다.
     document.getElementById('error-message-area').textContent = message;
-    // 'error-area' 요소를 보이게 합니다.
     document.getElementById('error-area').style.display = 'block';
 }
 
@@ -50,13 +48,13 @@ function hideError() {
 // pageId로 templte를 찾고 data로 만들어서 화면에 보여준다.
 function changeWorkspace(pageId, data) {
     hideError();
-    var handlebarId = MappingInfo[pageId].handlebarTemplate;
+    var handlebarId = PageData[pageId].handlebarTemplate;
     var templateHtml = document.querySelector(handlebarId).innerHTML;
     var template = Handlebars.compile(templateHtml);
     var html = template(data);
     
     document.getElementById('workspace').innerHTML = html;
-    var initFunc = MappingInfo[pageId].init_function;
+    var initFunc = PageData[pageId].init_function;
     if(initFunc){
         initFunc();
     }
@@ -70,8 +68,8 @@ function logout() {
 }
 async function fetchWorkspace(pageId, detailUrl) {
     hideError();
-    const url = detailUrl || MappingInfo[pageId].url;
-    const method = MappingInfo[pageId].method;
+    const url = detailUrl || PageData[pageId].url;
+    const method = PageData[pageId].method;
     const token = localStorage.getItem('token');
 
     try {

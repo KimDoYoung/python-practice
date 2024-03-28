@@ -1,4 +1,33 @@
 ﻿/**
+ * 이벤트 위임을 사용하여 이벤트 리스너를 추가하는 편의 함수.
+ * 중복 등록을 방지하기 위해 각 이벤트 리스너에 고유 식별자를 사용합니다.
+ * 
+ * @param {string} parentSelector 이벤트를 위임할 부모 요소의 선택자.
+ * @param {string} targetSelector 대상 요소의 선택자.
+ * @param {string} eventType 이벤트 타입 (예: 'click').
+ * @param {Function} callback 이벤트 발생 시 실행할 콜백 함수.
+ */
+function addDelegatedEvent(parentSelector, targetSelector, eventType, callback) {
+    const parent = document.querySelector(parentSelector);
+    if (!parent) return;
+
+    // 이벤트 리스너에 고유 식별자를 생성합니다. 여기서는 parentSelector, targetSelector, eventType의 조합을 사용합니다.
+    const eventListenerId = `delegated-${eventType}-${parentSelector}-${targetSelector}`.replace(/[^\w-]/g, "_");
+
+    // 이미 해당 식별자를 가진 이벤트 리스너가 등록되었는지 확인합니다.
+    if (parent[eventListenerId]) return; // 이미 리스너가 등록되었다면 추가하지 않고 반환합니다.
+
+    parent.addEventListener(eventType, function(event) {
+        const target = event.target.closest(targetSelector);
+        if (!target) return; // 대상 요소가 아니면 리턴
+        callback(event, target); // 콜백 함수 실행
+    });
+
+    // 이벤트 리스너를 등록했다는 표시를 남깁니다.
+    parent[eventListenerId] = true;
+}
+
+/**
  * 이벤트 리스너를 쉽게 추가할 수 있는 편의 함수.
  * @param {string} elementId 요소의 ID
  * @param {Function} callback 클릭 이벤트 발생 시 실행할 콜백 함수
