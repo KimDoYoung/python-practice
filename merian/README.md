@@ -8,6 +8,12 @@
 2. 최대한 chatGPT가 소스를 생성하게 한다
 3. python으로 open api사용법을 정립
 
+## 폴더구조
+
+1. backend : Python 백엔드
+2. frontend : 웹 프런트 엔드
+3. js_test : javascript jest 테스트
+
 ## virtual 환경 설정
 
 - make_merian_folders.sh : 폴더 구조를 생성하는 bash shell 프로그램

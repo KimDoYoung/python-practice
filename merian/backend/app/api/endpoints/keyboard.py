@@ -2,7 +2,7 @@ import json
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status, Query
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import FileResponse, JSONResponse
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
@@ -19,85 +19,54 @@ logger = get_logger(__name__)
 
 router = APIRouter()
 
-# 리스트 조회
-# @router.get("/keyboard", response_model=List[KeyboardResponse])
-# async def read_keyboards(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
-#     async with db as session:
-#         keyboards = await session.execute(select(KeyboardModel).offset(skip).limit(limit))
-#         return keyboards.scalars().all()
-# @router.get("/keyboard")
-# async def read_keyboards(skip: int = 0, limit: int = 10, db: AsyncSession = Depends(get_db)):
-#     async with db as session:
-#         result = await session.execute(select(KeyboardModel).offset(skip).limit(limit))
-#         keyboards = result.scalars().all()
-#         keyboard_list = [KeyboardResponse.from_orm(kb).dict() for kb in keyboards]  # ORM 모델을 Pydantic 모델로 변환
-#         return JSONResponse(content={"list": keyboard_list, "skip": skip, "limit": limit})
-# @router.get("/keyboard")
-# async def read_keyboards(skip: int = 0, limit: int = 10, db: AsyncSession = Depends(get_db)):
-    
-#     async with db as session:
-#         result = await session.execute(select(KeyboardModel).offset(skip).limit(limit))
-#         keyboards = result.scalars().all()
-#         keyboard_list = [KeyboardResponse.from_orm(kb) for kb in keyboards]
-#         json_compatible_keyboard_list = jsonable_encoder(keyboard_list)
-#         return JSONResponse(content={"list": json_compatible_keyboard_list, "skip": skip, "limit": limit})
-# @router.get("/keyboard")
-# async def read_keyboards(skip: int = 0, limit: int = 10, db: AsyncSession = Depends(get_db)):
-#     async with db as session:
-#         result = await session.execute(
-#             select(
-#                 KeyboardModel,
-#                 func.count(FileCollectionMatch.file_id).label("file_count")
-#             ).join(
-#                 FileCollectionMatch, KeyboardModel.id == FileCollectionMatch.id
-#             ).group_by(KeyboardModel.id).offset(skip).limit(limit)
-#         )
-        
-#         keyboards = result.all()
-#         keyboard_list = [{
-#             "keyboard":   KeyboardResponse.from_orm(kb[0]),
-#             "file_count": kb[1]
-#         } for kb in keyboards]
-        
-#         json_compatible_keyboard_list = jsonable_encoder(keyboard_list)
-#         logger.debug(json_compatible_keyboard_list)
-#         return JSONResponse(content={"list": json_compatible_keyboard_list, "skip": skip, "limit": limit})
 #
 # 조건에 해당하는 리스트 조회
 #
 @router.get("/keyboard")
 async def read_keyboards(skip: int = 0, limit: int = 10, 
+                        searchText: Optional[str] = None,
                         db: AsyncSession = Depends(get_db),
-                        current_user_id: str = Depends(get_current_user),  # JWT 토큰에서 사용자 ID 추출
-    ):
+                        current_user_id: str = Depends(get_current_user)):
     
     async with db as session:
-        result = await session.execute(
-            select(
-                KeyboardModel.id,
-                KeyboardModel.product_name,
-                KeyboardModel.manufacturer,
-                KeyboardModel.purchase_date,
-                KeyboardModel.purchase_amount,
-                KeyboardModel.key_type,
-                KeyboardModel.switch_type,
-                KeyboardModel.actuation_force,
-                KeyboardModel.interface_type,
-                KeyboardModel.overall_rating,
-                KeyboardModel.typing_feeling,
-                KeyboardModel.create_on,
-                KeyboardModel.create_by,
-                func.count(FileCollectionMatch.file_id).label('file_count')
-            ).outerjoin(
-                FileCollectionMatch, KeyboardModel.id == FileCollectionMatch.id
-            ).group_by(KeyboardModel.id)
-            .order_by(KeyboardModel.id)
-            .offset(skip).limit(limit)
-        )
+        # 기본 쿼리 설정
+        base_query = select(
+            KeyboardModel.id,
+            KeyboardModel.product_name,
+            KeyboardModel.manufacturer,
+            KeyboardModel.purchase_date,
+            KeyboardModel.purchase_amount,
+            KeyboardModel.key_type,
+            KeyboardModel.switch_type,
+            KeyboardModel.actuation_force,
+            KeyboardModel.interface_type,
+            KeyboardModel.overall_rating,
+            KeyboardModel.typing_feeling,
+            KeyboardModel.create_on,
+            KeyboardModel.create_by,
+            func.count(FileCollectionMatch.file_id).label('file_count')
+        ).outerjoin(
+            FileCollectionMatch, KeyboardModel.id == FileCollectionMatch.id
+        ).group_by(KeyboardModel.id)
         
-        keyboards_info = result.all()
+        # 검색 조건 적용
+        if searchText:
+            search_condition = or_(
+                KeyboardModel.product_name.like(f"%{searchText}%"),
+                KeyboardModel.manufacturer.like(f"%{searchText}%")
+            )
+            base_query = base_query.filter(search_condition)
         
-        # Transform results into JSON compatible format
+        # totalCount를 구하기 위한 쿼리
+        count_query = select(func.count('*')).select_from(base_query.subquery())
+        total_count_result = await session.execute(count_query)
+        totalCount = total_count_result.scalar()
+        
+        # 실제 데이터 조회 쿼리에 limit와 offset 적용
+        query = base_query.order_by(KeyboardModel.create_by.desc()).offset(skip).limit(limit)
+        keyboards_info = await session.execute(query)
+        result = await keyboards_info.scalars().all()
+        # 결과 변환
         keyboard_list = [
             {
                 'id': kb[0], 
@@ -114,15 +83,21 @@ async def read_keyboards(skip: int = 0, limit: int = 10,
                 'create_on': kb[11],
                 'create_by': kb[12],
                 "file_count": kb[13] if kb[13] is not None else 0
-            } for kb in keyboards_info
+            } for kb in result
         ]
         
-        json_compatible_keyboard_list = jsonable_encoder(keyboard_list)
+        #json_compatible_keyboard_list = jsonable_encoder(keyboard_list)
+        json_compatible_keyboard_list = keyboard_list
         
-        return JSONResponse(content={"list": json_compatible_keyboard_list, "skip": skip, "limit": limit})
+        return JSONResponse(content={
+            "list": json_compatible_keyboard_list, 
+            "totalCount": totalCount,
+            "skip": skip, 
+            "limit": limit, 
+            "searchCondition": searchText
+        })
 
 # 단일 조회
-
 @router.get("/keyboard/{keyboard_id}", response_model=KeyboardResponse)
 async def read_keyboard_with_files(
     keyboard_id: int,
@@ -151,24 +126,6 @@ async def read_keyboard_with_files(
         response.files = file_responses  # KeyboardResponse 스키마에 files 필드 추가 필요
         logger.debug(response.model_dump_json())
         return response    
-# @router.get("/keyboard/{keyboard_id}", response_model=KeyboardResponse)
-# async def get_keyboard(keyboard_id: int, db: Session = Depends(get_db)):
-#     # 키보드 정보 조회
-#     keyboard = db.query(KeyboardModel).filter(KeyboardModel.id == keyboard_id).first()
-#     if not keyboard:
-#         raise HTTPException(status_code=404, detail="Keyboard not found")
-
-#     # 연관된 파일 정보 조회
-#     files = db.query(FBFile).filter(FBFile.node_id == keyboard_id).all()
-#     files_data = [FBFileResponse(
-#         file_id=file.file_id,
-#         org_name=file.org_name,
-#         mime_type=file.mime_type,
-#         file_size=file.file_size,
-#         # 추가 정보 필요 시 여기에 포함
-#     ) for file in files]
-
-#     return KeyboardResponse(**keyboard.__dict__, files=files_data)
 
 # keyboard DB에 추가
 @router.post("/keyboard/insert", response_model=KeyboardResponse)
@@ -182,6 +139,7 @@ async def create_keyboard(
         data = json.loads(keyboardData)
     except json.JSONDecodeError:
         raise HTTPException(status_code=400, detail="Invalid JSON data")
+    logger.debug("INSERT : 입력받은 데이터:" + json.dumps(data))
     new_keyboard_id=None
     # 올바르게 세션을 얻기 위한 변경
     async with db as session:
@@ -209,7 +167,6 @@ async def create_keyboard(
                             ext=extension,
                             file_size=file_size,
                             mime_type=mime_type,  # 파일의 MIME 타입 추가
-                            # 기타 필요한 메타데이터 필드 채우기
                             create_by=current_user_id  # 현재 사용자 ID로 생성자 정보 추가
                         )
                         session.add(db_file)
@@ -236,9 +193,7 @@ async def create_keyboard(
 @router.put("/keyboard/{keyboard_id}", response_model=KeyboardResponse)
 async def update_keyboard(
     keyboard_id: int,
-    # keyboardData: KeyboardUpdateRequest = Depends(),  # 수정할 필드
     keyboardFormData: str = Form(...),
-#    delete_file_ids: List[int] = Form(default=[]),  # 삭제할 파일 ID
     files: List[UploadFile] = None, #File(default=[]),  # 추가할 파일
     current_user_id: str = Depends(get_current_user),  # JWT 토큰에서 사용자 ID 추출
     db: AsyncSession = Depends(get_db)
@@ -247,7 +202,8 @@ async def update_keyboard(
         data = json.loads(keyboardFormData)
     except json.JSONDecodeError:
         raise HTTPException(status_code=400, detail="Invalid JSON data")
-        
+    logger.debug("UPDATE : 입력받은 데이터:" + json.dumps(data))
+    logger.debug("UPDATE : 입력받은 파일 수:" + str(len(files)))    
     # 트랜잭션 시작
     keyboardData = KeyboardCreateRequest(**data)    
     delete_file_ids = data['delete_file_ids']
@@ -298,7 +254,8 @@ async def update_keyboard(
             for var, value in vars(keyboardData).items():
                 if value is not None:
                     setattr(keyboard, var, value)  # 각 필드 업데이트
-            
+            keyboard.create_by = current_user_id
+            keyboard.create_on = func.now()  # 수정 시간 업데이트
             await session.commit()
         # 업데이트된 키보드 정보를 바탕으로 KeyboardResponse 생성
         keyboard_response = await get_keyboard_response(session, keyboard_id)
@@ -376,31 +333,3 @@ async def get_keyboard_response(
         files=files_response,
         file_count=len(files_response),
     )
-# @router.delete("/keyboard/{keyboard_id}", status_code=status.HTTP_204_NO_CONTENT)
-# async def delete_keyboard(keyboard_id: int, db: Session = Depends(get_db)):
-#     # 트랜잭션 시작
-#     with db.begin():
-#         # keyboard_id에 해당하는 KeyboardModel 검색
-#         db_keyboard = db.query(KeyboardModel).filter(KeyboardModel.id == keyboard_id).first()
-#         if db_keyboard is None:
-#             raise HTTPException(status_code=404, detail="Keyboard not found")
-        
-#         # 해당 keyboard와 연관된 file_collection_match 레코드 찾기
-#         related_file_collection_matches = db.query(FileCollectionMatch).filter(FileCollectionMatch.id == keyboard_id).all()
-        
-#         # 각 match에 대한 fb_file 찾아서 삭제
-#         for match in related_file_collection_matches:
-#             related_fb_files = db.query(FBFile).filter(FBFile.file_id == match.file_id).all()
-#             for fb_file in related_fb_files:
-#                 db.delete(fb_file)
-#             # file_collection_match 레코드 삭제
-#             db.delete(match)
-        
-#         # 마지막으로 keyboard 레코드 삭제
-#         db.delete(db_keyboard)
-        
-#         # 트랜잭션 커밋은 with 블록 종료 시 자동으로 실행됩니다.
-
-#     return {"ok": True}
-
-

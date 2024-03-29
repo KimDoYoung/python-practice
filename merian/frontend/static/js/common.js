@@ -27,38 +27,6 @@ function addDelegatedEvent(parentSelector, targetSelector, eventType, callback) 
     parent[eventListenerId] = true;
 }
 
-/**
- * 이벤트 리스너를 쉽게 추가할 수 있는 편의 함수.
- * @param {string} elementId 요소의 ID
- * @param {Function} callback 클릭 이벤트 발생 시 실행할 콜백 함수
- */
-function addClickEvent(elementId, callback) {
-    const element = document.getElementById(elementId);
-    if (element) {
-        element.addEventListener('click', callback);
-    }
-}
-/**
- * 이벤트 위임을 사용하여 이벤트 리스너를 추가하는 편의 함수.
- * 
- * @param {string} parentSelector 이벤트를 위임할 부모 요소의 선택자.
- * @param {string} targetSelector 대상 요소의 선택자.
- * @param {string} eventType 이벤트 타입 (예: 'click').
- * @param {Function} callback 이벤트 발생 시 실행할 콜백 함수.
- */
-function addDelegatedEvent(parentSelector, targetSelector, eventType, callback) {
-    const parent = document.querySelector(parentSelector);
-    if (!parent) return;
-
-    parent.addEventListener(eventType, function(event) {
-        const target = event.target.closest(targetSelector);
-        if (!target) return; // 대상 요소가 아니면 리턴
-        callback(event, target); // 콜백 함수 실행
-    });
-}
-function addDelegatedClickEvent(parentSelector, targetSelector,  callback) {
-    addDelegatedEvent(parentSelector, targetSelector, 'click', callback);
-}
 function formToJson(formData) {
     const obj = {};
     for (const [key, value] of formData.entries()) {

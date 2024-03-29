@@ -100,13 +100,120 @@ async function fetchWorkspace(pageId, detailUrl) {
 // view 화면 초기화
 function init_keyboard_view(){
     console.log('init_keyboard_view....');
-    addClickEvent('btnGoEdit', function() {
-        const id = this.getAttribute('data-id');
+    addDelegatedEvent('#workspace', '#btnGoEdit', 'click', function(e, target) {
+        const id = target.getAttribute('data-id');
         fetchWorkspace('keyboard-edit', '/keyboard/' + id);
     });
-    addClickEvent('btnGoList', function() {
+    addDelegatedEvent('#workspace', '#btnGoList', 'click', function(e, target) {
         fetchWorkspace('keyboard-list');
-    });   
+    });
+}
+
+
+// list화면 초기화
+function init_keyboard_list(){
+    //추가버튼
+    addDelegatedEvent('#workspace', '#btnAddKeyboard', 'click', function(e, target) {
+        e.stopPropagation();
+        changeWorkspace('keyboard-insert');
+    });
+
+    //보기버튼
+    addDelegatedEvent('#workspace', '.btnView', 'click', function(e, target) {
+        e.stopPropagation();
+        const id = target.getAttribute('data-id');
+        fetchWorkspace('keyboard-view', '/keyboard/' + id);
+    });
+    
+    //수정버튼
+    addDelegatedEvent('#workspace', '.btnEdit', 'click', function(e, target) {
+        e.stopPropagation();
+        const id = target.getAttribute('data-id');
+        fetchWorkspace('keyboard-edit', '/keyboard/' + id);
+    });
+    
+    //삭제버튼 동작
+    addDelegatedEvent('#workspace', '.btnDelete', 'click', async function(e, target) {
+        e.stopPropagation();
+        if(confirm('삭제하시겠습니까?') == false){
+            return;
+        }
+        const id = target.getAttribute('data-id');
+        var token = localStorage.getItem('token');
+        var url = '/keyboard/' + id;
+        try {
+            const response = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+            if(!response.ok){
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            // const responseData = await response.json();
+            // console.log(responseData);
+            fetchWorkspace('keyboard-list');
+        } catch (error) {
+            showError(error);
+        }
+    });
+}
+// insert화면 초기화
+function init_keyboard_insert(){
+    console.log('init_keyboard_insert');
+
+    // 취소 버튼 동작
+    addDelegatedEvent('#workspace', '#btnInsertCancel', 'click', function(e, target) {
+        e.stopPropagation();
+        fetchWorkspace('keyboard-list');
+    });
+
+    // 추가버튼 동작
+    addDelegatedEvent('#workspace', '#keyboardInsertForm', 'submit', function (e, form) {
+        e.preventDefault(); // 폼의 기본 제출 동작을 방지
+//  debugger;
+        const formData = new FormData(form);
+        var data = formToJson(formData);
+        delete data.file_uploads; // 파일은 제외
+        formData.append('keyboardData', JSON.stringify(data)); // JSON 문자열로 변환하여 추가
+
+        // 파일 처리
+        const fileTag = document.getElementById('file_uploads');
+        if (fileTag && fileTag.files.length > 0) {
+            Array.from(fileTag.files).forEach((file) => {
+                formData.append('files', file); // 'files' 키로 각 파일 추가
+            });
+        }
+        // JWT를 헤더에 추가
+        const token = localStorage.getItem('token');
+
+        // Fetch API를 사용하여 서버로 비동기 POST 요청 보냄
+        fetch('/keyboard/insert', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Authorization': 'Bearer ' + token
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // 요청이 성공하면 view로 이동
+            fetchWorkspace('keyboard-view', '/keyboard/' + data.id);
+        })
+        .catch(error => {
+            // 요청이 실패하면 실행될 코드
+            console.error('실패:', error);
+            showError(error);
+            // showError 함수는 오류를 표시하는 방법을 담당하는 별도의 함수로 정의되어야 함
+        });
+    });
 }
 // edit(수정)화면 초기화
 function init_keyboard_edit(){
@@ -128,6 +235,7 @@ function init_keyboard_edit(){
         });
 
         const data = Object.fromEntries(formData.entries());
+        delete data.file_uploads; // 파일은 제외
         data.delete_file_ids = deleteFileIds;
 
         // 파일 처리
@@ -156,9 +264,9 @@ function init_keyboard_edit(){
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
+            // 요청이 성공하면 view로 이동
+            fetchWorkspace('keyboard-view', '/keyboard/' + keyboardId);
 
-            // 요청이 성공하면 실행될 코드
-            fetchWorkspace('keyboard-list');
         } catch (error) {
             // 요청이 실패하면 실행될 코드
             console.error('실패:', error);
@@ -166,106 +274,3 @@ function init_keyboard_edit(){
         }
     });
 }    
-
-// list화면 초기화
-function init_keyboard_list(){
-    //추가버튼
-    addDelegatedClickEvent('#workspace', '#btnAddKeyboard', function(e, target) {
-        e.stopPropagation();
-        changeWorkspace('keyboard-insert');
-    });
-    //보기버튼
-    addDelegatedClickEvent('#workspace', '.btnView', function(e, target) {
-        e.stopPropagation();
-        const id = target.getAttribute('data-id');
-        fetchWorkspace('keyboard-view', '/keyboard/' + id);
-    });  
-    
-    //수정버튼
-    addDelegatedClickEvent('#workspace', '.btnEdit', function(e, target) {
-        e.stopPropagation();
-        const id = target.getAttribute('data-id');
-        fetchWorkspace('keyboard-edit', '/keyboard/' + id);
-    });
-
-    //삭제버튼 동작
-    addDelegatedClickEvent('#workspace', '.btnDelete', async function(e, target) {
-        e.stopPropagation();
-        if(confirm('삭제하시겠습니까?') == false){
-            return;
-        }
-        const id = target.getAttribute('data-id');
-        var token = localStorage.getItem('token');
-        var url = '/keyboard/' + id;
-        try {
-            const response = await fetch(url, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Aiuthorization': 'Bearer ' + token
-                }
-            });
-            if(!response.ok){
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            // const responseData = await response.json();
-            // console.log(responseData);
-            fetchWorkspace('keyboard-list');
-        } catch (error) {
-            showError(error);
-        }
-    });
-}
-// insert화면 초기화
-function init_keyboard_insert(){
-    console.log('init_keyboard_insert');
-
-    // 취소 버튼 동작
-    addDelegatedClickEvent('#workspace', '#btnInsertCancel', function(e, target) {
-        e.stopPropagation();
-        fetchWorkspace('keyboard-list');
-    });
-
-    // 추가버튼 동작
-    addDelegatedEvent('#workspace', '#keyboardInsertForm', 'submit', function (e, form) {
-        e.preventDefault(); // 폼의 기본 제출 동작을 방지
-debugger;
-        const formData = new FormData(form);
-        formData.append('keyboardData', JSON.stringify(formToJson(formData))); // JSON 문자열로 변환하여 추가
-
-        // 파일 처리
-        const fileTag = document.getElementById('file_uploads');
-        if (fileTag) {
-            Array.from(fileTag.files).forEach((file, index) => {
-                formData.append(`files[${index}]`, file); // 'files' 키로 각 파일 추가
-            });
-        }
-        
-        // JWT를 헤더에 추가
-        const token = localStorage.getItem('token');
-
-        // Fetch API를 사용하여 서버로 비동기 POST 요청 보냄
-        fetch('/keyboard/insert', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'Authorization': 'Bearer ' + token
-            },
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            // 요청이 성공하면 실행될 코드
-            fetchWorkspace('keyboard-view', '/keyboard/' + data.id);
-        })
-        .catch(error => {
-            // 요청이 실패하면 실행될 코드
-            console.error('실패:', error);
-            // showError 함수는 오류를 표시하는 방법을 담당하는 별도의 함수로 정의되어야 함
-        });
-    });
-}
