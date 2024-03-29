@@ -43,5 +43,5 @@ class PageAttr {
     }
 }
 
-module.exports = PageAttr;
+//module.exports = PageAttr;
 

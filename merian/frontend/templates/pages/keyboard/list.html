@@ -12,9 +12,11 @@
     <div class="container mx-auto mt-5">
         <h1 class="text-xl font-semibold mb-4">키보드 리스트</h1>
         <div class="flex space-x-2 items-center py-2">
-            <input type="text" name="search" placeholder="검색" class="border-2 border-gray-200 rounded-lg p-2 flex-grow">
+            <input type="text" name="searchText" id="searchText" value="{{searchText}}" placeholder="검색" class="border-2 border-gray-200 rounded-lg p-2 flex-grow">
+            <input type="hidden" name="currentPageNo" id="currentPageNo" value="{{pageAttr.current_page_number}}">
+            <input type="hidden" name="pageSize" id="pageSize" value="{{pageAttr.page_size}}">
           
-            <button class="p-2 rounded-lg bg-blue-500 text-white flex items-center justify-center">
+            <button class="p-2 rounded-lg bg-blue-500 text-white flex items-center justify-center" id="btnSearch">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
@@ -25,6 +27,12 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
               </svg>
               추가
+            </button>
+            <button id="btnResetSearchText" class="p-2 rounded-lg bg-gray-500 text-white flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9H9m11 11v-5h-.581m-15.357-2a8.001 8.001 0 0015.358 0z" />
+              </svg>
+              초기화
             </button>
           </div>
         <table class="table-auto w-full text-left whitespace-no-wrap">
@@ -66,9 +74,25 @@
               {{/each}}                
             </tbody>
         </table>
-        <div class="mt-5">
-          총갯수 : {{totalCount}}
-        </div>
+        <div class="mt-5 flex justify-center items-center" id="page-attr-area">
+          <div class="mr-3"> 총갯수 : {{pageAttr.total_item_count}} </div>
+          <div class="flex gap-1">
+              <!-- 이전 페이지 버튼 -->
+              {{#if pageAttr.is_exist_prev_page_number}}
+              <a href="#" data-page-no="{{decrement pageAttr.start_page_number}}" class="btnPageJump px-4 py-2 border rounded bg-blue-500 text-white">이전</a>
+              {{/if}}
+      
+              <!-- 페이지 번호들 -->
+              {{#each (range pageAttr.start_page_number pageAttr.end_page_number) as |num|}}
+              <a href="#" data-page-no="{{num}}" class="btnPageJump  px-4 py-2 border rounded {{#if (eq num pageAttr.current_page_number)}}bg-blue-500 text-white{{else}}bg-white text-blue-500{{/if}}">{{num}}</a>
+              {{/each}}
+      
+              <!-- 다음 페이지 버튼 -->
+              {{#if pageAttr.is_exist_next_page_number}}
+              <a href="#" data-page-no="{{increment pageAttr.end_page_number}}" class="btnPageJump px-4 py-2 border rounded bg-blue-500 text-white">다음</a>
+              {{/if}}
+          </div>
+      </div>
     </div>
 </body>
 </html>

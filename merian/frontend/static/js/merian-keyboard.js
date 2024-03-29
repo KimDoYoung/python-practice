@@ -159,6 +159,28 @@ function init_keyboard_list(){
             showError(error);
         }
     });
+    //page이동
+    addDelegatedEvent('#workspace', '#btnPageJump', 'click', function(e, target) {
+        e.stopPropagation();
+        const page = target.getAttribute('data-page-no');
+        var pageSize = document.getElementById('pageSize').value;
+        var searchText = document.getElementById('searchText').value;
+        var currentPageNo = page
+        fetchWorkspace('keyboard-list', `/keyboard?pageSize=${pageSize}&searchText=${searchText}&currentPageNo=${currentPageNo}`);
+    });
+    //btnSearch 검색 버튼
+    addDelegatedEvent('#workspace', '#btnSearch', 'click', function(e, target) {
+        e.stopPropagation();
+        var pageSize = document.getElementById('pageSize').value;
+        var searchText = document.getElementById('searchText').value;
+        fetchWorkspace('keyboard-list', `/keyboard?pageSize=${pageSize}&searchText=${searchText}`);
+    });
+    //resetSearchText 검색 리셋 버튼
+    addDelegatedEvent('#workspace', '#btnResetSearchText', 'click', function(e, target) {
+        e.stopPropagation();
+        document.getElementById('searchText').value = '';
+        fetchWorkspace('keyboard-list', "/keyboard");
+    });
 }
 // insert화면 초기화
 function init_keyboard_insert(){

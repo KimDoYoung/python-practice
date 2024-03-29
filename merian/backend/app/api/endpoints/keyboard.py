@@ -11,6 +11,7 @@ from backend.app.models.keyboard import FBFile, FileCollectionMatch, KeyboardMod
 from backend.app.schemas.keyboard_schema import FBFileResponse, KeyboardCreateRequest, KeyboardResponse, KeyboardUpdateRequest, KeyboardRequest
 from backend.app.services.keyboard_service import save_upload_file
 from backend.app.core.logger import get_logger
+from backend.app.utils.PageAttr import PageAttr
 from ...services.db_service import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import BackgroundTasks
@@ -23,11 +24,12 @@ router = APIRouter()
 # 조건에 해당하는 리스트 조회
 #
 @router.get("/keyboard")
-async def read_keyboards(skip: int = 0, limit: int = 10, 
-                        searchText: Optional[str] = None,
+async def read_keyboards(currentPageNo: int = 1, pageSize: int = 10, searchText: Optional[str] = None,
                         db: AsyncSession = Depends(get_db),
                         current_user_id: str = Depends(get_current_user)):
     
+    skip = (currentPageNo - 1) * pageSize
+    limit = pageSize 
     async with db as session:
         # 기본 쿼리 설정
         base_query = select(
@@ -60,41 +62,41 @@ async def read_keyboards(skip: int = 0, limit: int = 10,
         # totalCount를 구하기 위한 쿼리
         count_query = select(func.count('*')).select_from(base_query.subquery())
         total_count_result = await session.execute(count_query)
-        totalCount = total_count_result.scalar()
+        totalCount = total_count_result.scalar_one()
+
         
         # 실제 데이터 조회 쿼리에 limit와 offset 적용
         query = base_query.order_by(KeyboardModel.create_by.desc()).offset(skip).limit(limit)
         keyboards_info = await session.execute(query)
-        result = await keyboards_info.scalars().all()
+        result =  keyboards_info.mappings().all()
         # 결과 변환
         keyboard_list = [
             {
-                'id': kb[0], 
-                'product_name': kb[1], 
-                'manufacturer': kb[2],
-                'purchase_date': kb[3],
-                'purchase_amount': kb[4],
-                'key_type': kb[5],
-                'switch_type': kb[6],
-                'actuation_force': kb[7],
-                'interface_type': kb[8],
-                'overall_rating': kb[9],
-                'typing_feeling': kb[10],
-                'create_on': kb[11],
-                'create_by': kb[12],
-                "file_count": kb[13] if kb[13] is not None else 0
+                'id': kb.id, 
+                'product_name': kb.product_name, 
+                'manufacturer': kb.manufacturer,
+                'purchase_date': kb.purchase_date,
+                'purchase_amount': kb.purchase_amount,
+                'key_type': kb.key_type,
+                'switch_type': kb.switch_type,
+                'actuation_force': kb.actuation_force,
+                'interface_type': kb.interface_type,
+                'overall_rating': kb.overall_rating,
+                'typing_feeling': kb.typing_feeling,
+                'create_on': kb.create_on,
+                'create_by': kb.create_by,
+                "file_count": kb.file_count if kb.file_count is not None else 0                
             } for kb in result
         ]
         
         #json_compatible_keyboard_list = jsonable_encoder(keyboard_list)
-        json_compatible_keyboard_list = keyboard_list
-        
+        json_compatible_keyboard_list = jsonable_encoder(keyboard_list)
+        pageAttr = PageAttr(totalCount, pageSize, currentPageNo)
+        pageAttrJson = pageAttr.to_json()
         return JSONResponse(content={
             "list": json_compatible_keyboard_list, 
-            "totalCount": totalCount,
-            "skip": skip, 
-            "limit": limit, 
-            "searchCondition": searchText
+            "pageAttr": pageAttrJson,
+            "searchText": searchText
         })
 
 # 단일 조회

@@ -87,3 +87,28 @@
             return options.inverse(this);
         }
     });    
+
+// decrement 헬퍼: 숫자를 1 감소시킵니다.
+Handlebars.registerHelper('decrement', function(value) {
+    return value - 1;
+  });
+  
+  // increment 헬퍼: 숫자를 1 증가시킵니다.
+  Handlebars.registerHelper('increment', function(value) {
+    return value + 1;
+  });
+  
+  // range 헬퍼: 시작과 끝 숫자를 기반으로 배열을 생성합니다.
+  Handlebars.registerHelper('range', function(start, end) {
+    const range = [];
+    for (let i = start; i <= end; i++) {
+      range.push(i);
+    }
+    return range;
+  });
+  
+  // eq 헬퍼: 두 값을 비교하여 같으면 true, 다르면 false를 반환합니다.
+  Handlebars.registerHelper('eq', function(a, b) {
+    return a === b;
+  });
+  
