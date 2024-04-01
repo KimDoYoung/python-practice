@@ -187,6 +187,12 @@ function init_keyboard_insert(){
     // 취소 버튼 동작
     addDelegatedEvent('#workspace', '#btnInsertCancel', 'click', function(e, target) {
         e.stopPropagation();
+        // var paramArea = document.getElementById('params-area');
+        // var searchText = paramArea.querySelector('#searchText').value;
+        // var pageSize = paramArea.querySelector('#pageSize').value;
+        // var currentPageNo = paramArea.querySelector('#currentPageNo').value;
+        // var url = "/keyboard?pageSize=" + pageSize + "&searchText=" + searchText + "&currentPageNo=" + currentPageNo;
+        // fetchWorkspace('keyboard-list', url);
         fetchWorkspace('keyboard-list');
     });
 

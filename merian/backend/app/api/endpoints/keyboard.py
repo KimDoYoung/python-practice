@@ -23,7 +23,7 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 #
-# 조건에 해당하는 리스트 조회
+#  리스트 조회
 #
 @router.get("/keyboard")
 async def read_keyboards(request: Request, response: Response, # 수정됨
@@ -38,7 +38,7 @@ async def read_keyboards(request: Request, response: Response, # 수정됨
     pageSize = query_attr.get('pageSize', pageSize or 10)
     searchText = query_attr.get('searchText', searchText or "")
 
-    set_cookie(response, "query_attr", json.dumps({"currentPageNo": currentPageNo, "pageSize": pageSize, "searchText": searchText}))
+    set_cookie(response, "query_attr", {"currentPageNo": currentPageNo, "pageSize": pageSize, "searchText": searchText})
 
     skip = (currentPageNo - 1) * pageSize
     limit = pageSize 
@@ -105,6 +105,11 @@ async def read_keyboards(request: Request, response: Response, # 수정됨
         json_compatible_keyboard_list = jsonable_encoder(keyboard_list)
         pageAttr = PageAttr(totalCount, pageSize, currentPageNo)
         pageAttrJson = pageAttr.to_json()
+
+        response.set_cookie("name", "123")
+
+
+
         return JSONResponse(content={
             "list": json_compatible_keyboard_list, 
             "pageAttr": pageAttrJson,

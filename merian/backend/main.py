@@ -9,10 +9,17 @@ from backend.app.api.endpoints.fbfile import router as fbfile_router
 from backend.app.core.exception_handler import add_exception_handlers
 from backend.app.core.configs import MERIAN_PORT
 import os
-
-
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=['http://localhost:8686'],
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
 
 app.include_router(user_router)
 app.include_router(keyboqrd_router)
