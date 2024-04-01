@@ -152,15 +152,13 @@ function init_keyboard_list(){
             if(!response.ok){
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            // const responseData = await response.json();
-            // console.log(responseData);
             fetchWorkspace('keyboard-list');
         } catch (error) {
             showError(error);
         }
     });
     //page이동
-    addDelegatedEvent('#workspace', '#btnPageJump', 'click', function(e, target) {
+    addDelegatedEvent('#workspace', '.btnPageJump', 'click', function(e, target) {
         e.stopPropagation();
         const page = target.getAttribute('data-page-no');
         var pageSize = document.getElementById('pageSize').value;
@@ -230,10 +228,8 @@ function init_keyboard_insert(){
             fetchWorkspace('keyboard-view', '/keyboard/' + data.id);
         })
         .catch(error => {
-            // 요청이 실패하면 실행될 코드
             console.error('실패:', error);
             showError(error);
-            // showError 함수는 오류를 표시하는 방법을 담당하는 별도의 함수로 정의되어야 함
         });
     });
 }
@@ -276,7 +272,7 @@ function init_keyboard_edit(){
         try {
             const response = await fetch(`/keyboard/${keyboardId}`, {
                 method: 'PUT',
-                body: formData, // JSON.stringify을 사용하지 않고 formData 직접 전송
+                body: formData, 
                 headers: {
                     // 'Content-Type': 'multipart/form-data'는 자동으로 설정됩니다. Token만 직접 설정.
                     'Authorization': 'Bearer ' + token

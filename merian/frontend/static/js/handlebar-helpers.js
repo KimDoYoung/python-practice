@@ -39,6 +39,22 @@
 
         return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds + ' ' + period;
     }); 
+    // {{formatYmd "20240301"}}
+    Handlebars.registerHelper('formatYmd', function(inputDate) {
+        // 입력된 날짜가 올바른 길이(8자)를 가지고 있는지 확인
+        if(inputDate && inputDate.length === 8) {
+            // 년, 월, 일을 추출
+            var year = inputDate.substring(0, 4);
+            var month = inputDate.substring(4, 6);
+            var day = inputDate.substring(6, 8);
+    
+            // 형식화된 문자열 반환
+            return `${year}-${month}-${day}`;
+        } else {
+            // 입력 형식이 잘못된 경우 원래 문자열을 반환하거나 오류 메시지 출력
+            return "Invalid date format"; // 혹은 inputDate를 그대로 반환할 수도 있습니다.
+        }
+    });    
     /**
      * 파일 사이즈를 사람이 인식하기 쉽게 표시
      * {{humanFileSize 123456787}}
@@ -112,3 +128,6 @@ Handlebars.registerHelper('decrement', function(value) {
     return a === b;
   });
   
+  Handlebars.registerHelper('gt', function(a, b, options) {
+    return a > b ? options.fn(this) : options.inverse(this);
+});

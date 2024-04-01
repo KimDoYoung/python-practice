@@ -14,3 +14,10 @@
 4. mf-test
    1. Makefiles 테스트
 
+5. merian : 키보드 관리
+   1. 기술스택
+      1. FastAPI
+      2. SQLAlchemy : async 
+      3. jinja2, handlebar 
+      4. Postgresql 
+      5. tailwindcss

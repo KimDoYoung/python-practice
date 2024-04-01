@@ -35,56 +35,60 @@
               초기화
             </button>
           </div>
-        <table class="table-auto w-full text-left whitespace-no-wrap">
+          <table class="table-auto w-full text-left whitespace-no-wrap">
             <thead>
                 <tr class="text-gray-800 border-b-2 border-gray-300">
-                    <th class="px-4 py-3">제품명</th>
-                    <th class="px-4 py-3">제조사</th>
-                    <th class="px-4 py-3">키 타입</th>
-                    <th class="px-4 py-3">스위치 타입</th>
-                    <th class="px-4 py-3">구입일</th>
-                    <th class="px-4 py-3">구입금액</th>
-                    <th class="px-4 py-3">파일갯수</th>
-                    <th class="px-4 py-3">동작</th>
+                    <th class="px-4 py-2">제품명</th>
+                    <th class="px-4 py-2">제조사</th>
+                    <th class="px-4 py-2">키 타입</th>
+                    <th class="px-4 py-2">스위치 타입</th>
+                    <th class="px-4 py-2">구입일</th>
+                    <th class="px-4 py-2 text-right">구입금액</th>
+                    <th class="px-4 py-2 text-right">파일갯수</th>
+                    <th class="px-4 py-2 text-center">동작</th>
                 </tr>
             </thead>
             <tbody>
               {{#each list}}
                 <tr class="border-b border-gray-300">
-                    <td class="px-4 py-3"><a href="#" data-id="{{this.id}}" class="btnView">{{this.product_name}}</a></td>
-                    <td class="px-4 py-3">{{this.manufacturer}}</td>
-                    <td class="px-4 py-3">{{this.key_type}}</td>
-                    <td class="px-4 py-3">{{this.switch_type}}</td>
-                    <td class="px-4 py-3">{{this.purchase_date}}</td>
-                    <td class="px-4 py-3">{{this.purchase_amount}}</td>
-                    <td class="px-4 py-3">{{this.file_count}}</td>
-                    <td class="px-4 py-3">
+                    <td class="px-4 py-2"><a href="#" data-id="{{this.id}}" class="btnView">{{this.product_name}}</a></td>
+                    <td class="px-4 py-2">{{this.manufacturer}}</td>
+                    <td class="px-4 py-2">{{this.key_type}}</td>
+                    <td class="px-4 py-2">{{this.switch_type}}</td>
+                    <td class="px-4 py-2">{{formatYmd this.purchase_date}}</td>
+                    <td class="px-4 py-2 text-right">{{formatComma this.purchase_amount}}</td>
+                    <td class="px-4 py-2 text-right">{{this.file_count}}</td>
+                    <td class="px-4 py-2 text-center">
                       <!-- 수정 버튼 -->
-                      <button  class="btnEdit bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" data-id="{{this.id}}">
+                      <button  class="btnEdit bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded" data-id="{{this.id}}">
                         <i class="fas fa-edit"></i> 수정
                       </button>
-
+        
                       <!-- 삭제 버튼 -->
-                      <button  class="btnDelete bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"  data-id="{{this.id}}">
+                      <button  class="btnDelete bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-4 rounded"  data-id="{{this.id}}">
                         <i class="fas fa-trash"></i> 삭제
                       </button>
                     </td>
-                        
                 </tr>
               {{/each}}                
             </tbody>
         </table>
         <div class="mt-5 flex justify-center items-center" id="page-attr-area">
-          <div class="mr-3"> 총갯수 : {{pageAttr.total_item_count}} </div>
+          <div class="mr-3"> 총갯수 : {{formatComma pageAttr.total_item_count}} </div>
+          <div class="mr-3"> 총페이지 : {{formatComma pageAttr.current_page_number }} / {{formatComma pageAttr.total_page_count}} </div>
           <div class="flex gap-1">
               <!-- 이전 페이지 버튼 -->
-              {{#if pageAttr.is_exist_prev_page_number}}
+              {{#gt pageAttr.start_page_number 1}}
               <a href="#" data-page-no="{{decrement pageAttr.start_page_number}}" class="btnPageJump px-4 py-2 border rounded bg-blue-500 text-white">이전</a>
-              {{/if}}
-      
+              {{/gt}}
+              
               <!-- 페이지 번호들 -->
               {{#each (range pageAttr.start_page_number pageAttr.end_page_number) as |num|}}
-              <a href="#" data-page-no="{{num}}" class="btnPageJump  px-4 py-2 border rounded {{#if (eq num pageAttr.current_page_number)}}bg-blue-500 text-white{{else}}bg-white text-blue-500{{/if}}">{{num}}</a>
+                {{#if (eq num ../pageAttr.current_page_number)}}
+                  <a href="#" data-page-no="{{num}}" class="px-4 py-2 border rounded bg-white text-blue-500">{{num}}</a>
+                {{else}}
+                  <a href="#" data-page-no="{{num}}" class="btnPageJump  px-4 py-2 border rounded bg-blue-500 text-white-500">{{num}}</a>
+                {{/if}}
               {{/each}}
       
               <!-- 다음 페이지 버튼 -->

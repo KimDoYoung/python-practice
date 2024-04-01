@@ -117,3 +117,14 @@ CREATE TABLE IF NOT EXISTS public.file_collection_match (
 
 INSERT INTO public.edi_user (id,pw,nm,email,created_by)values('user1','$2b$12$C/MeW1GIhMe/W1nK45g7u.B.MrPzg4xQQDWFXZdCXYCfIA1xkClP2','김도영','kdy987@gmail.com','system');
 ```
+
+## 테스트 시나리오
+
+### CRUD
+
+1. insert
+   1. "한성1" 추가, 파일첨부 없음
+   2. "한성1" 수정, 파일첨부 1개
+   3. "한성1" 수정, 파일첨부 2개, 기존1개 삭제
+   4. "한성1" 삭제
+   5. 물리적 파일없어야함.

@@ -1,5 +1,6 @@
 import json
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status, Query
+import os
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, Response, UploadFile, status, Query
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import FileResponse, JSONResponse
 from sqlalchemy import func, or_, select
@@ -9,9 +10,10 @@ from typing import List, Optional
 from backend.app.core.security import get_current_user
 from backend.app.models.keyboard import FBFile, FileCollectionMatch, KeyboardModel
 from backend.app.schemas.keyboard_schema import FBFileResponse, KeyboardCreateRequest, KeyboardResponse, KeyboardUpdateRequest, KeyboardRequest
-from backend.app.services.keyboard_service import save_upload_file
+from backend.app.services.keyboard_service import delete_physical_file, save_upload_file
 from backend.app.core.logger import get_logger
 from backend.app.utils.PageAttr import PageAttr
+from backend.app.utils.cookies_util import get_cookie, set_cookie
 from ...services.db_service import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import BackgroundTasks
@@ -24,10 +26,20 @@ router = APIRouter()
 # 조건에 해당하는 리스트 조회
 #
 @router.get("/keyboard")
-async def read_keyboards(currentPageNo: int = 1, pageSize: int = 10, searchText: Optional[str] = None,
+async def read_keyboards(request: Request, response: Response, # 수정됨
+                        currentPageNo: Optional[int] = None, 
+                        pageSize: Optional[int] = None, 
+                        searchText: Optional[str] = None,
                         db: AsyncSession = Depends(get_db),
                         current_user_id: str = Depends(get_current_user)):
-    
+
+    query_attr = get_cookie(request, "query_attr", "{}") # 수정됨
+    currentPageNo = query_attr.get('currentPageNo', currentPageNo or 1)
+    pageSize = query_attr.get('pageSize', pageSize or 10)
+    searchText = query_attr.get('searchText', searchText or "")
+
+    set_cookie(response, "query_attr", json.dumps({"currentPageNo": currentPageNo, "pageSize": pageSize, "searchText": searchText}))
+
     skip = (currentPageNo - 1) * pageSize
     limit = pageSize 
     async with db as session:
@@ -196,7 +208,7 @@ async def create_keyboard(
 async def update_keyboard(
     keyboard_id: int,
     keyboardFormData: str = Form(...),
-    files: List[UploadFile] = None, #File(default=[]),  # 추가할 파일
+    files: List[UploadFile] = File(default=[]),  # 추가할 파일
     current_user_id: str = Depends(get_current_user),  # JWT 토큰에서 사용자 ID 추출
     db: AsyncSession = Depends(get_db)
 ):
@@ -213,10 +225,20 @@ async def update_keyboard(
         async with session.begin():
             # 1. 지워야 할 첨부파일들 삭제
             for file_id in delete_file_ids:
+                # fb_file 테이블에서 파일 정보 삭제
                 result = await session.execute(select(FBFile).filter(FBFile.file_id == file_id))
                 file_to_delete = result.scalars().first()
                 if file_to_delete:
+                    # 물리적 파일 삭제
+                    file_path = os.path.join(file_to_delete.phy_folder, file_to_delete.phy_name)
+                    delete_physical_file(file_path)
+                    # fb_file 에서 파일 정보 삭제
                     await session.delete(file_to_delete)
+                # file_collection_match 테이블에서 파일 정보 삭제    
+                result = await session.execute(select(FileCollectionMatch).filter(FileCollectionMatch.file_id == file_id and FileCollectionMatch.id == keyboard_id))
+                fcm_to_delete = result.scalars().first()
+                if fcm_to_delete:
+                    await session.delete(fcm_to_delete)  
             
             # 2. 추가해야 할 파일들 처리 및 추가
             for file in files:
@@ -285,6 +307,10 @@ async def delete_keyboard(keyboard_id: int, db: AsyncSession = Depends(get_db)):
                 result = await session.execute(select(FBFile).filter(FBFile.file_id == match.file_id))
                 related_fb_files = result.scalars().all()
                 for fb_file in related_fb_files:
+                    # 물리적 파일 삭제
+                    file_path = os.path.join(fb_file.phy_folder, fb_file.phy_name)
+                    delete_physical_file(file_path)
+                    # fb_file 레코드 삭제
                     await session.delete(fb_file)
                 # file_collection_match 레코드 삭제
                 await session.delete(match)

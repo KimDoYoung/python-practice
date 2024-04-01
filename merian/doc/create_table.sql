@@ -1,8 +1,10 @@
 -- collections 스키마에 키보드 정보를 저장하는 테이블 생성
+CREATE SCHEMA IF NOT EXISTS collections;
+
 DROP TABLE IF EXISTS collections.keyboard;
 CREATE TABLE IF NOT EXISTS  collections.keyboard (
     id serial4 PRIMARY KEY, -- 키보드 ID
-    product_name VARCHAR(100), -- 제품명
+    product_name VARCHAR(100) not null, -- 제품명
     manufacturer VARCHAR(100), -- 제조사
     purchase_date VARCHAR(8), -- 구입일 (YYYYMMDD 형식)
     purchase_amount BIGINT, -- 구입금액
@@ -44,6 +46,20 @@ CREATE TABLE IF NOT EXISTS public.file_collection_match (
  PRIMARY KEY (category, id, file_id)
 );
 
+DROP TABLE IF EXISTS public.edi_user;
+CREATE TABLE IF NOT EXISTS public.edi_user (
+	id varchar(30) NOT NULL,
+	pw varchar(100) NOT NULL,
+	nm varchar(50) NOT NULL,
+	email varchar(100) NOT NULL,
+	"role" varchar(100) NOT NULL DEFAULT 'ROLE_USER'::character varying,
+	created_by varchar(30) NOT NULL,
+	created_on timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	last_update_by varchar(30) NULL,
+	last_update_on timestamp NULL,
+	last_login_on timestamp NULL,
+	CONSTRAINT pk_edi_user PRIMARY KEY (id)
+);
 delete from public.edi_user where id='user1';
 INSERT INTO public.edi_user (id,pw,nm,email,created_by)values('user1','$2b$12$C/MeW1GIhMe/W1nK45g7u.B.MrPzg4xQQDWFXZdCXYCfIA1xkClP2','김도영','kdy987@gmail.com','system');
 
@@ -53,8 +69,8 @@ INSERT INTO public.edi_user (id,pw,nm,email,created_by)values('user1','$2b$12$C/
 -- Drop table
 
 -- DROP TABLE public.fb_file;
-
-CREATE TABLE public.fb_file (
+DROP TABLE IF EXISTS public.fb_file;
+CREATE TABLE IF NOT EXISTS public.fb_file (
 	file_id serial4 NOT NULL,
 	node_id int4 NOT NULL,
 	phy_folder varchar(300) NOT NULL,
@@ -73,6 +89,35 @@ CREATE TABLE public.fb_file (
 );
 
 
--- public.fb_file foreign keys
-
-ALTER TABLE public.fb_file ADD CONSTRAINT fk_node_id FOREIGN KEY (node_id) REFERENCES public.fb_node(node_id) ON DELETE RESTRICT;
+-- 테스트데이터 생성
+INSERT INTO collections.keyboard (
+    product_name, 
+    manufacturer, 
+    purchase_date, 
+    purchase_amount, 
+    key_type, 
+    switch_type, 
+    actuation_force, 
+    interface_type, 
+    overall_rating, 
+    typing_feeling,
+    create_by
+)
+SELECT
+    'Keyboard ' || s.id, -- 제품명
+    CASE WHEN s.id % 3 = 0 THEN 'Manufacturer A'
+         WHEN s.id % 3 = 1 THEN 'Manufacturer B'
+         ELSE 'Manufacturer C' END, -- 제조사
+    TO_CHAR('20230101'::DATE + (s.id % 30) * '1 day'::INTERVAL, 'YYYYMMDD'), -- 구입일, 2023년 1월의 어떤 날짜
+    (RANDOM() * (5000 - 1000 + 1) + 1000)::INT, -- 구입금액, 1000에서 5000 사이
+    CASE WHEN s.id % 2 = 0 THEN 'Mechanic' ELSE 'Membrane' END, -- 키 타입
+    CASE WHEN s.id % 4 = 0 THEN 'Cherry MX'
+         WHEN s.id % 4 = 1 THEN 'Topre'
+         WHEN s.id % 4 = 2 THEN 'Gateron'
+         ELSE 'Romer-G' END, -- 스위치 타입
+    (RANDOM() * (80 - 45 + 1) + 45)::INT || 'g', -- 작동 압력, 45g에서 80g 사이
+    CASE WHEN s.id % 2 = 0 THEN 'USB' ELSE 'Bluetooth' END, -- 인터페이스 타입
+    (RANDOM() * 9 + 1)::INT, -- 종합적 평가, 1에서 10 사이
+    'Typing feeling of keyboard ' || s.id, -- 타이핑 감각
+    'admin' -- 생성자
+FROM generate_series(1, 1321) AS s(id);

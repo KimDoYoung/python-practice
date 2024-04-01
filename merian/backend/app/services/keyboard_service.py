@@ -1,6 +1,5 @@
 import asyncio
 import uuid
-import aiofiles
 from fastapi import UploadFile
 from fastapi import UploadFile
 from datetime import datetime
@@ -32,45 +31,22 @@ def save_file(file, file_path):
         shutil.copyfileobj(file, out_file)
     return file_path.stat().st_size
 
-# def save_upload_file(upload_file: UploadFile) -> tuple:
-#     date_path = datetime.now().strftime("%Y/%m")
-#     save_dir = Path(FILE_DIR) / date_path
-#     save_dir.mkdir(parents=True, exist_ok=True)
+import os
 
-#     ext = upload_file.filename.split('.')[-1]
-#     unique_filename = f"{uuid.uuid4().hex}.{ext}"
-#     file_path = save_dir / unique_filename
+def delete_physical_file(file_path):
+    """
+    물리적 파일을 조용히 삭제하는 함수.
+    파일 경로를 인자로 받아 파일이 존재하면 삭제한다.
+    파일 삭제 성공 여부만 반환한다.
 
-#     file_size = 0  # 파일 크기 초기화
-#     mime_type = upload_file.content_type  # 파일의 MIME 타입 추출
-
-#     with upload_file.file as file:
-#         # shutil.copyfileobj를 사용하여 파일 콘텐츠를 저장 위치로 복사
-#         with open(file_path, 'wb') as out_file:
-#             shutil.copyfileobj(file, out_file)
-#         file_size = file_path.stat().st_size
-
-#     # 저장된 파일의 폴더 경로, 파일명, 확장자, 파일 크기, MIME 타입 반환
-#     return (str(save_dir), unique_filename, ext, file_size, mime_type)
-
-# async def save_upload_file(upload_file: UploadFile) -> tuple:
-#     date_path = datetime.now().strftime("%Y/%m")
-#     save_dir = Path(FILE_DIR) / date_path
-#     save_dir.mkdir(parents=True, exist_ok=True)
-
-#     ext = upload_file.filename.split('.')[-1]
-#     unique_filename = f"{uuid.uuid4()}.{ext}"
-#     file_path = save_dir / unique_filename
-
-#     file_size = 0  # 파일 크기 초기화
-#     mime_type = upload_file.content_type  # 파일의 MIME 타입 추출
-
-#     async with upload_file.file as file:
-#         content = await file.read()  # 파일 내용 읽기
-#         file_size = len(content)  # 파일 크기 계산
-#         async with aiofiles.open(file_path, 'wb') as out_file:
-#             await out_file.write(content)  # 파일 쓰기
-
-#     # 저장된 파일의 폴더 경로, 파일명, 확장자, 파일 크기, MIME 타입 반환
-#     return (str(save_dir), unique_filename, ext, file_size, mime_type)
-
+    :param file_path: 삭제할 파일의 전체 경로
+    :return: bool 파일 삭제 성공 여부
+    """
+    try:
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            return True
+    except Exception:
+        # 예외가 발생하더라도 여기서 처리하고, 실패했다는 것을 나타내기 위해 False 반환
+        pass
+    return False
