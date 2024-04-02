@@ -2,7 +2,7 @@
 
 ## 개요
 
-다음을 [참조로 시작](https://www.bluestones.biz/cms/pages?action=view&page=/HomePage/stock/stock_products.md) 
+다음을 [참조로 시작](https://www.bluestones.biz/cms/pages?action=view&page=/HomePage/stock/stock_products.md)
 **주식**거래만을 대상으로 한다.
 
 ## 기술스택
