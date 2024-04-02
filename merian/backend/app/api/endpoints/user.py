@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from backend.app.core.configs import ACCESS_TOKEN_EXPIRE_MINUTES
+from backend.app.core.configs import ACCESS_TOKEN_EXPIRE_MINUTES, QUERY_ATTR_COOKIE
 from backend.app.services.db_service import get_db
 from backend.app.utils.cookies_util import delete_cookie
 
@@ -40,7 +40,7 @@ async def login_for_access_token(form_data: LoginFormData, db: AsyncSession = De
 @router.get("/logout")
 async def login_for_access_token(response: Response):
     # 쿠키 삭제
-    delete_cookie(response, "query_attr")
+    delete_cookie(response, QUERY_ATTR_COOKIE)
     return { "message": "Logout Success" }
 
 # 사용자 인증 함수 - 비동기 함수로 변경

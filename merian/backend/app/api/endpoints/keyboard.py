@@ -11,6 +11,7 @@ from backend.app.services.keyboard_service import delete_physical_file, save_upl
 from backend.app.core.logger import get_logger
 from backend.app.utils.PageAttr import PageAttr
 from backend.app.utils.cookies_util import get_cookie, set_cookie
+from configs import QUERY_ATTR_COOKIE
 from ...services.db_service import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -39,7 +40,7 @@ async def read_keyboards(request: Request, response: Response, # 수정됨
                         searchText: Optional[str] = None,
                         db: AsyncSession = Depends(get_db),
                         current_user_id: str = Depends(get_current_user)):
-    query_attr = get_cookie(request, "query_attr", "{}") # 수정됨
+    query_attr = get_cookie(request, QUERY_ATTR_COOKIE , "{}") # 수정됨
     if currentPageNo is None:
         currentPageNo = query_attr.get('currentPageNo', currentPageNo or 1)
     if pageSize is None:    
@@ -47,7 +48,7 @@ async def read_keyboards(request: Request, response: Response, # 수정됨
     if searchText is None:    
         searchText = query_attr.get('searchText', searchText or "")
 
-    set_cookie(response, "query_attr", {"currentPageNo": currentPageNo, "pageSize": pageSize, "searchText": searchText})
+    set_cookie(response, QUERY_ATTR_COOKIE, {"currentPageNo": currentPageNo, "pageSize": pageSize, "searchText": searchText})
 
     skip = (currentPageNo - 1) * pageSize
     limit = pageSize 

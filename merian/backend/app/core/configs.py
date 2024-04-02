@@ -32,3 +32,6 @@ if not os.path.exists(LOG_DIR):
 SECRET_KEY = "a_very_secret_key"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+# 쿠키명
+QUERY_ATTR_COOKIE = "query_attr"
