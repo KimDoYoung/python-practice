@@ -2,11 +2,8 @@ import json
 import os
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, Response, UploadFile, status, Query
 from fastapi.encoders import jsonable_encoder
-from fastapi.responses import FileResponse, JSONResponse
 from sqlalchemy import func, or_, select
-from sqlalchemy.orm import Session
 from typing import List, Optional
-
 from backend.app.core.security import get_current_user
 from backend.app.models.keyboard import FBFile, FileCollectionMatch, KeyboardModel
 from backend.app.schemas.keyboard_schema import FBFileResponse, KeyboardCreateRequest, KeyboardResponse, KeyboardUpdateRequest, KeyboardRequest
@@ -16,11 +13,21 @@ from backend.app.utils.PageAttr import PageAttr
 from backend.app.utils.cookies_util import get_cookie, set_cookie
 from ...services.db_service import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import BackgroundTasks
+
 
 logger = get_logger(__name__)
 
 router = APIRouter()
+
+@router.get("/set_cookie")
+def set_cookie1(response: Response):
+    response.set_cookie(key="merian_test111", value="merian is keyboard manager111")
+    return {"message": "Cookie is set"}
+
+@router.get("/aset_cookie")
+def set_cookie2(response: Response):
+    response.set_cookie(key="ayncmerian_test111", value="async merian is keyboard manager111")
+    return {"message": "async Cookie is set"}
 
 #
 #  리스트 조회
@@ -32,11 +39,13 @@ async def read_keyboards(request: Request, response: Response, # 수정됨
                         searchText: Optional[str] = None,
                         db: AsyncSession = Depends(get_db),
                         current_user_id: str = Depends(get_current_user)):
-
     query_attr = get_cookie(request, "query_attr", "{}") # 수정됨
-    currentPageNo = query_attr.get('currentPageNo', currentPageNo or 1)
-    pageSize = query_attr.get('pageSize', pageSize or 10)
-    searchText = query_attr.get('searchText', searchText or "")
+    if currentPageNo is None:
+        currentPageNo = query_attr.get('currentPageNo', currentPageNo or 1)
+    if pageSize is None:    
+        pageSize = query_attr.get('pageSize', pageSize or 10)
+    if searchText is None:    
+        searchText = query_attr.get('searchText', searchText or "")
 
     set_cookie(response, "query_attr", {"currentPageNo": currentPageNo, "pageSize": pageSize, "searchText": searchText})
 
@@ -101,20 +110,15 @@ async def read_keyboards(request: Request, response: Response, # 수정됨
             } for kb in result
         ]
         
-        #json_compatible_keyboard_list = jsonable_encoder(keyboard_list)
         json_compatible_keyboard_list = jsonable_encoder(keyboard_list)
         pageAttr = PageAttr(totalCount, pageSize, currentPageNo)
         pageAttrJson = pageAttr.to_json()
 
-        response.set_cookie("name", "123")
-
-
-
-        return JSONResponse(content={
+        return {
             "list": json_compatible_keyboard_list, 
             "pageAttr": pageAttrJson,
             "searchText": searchText
-        })
+        }
 
 # 단일 조회
 @router.get("/keyboard/{keyboard_id}", response_model=KeyboardResponse)

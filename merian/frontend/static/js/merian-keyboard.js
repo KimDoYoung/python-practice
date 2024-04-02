@@ -60,11 +60,13 @@ function changeWorkspace(pageId, data) {
     }
 } 
 
-function logout() {
+async function logout() {
     // JWT를 저장하는 방식에 따라 다름 (예: localStorage, sessionStorage)
     localStorage.removeItem('token');
     // 사용자를 로그인 페이지로 리다이렉트
+    await fetch('/logout', { method:'GET' });
     window.location.href = '/';
+    
 }
 async function fetchWorkspace(pageId, detailUrl) {
     hideError();
@@ -171,13 +173,14 @@ function init_keyboard_list(){
         e.stopPropagation();
         var pageSize = document.getElementById('pageSize').value;
         var searchText = document.getElementById('searchText').value;
-        fetchWorkspace('keyboard-list', `/keyboard?pageSize=${pageSize}&searchText=${searchText}`);
+        var currentPageNo = 1;
+        fetchWorkspace('keyboard-list', `/keyboard?currentPageNo=${currentPageNo}&pageSize=${pageSize}&searchText=${searchText}`);
     });
     //resetSearchText 검색 리셋 버튼
     addDelegatedEvent('#workspace', '#btnResetSearchText', 'click', function(e, target) {
         e.stopPropagation();
         document.getElementById('searchText').value = '';
-        fetchWorkspace('keyboard-list', "/keyboard");
+        fetchWorkspace('keyboard-list', "/keyboard?currentPageNo=1&searchText=");
     });
 }
 // insert화면 초기화

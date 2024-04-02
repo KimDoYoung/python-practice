@@ -10,7 +10,8 @@ def set_cookie(response: Response, key: str, value: dict):
         # domain="localhost",
         # path="/keyboard",
         # httponly=True,  # 클라이언트 사이드 스크립트 접근 방지
-        # max_age=8*60*60,  # 8시간 후 쿠키 만료
+         max_age=3600,  # 1시간 후 쿠키 만료
+         expires=1800,  # 30분 후 쿠키 만료
         # secure=False,  # HTTPS를 통해서만 쿠키 전송. 실제 배포에서 주석 해제
         # samesite='Lax'  # strict 쿠키를 동일한 사이트에서만 전송
     )

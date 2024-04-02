@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-from fastapi import FastAPI, Query, Request
+from fastapi import FastAPI, Query, Request, Response
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -9,7 +9,8 @@ from backend.app.api.endpoints.fbfile import router as fbfile_router
 from backend.app.core.exception_handler import add_exception_handlers
 from backend.app.core.configs import MERIAN_PORT
 import os
-from fastapi.middleware.cors import CORSMiddleware
+
+from backend.app.utils.cookies_util import delete_cookie
 
 app = FastAPI()
 
@@ -73,8 +74,8 @@ async def read_root(request: Request):
     return HTMLResponse(template.render(request=request))
     
 @app.get("/main", response_class=HTMLResponse)
-async def read_root(request: Request, pageId: str = Query(default="keyboard-list")):
-    
+async def read_root(request: Request,  pageId: str = Query(default="keyboard-list")):
+
     keyboard_list = read_html_content('frontend/templates/pages/keyboard/list.html')
     keyboard_insert = read_html_content('frontend/templates/pages/keyboard/insert.html')
     keyboard_edit = read_html_content('frontend/templates/pages/keyboard/edit.html')
