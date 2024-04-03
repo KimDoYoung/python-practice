@@ -17,6 +17,16 @@
 DB 는 postgresql을 사용한다.
 각 증권사의 제공 api를 사용한다. 각 증권산의 제공 api는 REST방식도 있고, ocx(dll)을 사용하는 방식도 있다.
 
+## 실행
+
+```text
+export JOANNA_MODE=local && uvicorn backend.main:app --reload
+```
+
+## 의문점
+
+1. Access_token을 발급받아서 사용하는데 만료되었는지는 어떻게 알 수 있을까?
+
 ## 참고자료
 
 1. [한국투자증권 API (REST)](https://apiportal.koreainvestment.com/intro)
