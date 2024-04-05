@@ -5,6 +5,7 @@ import uvicorn
 
 from backend.app.api.v1.endpoints.stc import korea_investment
 from backend.app.api.v1.endpoints import user
+from backend.app.api.v1.endpoints import home
 from backend.app.core.logger import get_logger
 
 logger = get_logger(__name__)
@@ -40,6 +41,7 @@ def configure_routes():
     app.mount("/static", StaticFiles(directory=static_files_path), name="static")
     app.include_router(korea_investment.router)
     app.include_router(user.router)
+    app.include_router(home.router)
     # app.include_router(account.router)
     # app.include_router(packages.router)
 
