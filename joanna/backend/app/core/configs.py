@@ -8,7 +8,10 @@ def load_environment(env_mode):
     load_dotenv(dotenv_path=dotenv_path)
 
 # 환경 변수를 통해 현재 모드를 결정
-env_mode = os.getenv('JOANNA_MODE', 'production')
+env_mode = os.getenv('JOANNA_MODE', 'local')
+print("=====================================  env_mode  =====================================")
+print(f"env_mode: {env_mode}")
+print("=====================================  env_mode  =====================================")
 load_environment(env_mode)
 
 # 데이터베이스
@@ -21,7 +24,11 @@ KOREA_INVESTMENT_URL_BASE = os.getenv('KOREA_INVESTMENT_URL_BASE')
 
 if env_mode == "local":
     LOG_FILE = "c:\\tmp\\logs\\joanna\\joanna.log"
-    FILE_DIR="c:\\tmp\\files\\joanna"
 else:  
     LOG_FILE="/logs/joanna/joanna.log"
-    FILE_DIR="/files/joanna"
+
+# 로그파일폴더가 존재하지 않으면 생성
+log_dir = os.path.dirname(LOG_FILE)
+
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)

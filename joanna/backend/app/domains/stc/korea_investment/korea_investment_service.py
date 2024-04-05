@@ -2,14 +2,16 @@ import json
 
 import requests
 from backend.app.core.configs import KOREA_INVESTMENT_APP_KEY, KOREA_INVESTMENT_APP_SECRET,KOREA_INVESTMENT_URL_BASE
+from backend.app.core.logger import get_logger
 
+logger = get_logger(__name__)
 
-#
-# 한국투자증권 API에서 access_token을 받아오는 함수
-#
 def get_access_token():
-    print(f"APP_KEY:{KOREA_INVESTMENT_APP_KEY}")
-    print(f"APP_SECRET:{KOREA_INVESTMENT_APP_SECRET}")
+    '''
+    한국투자증권 API에서 access_token을 받아오는 함수
+    '''
+    logger.debug(f"APP_KEY:{KOREA_INVESTMENT_APP_KEY}")
+    logger.debug(f"APP_SECRET:{KOREA_INVESTMENT_APP_SECRET}")
     
     APP_KEY = KOREA_INVESTMENT_APP_KEY
     APP_SECRET = KOREA_INVESTMENT_APP_SECRET
@@ -22,12 +24,14 @@ def get_access_token():
     PATH = "oauth2/tokenP"
 
     URL = f"{URL_BASE}/{PATH}"
-    print(URL)
+    logger.debug(f"URL:{URL}")
     
     res = requests.post(URL, headers=headers, data=json.dumps(body))
-    print(res.text)
+    logger.debug("response.text: [{res.text}]")
+
     access_token = res.json().get("access_token")
-    print(access_token)
+    logger.debug("access_token:[{access_token}]")
+    
     return access_token
 
 # 해시키 조회

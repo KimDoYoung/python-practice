@@ -6,6 +6,10 @@
     "editor.codeActionsOnSave": {
         "source.fixAll.markdownlint" : "always"
     },
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/.pytest_cache": true,
+    },
     "python.analysis.extraPaths": [
         "./backend/app/core"
     ],
@@ -14,5 +18,6 @@
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
-    "python.envFile":   "${workspaceFolder}/.env.development",
+    "python.envFile":   "${workspaceFolder}/.env.local",
+
 }

@@ -23,6 +23,32 @@ DB 는 postgresql을 사용한다.
 export JOANNA_MODE=local && uvicorn backend.main:app --reload
 ```
 
+* test는 pytest를 사용하면 runtest.sh을 만들었음
+
+> ./runtest.sh
+
+* debugging mode로 실행
+  * vscode에서 디버깅 모드로 실행  (F5)
+
+```json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: FastAPI",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "uvicorn",
+            "args": [
+                "backend.main:app",
+                "--reload"
+            ],
+            "jinja": true,
+        }
+    ]
+}
+```
+
 ## 의문점
 
 1. Access_token을 발급받아서 사용하는데 만료되었는지는 어떻게 알 수 있을까?

@@ -5,7 +5,7 @@ from backend.app.core.configs import LOG_FILE
 
 def get_logger(name):
     logger = logging.getLogger(name)
-    JOANNA_MODE = os.getenv('JOANNA_MODE', 'real')
+    JOANNA_MODE = os.getenv('JOANNA_MODE', 'local')
     if JOANNA_MODE == "local":
         logger.setLevel(logging.DEBUG)
     else:
