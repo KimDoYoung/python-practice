@@ -21,3 +21,5 @@
       3. jinja2, handlebar 
       4. Postgresql 
       5. tailwindcss
+6. joanna : RESTful방식의 주식매매 연습
+7. sofia : Web app - 이미지보기
