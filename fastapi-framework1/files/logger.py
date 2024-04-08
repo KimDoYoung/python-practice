@@ -2,11 +2,10 @@ import logging
 from logging.handlers import RotatingFileHandler
 import os
 
-from core.sofia_config import LOG_FILE
-
 
 def get_logger(name):
 
+    LOG_FILE = "c:\\tmp\\logs\\sofia\\sofia.log"
     # LOG_FILE의 디렉토리 경로를 얻음
     log_dir = os.path.dirname(LOG_FILE)
 
