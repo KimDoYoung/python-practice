@@ -5,6 +5,7 @@ import db.db_session as db_session
 from sqlalchemy.sql import text
 
 from db.schema.image_file_schema import ImageFileSchema
+from db.db_session import db_dependency
 
 router = APIRouter()
 
@@ -16,9 +17,14 @@ def is_image_file(filename):
     extension = os.path.splitext(filename)[1].lower()
     return extension in valid_extensions
 
-#C:\Users\deHong\tmp\도서\주식 자동 거래 시스템 구축
+
 @router.post("/folders/add")
-async def folders_add(folder_name: str = Form(...)):
+async def folders_add(folder_name: str = Form(...), db : db_dependency):
+
+
+#C:\Users\deHong\tmp\도서\주식 자동 거래 시스템 구축
+@router.post("/folders/add1")
+async def folders_add1(folder_name: str = Form(...)):
     """
     1. folder_name이 물리적으로 존재하는지 체크
     2. 존재하지 않으면 raise sofia_exceptions.FolderNotFoundError
