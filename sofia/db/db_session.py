@@ -7,8 +7,8 @@ import sqlalchemy.orm as orm
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine, AsyncSession
 from sqlalchemy.orm import Session
 
-from db.schema.base_schema import SqlAlchemyBase
-
+from db.schema.base_schema import BaseSchema
+from typing import AsyncGenerator
 __factory: Optional[Callable[[], Session]] = None
 __async_engine: Optional[AsyncEngine] = None
 
@@ -44,7 +44,7 @@ def global_init(db_file: str):
     # noinspection PyUnresolvedReferences
     import db.schema.__all_schemas
 
-    SqlAlchemyBase.metadata.create_all(engine)
+    BaseSchema.metadata.create_all(engine)
 
 
 def create_session() -> Session:
@@ -69,3 +69,7 @@ def create_async_session() -> AsyncSession:
     session.sync_session.expire_on_commit = False
 
     return session
+
+async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
+    async with __factory() as session:
+        yield session

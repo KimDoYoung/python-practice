@@ -2,10 +2,10 @@ from sqlalchemy import create_engine, Column, Integer, String, REAL, ForeignKey,
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
-from db.schema.base_schema import SqlAlchemyBase
+from db.schema.base_schema import BaseSchema
 
 
-class ImageFolder(SqlAlchemyBase):
+class ImageFolderSchema(BaseSchema):
     __tablename__ = 'image_folders'
     
     id = Column(Integer, primary_key=True, autoincrement=True)

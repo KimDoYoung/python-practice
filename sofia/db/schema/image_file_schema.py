@@ -1,22 +1,21 @@
 from sqlalchemy import  Column, Integer,  REAL, ForeignKey, Text
 from sqlalchemy.orm import relationship
 
-from db.schema.base_schema import SqlAlchemyBase
+from db.schema.base_schema import BaseSchema
 
 
 
-class ImageFile(SqlAlchemyBase):
+class ImageFileSchema(BaseSchema):
     __tablename__ = 'image_files'
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     org_name = Column(Text, nullable=False)
-    hash_code = Column(Text, nullable=False)
     seq = Column(Integer, nullable=False)
     folder_id = Column(Integer, ForeignKey('image_folders.id'), nullable=True)
-    image_format = Column(Text, nullable=False)
-    image_width = Column(Integer, nullable=False)
-    image_height = Column(Integer, nullable=False)
-    image_mode = Column(Text, nullable=False)
+    image_format = Column(Text, nullable=True)
+    image_width = Column(Integer, nullable=True)
+    image_height = Column(Integer, nullable=True)
+    image_mode = Column(Text, nullable=True)
     color_palette = Column(Text)
     camera_manufacturer = Column(Text)
     camera_model = Column(Text)

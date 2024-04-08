@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sofia Image Viewer</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body>
+    (% include "common/nav.html" %)
+    <header>
+        <div id="newfolder-area" class="hidden">
+            <form action="/folders/add" method="POST" class="flex flex-col space-y-2">
+                <input type="text" name="folder_name" id="folder_name" placeholder="Folder Name" 
+                       class="px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" 
+                       required>
+                <button type="submit" id="btnAddFolder"
+                        class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                    Create
+                </button>
+            </form>
+        </div>
+    </header>
+    <main>
+        <div class="flex h-screen">
+            <div class="w-1/5 bg-gray-200">(% block folder_area %)(% endblock %)</div>
+            <div class="w-4/5 bg-gray-400">(% block file_area %)(% endblock %)</div>
+        </div>
+    </main>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        console.log('Document is ready');
+        $('#btnShowNewFolderArea').on('click', function(){
+            $('#newfolder-area').toggleClass('hidden');
+        });
+    });
+</script>
+</body>
+</html>
