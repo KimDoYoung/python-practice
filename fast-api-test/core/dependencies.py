@@ -3,8 +3,7 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from .database import AsyncSessionLocal
 from service.item_service import ItemService
-from typing import AsyncGenerator, Generator, Annotated
-from sqlmodel import Session
+from typing import AsyncGenerator, Annotated
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     db: AsyncSession = AsyncSessionLocal()
