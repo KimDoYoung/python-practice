@@ -1,25 +1,11 @@
-from fastapi import FastAPI, Response
-import uvicorn
+from fastapi import FastAPI
+from api.v1.item_routes import router as item_router
+from core.database import init_db
 
 app = FastAPI()
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
+app.include_router(item_router)
 
-@app.get("/setcookie")
-def set_cookie(response: Response):
-    response.set_cookie(key="my_cookie", value="my_value")
-    response.set_cookie(key="option_cookie", value="Hello cookie...", 
-                        expires=1800, 
-                        max_age=3600,
-                        domain="127.0.0.1", 
-                        #path="/", 
-                        secure=False,
-                        #httponly=True, 
-                        samesite="Lax"
-                        )
-    return {"message": "Cookie set"}
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+@app.on_event("startup")
+async def startup_event():
+    await init_db(app)

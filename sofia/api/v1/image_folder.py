@@ -61,8 +61,6 @@ async def folders_add1(folder_name: str = Form(...)):
                 session.add(image_file)
             session.commit()    
     
-    ImageFolderModel = ImageFolder(folder_name=folder_name) 
-
     return {"folder_id": last_folder_id}
 
 @router.get("/folders/{folder_id}")
