@@ -1,6 +1,6 @@
 import os
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-from core.sofia_logger import get_logger
+from core.logger import get_logger
 
 logger = get_logger(__name__)
 

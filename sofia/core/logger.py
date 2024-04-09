@@ -2,7 +2,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 import os
 
-from core.sofia_config import LOG_FILE
+from core.config import LOG_FILE
 
 
 def get_logger(name):
