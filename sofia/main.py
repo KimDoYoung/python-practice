@@ -10,40 +10,30 @@ app = FastAPI()
 
 @app.on_event("startup")
 async def startup_event():
-    #file = (Path(__file__).parent / "data" / "sofia.sqlite").absolute()
+    """
+    애플리케이션 시작 시 필요한 초기화 수행
+    """
     await global_init()  # 데이터베이스 초기화
 
-def configure(dev_mode: bool):
+def configure():
     """
-    routers 설정
+    애플리케이션 구성: 라우터 및 기타 설정
     """
     configure_routers()
 
 def configure_routers():
-    '''
-    라우터 설정
-    '''
+    """
+    라우터 설정: API 엔드포인트 및 정적 파일 서빙
+    """
     app.mount("/static", StaticFiles(directory="static"), name="static")
     app.include_router(home_router)
     app.include_router(folder_router)
     app.include_router(file_router)
 
-# def configure_db(dev_mode):
-#     '''
-#     데이터베이스 설정
-#     '''
-    #file = (Path(__file__).parent / "data" / "sofia.sqlite").absolute()
-    #await db_session.global_init(file.as_posix())  # 데이터베이스 초기화
-
-
 def main():
     import uvicorn
-    configure(dev_mode=True)
-    uvicorn.run(app, host="0.0.0.0", port=8000)
-
+    configure()
+    uvicorn.run(app, host="0.0.0.0", port=8181)
 
 if __name__ == '__main__':
     main()
-else:
-    configure(dev_mode=False)
-

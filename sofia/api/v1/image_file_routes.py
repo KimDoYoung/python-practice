@@ -11,7 +11,6 @@ router = APIRouter()
 logger = get_logger(__name__)
 
 @router.get("/image/{file_id}")
-#async def get_image(file_id: int, db=Depends(get_db), file_service=Depends(get_file_service), folder_service=Depends(get_folder_service)):
 async def get_image(file_id: int, db=Depends(get_db), file_service=Depends(get_file_service), folder_service=Depends(get_folder_service)):
 
     image_file = await file_service.get(db=db, id=file_id)
