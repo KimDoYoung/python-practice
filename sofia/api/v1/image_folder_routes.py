@@ -35,7 +35,6 @@ async def folders_add(db: db_dependency, service: folder_service_dependency, fol
     )
     folder = ImageFoldersCreate(folder_name=folder_name)
 
-    # new_folder = await service.create(folder, db)
     async with db.begin():
         new_folder = ImageFolders(**folder.model_dump())
         db.add(new_folder)
