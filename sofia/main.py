@@ -1,4 +1,3 @@
-from pathlib import Path
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from api.v1.home_routes import router as home_router
@@ -29,6 +28,7 @@ def configure_routers():
     app.include_router(home_router)
     app.include_router(folder_router)
     app.include_router(file_router)
+    print('main.py: configure_routers() 호출됨')
 
 def main():
     import uvicorn
@@ -36,4 +36,7 @@ def main():
     uvicorn.run(app, host="0.0.0.0", port=8181)
 
 if __name__ == '__main__':
+    print('main.py: __name__ == __main__')
     main()
+else:
+    configure()

@@ -12,6 +12,8 @@ router = APIRouter()
 # 메인 페이지 라우터
 @router.get("/", response_class=HTMLResponse)
 async def read_root(request: Request, db=Depends(get_db), folder_service = Depends(get_folder_service)):
+    """ 메인페이지 """
+    logger.debug("-----------> 메인페이지 호출")
     folder_list = await folder_service.get_all(db)
     folder_json_list = [folder.model_dump() for folder in folder_list]
     context = {"request": request, "message": "Welcome to Sofia-주식매매시스템", "list": folder_json_list}

@@ -1,5 +1,6 @@
 
 from datetime import datetime
+from PIL import Image
 import os
 
 
@@ -27,3 +28,18 @@ def get_mime_type(file_name):
         return "image/gif"
     else:
         return "application/octet-stream"  # 기본값
+
+
+# 사용 예
+# image_paths = ['image1.jpg', 'image2.jpg', 'image3.jpg']  # 이미지 파일 경로 리스트
+# output_path = 'output.pdf'  # 출력될 PDF 파일 경로
+# images_to_pdf(image_paths, output_path)
+def images_to_pdf(image_paths, output_path):
+    """이미지 파일들을 PDF로 변환하는 함수"""
+    # 이미지 파일들을 열고, PIL 이미지 객체의 리스트를 생성
+    images = [Image.open(image_path) for image_path in image_paths]
+
+    # 첫 번째 이미지를 기준으로 PDF 저장
+    # 나머지 이미지들은 append_images 리스트에 추가
+    images[0].save(output_path, save_all=True, append_images=images[1:])
+
