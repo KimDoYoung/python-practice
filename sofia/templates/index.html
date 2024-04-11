@@ -1,7 +1,12 @@
 (% extends "base.html" %)
 
 (% block folder_area %)
-folder area...
+folder area... ((message))
+<ul>
+    (% for folder in list %)
+        <li>(( folder.folder_name )) ((folder.id))</li>
+    (% endfor %)
+</ul>
 (% endblock %)
 
 (% block file_area %)

@@ -4,7 +4,7 @@ from fastapi import Depends
 from sqlmodel import Session
 from sqlalchemy.future import select as async_select
 from models.image_file_model import ImageFile
-from models.image_folder_model import ImageFolderWithFiles, ImageFolders, ImageFoldersCreate
+from models.image_folder_model import ImageFolderWithFiles, ImageFolders, ImageFoldersBase, ImageFoldersCreate
 
 class ImageFolderService:
 
@@ -21,13 +21,14 @@ class ImageFolderService:
             result = await session.execute(statement)
             folder = result.scalars().first()
             if folder is not None:
+                folder_and_files = ImageFolderWithFiles(**folder.__dict__)
                 statement = async_select(ImageFile).where(ImageFile.folder_id == folder_id).order_by(ImageFile.seq.asc())
                 files = await session.execute(statement)
-                folder.files = files.scalars().all()
-            return folder
+                folder_and_files.files = files.scalars().all()
+            return folder_and_files
 
     async def get_all(self, db: Session) -> list[ImageFolders]:
         async with db as session:
-            statement = async_select(ImageFolders)
+            statement = async_select(ImageFolders).order_by(ImageFolders.id.desc()) # 최신순으로 정렬
             result = await session.execute(statement)
             return result.scalars().all()
