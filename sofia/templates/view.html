@@ -9,7 +9,7 @@
     <h1>folder images view ((folder.folder_name))</h1>
     <ul>
     (% for image in folder.files %)
-        <li>(( image.org_name ))</li>
+        <li><a href="/image/((image.id))">(( image.org_name ))</a></li>
     (% endfor %)
     </ul>
 </body>

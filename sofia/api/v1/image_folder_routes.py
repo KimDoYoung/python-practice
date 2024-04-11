@@ -3,13 +3,14 @@ import os
 
 from fastapi.responses import HTMLResponse, RedirectResponse
 from core.exceptions import FolderNotFoundError
-from core.dependencies import db_dependency, folder_service_dependency
+from core.dependencies import  get_db, get_folder_service
 from core.logger import get_logger
 from core.template_engine import render_template
 from core.util import is_image_file
-from models.image_file_model import ImageFile, ImageFileCreate
-from models.image_folder_model import ImageFolders, ImageFoldersCreate
+from models.image_file_model import ImageFile
+from models.image_folder_model import ImageFolder, ImageFolderCreate
 from starlette.status import HTTP_303_SEE_OTHER
+from fastapi import Depends
 
 router = APIRouter()
 
@@ -17,7 +18,8 @@ logger = get_logger(__name__)
 
 #C:\Users\deHong\tmp\도서\주식 자동 거래 시스템 구축
 @router.post("/folders/add")
-async def folders_add(db: db_dependency, service: folder_service_dependency, folder_name: str = Form(...)):
+# async def folders_add(db: Depends = Depends(get_db), folder_name: str = Form(...)):
+async def folders_add(db = Depends(get_db), folder_name: str = Form(...)):
     """
     1. folder_name이 물리적으로 존재하는지 체크
     2. 존재하지 않으면 raise sofia_exceptions.FolderNotFoundError
@@ -35,10 +37,10 @@ async def folders_add(db: db_dependency, service: folder_service_dependency, fol
     
     short_folder_name = os.path.basename(folder_name)
     note = f"org folder name : {folder_name}"
-    folder = ImageFoldersCreate(folder_name=short_folder_name, note=note)
+    folder = ImageFolderCreate(folder_name=short_folder_name, folder_path=folder_name, note=note)
 
     async with db.begin():
-        new_folder = ImageFolders(**folder.model_dump())
+        new_folder = ImageFolder(**folder.model_dump())
         db.add(new_folder)
         await db.flush()
         await db.refresh(new_folder)
@@ -50,16 +52,17 @@ async def folders_add(db: db_dependency, service: folder_service_dependency, fol
     # return {"folder_id": new_folder.id}
     return RedirectResponse(f"/folders/{new_folder.id}", status_code=HTTP_303_SEE_OTHER)
 
-# folder_id에 해당하는 폴더의 이미지 목록을 조회
+# folder_id에 해당하는 폴더의 이미지 목록을 조회    
 @router.get("/folders/{folder_id}", response_class=HTMLResponse)
-async def get_folder(request: Request, db: db_dependency, service: folder_service_dependency, folder_id: int, thumb: bool = False):
+async def get_folder(request: Request, folder_id: int,thumb: bool = False, db = Depends(get_db), service= Depends(get_folder_service) ):
     folder = await service.get(folder_id, db)
     folder_json = folder.model_dump()
     logger.debug(f"folder_json: {folder_json}")
     context = {"request": request,  "folder": folder_json}
     return render_template("view.html", context)
 
-@router.delete("/folders/delete/{folder_id}")
-async def delete_folder(folder_id: int):
-    # Logic to delete the specified folder and its associated image files
-    return {"message": f"Folder {folder_id} deleted along with its image files"}
+@router.delete("/folders/{folder_id}")
+async def delete_folder(folder_id: int, db=Depends(get_db), service = Depends(get_folder_service)):
+    folder = await service.delete(folder_id, db)
+    logger.debug(f"Folder {folder.folder_name} deleted along with its image files")
+    return RedirectResponse("/", status_code=HTTP_303_SEE_OTHER)

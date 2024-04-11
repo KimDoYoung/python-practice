@@ -15,3 +15,15 @@ def is_image_file(filename):
     # 파일의 확장자를 추출하고 소문자로 변환하여 유효한지 확인
     extension = os.path.splitext(filename)[1].lower()
     return extension in valid_extensions
+
+# MIME 타입을 결정하는 함수
+def get_mime_type(file_name):
+    extension = os.path.splitext(file_name)[1].lower()
+    if extension == ".jpg" or extension == ".jpeg":
+        return "image/jpeg"
+    elif extension == ".png":
+        return "image/png"
+    elif extension == ".gif":
+        return "image/gif"
+    else:
+        return "application/octet-stream"  # 기본값

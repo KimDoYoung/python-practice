@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from api.v1.home_routes import router as home_router
 from api.v1.image_folder_routes import router as folder_router
+from api.v1.image_file_routes import router as file_router
 from core.database import global_init
 
 app = FastAPI()
@@ -18,7 +19,6 @@ def configure(dev_mode: bool):
     """
     configure_routers()
 
-
 def configure_routers():
     '''
     라우터 설정
@@ -26,6 +26,7 @@ def configure_routers():
     app.mount("/static", StaticFiles(directory="static"), name="static")
     app.include_router(home_router)
     app.include_router(folder_router)
+    app.include_router(file_router)
 
 # def configure_db(dev_mode):
 #     '''
