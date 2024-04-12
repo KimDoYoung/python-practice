@@ -21,6 +21,7 @@ class ImageFileBase(SQLModel):
     gps_latitude: Optional[float] = None
     gps_longitude: Optional[float] = None
     image_orientation: Optional[str] = None
+    thumb_path: Optional[str] = None
 
 class ImageFile(ImageFileBase, table=True):
     __tablename__ = "image_files"    
