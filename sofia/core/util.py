@@ -1,8 +1,15 @@
-
 from datetime import datetime
+import shutil
+import tempfile
+import zipfile
 from PIL import Image
+from PIL.Image import Resampling  
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
 import os
+from core.logger import get_logger
 
+logger = get_logger(__name__)
 
 def datetime_serializer(obj):
     """datetime 객체를 직렬화하기 위한 함수"""
@@ -45,17 +52,94 @@ def get_mime_type(file_name):
     else:
         return "application/octet-stream"  # 기본값
 
+def create_pdf_from_images(image_paths, output_filename):
+    """
+    여러 이미지 파일들을 하나의 PDF 파일로 만듭니다.
+    :param image_paths: 이미지 파일 경로 리스트
+    :param output_filename: 출력될 PDF 파일 이름 (확장자 '.pdf' 포함)
+    """
+    # PDF 생성을 위한 캔버스 설정
+    c = canvas.Canvas(output_filename, pagesize=letter)
+    width, height = letter  # reportlab의 letter는 8.5*11 인치
 
-# 사용 예
-# image_paths = ['image1.jpg', 'image2.jpg', 'image3.jpg']  # 이미지 파일 경로 리스트
-# output_path = 'output.pdf'  # 출력될 PDF 파일 경로
-# images_to_pdf(image_paths, output_path)
-def images_to_pdf(image_paths, output_path):
-    """이미지 파일들(배열)을 PDF로 변환하는 함수"""
-    # 이미지 파일들을 열고, PIL 이미지 객체의 리스트를 생성
-    images = [Image.open(image_path) for image_path in image_paths]
+    for path in image_paths:
+        try:
+            with Image.open(path) as img:
+                if not os.path.exists(path):
+                    continue
+                img_width, img_height = img.size
+                aspect_ratio = img_width / img_height
 
-    # 첫 번째 이미지를 기준으로 PDF 저장
-    # 나머지 이미지들은 append_images 리스트에 추가
-    images[0].save(output_path, save_all=True, append_images=images[1:])
+                # 이미지가 페이지 너비 또는 높이보다 크면 조정
+                if img_width > width or img_height > height:
+                    if (width / height) > aspect_ratio:
+                        img_height = height
+                        img_width = img_height * aspect_ratio
+                    else:
+                        img_width = width
+                        img_height = img_width / aspect_ratio
 
+                img = img.resize((int(img_width), int(img_height)), Resampling.LANCZOS)
+
+                # tempfile을 사용하여 임시 파일 생성
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.jpg') as tmp:
+                    img.save(tmp.name)
+
+                    # 이미지를 페이지 하단에 배치
+                    c.drawImage(tmp.name, 0, height - img_height, width=img_width, height=img_height)
+                    c.showPage()
+                    # 파일 경로를 저장
+                    tmp_file_path = tmp.name
+
+            # 처리가 끝난 임시 파일 삭제
+            os.remove(tmp_file_path)
+        except Exception as e:
+            print(f"Failed to add {path}: {e}")
+
+    # PDF 파일 저장
+    c.save()
+
+# 사용 예시
+#image_paths = ['path/to/image1.jpg', 'path/to/image2.jpg', 'path/to/image3.jpg']
+#output_zip_file = 'output_images.zip'
+#create_zip_from_images(image_paths, output_zip_file)
+def create_zip_from_images(image_paths, output_zip_filename):
+    """
+    여러 이미지 파일들을 하나의 ZIP 파일로 만듭니다.
+    :param image_paths: 이미지 파일 경로 리스트
+    :param output_zip_filename: 출력될 ZIP 파일의 전체 경로와 이름 (.zip 확장자 포함)
+    """
+    # ZIP 파일 생성
+    with zipfile.ZipFile(output_zip_filename, 'w') as myzip:
+        for image_path in image_paths:
+            # ZIP 파일에 이미지 파일 추가
+            myzip.write(image_path, arcname=os.path.basename(image_path))
+
+def backup_and_rotate_image(original_path):
+    """
+    원본 이미지를 같은 폴더에 타임스탬프를 붙인 백업 파일로 복사하고, 복사된 이미지를 90도 회전하여 저장합니다.
+    
+    :param original_path: 원본 이미지 파일 경로
+    """
+    # 원본 파일명과 경로 추출
+    folder_path, filename = os.path.split(original_path)
+    file_root, file_ext = os.path.splitext(filename)
+
+    # 타임스탬프 생성
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    # 백업 파일 경로 생성
+    backup_filename = f"{file_root}_{timestamp}{file_ext}"
+    backup_path = os.path.join(folder_path, backup_filename)
+
+    # 원본 파일을 백업 경로로 복사
+    shutil.copy2(original_path, backup_path)
+    logger.debug(f"Backup created at {backup_path}")
+
+    # 백업된 파일을 열어서 처리
+    with Image.open(original_path) as img:
+        # 이미지를 90도 오른쪽으로 회전 (시계 방향)
+        rotated_img = img.rotate(-90, expand=True)
+        # 회전된 이미지 저장
+        rotated_img.save(original_path)
+        logger.debug(f"Rotated image saved at {original_path}")

@@ -1,3 +1,9 @@
+# Sofia-폴더별로 이미지파일보기
+
+## 개요
+
+폴더에 포함되어 있는 이미지를 db에 넣고 관리
+
 ### 기능
 
 1. 폴더들의 목록을 db에 가지고 있다.
@@ -8,7 +14,7 @@
 
 ### 기술스택
 
-1. FastAPI 
+1. FastAPI
 2. sqlite db
 3. async 기법 사용
 4. jinja template사용
@@ -58,6 +64,7 @@ CREATE TABLE image_folders (
 | /folder/{folder_id} | get | thumb=true | folder에 포함된 이미지 리스트를 리턴 , thumb=true이며 thumb스타일로 보여준다. |
 | /image/{image_id} | get |  | 이미지 파일을 읽어서 stream으로 write |
 | /image/info/{image_id} | get |  | 이미지 파일의 속성 즉 image_file의 columns정보를 보여준다. |
+
 - 주의) 위 url에  api를 앞에 붙인 것은 json형태로 같은 context를 리턴
 
 ### 폴더구조
@@ -66,7 +73,7 @@ root : main.py
 
 root> db, services,static,templates,views, viewmodels 를 둔다.
 
-db: sofia.sqlite 
+db: sofia.sqlite
 
 services: db 생성, db연결, db조회등 모듈
 

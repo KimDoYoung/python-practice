@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import List, Optional
+from fastapi import Form
 from sqlmodel import SQLModel, Field
 
 from models.image_file_model import ImageFile, ImageFileBase
@@ -25,3 +26,15 @@ class ImageFolderUpdate(ImageFolderBase):
 
 class ImageFolderWithFiles(ImageFolderBase):
     files : Optional[List[ImageFile]] = None
+
+class FolderExport(SQLModel):
+    folder_id: int
+    export_type: str
+    
+    @classmethod
+    def as_form(
+        cls,
+        folder_id: int = Form(...),
+        export_type: str = Form(...)
+    ) -> "FolderExport":
+        return cls(folder_id=folder_id, export_type=export_type)

@@ -13,3 +13,8 @@ class ImageFileService:
             raise HTTPException(status_code=404, detail=f"ImageFile with id {id} not found")
     
         return image_file.scalars().first()
+
+    async def get_files(self, session: AsyncSession, ids : list[int]) -> list[ImageFile]:
+        statement = select(ImageFile).where(ImageFile.id.in_(ids))
+        image_files = await session.execute(statement)
+        return image_files.scalars().all()

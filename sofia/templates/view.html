@@ -1,25 +1,45 @@
 (% extends 'base.html' %)
-
+(% block folder_name %) <h1 class="text-2xl font-semibold text-center">((folder.folder_name))</h1> (% endblock %)
 (% block content %)
-    <h1 class="text-2xl font-semibold text-center">((folder.folder_name))</h1>
-    <p class="text-sm text-gray-500 text-center">((folder.folder_path))</p>
-    <!-- <ul>
-    (% for image in folder.files %)
-        <li><a href="/image/((image.id))">(( image.org_name ))</a></li>
-    (% endfor %)
-    </ul> -->
+    <input type="hidden" id="folder_id" value="((folder.folder_id))">
+    <input type="hidden" id="folder_name" value="((folder.folder_name))">
+    <input type="hidden" id="folder_path" value="((folder.folder_path))">
+    <!-- <h1 class="hidden text-2xl font-semibold text-center">((folder.folder_name))</h1>
+    <p class="text-sm text-gray-500 text-center">((folder.folder_path))</p> -->
     <div class="flex flex-wrap gap-2 p-4"> <!-- flex-wrap과 간격, 패딩 설정 -->
         (% for image in folder.files %)
-        <div class="w-32 h-32 bg-gray-200 flex items-center justify-center overflow-hidden rounded-lg">
+<!--         <div class="w-32 h-32 bg-gray-200 flex items-center justify-center overflow-hidden rounded-lg">
           <img src="/image/((image.id))?thumb" alt="Thumbnail" class="max-w-full max-h-full object-cover object-center">
         </div>
+ -->        <div class="w-32 h-32 bg-gray-200 flex flex-col items-center justify-center overflow-hidden rounded-lg p-2">
+            <img src="/image/(( image.id ))?thumb" alt="Thumbnail" class="max-w-full max-h-full object-cover object-center mb-2">
+            <input type="checkbox" id="select-((image.id ))" name="selected_images" value="((image.id ))">
+            <!-- <label for="select-(( image.id ))">Select</label> -->
+          </div>
         (% endfor %)
     </div>        
 (% endblock %)
 (% block script %)
-    <script>
-        $(document).ready(function() {
-            console.log('Document is ready');
+<script>
+    $(document).ready(function() {
+        console.log('Document is ready');
+        var folderId = $('#folder_id').val();
+        var folderName = $('#folder_name').val();
+        var folderPath = $('#folder_path').val();
+        var html = `<span class="text-white">${folderName}</span> <span class="text-gray-300">(${folderPath})</span>`;
+        $('#folder-info').html(html);
+
+        $('#header-button-area').removeClass('hidden');
+        $('#btnRotate90').click(function() {
+            var selectedImages = [];
+            $('input[name="selected_images"]:checked').each(function() {
+                selectedImages.push($(this).val());
+            });
+
+            var queryString = $.param({ images: selectedImages }, true); //traditional true []을 안붙임
+            var url = '/image/rotate/' +folderId+"?"+ queryString;
+            window.location.href = url;
         });
-    </script>
+    });
+</script>
 (% endblock %)

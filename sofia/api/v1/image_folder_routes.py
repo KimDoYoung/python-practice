@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Form, Request
+from fastapi import APIRouter, Depends, Form, HTTPException, Request
 import os
 from PIL import Image
 import exifread
@@ -8,11 +8,12 @@ from core.exceptions import FolderNotFoundError
 from core.dependencies import  get_db, get_folder_service
 from core.logger import get_logger
 from core.template_engine import render_template
-from core.util import convert_to_datetime, is_image_file, safe_float_conversion
+from core.util import convert_to_datetime, create_pdf_from_images, create_zip_from_images, is_image_file, safe_float_conversion
 from models.image_file_model import ImageFile
-from models.image_folder_model import ImageFolder, ImageFolderCreate
+from models.image_folder_model import FolderExport, ImageFolder, ImageFolderCreate
 from starlette.status import HTTP_303_SEE_OTHER
 from fastapi import Depends
+from fastapi.responses import FileResponse
 
 router = APIRouter()
 
@@ -24,9 +25,42 @@ async def folder_form_add():
 
 @router.get("/folder/export/{folder_id}", response_class=HTMLResponse)
 async def folder_export(folder_id: int, db = Depends(get_db), service = Depends(get_folder_service) ):
-    service.get(folder_id, db)
-    context = {}
+
+    folder = await service.get(folder_id, db)
+    folder_json = folder.model_dump()
+    folder_json['folder_id'] = folder_id
+    logger.debug("folder_json: {folder_json}")
+    context = { "folder" : folder_json }
     return render_template("folder_export.html", context)   
+
+@router.post("/folder/export")
+async def folder_export(folder_export: FolderExport = Depends(FolderExport.as_form), db = Depends(get_db), service = Depends(get_folder_service)):
+    folder_id = folder_export.folder_id
+    export_type = folder_export.export_type
+
+    # 폴더 정보 로드
+    folder = await service.get(folder_id, db)
+    if not folder:
+        raise HTTPException(status_code=404, detail="Folder not found")
+
+    folder_base = folder.folder_path
+    file_paths = [os.path.join(folder_base, file.org_name) for file in folder.files]
+    timestamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+    file_name = f"{folder.folder_name}_{timestamp}.{export_type}"
+    output_file = os.path.join(folder_base, file_name)
+
+    # export_type에 따른 파일 생성 로직
+    if export_type == "pdf":
+        create_pdf_from_images(file_paths, output_file)
+        media_type = "application/pdf"
+    elif export_type == "zip":
+        create_zip_from_images(file_paths, output_file)
+        media_type = "application/zip"
+    else:
+        raise HTTPException(status_code=400, detail="Invalid export type specified")
+
+    return FileResponse(output_file, filename=file_name, media_type=media_type)
+        
 
 @router.post("/folder/add")
 async def folders_add(db = Depends(get_db), folder_name: str = Form(...)):
@@ -72,6 +106,7 @@ async def get_folder(request: Request, folder_id: int,thumb: bool = False, db = 
     '''
     folder = await service.get(folder_id, db)
     folder_json = folder.model_dump()
+    folder_json['folder_id'] = folder_id
     logger.debug(f"folder_json: {folder_json}")
     context = {"request": request,  "folder": folder_json}
     return render_template("view.html", context)
