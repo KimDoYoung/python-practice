@@ -20,10 +20,14 @@ async def get_image(request: Request, file_id: int, db=Depends(get_db), file_ser
         image_file = await file_service.get(db, file_id)
         if not image_file:
             raise HTTPException(status_code=404, detail="Image not found")
-        folder_path = await folder_service.get_folder_path(image_file.folder_id, db)        
-        fullpath = os.path.join(folder_path, "thumbs",image_file.thumb_path)
-        if not os.path.exists(fullpath):
-            fullpath = os.path.join(folder_path, image_file.org_name)
+        folder_path = await folder_service.get_folder_path(image_file.folder_id, db)
+        if image_file.thumb_path is not None and image_file.thumb_path != "":
+            fullpath = os.path.join(folder_path, "thumbs",image_file.thumb_path)
+            if not os.path.exists(fullpath):
+                fullpath = os.path.join(folder_path, image_file.org_name)
+        else:
+            fullpath = os.path.join(folder_path, image_file.org_name)        
+            logger.debug("fullpath : %s 는 thumb가 존재하지 않음", fullpath)
     else:
         image_file = await file_service.get(db, file_id)
         if not image_file:

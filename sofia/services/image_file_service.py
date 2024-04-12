@@ -18,3 +18,14 @@ class ImageFileService:
         statement = select(ImageFile).where(ImageFile.id.in_(ids))
         image_files = await session.execute(statement)
         return image_files.scalars().all()
+    
+    async def delete_by_folder_id(self, folder_id: int, session: AsyncSession) -> int:
+        """ 이미지 파일 테이블에서 folder_id로 이미지 파일 삭제"""
+        statement = select(ImageFile).where(ImageFile.folder_id == folder_id)
+        image_files = await session.execute(statement)
+        i = 0
+        for image_file in image_files.scalars().all():
+            await session.delete(image_file)
+            i += 1
+        await session.commit()
+        return i

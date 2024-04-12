@@ -11,9 +11,11 @@
 <!--         <div class="w-32 h-32 bg-gray-200 flex items-center justify-center overflow-hidden rounded-lg">
           <img src="/image/((image.id))?thumb" alt="Thumbnail" class="max-w-full max-h-full object-cover object-center">
         </div>
- -->        <div class="w-32 h-32 bg-gray-200 flex flex-col items-center justify-center overflow-hidden rounded-lg p-2">
-            <img src="/image/(( image.id ))?thumb" alt="Thumbnail" class="max-w-full max-h-full object-cover object-center mb-2">
-            <input type="checkbox" id="select-((image.id ))" name="selected_images" value="((image.id ))">
+ -->        <div class="w-48 h-48 bg-gray-200 flex flex-col items-center justify-center overflow-hidden rounded-lg p-2">
+            <img src="/image/(( image.id ))?thumb" alt="Thumbnail" class="max-w-full max-h-full object-cover object-center">
+            <label for="select-((image.id))"><input type="checkbox" id="select-((image.id))" name="selected_images" value="((image.id))">((image.id))</label>
+            <!-- <label for="select-((image.id ))">((image.id))</label>
+            <input type="checkbox" id="select-((image.id ))" name="selected_images" value="((image.id ))" > -->
             <!-- <label for="select-(( image.id ))">Select</label> -->
           </div>
         (% endfor %)

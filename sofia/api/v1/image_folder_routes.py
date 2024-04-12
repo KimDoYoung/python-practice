@@ -5,7 +5,7 @@ import exifread
 from datetime import datetime
 from fastapi.responses import HTMLResponse, RedirectResponse
 from core.exceptions import FolderNotFoundError
-from core.dependencies import  get_db, get_folder_service
+from core.dependencies import  get_db, get_file_service, get_folder_service
 from core.logger import get_logger
 from core.template_engine import render_template
 from core.util import convert_to_datetime, create_pdf_from_images, create_zip_from_images, is_image_file, safe_float_conversion
@@ -95,8 +95,11 @@ async def folders_add(db = Depends(get_db), folder_name: str = Form(...)):
             image_file.folder_id = new_folder_id
             image_file.seq = idx+10
             db.add(image_file)
+    logger.debug("---------------------------------------------")
+    logger.debug(f"Folder {new_folder.folder_name} added with {len(files)} image files")
+    logger.debug("---------------------------------------------")
     # `async with db.begin():` 블록을 벗어나면 자동으로 커밋됩니다.          
-    return RedirectResponse(f"/folders/{new_folder.id}", status_code=HTTP_303_SEE_OTHER)
+    return RedirectResponse(f"/folder/{new_folder.id}", status_code=HTTP_303_SEE_OTHER)
 
 # folder_id에 해당하는 폴더의 이미지 목록을 조회    
 @router.get("/folder/{folder_id}", response_class=HTMLResponse)
@@ -112,8 +115,16 @@ async def get_folder(request: Request, folder_id: int,thumb: bool = False, db = 
     return render_template("view.html", context)
 
 @router.delete("/folder/{folder_id}")
-async def delete_folder(folder_id: int, db=Depends(get_db), service = Depends(get_folder_service)):
-    folder = await service.delete(folder_id, db)
+async def delete_folder(folder_id: int, db=Depends(get_db), folder_service = Depends(get_folder_service), file_service = Depends(get_file_service)):
+    """
+    폴더 삭제 API
+    """
+    logger.debug("---------------------------------------------")
+    logger.debug(f" /folder/{folder_id} 시작 ")
+    logger.debug("---------------------------------------------")
+    deleted_count = await file_service.delete_by_folder_id(folder_id, db)
+    logger.debug("지워진 파일 수: {deleted_count}")
+    folder = await folder_service.delete(folder_id, db)
     logger.debug(f"Folder {folder.folder_name} deleted along with its image files")
     return RedirectResponse("/", status_code=HTTP_303_SEE_OTHER)
 
@@ -126,9 +137,12 @@ def create_thumb_and_get_attribute(full_path):
     # thumbs 폴더가 없다면 생성
     os.makedirs(thumbs_dir, exist_ok=True)
 
+    # 파일 크기를 구함
+    file_size = os.path.getsize(full_path)
     # 원본 이미지를 불러옴
     with Image.open(full_path) as img:
         max_size = 300
+        
         if img.height > max_size or img.width > max_size:
             # 이미지 크기 비율에 맞게 조정
             if img.height > img.width:
@@ -159,7 +173,8 @@ def create_thumb_and_get_attribute(full_path):
             image_width=img.width,
             image_height=img.height,
             image_mode=img.mode,
-            thumb_path=thumb_path
+            thumb_path=thumb_path,
+            image_size=file_size
         )
 
         # Exif 데이터에서 추가적인 정보 추출

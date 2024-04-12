@@ -6,6 +6,7 @@ class ImageFileBase(SQLModel):
     org_name: str
     seq: int
     folder_id: Optional[int] = Field(default=None, foreign_key="image_folders.id")
+    image_size: Optional[int] = None
     image_format: Optional[str] = None
     image_width: Optional[int] = None
     image_height: Optional[int] = None
