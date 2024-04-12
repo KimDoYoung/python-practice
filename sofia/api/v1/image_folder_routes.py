@@ -17,10 +17,18 @@ from fastapi import Depends
 router = APIRouter()
 
 logger = get_logger(__name__)
+@router.get("/folder/form/add", response_class=HTMLResponse)
+async def folder_form_add():
+    context = {}
+    return render_template("folder_form_add.html", context)    
 
-#C:\Users\deHong\tmp\도서\주식 자동 거래 시스템 구축
-@router.post("/folders/add")
-# async def folders_add(db: Depends = Depends(get_db), folder_name: str = Form(...)):
+@router.get("/folder/export/{folder_id}", response_class=HTMLResponse)
+async def folder_export(folder_id: int, db = Depends(get_db), service = Depends(get_folder_service) ):
+    service.get(folder_id, db)
+    context = {}
+    return render_template("folder_export.html", context)   
+
+@router.post("/folder/add")
 async def folders_add(db = Depends(get_db), folder_name: str = Form(...)):
     """
     1. folder_name이 물리적으로 존재하는지 체크
@@ -52,13 +60,12 @@ async def folders_add(db = Depends(get_db), folder_name: str = Form(...)):
             image_file = create_thumb_and_get_attribute(full_path)
             image_file.folder_id = new_folder_id
             image_file.seq = idx+10
-            #image_file = ImageFile(org_name=file_name, seq=idx+10, folder_id=new_folder_id)
             db.add(image_file)
     # `async with db.begin():` 블록을 벗어나면 자동으로 커밋됩니다.          
     return RedirectResponse(f"/folders/{new_folder.id}", status_code=HTTP_303_SEE_OTHER)
 
 # folder_id에 해당하는 폴더의 이미지 목록을 조회    
-@router.get("/folders/{folder_id}", response_class=HTMLResponse)
+@router.get("/folder/{folder_id}", response_class=HTMLResponse)
 async def get_folder(request: Request, folder_id: int,thumb: bool = False, db = Depends(get_db), service= Depends(get_folder_service) ):
     '''
     폴더 아이디에 해당하는 폴더 정보를 조회하는 API
@@ -69,7 +76,7 @@ async def get_folder(request: Request, folder_id: int,thumb: bool = False, db = 
     context = {"request": request,  "folder": folder_json}
     return render_template("view.html", context)
 
-@router.delete("/folders/{folder_id}")
+@router.delete("/folder/{folder_id}")
 async def delete_folder(folder_id: int, db=Depends(get_db), service = Depends(get_folder_service)):
     folder = await service.delete(folder_id, db)
     logger.debug(f"Folder {folder.folder_name} deleted along with its image files")
@@ -101,7 +108,8 @@ def create_thumb_and_get_attribute(full_path):
             # 썸네일 이미지 파일명 설정 및 저장
             thumb_name = os.path.basename(full_path).rsplit('.', 1)[0] + '_thumb.png'
             thumb_path = os.path.join(thumbs_dir, thumb_name)
-            img.save(thumb_path, 'PNG')            
+            img.save(thumb_path, 'PNG')
+            thumb_path = thumb_name  # 썸네일 이미지 파일명만 저장
         else:
             thumb_path = None
 

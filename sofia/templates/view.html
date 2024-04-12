@@ -1,16 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h1>folder images view ((folder.folder_name))</h1>
-    <ul>
+(% extends 'base.html' %)
+
+(% block content %)
+    <h1 class="text-2xl font-semibold text-center">((folder.folder_name))</h1>
+    <p class="text-sm text-gray-500 text-center">((folder.folder_path))</p>
+    <!-- <ul>
     (% for image in folder.files %)
         <li><a href="/image/((image.id))">(( image.org_name ))</a></li>
     (% endfor %)
-    </ul>
-</body>
-</html>
+    </ul> -->
+    <div class="flex flex-wrap gap-2 p-4"> <!-- flex-wrap과 간격, 패딩 설정 -->
+        (% for image in folder.files %)
+        <div class="w-32 h-32 bg-gray-200 flex items-center justify-center overflow-hidden rounded-lg">
+          <img src="/image/((image.id))?thumb" alt="Thumbnail" class="max-w-full max-h-full object-cover object-center">
+        </div>
+        (% endfor %)
+    </div>        
+(% endblock %)
+(% block script %)
+    <script>
+        $(document).ready(function() {
+            console.log('Document is ready');
+        });
+    </script>
+(% endblock %)

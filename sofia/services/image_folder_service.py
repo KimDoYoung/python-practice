@@ -15,6 +15,9 @@ class ImageFolderService:
         return new_folder
     
     async def get(self, folder_id: int, session: AsyncSession) -> ImageFolderWithFiles:
+        """
+            folder_id에 해당하는 폴더 정보와 폴더에 속한 파일들을 조회
+        """
         statement = select(ImageFolder).where(ImageFolder.id == folder_id)
         result = await session.execute(statement)
         folder = result.scalars().first()
