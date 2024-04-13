@@ -23,6 +23,7 @@ class ImageFileBase(SQLModel):
     gps_longitude: Optional[float] = None
     image_orientation: Optional[str] = None
     thumb_path: Optional[str] = None
+    file_time : Optional[datetime.datetime] = None  # 파일 생성 시간
 
 class ImageFile(ImageFileBase, table=True):
     __tablename__ = "image_files"    

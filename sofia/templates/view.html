@@ -1,25 +1,48 @@
 (% extends 'base.html' %)
+
 (% block folder_name %) <h1 class="text-2xl font-semibold text-center">((folder.folder_name))</h1> (% endblock %)
 (% block content %)
     <input type="hidden" id="folder_id" value="((folder.folder_id))">
     <input type="hidden" id="folder_name" value="((folder.folder_name))">
     <input type="hidden" id="folder_path" value="((folder.folder_path))">
-    <!-- <h1 class="hidden text-2xl font-semibold text-center">((folder.folder_name))</h1>
-    <p class="text-sm text-gray-500 text-center">((folder.folder_path))</p> -->
-    <div class="flex flex-wrap gap-2 p-4"> <!-- flex-wrap과 간격, 패딩 설정 -->
-        (% for image in folder.files %)
-<!--         <div class="w-32 h-32 bg-gray-200 flex items-center justify-center overflow-hidden rounded-lg">
-          <img src="/image/((image.id))?thumb" alt="Thumbnail" class="max-w-full max-h-full object-cover object-center">
+    <div id="thumb-area">
+        <div class="flex flex-wrap gap-2 p-4"> <!-- flex-wrap과 간격, 패딩 설정 -->
+            (% for image in folder.files %)
+                <div class="thumb w-48 h-48 bg-gray-200 flex flex-col items-center justify-center overflow-hidden rounded-lg p-2">
+                    <img src="/image/(( image.id ))?thumb" alt="Thumbnail" class="max-w-full max-h-full object-cover object-center">
+                    <div class="info flex flex-row items-center justify-center space-x-2 w-full px-2">
+                        <input type="checkbox" id="select-((image.id))" name="selected_images" value="((image.id))">
+                        <span class="text-xs text-gray-500">(( image.image_width )) x (( image.image_height ))</span>
+                        <!-- <span class="text-xs text-gray-500">(( human_file_size(image.image_size) ))</span> -->
+                    </div>                    
+                </div>
+            (% endfor %)
         </div>
- -->        <div class="w-48 h-48 bg-gray-200 flex flex-col items-center justify-center overflow-hidden rounded-lg p-2">
-            <img src="/image/(( image.id ))?thumb" alt="Thumbnail" class="max-w-full max-h-full object-cover object-center">
-            <label for="select-((image.id))"><input type="checkbox" id="select-((image.id))" name="selected_images" value="((image.id))">((image.id))</label>
-            <!-- <label for="select-((image.id ))">((image.id))</label>
-            <input type="checkbox" id="select-((image.id ))" name="selected_images" value="((image.id ))" > -->
-            <!-- <label for="select-(( image.id ))">Select</label> -->
-          </div>
-        (% endfor %)
-    </div>        
+    </div>
+    <div id="list-area" class="hidden m-3">
+        <table class="min-w-full table-auto">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="px-4 py-2 text-left">#</th>
+                    <th class="px-4 py-2 text-left">Image Name</th>
+                    <th class="px-4 py-2 text-left">Image Size(WxH)</th>
+                    <th class="px-4 py-2 text-right">File Size</th>
+                    <th class="px-4 py-2 text-left">Image Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                (% for image in folder.files %)
+                    <tr>
+                        <td class="border px-4 py-2">(( loop.index ))</td>
+                        <td class="border px-4 py-2">(( image.org_name ))</td>
+                        <td class="border px-4 py-2">(( image.image_width )) x (( image.image_height ))</td>
+                        <td class="border px-4 py-2 text-right">(( human_file_size(image.image_size) ))</td>
+                        <td class="border px-4 py-2">(( image.file_time.strftime('%Y-%m-%d %H:%M:%S') ))</td>
+                    </tr>
+                (% endfor %)
+            </tbody>
+        </table>
+    </div>
 (% endblock %)
 (% block script %)
 <script>
@@ -31,17 +54,51 @@
         var html = `<span class="text-white">${folderName}</span> <span class="text-gray-300">(${folderPath})</span>`;
         $('#folder-info').html(html);
 
-        $('#header-button-area').removeClass('hidden');
+        $('#header-button-area1').removeClass('hidden');
+        $('#header-button-area2').removeClass('hidden');
+
+        // 버튼 rotate 90
         $('#btnRotate90').click(function() {
             var selectedImages = [];
             $('input[name="selected_images"]:checked').each(function() {
                 selectedImages.push($(this).val());
             });
-
+            if(selectedImages.length == 0) {
+                alert('90도 회전 시킬 이미지를 선택해 주세요.');
+                return;
+            }
             var queryString = $.param({ images: selectedImages }, true); //traditional true []을 안붙임
             var url = '/image/rotate/' +folderId+"?"+ queryString;
             window.location.href = url;
         });
+        //버튼 
+        $('#btnViewList').click(function() {
+            $('#thumb-area').addClass('hidden');
+            $('#list-area').removeClass('hidden');
+
+            $('.icon-btn').removeClass('active');
+            $(this).addClass('active');
+        });
+        $('#btnViewSmall, #btnViewMedium, #btnViewLarge').click(function() {
+            $('#list-area').addClass('hidden');
+            $('#thumb-area').removeClass('hidden');
+            // 클릭된 요소의 ID에 따라 처리
+            var sizeClasses = {
+                'btnViewSmall': 'w-32 h-32',
+                'btnViewMedium': 'w-48 h-48',
+                'btnViewLarge': 'w-64 h-64'
+            };
+
+            var selectedSize = sizeClasses[this.id]; // 현재 클릭된 버튼의 ID를 사용하여 사이즈 클래스 결정
+
+            // 모든 버튼에서 'active' 클래스 제거 후 현재 클릭된 버튼에만 'active' 추가
+            $('.icon-btn').removeClass('active');
+            $(this).addClass('active');
+
+            // 모든 'thumb' 클래스 요소의 사이즈 조정
+            $('.thumb').removeClass('w-64 h-64 w-48 h-48 w-32 h-32')
+                    .addClass(selectedSize);
+        });        
     });
 </script>
 (% endblock %)

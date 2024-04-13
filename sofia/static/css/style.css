@@ -1,0 +1,14 @@
+#btnRotate90 i {
+    transform: rotate(90deg);
+}
+.icon-btn {
+  @apply p-2 border border-gray-300 text-gray-700 hover:bg-blue-500 hover:text-white;
+}
+
+.icon-btn.active {
+  @apply bg-blue-500 text-white border-blue-500;
+}
+
+.text-xxs {
+    font-size: 0.6rem;
+}

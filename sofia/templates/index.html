@@ -14,31 +14,38 @@
           </tr>
         </thead>
         <tbody>
-          (% for folder in list %)
-          <tr class="hover:bg-gray-50">
-            <td class="border px-4 py-2">(( folder.folder_name ))</td>
-            <td class="border px-4 py-2">(( folder.folder_path ))</td>
-            <td class="border px-4 py-2">(( folder.last_load_time ))</td>
-            <td class="border px-4 py-2">
-                <div class="flex space-x-2">
-                    <!-- 보기 버튼 -->
-                    <button  data-folder-id="((folder.id))" class="btnView px-4 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
-                      <i class="fas fa-eye"></i> 보기
-                    </button>
-                  
-                    <!-- PDF 만들기 버튼 -->
-                    <button  data-folder-id="((folder.id))" class="btnExport px-4 py-2 text-sm bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50">
-                      <i class="fas fa-file-pdf"></i> Export
-                    </button>
-                  
-                    <!-- 삭제 버튼 -->
-                    <button  data-folder-id="((folder.id))" class="btnDelete px-4 py-2 text-sm bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">
-                      <i class="fas fa-trash-alt"></i> 삭제
-                    </button>
-                  </div>
-            </td>
-          </tr>
-          (% endfor %)
+          (% if list|length == 0 %)
+            <tr>
+                <td class="border px-4 py-2 text-center bg-red-100" colspan="4">No data</td>
+            </tr>
+          (% endif %)
+          (% if list|length > 0 %)
+            (% for folder in list %)
+            <tr class="hover:bg-gray-50">
+                <td class="border px-4 py-2">(( folder.folder_name ))</td>
+                <td class="border px-4 py-2">(( folder.folder_path ))</td>
+                <td class="border px-4 py-2">(( folder.last_load_time ))</td>
+                <td class="border px-4 py-2">
+                    <div class="flex space-x-2">
+                        <!-- 보기 버튼 -->
+                        <button  data-folder-id="((folder.id))" class="btnView px-4 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                        <i class="fas fa-eye"></i> 보기
+                        </button>
+                    
+                        <!-- PDF 만들기 버튼 -->
+                        <button  data-folder-id="((folder.id))" class="btnExport px-4 py-2 text-sm bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50">
+                        <i class="fas fa-file-pdf"></i> Export
+                        </button>
+                    
+                        <!-- 삭제 버튼 -->
+                        <button  data-folder-id="((folder.id))" class="btnDelete px-4 py-2 text-sm bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">
+                        <i class="fas fa-trash-alt"></i> 삭제
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            (% endfor %)
+        (% endif %)
         </tbody>
       </table>
     </div>

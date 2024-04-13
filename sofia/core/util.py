@@ -11,6 +11,15 @@ from core.logger import get_logger
 
 logger = get_logger(__name__)
 
+def human_file_size(filesize: int) -> str:
+    """파일 크기를 읽기 쉬운 형태로 변환하는 함수"""
+    # 파일 크기 단위 정의
+    for unit in ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB']:
+        if filesize < 1024.0:
+            return f"{filesize:.1f}{unit}"
+        filesize /= 1024.0
+    return f"{filesize:.1f}YB"
+
 def datetime_serializer(obj):
     """datetime 객체를 직렬화하기 위한 함수"""
     if isinstance(obj, datetime):

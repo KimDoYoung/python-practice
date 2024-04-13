@@ -129,11 +129,12 @@ async def delete_folder(folder_id: int, db=Depends(get_db), folder_service = Dep
     return RedirectResponse("/", status_code=HTTP_303_SEE_OTHER)
 
 
-def create_thumb_and_get_attribute(full_path):
+def create_thumb_and_get_attribute(full_path)->ImageFile:
     # 썸네일이 저장될 폴더 경로를 설정
     base_dir = os.path.dirname(full_path)
     thumbs_dir = os.path.join(base_dir, 'thumbs')
-    
+    # 파일의 생성일시를 구함
+    creation_time = datetime.fromtimestamp(os.path.getctime(full_path))
     # thumbs 폴더가 없다면 생성
     os.makedirs(thumbs_dir, exist_ok=True)
 
@@ -142,7 +143,7 @@ def create_thumb_and_get_attribute(full_path):
     # 원본 이미지를 불러옴
     with Image.open(full_path) as img:
         max_size = 300
-        
+        img_width, img_height = img.size
         if img.height > max_size or img.width > max_size:
             # 이미지 크기 비율에 맞게 조정
             if img.height > img.width:
@@ -170,8 +171,8 @@ def create_thumb_and_get_attribute(full_path):
         image_file = ImageFile(
             org_name=os.path.basename(full_path),
             image_format=img.format,
-            image_width=img.width,
-            image_height=img.height,
+            image_width=img_width,
+            image_height=img_height,
             image_mode=img.mode,
             thumb_path=thumb_path,
             image_size=file_size
@@ -193,5 +194,6 @@ def create_thumb_and_get_attribute(full_path):
         image_file.gps_latitude = safe_float_conversion(get_tag_value(tags, 'GPS GPSLatitude'))
         image_file.gps_longitude = safe_float_conversion(get_tag_value(tags, 'GPS GPSLongitude'))
         image_file.image_orientation = get_tag_value(tags, 'Image Orientation')
-
+        image_file.file_time = creation_time
+        
         return image_file
