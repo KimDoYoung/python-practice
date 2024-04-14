@@ -11,7 +11,7 @@
                 <div class="thumb w-48 h-48 bg-gray-200 flex flex-col items-center justify-center overflow-hidden rounded-lg p-2">
                     <img src="/image/(( image.id ))?thumb" alt="Thumbnail" class="max-w-full max-h-full object-cover object-center">
                     <div class="info flex flex-row items-center justify-center space-x-2 w-full px-2">
-                        <input type="checkbox" id="select-((image.id))" name="selected_images" value="((image.id))">
+                        <input type="checkbox" id="select-((image.id))" name="selected_images" value="((image.id))" class="hidden">
                         <span class="text-xs text-gray-500">(( image.image_width )) x (( image.image_height ))</span>
                         <!-- <span class="text-xs text-gray-500">(( human_file_size(image.image_size) ))</span> -->
                     </div>                    
@@ -57,6 +57,22 @@
         $('#header-button-area1').removeClass('hidden');
         $('#header-button-area2').removeClass('hidden');
 
+        $('#btnDelete').click(function() {
+            var selectedImages = [];
+            $('input[name="selected_images"]:checked').each(function() {
+                selectedImages.push($(this).val());
+            });
+            if(selectedImages.length == 0) {
+                alert('삭제할 이미지를 선택해 주세요.');
+                return;
+            }
+            if(confirm('선택한 이미지를 삭제(휴지통이동)  하시겠습니까?') == false) {
+                return;
+            }
+            var queryString = $.param({ images: selectedImages }, true); //traditional true []을 안붙임
+            var url = '/image/delete/' +folderId+"?"+ queryString;
+            window.location.href = url;
+        });
         // 버튼 rotate 90
         $('#btnRotate90').click(function() {
             var selectedImages = [];
@@ -67,11 +83,14 @@
                 alert('90도 회전 시킬 이미지를 선택해 주세요.');
                 return;
             }
+            if(confirm('선택한 이미지를 90도 회전 시키겠습니까?') == false) {
+                return;
+            }
             var queryString = $.param({ images: selectedImages }, true); //traditional true []을 안붙임
             var url = '/image/rotate/' +folderId+"?"+ queryString;
             window.location.href = url;
         });
-        //버튼 
+        //버튼 리스트
         $('#btnViewList').click(function() {
             $('#thumb-area').addClass('hidden');
             $('#list-area').removeClass('hidden');
@@ -79,6 +98,7 @@
             $('.icon-btn').removeClass('active');
             $(this).addClass('active');
         });
+        //버튼 썸네일 소 중 대
         $('#btnViewSmall, #btnViewMedium, #btnViewLarge').click(function() {
             $('#list-area').addClass('hidden');
             $('#thumb-area').removeClass('hidden');
@@ -98,7 +118,26 @@
             // 모든 'thumb' 클래스 요소의 사이즈 조정
             $('.thumb').removeClass('w-64 h-64 w-48 h-48 w-32 h-32')
                     .addClass(selectedSize);
-        });        
+        });
+        $('.thumb').click(function() {
+            // div를 클릭하면 체크박스의 checked 상태를 토글
+            var checkbox = $(this).find('input[type="checkbox"]');
+            checkbox.prop('checked', !checkbox.prop('checked'));
+            if(checkbox.prop('checked'))
+                $(this).removeClass('bg-gray-200').addClass('bg-blue-200');
+            else
+                $(this).removeClass('bg-blue-200').addClass('bg-gray-200');
+        });
+
+        $('.thumb img').click(function(event) {
+            event.stopPropagation(); // 이벤트 버블링 방지
+            var imageId = $(this).closest('.thumb').find('input[type="checkbox"]').val();
+            window.location.href = `/image/${imageId}`; // 원본 이미지로 이동
+        });  
+        $('#btnUnCheckAll').click(function() {
+            $('input[name="selected_images"]').prop('checked', false);
+            $('.thumb').removeClass('bg-blue-200').addClass('bg-gray-200');
+        });
     });
 </script>
 (% endblock %)

@@ -60,3 +60,25 @@ async def image_rotate(folder_id: int, images: list[int] = Query(None),
             backup_and_rotate_image(thumb_path)
 
     return RedirectResponse(f"/folder/{folder_id}", status_code=status.HTTP_303_SEE_OTHER)
+
+@router.get("/image/delete/{folder_id}")
+async def image_delete(folder_id: int, images: list[int] = Query(None), 
+                       db=Depends(get_db), folder_service=Depends(get_folder_service), file_service=Depends(get_file_service)):
+    """ 선택된 이미지를 삭제한다. """
+    if not images:
+        raise HTTPException(status_code=400, detail="No images provided")
+    
+    base_folder = await folder_service.get_folder_path(folder_id, db)
+    image_list = await file_service.get_files(db, images)
+    for image in image_list:
+        fullpath = os.path.join(base_folder, image.org_name)
+        # 물리적 파일 삭제
+        os.remove(fullpath)
+        thumb_path = os.path.join(base_folder, "thumbs", image.thumb_path)
+        # thumb파일이 있으면 삭제
+        if os.path.exists(thumb_path):
+            os.remove(thumb_path)
+        # DB에서 삭제
+        await file_service.delete(db, image.id)    
+
+    return RedirectResponse(f"/folder/{folder_id}", status_code=status.HTTP_303_SEE_OTHER)

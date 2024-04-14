@@ -7,21 +7,27 @@
         </div>
         <div id="folder-info"></div> 
         <div id="header-button-area1" class="hidden">
-                <button class="text-white" id="btnRotate90" title="image clock-90 rotate">
+                <button class="text-white" id="btnRotate90" title="Rotate selected images 90 degrees clockwise">
                     <i class="fas fa-sync"></i>
                 </button>
+                <button class="text-white" id="btnDelete" title="delete selected images">
+                    <i class="fas fa-trash"></i>
+                </button>                
+                <button class="text-white" id="btnUnCheckAll" title="un-select ALL images">
+                    <i class="far fa-square"></i>
+                </button>                
         </div> 
         <div id="header-button-area2" class="hidden flex space-x-2">
-            <button class="icon-btn" data-mode="list" id="btnViewList">
+            <button class="icon-btn" data-mode="list" id="btnViewList" title="list view">
               <i class="fas fa-list"></i>
             </button>
-            <button class="icon-btn" data-mode="small" id="btnViewSmall">
+            <button class="icon-btn" data-mode="small" id="btnViewSmall" title="thumb small">
               <i class="fas fa-th"></i>
             </button>
-            <button class="icon-btn active" data-mode="medium" id="btnViewMedium" >
+            <button class="icon-btn active" data-mode="medium" id="btnViewMedium" title="thumb meidum">
               <i class="fas fa-th-large"></i>
             </button>
-            <button class="icon-btn" data-mode="large" id="btnViewLarge">
+            <button class="icon-btn" data-mode="large" id="btnViewLarge" title="thumb large">
               <i class="fas fa-th-list"></i>
             </button>
           </div>        
