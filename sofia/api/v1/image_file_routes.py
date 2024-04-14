@@ -1,9 +1,11 @@
 import os
+import re
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
-from fastapi.responses import FileResponse, RedirectResponse
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 
 from core.dependencies import get_db, get_file_service, get_folder_service
 from core.logger import get_logger
+from core.template_engine import render_template
 from core.util import backup_and_rotate_image, get_mime_type
 from starlette import status
 
@@ -82,3 +84,13 @@ async def image_delete(folder_id: int, images: list[int] = Query(None),
         await file_service.delete(db, image.id)    
 
     return RedirectResponse(f"/folder/{folder_id}", status_code=status.HTTP_303_SEE_OTHER)
+
+def validate_image_ids(value: str):
+    if not re.match(r'^(\d+\|)*\d+$', value):
+        raise ValueError("Invalid image IDs format")
+    return value
+
+@router.get("/slide", response_class=HTMLResponse)
+async def image_slide(s: int, a: str = Query(..., description="Pipe-separated list of image IDs", example="1|2|3|4", validator=validate_image_ids)):
+    context = {"startImageId":s, "allImageIds":a}
+    return render_template("slide.html", context)    

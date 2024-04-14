@@ -1,0 +1,83 @@
+(% extends 'base.html' %)
+(% block style %)
+<style>
+.image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 4rem); /* Adjust based on nav height */
+    overflow: auto;
+}
+img {
+    max-width: 100%;
+    max-height: 100%;
+}
+</style>
+(% endblock %)
+
+(% block folder_name %) <h1 class="text-2xl font-semibold text-center">((folder.folder_name))</h1> (% endblock %)
+(% block content %)
+    <input type="hidden" id="allImage" value="((allImageIds))">
+    <input type="hidden" id="startImageId" value="((startImageId))">
+
+    <div class="image-container">
+        <img id="mainImage" src="/image/((startImageId))" alt="Display Image">
+    </div>    
+(% endblock %)
+(% block script %)
+<script>
+    $(document).ready(function() {
+        console.log('Document is ready');
+        let allImageIds = $('#allImage').val().split('_').map(Number);
+        let startImageId = $('#startImageId').val();
+        let nowImageId = Number(startImageId);
+        $('#header-button-area3').removeClass('hidden');
+        //$('#header-button-area2').removeClass('hidden');
+        let scale = 1;
+        const scaleFactor = 0.1;
+
+        $('#zoomIn').click(function() {
+            scale += scaleFactor;
+            $('#mainImage').css('transform', `scale(${scale})`);
+        });
+
+        $('#zoomOut').click(function() {
+            scale = Math.max(scale - scaleFactor, 0.1); // Prevent scaling to 0
+            $('#mainImage').css('transform', `scale(${scale})`);
+        });
+
+        $('#nextImage').click(function() {
+            let nextIdx = allImageIds.indexOf(nowImageId)
+            if (nextIdx < allImageIds.length - 1) {
+                nextIdx++;
+            } else {
+                nextIdx = 0;
+            }
+            nowImageId = allImageIds[nextIdx];
+            $('#mainImage').prop('src', `/image/${nowImageId}`);
+        });
+
+        $('#prevImage').click(function() {
+            // nowImageId의 현재 인덱스 찾기
+            let currentIdx = allImageIds.indexOf(nowImageId);
+
+            // 이전 인덱스 계산
+            let prevIdx;
+            if (currentIdx !== -1) { // nowImageId가 배열에 존재할 경우에만 처리
+                if (currentIdx > 0) {
+                    prevIdx = currentIdx - 1;
+                } else {
+                    prevIdx = allImageIds.length - 1;  // 첫 번째 인덱스일 경우, 마지막 인덱스로 순환
+                }
+                nowImageId = allImageIds[prevIdx];
+
+                // 이전 이미지 ID로 이미지 소스 업데이트
+                $('#mainImage').prop('src', `/image/${nowImageId}`);
+            } else {
+                console.error("nowImageId is not in the allImageIds array");
+            }
+        });
+
+    });
+</script>
+(% endblock %)

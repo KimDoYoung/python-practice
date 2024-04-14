@@ -132,7 +132,22 @@
         $('.thumb img').click(function(event) {
             event.stopPropagation(); // 이벤트 버블링 방지
             var imageId = $(this).closest('.thumb').find('input[type="checkbox"]').val();
-            window.location.href = `/image/${imageId}`; // 원본 이미지로 이동
+            // window.location.href = `/image/${imageId}`; // 원본 이미지로 이동
+            // 체크된 것이 있으면 체크된 것만 슬라이드로 이동
+            var checkedImageIds = $('input[name="selected_images"]:checked').map(function() {
+                return $(this).val();
+            }).get();
+            // 체크된 것이 없으면 전체 이미지로 슬라이드 이동
+            if(checkedImageIds.length == 0) {
+                checkedImageIds = $('input[name="selected_images"]').map(function() {
+                    return $(this).val();
+                }).get();
+            }
+            var separatedImageIds = checkedImageIds.join('_');
+            //debugger;
+            // var encodeIds = encodeURIComponent(separatedImageIds);
+            //var url = encodeURIComponent(`/image/slide?s=${imageId}&a=${separatedImageIds}`);
+            JuliaUtil.submitGet("/slide", {s: imageId, a: separatedImageIds});
         });  
         $('#btnUnCheckAll').click(function() {
             $('input[name="selected_images"]').prop('checked', false);
