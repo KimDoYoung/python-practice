@@ -4,6 +4,15 @@
 
 폴더에 포함되어 있는 이미지를 db에 넣고 관리
 
+## TODO
+
+1. export시 waiting...
+2. slide에서 리스트쪽으로 이동, 이때 list,thumb sml를 기록했다가 이동
+3. slide에 auto    버튼 slide 3초
+4. slide에 원본크기 버튼
+5. slide에 화면에 맞는 크기
+6. view에서 선택된 것들 export
+
 ### 기능
 
 1. 폴더들의 목록을 db에 가지고 있다.

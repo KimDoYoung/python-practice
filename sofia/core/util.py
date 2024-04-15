@@ -11,6 +11,10 @@ from core.logger import get_logger
 
 logger = get_logger(__name__)
 
+def format_datetime(value: datetime, format: str = "%Y-%m-%d %H:%M:%S") -> str:
+    """날짜 및 시간 형식을 지정된 형식으로 변환하는 함수"""
+    return value.strftime(format)
+
 def human_file_size(filesize: int) -> str:
     """파일 크기를 읽기 쉬운 형태로 변환하는 함수"""
     # 파일 크기 단위 정의

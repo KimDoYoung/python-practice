@@ -90,7 +90,7 @@ def validate_image_ids(value: str):
         raise ValueError("Invalid image IDs format")
     return value
 
-@router.get("/slide", response_class=HTMLResponse)
-async def image_slide(s: int, a: str = Query(..., description="Pipe-separated list of image IDs", example="1|2|3|4", validator=validate_image_ids)):
-    context = {"startImageId":s, "allImageIds":a}
+@router.get("/slide/{folder_id}", response_class=HTMLResponse)
+async def image_slide(folder_id:int, s: int, a: str = Query(..., description="Pipe-separated list of image IDs", example="1|2|3|4", validator=validate_image_ids)):
+    context = {"startImageId":s, "allImageIds":a, "folder_id":folder_id}
     return render_template("slide.html", context)    

@@ -6,7 +6,7 @@
             </a>
         </div>
         <div id="folder-info"></div> 
-        <div id="header-button-area1" class="hidden">
+        <div id="header-button-area1" class="hidden flex space-x-3">
                 <button class="text-white" id="btnRotate90" title="Rotate selected images 90 degrees clockwise">
                     <i class="fas fa-sync"></i>
                 </button>
@@ -32,18 +32,30 @@
             </button>
         </div>
         <div id="header-button-area3" class="hidden flex space-x-2">
-            <button id="prevImage" class="p-2 bg-blue-500 text-white rounded hover:bg-blue-700 focus:outline-none">
+            <button id="backToThumb" class="p-2 bg-blue-500 text-white rounded hover:bg-blue-700 focus:outline-none" title="return to thumb images">
+                <i class="fa-solid fa-table"></i>
+            </button>
+            <button id="prevImage" class="p-2 bg-blue-500 text-white rounded hover:bg-blue-700 focus:outline-none" title="prev image">
                 <i class="fas fa-arrow-left"></i>
             </button>
-            <button id="zoomIn" class="p-2 bg-blue-500 text-white rounded hover:bg-blue-700 focus:outline-none">
+            <button id="zoomIn" class="p-2 bg-blue-500 text-white rounded hover:bg-blue-700 focus:outline-none" title="zoom in">
                 <i class="fas fa-search-plus"></i>
             </button>
-            <button id="zoomOut" class="p-2 bg-blue-500 text-white rounded hover:bg-blue-700 focus:outline-none">
+            <button id="zoomOut" class="p-2 bg-blue-500 text-white rounded hover:bg-blue-700 focus:outline-none" title="zoom out">
                 <i class="fas fa-search-minus"></i>
             </button>
-            <button id="nextImage" class="p-2 bg-blue-500 text-white rounded hover:bg-blue-700 focus:outline-none">
+            <button id="originSize" class="p-2 bg-blue-500 text-white rounded hover:bg-blue-700 focus:outline-none" title="origin size">
+                <i class="fas fa-expand-arrows-alt"></i>
+            </button>
+            <button id="screenSize" class="p-2 bg-blue-500 text-white rounded hover:bg-blue-700 focus:outline-none" title="screen size">
+                <i class="fas fa-compress-arrows-alt"></i>
+            </button>
+            <button id="nextImage" class="p-2 bg-blue-500 text-white rounded hover:bg-blue-700 focus:outline-none" title="next image">
                 <i class="fas fa-arrow-right"></i>
-            </button>            
+            </button> 
+            <button id="autoSlide" class="p-2 bg-blue-500 text-white rounded hover:bg-blue-700 focus:outline-none" title="Auto slide images">
+                <i class="fas fa-play"></i>
+            </button>
         </div>
         <a href="/folder/form/add" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
             Add New Folder

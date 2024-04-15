@@ -1,7 +1,7 @@
 import os
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from core.logger import get_logger
-from core.util import human_file_size
+from core.util import format_datetime, human_file_size
 
 logger = get_logger(__name__)
 
@@ -21,6 +21,7 @@ env = Environment(
     variable_end_string='))'
 )
 env.globals['human_file_size'] = human_file_size  # 함수를 글로벌로 등록
+env.filters['ymdhms'] = format_datetime  # 필터를 등록
 def render_template(template_name, context):
     template = env.get_template(template_name)
     return template.render(context)

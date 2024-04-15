@@ -147,7 +147,7 @@
             //debugger;
             // var encodeIds = encodeURIComponent(separatedImageIds);
             //var url = encodeURIComponent(`/image/slide?s=${imageId}&a=${separatedImageIds}`);
-            JuliaUtil.submitGet("/slide", {s: imageId, a: separatedImageIds});
+            JuliaUtil.submitGet("/slide/" + folderId, {s: imageId, a: separatedImageIds});
         });  
         $('#btnUnCheckAll').click(function() {
             $('input[name="selected_images"]').prop('checked', false);
