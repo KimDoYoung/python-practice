@@ -8,5 +8,18 @@ router = APIRouter()
 
 @router.get("/", response_class=HTMLResponse)
 def display_index(request: Request):
+    ''' 메인 '''
     context = {"request": request, "message": "Welcome to Joanna API!-주식매매시스템"}
     return render_template("index.html", context)
+
+@router.get("/stockapi", response_class=HTMLResponse)
+def display_index(request: Request):
+    ''' 증권사 메인 '''
+    context = {"request": request, "message": "Welcome to Joanna API!-주식매매시스템"}
+    return render_template("stockapi/index.html", context)
+
+@router.get("/openapi", response_class=HTMLResponse)
+def display_index(request: Request):
+    ''' OPen api 메인 '''
+    context = {"request": request, "message": "Welcome to Joanna API!-주식매매시스템"}
+    return render_template("openapi/index.html", context)

@@ -20,6 +20,6 @@ env = Environment(
     variable_end_string='))'
 )
 
-def render_template(template_name, context):
+def render_template(template_name, context={}):
     template = env.get_template(template_name)
     return template.render(context)

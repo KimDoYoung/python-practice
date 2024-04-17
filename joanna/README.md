@@ -1,5 +1,11 @@
 # 주식트레이딩 - joanna
 
+## TODO
+
+1. 키 등록
+2. 데이터베이스 선택, 몽고db?
+
+
 ## 개요
 
 다음을 [참조로 시작](https://www.bluestones.biz/cms/pages?action=view&page=/HomePage/stock/stock_products.md)

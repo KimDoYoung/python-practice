@@ -1,0 +1,94 @@
+(% extends 'openapi/datagokr/openapi_base.html' %)
+(% block content %)
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-5">
+        <form action="/datagokr/stock/prices" method="post">
+            <div class="grid grid-cols-3 gap-4">
+                <!-- 일자 정보 -->
+                <div class="bg-yellow-100">
+                    <h2 class="font-bold mb-2">일자 정보</h2>
+                    <div class="mb-4 flex item-center space-x-4">
+                        <label for="basDt" class="block text-sm font-medium text-gray-700">기준일자</label>
+                        <input type="text" id="basDt" name="basDt" class="mt-1 px-2 block w-24 rounded-md border-gray-300 shadow-sm">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="beginBasDt" class="block text-sm font-medium text-gray-700">기준 시작일자</label>
+                        <input type="text" id="beginBasDt" name="beginBasDt" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="endBasDt" class="block text-sm font-medium text-gray-700">기준 종료일자</label>
+                        <input type="text" id="endBasDt" name="endBasDt" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="likeBasDt" class="block text-sm font-medium text-gray-700">기준일자 검색</label>
+                        <input type="text" id="likeBasDt" name="likeBasDt" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    </div>
+
+
+                </div>
+
+                <!-- 코드 및 종목명 -->
+                <div class="bg-blue-100">
+                    <h2 class="font-bold mb-2">코드 및 종목명</h2>
+                    <div class="mb-4">
+                        <label for="isinCd" class="block text-sm font-medium text-gray-700">ISIN코드</label>
+                        <input type="text" id="isinCd" name="isinCd" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="likeIsinCd" class="block text-sm font-medium text-gray-700">ISIN코드 검색</label>
+                        <input type="text" id="likeIsinCd" name="likeIsinCd" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="itmsNm" class="block text-sm font-medium text-gray-700">종목명</label>
+                        <input type="text" id="itmsNm" name="itmsNm" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="likeItmsNm" class="block text-sm font-medium text-gray-700">종목명 검색</label>
+                        <input type="text" id="likeItmsNm" name="likeItmsNm" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    </div>
+
+
+                    <div class="mb-4">
+                        <label for="likeSrtnCd" class="block text-sm font-medium text-gray-700">단축코드 검색</label>
+                        <input type="text" id="likeSrtnCd" name="likeSrtnCd" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    </div>                    
+                </div>
+
+                <!-- 거래 정보 -->
+                <div class="bg-yellow-100">
+                    <h2 class="font-bold mb-2">거래 정보</h2>
+                    <div class="mb-4">
+                        <label for="beginVs" class="block text-sm font-medium text-gray-700">대비 시작 ~ 종료</label>
+                        <input type="number" id="beginVs" name="beginVs" class="mt-1 inline-block w-5/12 rounded-md border-gray-300 shadow-sm">
+                        <span class="mx-2">~</span>
+                        <input type="number" id="endVs" name="endVs" class="mt-1 inline-block w-5/12 rounded-md border-gray-300 shadow-sm">
+                    </div>
+                    <div class="mb-4">
+                        <label for="mrktCls" class="block text-sm font-medium text-gray-700">시장구분</label>
+                        <input type="text" id="mrktCls" name="mrktCls" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    </div>
+                    <!-- Similar for other range inputs -->
+                </div>
+            </div>
+
+            <button id="btnStockPriceSubmit" type="button" class="mt-4 px-4 py-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                제출
+            </button>
+        </form>
+    </div>
+(% endblock %)
+(% block script %)
+<script>
+    $(document).ready(function() {
+        console.log('ready...');
+        $('#btnStockPriceSubmit').click(function() {
+            JuliaUtil.submitPost('/datagokr/stock/prices', {});
+        });
+    });
+</script>
+(% endblock %)
