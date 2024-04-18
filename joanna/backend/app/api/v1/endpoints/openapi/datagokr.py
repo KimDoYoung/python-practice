@@ -1,3 +1,4 @@
+from dataclasses import asdict
 from fastapi import APIRouter
 from fastapi.responses import HTMLResponse
 import requests
@@ -7,11 +8,29 @@ from backend.app.core.template_engine import render_template
 from backend.app.domains.openapi.godata_model import StockPriceRequest
 from backend.app.core.configs import DATA_GO_KR_API_KEY
 
+from requests.adapters import HTTPAdapter
+from urllib3.util.ssl_ import create_urllib3_context
+import urllib.parse
+
 logger = get_logger(__name__)
 
 router = APIRouter()
 
 template_base = "openapi/datagokr"
+
+class SSLAdapter(HTTPAdapter):
+    def init_poolmanager(self, *args, **kwargs):
+        context = create_urllib3_context()
+        # 필요한 SSL 버전을 명시적으로 지정, 예: TLSv1_2
+        context.set_ciphers('DEFAULT@SECLEVEL=1')
+        kwargs['ssl_context'] = context
+        return super(SSLAdapter, self).init_poolmanager(*args, **kwargs)
+
+# API 연결에 사용할 어댑터를 설정
+adapter = SSLAdapter()
+
+session = requests.Session()
+session.mount('https://', adapter)
 
 @router.get("/datagokr/stock/prices", response_class=HTMLResponse)
 async def datagokr_stock_prices():
@@ -22,35 +41,39 @@ async def datagokr_stock_prices():
     context = {}
     return render_template(f"{template_base}/stock_price_info.html", context)    
 
-@router.post("/datagokr/stock/prices", response_class=HTMLResponse)
-async def datagokr_stock_prices(stock_price_request: StockPriceRequest):
+
+@router.post("/datagokr/stock/prices")
+async def datagokr_stock_prices1(stock_price_request: StockPriceRequest):
     '''
     금융위원회 주식시세정보
     '''
     logger.debug("금융위원회 주식시세정보 폼 POST")
     api_key = DATA_GO_KR_API_KEY
+    #api_key = "1ROBN6Q1t6iYO9fc2SbHVby0AruUb78/jd0Ruzvyv33tgJKV7WcOyZ+SmhnNPIYmrR0/ppqifPYDcrywywu9ZQ=="
+    api_key = urllib.parse.unquote(api_key)
     url= "https://apis.data.go.kr/1160100/service/GetStockSecuritiesInfoService/getStockPriceInfo"
-    params = {
-        "serviceKey": api_key,
-        "numOfRows": stock_price_request.numOfRows,
-        "pageNo": stock_price_request.pageNo,
-        "resultType": "xml",
-    }
+    params = asdict(stock_price_request)
+    params["serviceKey"] = api_key
+    # None 값 제거 (dict comprehension을 사용)
+    params = {k: v for k, v in params.items() if v is not None}
     logger.debug(f"params: {params}")
-    # API 요청 실행
-    response = requests.get(url, params=params)
+    response = session.get(url, params=params)
     logger.debug(f"response: {response}")
     # 응답 처리
+    erro_response_json = {}
+    response_json = {}
     if response.status_code == 200:
-        print("요청 성공:")
+        logger.debug("요청 성공:")
         if is_data_go_error(response.text):
             erro_response_json = get_error_response(response.text)
         else:
             response_json =get_parsing_response(response.text)
+            logger.debug(f"godata로 받은 json: {response_json}" )
     else:
-        print("요청 실패, 상태 코드:", response.status_code)
+        logger.debug("요청 실패, 상태 코드: ", response.status_code)
     context = {"error" : erro_response_json, "list" : response_json}
-    return render_template(f"{template_base}/stock_price_info.html", context)
+    return context
+    #return render_template(f"{template_base}/stock_price_info.html", context)
 
 
 def is_data_go_error(response_text):
@@ -58,17 +81,6 @@ def is_data_go_error(response_text):
     return "<cmmMsgHeader>" in response_text
 
 import json
-
-# def get_parsing_response(json_data):
-#     '''정상적 데이터가 왔었을 때 파싱하는 함수'''
-#     try:
-#         data = json.loads(json_data)
-#         items = data['response']['body']['items']['item']
-#         return items  # 주식 데이터의 리스트를 반환
-#     except json.JSONDecodeError:
-#         return {"Error": "Failed to decode JSON"}
-#     except KeyError:
-#         return {"Error": "Invalid JSON structure"}
 
 def get_parsing_response(xml_data):
     '''정상적 데이터가 XML로 왔었을 때 파싱하는 함수'''

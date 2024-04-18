@@ -1,7 +1,7 @@
 (% extends 'openapi/datagokr/openapi_base.html' %)
 (% block content %)
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-5">
-        <form action="/datagokr/stock/prices" method="post">
+    <div id="search-area" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-5">
+        <form id="form1" action="/datagokr/stock/prices" method="post">
             <div class="grid grid-cols-3 gap-4">
                 <!-- 일자 정보 -->
                 <div class="bg-yellow-100">
@@ -79,16 +79,223 @@
             <button id="btnStockPriceSubmit" type="button" class="mt-4 px-4 py-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                 제출
             </button>
+            <button id="btnStockPriceClear" type="button" class="mt-4 px-4 py-2 bg-gray-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                초기화
+            </button>
         </form>
     </div>
+    <div id="result-area"></div>
+    
+    <!-- 주식가격정보 핸들바 템플릿 -->
+    (% raw %)
+    <script id="error-template" type="text/x-handlebars-template">
+        <div class="bg-red-500 text-white p-4 rounded-lg max-w-md mx-auto mt-10 text-center">
+            <h1 class="text-xl mb-2 font-bold">서비스 오류 발생</h1>
+            <p>에러 메시지: <span class="text-yellow">{{error.AuthorizationMessage}}</span>
+            <p>오류 내용: {{error.ErrorMessage}}</p>
+            <p>오류 코드: {{error.ReasonCode}}</p>
+        </div>
+    </script>
+    <script id="stock-price-template" type="text/x-handlebars-template">
+        <table id="stock_price_result" class="table-auto w-full mt-4">
+            <thead>
+                <tr class="bg-blue-500 text-white">
+                    <th class="px-4 py-2">기준일자</th>
+                    <th class="px-4 py-2">단축코드</th>
+                    <th class="px-4 py-2">ISIN코드</th>
+                    <th class="px-4 py-2">종목명</th>
+                    <th class="px-4 py-2">시장구분</th>
+                    <th class="px-4 py-2">종가</th>
+                    <th class="px-4 py-2">대비</th>
+                    <th class="px-4 py-2">등락률</th>
+                    <th class="px-4 py-2">시가</th>
+                    <th class="px-4 py-2">고가</th>
+                    <th class="px-4 py-2">저가</th>
+                    <th class="px-4 py-2">거래량</th>
+                    <th class="px-4 py-2">거래대금</th>
+                    <th class="px-4 py-2">시가총액</th>
+                    <th class="px-4 py-2">상장증서수</th>
+                    <th class="px-4 py-2">신주발행가</th>
+                    <th class="px-4 py-2">상장폐지일</th>
+                    <th class="px-4 py-2">목적주권_종목코드</th>
+                    <th class="px-4 py-2">목적주권_종목명</th>
+                    <th class="px-4 py-2">목적주권_종가</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each list}}
+                <tr>
+                    <td class="border px-4 py-2">{{basDt}}</td>
+                    <td class="border px-4 py-2">{{srtnCd}}</td>
+                    <td class="border px-4 py-2">{{isinCd}}</td>
+                    <td class="border px-4 py-2">{{itmsNm}}</td>
+                    <td class="border px-4 py-2">{{mrktCtg}}</td>
+                    <td class="border px-4 py-2">{{clpr}}</td>
+                    <td class="border px-4 py-2">{{vs}}</td>
+                    <td class="border px-4 py-2">{{fltRt}}</td>
+                    <td class="border px-4 py-2">{{mkp}}</td>
+                    <td class="border px-4 py-2">{{hipr}}</td>
+                    <td class="border px-4 py-2">{{lopr}}</td>
+                    <td class="border px-4 py-2">{{trqu}}</td>
+                    <td class="border px-4 py-2">{{trPrc}}</td>
+                    <td class="border px-4 py-2">{{mrktTotAmt}}</td>
+                    <td class="border px-4 py-2">{{lstgCtfCnt}}</td>
+                    <td class="border px-4 py-2">{{nstIssPrc}}</td>
+                    <td class="border px-4 py-2">{{dltDt}}</td>
+                    <td class="border px-4 py-2">{{purRgtScrtItmsCd}}</td>
+                    <td class="border px-4 py-2">{{purRgtScrtItmsNm}}</td>
+                    <td class="border px-4 py-2">{{purRgtScrtItmsClpr}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </script>
+
+    (% endraw %)    
 (% endblock %)
 (% block script %)
+(% raw %)
 <script>
     $(document).ready(function() {
         console.log('ready...');
+        $('#btnStockPriceClear').click(function(){
+            $('#form1 input[type="text"]').val('');              
+        })
         $('#btnStockPriceSubmit').click(function() {
-            JuliaUtil.submitPost('/datagokr/stock/prices', {});
+            $('#result-area').empty().append('Loading...');
+            const formData = gatherFormData();
+            const filteredData = JuliaUtil.emptyElementExtract(formData);
+            console.log(filteredData);
+
+            submitData(filteredData);
         });
+
+        //폼데이터로 javascript객체를 만듬
+        function gatherFormData() {
+            return {
+                basDt: $('#basDt').val(),
+                beginBasDt: $('#beginBasDt').val(),
+                endBasDt: $('#endBasDt').val(),
+                likeBasDt: $('#likeBasDt').val(),
+                isinCd: $('#isinCd').val(),
+                likeIsinCd: $('#likeIsinCd').val(),
+                itmsNm: $('#itmsNm').val(),
+                likeItmsNm: $('#likeItmsNm').val(),
+                likeSrtnCd: $('#likeSrtnCd').val(),
+                beginVs: $('#beginVs').val(),
+                endVs: $('#endVs').val(),
+                mrktCls: $('#mrktCls').val()
+            };
+        }
+        function submitData(data) {
+            fetch('/datagokr/stock/prices', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data),
+            })
+            .then(response => handleResponse(response))
+            .then(data => handleData(data))
+            .catch(error => handleError(error));
+        }
+        function handleResponse(response) {
+            if (!response.ok) {
+                response.json().then(data => {
+                    renderTemplate("#error-template", data.error || { ErrorMessage: "Unknown error occurred" }, '#result-area');
+                }).catch(() => {
+                    renderTemplate("#error-template", { ErrorMessage: "Failed to parse error response" }, '#result-area');
+                });
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        }
+        function handleData(data) {
+            if (data.error && Object.keys(data.error).length !== 0) {
+                var error = {
+                    AuthorizationMessage: data.error["Authorization Message"],
+                    ErrorMessage: data.error["Error Message"],
+                    ReasonCode: data.error["Reason Code"]
+                }
+                renderTemplate("#error-template", error, '#result-area');
+            } else if (data.list && data.list.length > 0) {
+                renderTemplate("#stock-price-template", {list: data.list}, '#result-area');
+            } else {
+                $('#result-area').empty().append('No data found');
+            }
+        }        
+        function handleError(error) {
+            console.error('Error:', error);
+
+            renderTemplate("#error-template", {
+                AuthorizationMessage: "Request failed",
+                ErrorMessage: error.message || "ERROR",
+                ReasonCode: "00"
+            }, '#result-area');
+        }
+        function renderTemplate(templateId, data, target) {
+            const template = Handlebars.compile($(templateId).html());
+            const html = template(data);
+            $(target).empty().append(html);
+        }
+        // $('#btnStockPriceSubmit').click(function() {
+        //     var data = {
+        //         basDt: $('#basDt').val(),
+        //         beginBasDt: $('#beginBasDt').val(),
+        //         endBasDt: $('#endBasDt').val(),
+        //         likeBasDt: $('#likeBasDt').val(),
+        //         isinCd: $('#isinCd').val(),
+        //         likeIsinCd: $('#likeIsinCd').val(),
+        //         itmsNm: $('#itmsNm').val(),
+        //         likeItmsNm: $('#likeItmsNm').val(),
+        //         likeSrtnCd: $('#likeSrtnCd').val(),
+        //         beginVs: $('#beginVs').val(),
+        //         endVs: $('#endVs').val(),
+        //         mrktCls: $('#mrktCls').val()
+        //     };
+        //     var filteredData = JuliaUtil.emptyElementExtract(data);
+        //     console.log(filteredData);
+        //     fetch('/datagokr/stock/prices', {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //         },
+        //         body: JSON.stringify(filteredData),
+        //     })
+        //     .then(response => response.json())
+        //     .then(data => {
+        //         //debugger;
+        //         if(data.list.length > 0) {
+        //             var template = Handlebars.compile($("#stock-price-template").html());
+        //             var html = template({list: data.list});
+        //             $('#result-area').empty().append(html);
+        //         }else if (data.error && Object.keys(data.error).length !== 0){
+        //             var template = Handlebars.compile($("#error-template").html());
+        //             var error = {
+        //                 "AuthorizationMessage": data.error["Authorization Message"],
+        //                 "ErrorMessage": data.error["Error Message"],
+        //                 "ReasonCode" : data.error["Reason Code"]
+        //             };
+        //             var html = template({error: error});
+        //             $('#result-area').empty().append(html);
+        //         }else {
+        //             if(data.list.length === 0) {
+        //                 $('#result-area').empty().append('No data found');
+        //             }
+        //         }
+
+        //     }).catch( (error) => {
+        //         console.error('Error:', error);
+        //         var template = Handlebars.compile($("#error-template").html());
+        //             var error = {
+        //                 "AuthorizationMessage": error,
+        //                 "ErrorMessage": "ERROR",
+        //                 "ReasonCode" : "00"
+        //             };
+        //             var html = template({error: error});
+        //             $('#result-area').empty().append(html);                
+        //     })
+
+        // });
     });
 </script>
+(% endraw %)
 (% endblock %)

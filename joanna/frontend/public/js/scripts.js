@@ -355,6 +355,15 @@ var JuliaUtil = (function () {
     var navigateTo = function navigateToURL(url) {
         window.location.href = url
     }
+    var emptyElementExtract = (data) => {
+        let filteredData = {};
+        Object.keys(data).forEach(key => {
+            if (data[key] !== '' && data[key] !== null && data[key] !== undefined) {
+                filteredData[key] = data[key];
+            }
+        });
+        return filteredData;
+    }
 
     return {
         isString: isString,
@@ -388,6 +397,7 @@ var JuliaUtil = (function () {
         tableToString: tableToString /* table html을  string으로 */,
         isValidYmd: isValidYmd,
         contextPath: contextPath,
+        emptyElementExtract : emptyElementExtract
     }
 })()
 
