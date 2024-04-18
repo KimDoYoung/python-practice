@@ -23,6 +23,9 @@
         <table class="min-w-full table-auto">
             <thead class="bg-gray-100">
                 <tr>
+                    <th class="px-4 py-2 text-left">
+                        <input type="checkbox" id="check-all">
+                    </th>
                     <th class="px-4 py-2 text-left">#</th>
                     <th class="px-4 py-2 text-left">Image Name</th>
                     <th class="px-4 py-2 text-left">Image Size(WxH)</th>
@@ -33,6 +36,9 @@
             <tbody>
                 (% for image in folder.files %)
                     <tr>
+                        <td class="border px-4 py-2">
+                            <input type="checkbox" id="select-((image.id))" name="selected_images" value="((image.id))">
+                        </td>
                         <td class="border px-4 py-2">(( loop.index ))</td>
                         <td class="border px-4 py-2">(( image.org_name ))</td>
                         <td class="border px-4 py-2">(( image.image_width )) x (( image.image_height ))</td>
@@ -153,6 +159,18 @@
             $('input[name="selected_images"]').prop('checked', false);
             $('.thumb').removeClass('bg-blue-200').addClass('bg-gray-200');
         });
+
+        $('#check-all').click(function() {
+            var checked = $(this).prop('checked');
+            $('input[name="selected_images"]').prop('checked', checked);
+            if(checked)
+                $('.thumb').removeClass('bg-gray-200').addClass('bg-blue-200');
+            else
+                $('.thumb').removeClass('bg-blue-200').addClass('bg-gray-200');
+            $()
+        }); 
+
+    
     });
 </script>
 (% endblock %)
