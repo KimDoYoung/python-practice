@@ -1,6 +1,4 @@
 from fastapi import HTTPException
-from sqlmodel import SQLModel, Field
-from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select  
 from backend.app.domains.openapi.dart_model import DartCorpCode
