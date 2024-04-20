@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select  
@@ -26,3 +27,9 @@ class DartService:
         session.add(dcc)
         await session.commit()
         return await self.get_corp_code(session, dcc.corp_code)
+
+    async def get_all(self, session: AsyncSession, searchText: str) -> List[DartCorpCode]:
+        ''' 기업명 or stock_code로 기업 정보를 조회한다.'''
+        statement = select(DartCorpCode).where(DartCorpCode.corp_name.like(f"%{searchText}%") or DartCorpCode.corp_code.like(f"%{searchText}%"))
+        result = await session.execute(statement)
+        return result.scalars().all()

@@ -20,12 +20,18 @@ router = APIRouter()
 template_base = "openapi/dart"
 
 @router.get("/openapi/dart/corp_code", response_class=HTMLResponse)
-async def dart_corp_code_form():
+async def dart_corp_code_form(searchText: str = None, 
+                                session: AsyncSession = Depends(get_db), 
+                                dart_service = Depends(get_dart_service)):
     '''
     DART 기업개황정보
     '''
     logger.debug("DART 기업개황정보 폼 display")
-    context = {}
+    if searchText:
+        logger.debug(f"검색어: {searchText}")
+        list = dart_service.get_all(session, searchText)
+
+    context = {searchText: searchText, "corp_list": list}
     return render_template(f"{template_base}/corp_code.html", context)
 
 @router.post("/openapi/dart/corp_code")

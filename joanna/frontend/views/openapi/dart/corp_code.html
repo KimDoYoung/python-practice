@@ -3,12 +3,50 @@
 <button id="btnGetAndFillDb" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
     DART corp code 가져와서 테이블 dart_corp_code에 저장하기
 </button>
+<div class="m-4">
+    <div class="search-area">
+        <form action="/openapi/dart/corp_code" method="get">
+            <input type="text" name="searchText" value="(( searchText ))" placeholder="회사명 또는 종목코드">
+            <button type="submit">검색</button>
+        </form>
+    </div>
+    <div class="table-area">
+        <table class="table-auto">
+            <thead>
+                <tr>
+                    <th>Corp Code</th>
+                    <th>Corp Name</th>
+                    <th>Stock Code</th>
+                    <th>Modify Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if corp_list|length == 0 %}
+                    <tr>
+                        <td colspan="4">No result</td>
+                    </tr>
+                {% else %}
+                    {% for corp in corp_list %}
+                        <tr>
+                            <td>{{ corp.corp_code }}</td>
+                            <td>{{ corp.corp_name }}</td>
+                            <td>{{ corp.stock_code }}</td>
+                            <td>{{ corp.modify_date }}</td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>    
+</div>
 (% endblock %)
 (% block script %)
 (% raw %)
 <script>
     jQuery(document).ready(function () {
        $('#btnGetAndFillDb').click(function () {
+         alert("DART corp code 가져와서 테이블 dart_corp_code에 저장하기-schedule로");
+         return;
          fetch('/openapi/dart/corp_code', {
              method: 'POST',
              headers: {
