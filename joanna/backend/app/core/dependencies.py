@@ -1,8 +1,10 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import  AsyncGenerator
 
-from core.database import AsyncSessionLocal
-from core.logger import get_logger
+from backend.app.core.database import AsyncSessionLocal
+from backend.app.core.logger import get_logger
+from backend.app.domains.openapi.appkey_service import AppKeyService
+from backend.app.domains.openapi.dart_service import DartService
 
 logger = get_logger(__name__)
 
@@ -19,5 +21,9 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 # Service dependencies
 def get_dart_service() -> DartService:
     return DartService()
+
+def get_appkey_service() -> AppKeyService:
+    return AppKeyService()
+
 
 logger.debug("----> Dependencies created.")

@@ -2,7 +2,7 @@ from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional
 from datetime import datetime
 
-from backend.app.domains.openapi.appkey_model import AppKey
+#from backend.app.domains.openapi.appkey_model import AppKey
 
 class User(SQLModel, table=True, schema="public"):
     __tablename__ = "users"
@@ -13,4 +13,4 @@ class User(SQLModel, table=True, schema="public"):
     kind: str = Field(default='P', max_length=1, nullable=False)
     created_at: datetime = Field(default_factory=datetime.now, nullable=False)
 
-    appkeys: list["AppKey"] = Relationship(back_populates="user")
+#    appkeys: list["AppKey"] = Relationship(back_populates="user")

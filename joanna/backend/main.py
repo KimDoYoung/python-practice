@@ -5,6 +5,7 @@ import uvicorn
 
 from backend.app.api.v1.endpoints.stc import korea_investment
 from backend.app.api.v1.endpoints.openapi import datagokr
+from backend.app.api.v1.endpoints.openapi import dart
 from backend.app.api.v1.endpoints import user
 from backend.app.api.v1.endpoints import home
 from backend.app.core.logger import get_logger
@@ -42,6 +43,7 @@ def configure_routes():
     app.mount("/public", StaticFiles(directory=static_files_path), name="public")
     app.include_router(korea_investment.router)
     app.include_router(datagokr.router)
+    app.include_router(dart.router)
     app.include_router(user.router)
     app.include_router(home.router)
     # app.include_router(account.router)
