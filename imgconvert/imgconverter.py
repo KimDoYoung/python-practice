@@ -26,9 +26,12 @@ def main():
     parser.add_argument("src_format", type=str, help="Source image format (e.g., jpg, png)")
     parser.add_argument("dest_format", type=str, help="Destination image format (e.g., png, jpg)")
     
-    args = parser.parse_args()
-
-    convert_images(args.target_folder, args.src_format, args.dest_format)
+    try:
+        args = parser.parse_args()
+        convert_images(args.target_folder, args.src_format, args.dest_format)
+    except SystemExit:
+        # argparse가 자동으로 출력하는 도움말 이후에 추가 정보를 제공
+        print(f"\nExample: python {os.path.basename(__file__)} ./images jpg png\n")
 
 if __name__ == "__main__":
     main()
