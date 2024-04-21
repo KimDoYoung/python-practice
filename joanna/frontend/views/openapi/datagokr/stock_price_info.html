@@ -1,5 +1,5 @@
-(% extends 'openapi/datagokr/openapi_base.html' %)
-(% block content %)
+{% extends 'openapi/datagokr/openapi_base.html' %}
+{% block content %}
     <div id="search-area" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-5">
         <form id="form1" action="/datagokr/stock/prices" method="post">
             <div class="grid grid-cols-3 gap-4">
@@ -87,7 +87,7 @@
     <div id="result-area"></div>
     
     <!-- 주식가격정보 핸들바 템플릿 -->
-    (% raw %)
+    {% raw %}
     <script id="error-template" type="text/x-handlebars-template">
         <div class="bg-red-500 text-white p-4 rounded-lg max-w-md mx-auto mt-10 text-center">
             <h1 class="text-xl mb-2 font-bold">서비스 오류 발생</h1>
@@ -151,10 +151,10 @@
         </table>
     </script>
 
-    (% endraw %)    
-(% endblock %)
-(% block script %)
-(% raw %)
+    {% endraw %}    
+{% endblock %}
+{% block script %}
+{% raw %}
 <script>
     $(document).ready(function() {
         console.log('ready...');
@@ -297,5 +297,5 @@
         // });
     });
 </script>
-(% endraw %)
-(% endblock %)
+{% endraw %}
+{% endblock %}
