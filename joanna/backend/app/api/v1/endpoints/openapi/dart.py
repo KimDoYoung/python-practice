@@ -12,33 +12,55 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import aiohttp
 from xml.etree.ElementTree import parse
 
+from backend.app.domains.openapi.query_attr_model import QueryAttr
+
 
 logger = get_logger(__name__)
 
 router = APIRouter()
 
 template_base = "openapi/dart"
+@router.get("/openapi/dart/form", response_class=HTMLResponse)
+async def openapi_dart_form(template: str = None):
+    if template is None:
+        template = "menu"
+    else:
+        template = f"templates/{template}"   
 
-@router.get("/openapi/dart/corp_code", response_class=HTMLResponse)
-async def dart_corp_code_form(searchText: str = None, 
+    template_full_path = f"{template_base}/{template}.html" 
+    logger.debug("template_full_path: %s", template_full_path)
+    return render_template(template_full_path, {})
+
+@router.post("/openapi/dart/corp_code")
+async def dart_corp_code_form(queryAttr: QueryAttr, 
                                 session: AsyncSession = Depends(get_db), 
                                 dart_service = Depends(get_dart_service)):
     '''
-    DART 기업개황정보
+    DART 기업 코드 조회
     '''
-    logger.debug("DART 기업개황정보 폼 display")
-    if searchText:
-        logger.debug(f"검색어: {searchText}")
-        list = dart_service.get_all(session, searchText)
+    logger.debug("DART 기업 코드 조회 시작: searchText=%s, limit=%d, skip=%d", queryAttr.searchText, queryAttr.limit, queryAttr.skip)
+    try:
+        corp_list = await dart_service.get_all(session, queryAttr.searchText, queryAttr.skip, queryAttr.limit + 1)
+        context = {
+            "searchText": queryAttr.searchText,
+            "corp_list": corp_list[:queryAttr.limit],  # 한 페이지에 보여줄 항목만 전달
+            "limit": queryAttr.limit,
+            "skip": queryAttr.skip,
+            "next": len(corp_list) > queryAttr.limit  # 다음 페이지 존재 여부
+        }
+    except Exception as e: 
+        logger.error("DART 기업 코드 조회 중 에러 발생: %s", str(e))
+        raise HTTPException(status_code=500, detail="Server Error")
+    
+    return context
 
-    context = {searchText: searchText, "corp_list": list}
-    return render_template(f"{template_base}/corp_code.html", context)
-
-@router.post("/openapi/dart/corp_code")
+@router.post("/openapi/dart/batch/corp_code")
 async def dart_corp_code_fill_db(session = Depends(get_db), 
             appkey_service = Depends(get_appkey_service),
             dart_service = Depends(get_dart_service)):
-
+    """
+    DART 기업코드 데이터베이스에 저장
+    """
     base = AppKeyBase(user_id="kdy987", key_name="DART-OPENKEY")
     found_app_key = await appkey_service.get(base, session)
     crtfc_key = found_app_key.key_value

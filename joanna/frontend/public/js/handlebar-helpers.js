@@ -131,3 +131,15 @@ Handlebars.registerHelper('decrement', function(value) {
   Handlebars.registerHelper('gt', function(a, b, options) {
     return a > b ? options.fn(this) : options.inverse(this);
 });
+
+Handlebars.registerHelper('defaultNumber', function(value, defaultValue) {
+    return value !== undefined && value !== null ? value : defaultValue;
+});
+
+Handlebars.registerHelper('add', function (value, addition) {
+    return Number(value) + Number(addition);
+});
+
+Handlebars.registerHelper('subtract', function (value, subtraction) {
+    return Number(value) - Number(subtraction);
+});

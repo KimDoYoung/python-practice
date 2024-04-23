@@ -1,5 +1,6 @@
 from typing import List
 from fastapi import HTTPException
+from sqlalchemy import and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select  
 from backend.app.domains.openapi.dart_model import DartCorpCode
@@ -28,8 +29,25 @@ class DartService:
         await session.commit()
         return await self.get_corp_code(session, dcc.corp_code)
 
-    async def get_all(self, session: AsyncSession, searchText: str) -> List[DartCorpCode]:
-        ''' 기업명 or stock_code로 기업 정보를 조회한다.'''
-        statement = select(DartCorpCode).where(DartCorpCode.corp_name.like(f"%{searchText}%") or DartCorpCode.corp_code.like(f"%{searchText}%"))
+    async def get_all(self, session: AsyncSession, 
+                    searchText: str, skip: int, limit: int) -> List[DartCorpCode]:
+        ''' 기업명 or stock_code로 기업 정보를 조회한다. searchText가 비어있으면 모든 기업 정보 조회.
+            또한, 모든 조회에서 stock_code는 null이 아니어야 한다.
+        '''
+
+        # stock_code가 null이 아닌 조건을 항상 포함
+        conditions = [DartCorpCode.stock_code.isnot(None)]
+
+        if searchText:
+            # searchText가 비어있지 않은 경우 검색 조건을 추가
+            search_condition = or_(
+                DartCorpCode.corp_name.like(f"%{searchText}%"),
+                DartCorpCode.corp_code.like(f"%{searchText}%")
+            )
+            conditions.append(search_condition)
+
+        # 모든 조건을 and_로 묶어 where 절에 적용
+        statement = select(DartCorpCode).where(and_(*conditions)).offset(skip).limit(limit)
+
         result = await session.execute(statement)
         return result.scalars().all()

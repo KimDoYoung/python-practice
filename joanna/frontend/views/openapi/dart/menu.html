@@ -1,0 +1,29 @@
+{% extends 'openapi/datagokr/openapi_base.html' %}
+{% block content %}
+<div class="menu-area m-4 p-2 bg-yellow-200">    
+    <ul class="inline-flex">
+        <li class="" id="btnGetAndFillDb"><a href="#" data="corp-template">dart_corp_code에 저장하기</a></li>
+        <li class=""><a href="#" data-template="dart_corp_code"> / corp-code 검색</a></li>
+    </ul>
+</div>
+<div class="content-area"></div>
+{% endblock %}
+{% block script %}
+{% raw %}
+<script>
+    jQuery(document).ready(function () {
+        //메뉴클릭 이벤트
+        $(".menu-area ul li a").click(function () {
+            var templateName = $(this).data("template");
+            fetch("/openapi/dart/form/?template=" + templateName)
+                .then(response => response.text())
+                .then(html => {
+                    $(".content-area").html(html);
+                });
+            $(".content-area").html(html);            
+        });
+
+    });
+</script>
+{% endraw %}
+{% endblock %}

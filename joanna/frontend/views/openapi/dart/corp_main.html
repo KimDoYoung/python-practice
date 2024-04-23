@@ -1,0 +1,139 @@
+{% extends 'openapi/datagokr/openapi_base.html' %}
+{% block content %}
+<!-- <button id="btnGetAndFillDb" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+    DART corp code 가져와서 테이블 dart_corp_code에 저장하기
+</button> -->
+<div class="menu-area m-4 p-2 bg-yellow-200">
+    
+    <ul class="inline-flex">
+        <li class="" id="btnGetAndFillDb"><a href="#" data="corp-template">dart_corp_code에 저장하기</a></li>
+        <li class=""><a href="#" data="corp-template"> / corp-code 검색</a></li>
+    </ul>
+</div>
+<div class="search-area"></div>
+
+{%raw%}
+<script id="corp-template" type="text/x-handlebars-template">
+<div class="m-4">
+    <div class="search-area">
+        <form action="/openapi/dart/corp_code" method="post">
+            <input type="text" name="searchText" value="{{ searchText }}" placeholder="회사명 또는 종목코드">
+            <input type="hidden" name="skip" value="{{defaultNumber skip 0}}">
+            <input type="hidden" name="limit" value="{{defaultNumber limit 10}}">
+            <button type="button" id="btnCorpCodeSubmit">검색</button>
+        </form>
+    </div>
+    <div class="result-area">
+            {{#if list.length}}
+            <div class="flex flex-col">
+                {{#each list as |corp|}}
+                    <div class="flex flex-row border-b border-gray-200">
+                        <div class="flex-1 p-2">{{corp.corp_code}}</div>
+                        <div class="flex-1 p-2">{{corp.corp_name}}</div>
+                        <div class="flex-1 p-2">{{corp.stock_code}}</div>
+                        <div class="flex-1 p-2">{{corp.modify_date}}</div>
+                    </div>
+                {{/each}}
+            </div>
+            {{else}}
+                <div class="flex flex-row border-b border-gray-200">
+                    <div class="flex-1 p-2 text-center" colspan="4">No result</div>
+                </div>
+            {{/if}}
+    </div>
+
+    {{#if next}}
+        {{#if skip}}
+            <a href="#" data-skip="{{subtract skip limit}}" id="prevButton" class="prev">Previous</a>
+        {{/if}}
+        <a href="#" data-skip="{{add skip limit}}" id="nextButton" class="next">Next</a>
+    {{/if}}
+ 
+</div>
+</script>
+{%endraw%}
+{% endblock %}
+{% block script %}
+{% raw %}
+<script>
+    jQuery(document).ready(function () {
+        //메뉴클릭 이벤트
+        $(".menu-area ul li a").click(function () {
+            var template = $(this).attr('data');
+            var source = $('#' + template).html();
+            var template = Handlebars.compile(source);
+            var context = {
+                searchText: '',
+                list: []
+            };
+            var html = template(context);
+            $(".search-area").html(html);
+        });
+        $('.search-area').on('click','#nextButton', function(){
+            var skip = $(this).data('skip');
+            skip = Number(skip) + 10;
+            $('input[name=skip]').val(skip);
+            $('#btnCorpCodeSubmit').click();    
+        });
+        $('.search-area').on('click','#prevButton', function(){
+            var skip = $(this).data('skip');
+            skip = Number(skip) - 10;
+            $('input[name=skip]').val(skip);
+            $('#btnCorpCodeSubmit').click();    
+        });        
+        $('.search-area').on('click','#btnCorpCodeSubmit', function(){
+
+            var searchText = $('input[name=searchText]').val();
+            var skip = $('input[name=skip]').val();
+            var limit = $('input[name=limit]').val();
+            fetch('/openapi/dart/corp_code', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    searchText: searchText,
+                    skip: skip,
+                    limit: limit
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                var source = $('#corp-template').html();
+                var template = Handlebars.compile(source);
+                var context = {
+                    searchText: searchText,
+                    list: data.corp_list,
+                    skip : data.skip,
+                    limit : data.limit,
+                    next : data.next
+                };
+                var html = template(context);
+                $(".search-area").html(html);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        });
+
+        $('#btnGetAndFillDb').click(function () {
+            alert("DART corp code 가져와서 테이블 dart_corp_code에 저장하기-schedule로");
+            return;
+            fetch('/openapi/dart/batch/corp_code', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                location.href = '/openapi/dart/menu';
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        });
+    });
+</script>
+{% endraw %}
+{% endblock %}
