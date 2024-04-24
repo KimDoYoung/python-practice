@@ -1,0 +1,74 @@
+<div class="search-area">
+    회사고유번호(corp_code) : <input type="text" name="corp_code" class="bg-gray-50 border border-gray-300 text-gray-900" value="00126380" />
+    <button id="btnSubmit" class="bg-blue-300 hover:bg-blud-500 rounded-md text-white p-2">검색</button>      
+</div>
+<div class="result-area mt-5"></div>
+
+{% block script %}{% raw %}
+<!-- ---------------------------------------------- -->
+<script id="company-template" type="text/x-handlebars-template">
+    <div class="grid grid-cols-4 gap-4 bg-blue-100">
+        <div><strong>정식명칭:</strong> {{corp_name}}</div>
+        <div><strong>영문명칭:</strong> {{corp_name_eng}}</div>
+        <div><strong>종목명:</strong> {{stock_name}}</div>
+        <div><strong>종목코드:</strong> {{stock_code}}</div>
+        <div><strong>대표자명:</strong> {{ceo_nm}}</div>
+        <div><strong>법인구분:</strong> {{corp_cls}}</div>
+        <div><strong>법인등록번호:</strong> {{jurir_no}}</div>
+        <div><strong>사업자등록번호:</strong> {{bizr_no}}</div>
+        <div><strong>주소:</strong> {{adres}}</div>
+        <div><strong>홈페이지:</strong> {{hm_url}}</div>
+        <div><strong>IR홈페이지:</strong> {{ir_url}}</div>
+        <div><strong>전화번호:</strong> {{phn_no}}</div>
+        <div><strong>팩스번호:</strong> {{fax_no}}</div>
+        <div><strong>업종코드:</strong> {{induty_code}}</div>
+        <div><strong>설립일:</strong> {{est_dt}}</div>
+        <div><strong>결산월:</strong> {{acc_mt}}</div>
+    </div>
+</script>
+<script id="company-error-template" type="text/x-handlebars-template">
+    <div class="p-6 max-w-sm w-full bg-white rounded-lg border border-gray-200 shadow-md">
+        <h2 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">에러 : {{status}}</h2>
+        <!-- 여기에 서버 응답 에러 또는 정보 메시지가 들어갑니다 -->
+        <div class="text-red-500" id="errorMessage">
+            {{message}}
+        </div>
+    </div>
+</script>
+<!-- ---------------------------------------------- -->
+<script>    
+    jQuery(document).ready(function () {
+        //검색 버튼
+        $('.search-area').on('click','#btnSubmit', function(){
+            var corp_code = $('input[name=corp_code]').val();
+            $(".result-area").empty();
+            debugger;
+            fetch("/openapi/dart/company?corp_code=" + corp_code)
+                .then(response => response.json())
+                .then(data => {
+                    var templateName = "company-template";
+                    if(data.status != "000") {
+                        templateName = "company-error-template";
+                        if(data.detail) {
+                            data.message = data.detail;
+                            data.status = "500";
+                        }
+                    }
+                    var source = document.getElementById(templateName).innerHTML;
+                    var template = Handlebars.compile(source);
+                    var html = template(data);
+                    $(".result-area").html(html);
+                })
+                .catch(error => {
+                    debugger;
+                    console.error('Error:', error);
+                    var source = document.getElementById("company-error-template").innerHTML;
+                    var template = Handlebars.compile(source);
+                    var html = template(error);
+                    $(".result-area").html(html);
+                });
+        });
+    });
+</script>
+<!-- ---------------------------------------------- -->
+{% endraw %} {% endblock %}

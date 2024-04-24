@@ -4,6 +4,8 @@
     <ul class="inline-flex">
         <li class="" id="btnGetAndFillDb"><a href="#" data="corp-template">dart_corp_code에 저장하기</a></li>
         <li class=""><a href="#" data-template="dart_corp_code"> / corp-code 검색</a></li>
+        <li class=""><a href="#" data-template="dart_company"> / 기업개황</a></li>
+        <li class=""><a href="#" data-template="dart_jaemu"> / 재무정보</a></li>
     </ul>
 </div>
 <div class="content-area"></div>
@@ -20,7 +22,6 @@
                 .then(html => {
                     $(".content-area").html(html);
                 });
-            $(".content-area").html(html);            
         });
 
     });

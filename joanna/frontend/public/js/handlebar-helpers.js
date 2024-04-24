@@ -143,3 +143,7 @@ Handlebars.registerHelper('add', function (value, addition) {
 Handlebars.registerHelper('subtract', function (value, subtraction) {
     return Number(value) - Number(subtraction);
 });
+
+Handlebars.registerHelper('incFromStart', function(index, startNumber) {
+    return Number(index)+ 1 + Number(startNumber);
+});

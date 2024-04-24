@@ -1,7 +1,9 @@
 from io import BytesIO
+import json
 from zipfile import ZipFile
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import HTMLResponse
+import requests
 from backend.app.core.logger import get_logger
 from backend.app.domains.openapi.appkey_model import AppKey, AppKeyBase
 from backend.app.domains.openapi.appkey_service import AppKeyService
@@ -20,8 +22,9 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 template_base = "openapi/dart"
-@router.get("/openapi/dart/form", response_class=HTMLResponse)
+@router.get("/openapi/dart/form", response_class=HTMLResponse, include_in_schema=False)
 async def openapi_dart_form(template: str = None):
+    ''' DART 관련 메뉴 또는 요청 폼을 표시합니다.'''
     if template is None:
         template = "menu"
     else:
@@ -30,6 +33,69 @@ async def openapi_dart_form(template: str = None):
     template_full_path = f"{template_base}/{template}.html" 
     logger.debug("template_full_path: %s", template_full_path)
     return render_template(template_full_path, {})
+
+@router.get("/openapi/dart/jaemu")
+async def dart_jaemu(
+            corp_code: str,
+            bsns_year: str,
+            reprt_code: str,
+            session: AsyncSession = Depends(get_db),
+            appkey_service = Depends(get_appkey_service),
+            dart_service = Depends(get_dart_service)
+            ):
+    '''
+    DART 재무 정보 조회
+    '''
+    base = AppKeyBase(user_id="kdy987", key_name="DART-OPENKEY")
+    found_app_key = await appkey_service.get(base, session)
+    crtfc_key = found_app_key.key_value
+    #raise HTTPException(status_code=500, detail="Server Error")
+    params = {
+        "crtfc_key": crtfc_key,
+        "corp_code": corp_code,
+        "bsns_year": bsns_year,
+        "reprt_code": reprt_code
+    }
+    url = f"https://opendart.fss.or.kr/api/fnlttSinglAcnt.json"
+    logger.debug("DART 재무 정보 조회: %s", url)
+    response = requests.get(url, params=params)
+    if response.status_code == 200:
+        # 성공적으로 데이터를 받았을 때
+        context = response.json()
+    else:
+        # 요청 실패 처리
+        logger.error(f"Failed to retrieve data: {response.status_code}")
+        context = {"message": "error"}
+    logger.debug(json.dumps(context, indent=4, sort_keys=True))
+    return context
+
+@router.get("/openapi/dart/company")
+async def dart_company(
+            corp_code: str,
+            session: AsyncSession = Depends(get_db),
+            appkey_service = Depends(get_appkey_service),
+            dart_service = Depends(get_dart_service)
+            ):
+    '''
+    DART 회사 정보 조회
+    '''
+    base = AppKeyBase(user_id="kdy987", key_name="DART-OPENKEY")
+    found_app_key = await appkey_service.get(base, session)
+    crtfc_key = found_app_key.key_value
+    #raise HTTPException(status_code=500, detail="Server Error")
+    url = f"https://opendart.fss.or.kr/api/company.json?crtfc_key={crtfc_key}&corp_code={corp_code}"
+    logger.debug("DART 회사 정보 조회: %s", url)
+    response = requests.get(url)
+    if response.status_code == 200:
+        # 성공적으로 데이터를 받았을 때
+        context = response.json()
+    else:
+        # 요청 실패 처리
+        logger.error(f"Failed to retrieve data: {response.status_code}")
+        context = {"message": "error"}
+    
+    return context
+    
 
 @router.post("/openapi/dart/corp_code")
 async def dart_corp_code_form(queryAttr: QueryAttr, 

@@ -1,0 +1,96 @@
+<div class="search-area">
+    회사고유번호(corp_code) : 
+    <input type="text" name="corp_code" class="bg-gray-50 border border-gray-300 text-gray-900" value="00126380" />
+    <br>
+    사업년도 : <input type="text" name="bsns_year" class="bg-gray-50 border border-gray-300 text-gray-900" value="2023" />
+    <br>
+    보고서 코드 : 
+        <select name="reprt_code" class="bg-gray-50">
+            <option value="11011">사업보고서(정정)</option>
+            <option value="11012">반기보고서 </option>
+            <option value="11013">1분기보고서 </option>
+            <option value="11014">3분기보고서 <option>
+        </select>
+    <button id="btnSubmit" class="bg-blue-300 hover:bg-blud-500 rounded-md text-white p-2">검색</button>      
+</div>
+<div class="result-area mt-5"></div>
+
+{% block script %}{% raw %}
+<!-- ---------------------------------------------- -->
+<script id="company-template" type="text/x-handlebars-template">
+    <h1 class="text-2xl font-bold text-center mb-4">재무제표 정보</h1>
+    <table class="table-auto w-full text-sm text-left text-gray-500">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+            <tr>
+                <th class="px-6 py-3">계정명</th>
+                <th class="px-6 py-3">재무제표명</th>
+                <th class="px-6 py-3">재무제표구분</th>
+                <th class="px-6 py-3">당기일자</th>
+                <th class="px-6 py-3">당기금액</th>
+                <th class="px-6 py-3">통화</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white">
+            {{#each list as |item|}}
+            <tr>
+                <td class="px-6 py-3">{{item.account_nm}}</td>
+                <td class="px-6 py-3">{{item.sj_nm}}</td>
+                <td class="px-6 py-3">{{item.sj_div}}</td>
+                <td class="px-6 py-3">{{item.thstrm_dt}}</td>
+                <td class="px-6 py-3">{{item.thstrm_amount}}</td>
+                <td class="px-6 py-3">{{item.currency}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</script>
+<script id="company-error-template" type="text/x-handlebars-template">
+    <div class="p-6 max-w-sm w-full bg-white rounded-lg border border-gray-200 shadow-md">
+        <h2 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">에러 : {{status}}</h2>
+        <!-- 여기에 서버 응답 에러 또는 정보 메시지가 들어갑니다 -->
+        <div class="text-red-500" id="errorMessage">
+            {{message}}
+        </div>
+    </div>
+</script>
+<!-- ---------------------------------------------- -->
+<script>    
+    jQuery(document).ready(function () {
+        //검색 버튼
+        $('.search-area').on('click','#btnSubmit', function(){
+            var corp_code = $('input[name=corp_code]').val();
+            var bsns_year = $('input[name=bsns_year]').val();
+            var reprt_code = $('select[name=reprt_code]').val();
+            $(".result-area").empty();
+
+            debugger;
+            var param = `corp_code=${corp_code}&bsns_year=${bsns_year}&reprt_code=${reprt_code}`;
+            fetch("/openapi/dart/jaemu?" + param)
+                .then(response => response.json())
+                .then(data => {
+                    var templateName = "company-template";
+                    if(data.status != "000") {
+                        templateName = "company-error-template";
+                        if(data.detail) {
+                            data.message = data.detail;
+                            data.status = "500";
+                        }
+                    }
+                    var source = document.getElementById(templateName).innerHTML;
+                    var template = Handlebars.compile(source);
+                    var html = template(data);
+                    $(".result-area").html(html);
+                })
+                .catch(error => {
+                    debugger;
+                    console.error('Error:', error);
+                    var source = document.getElementById("company-error-template").innerHTML;
+                    var template = Handlebars.compile(source);
+                    var html = template(error);
+                    $(".result-area").html(html);
+                });
+        });
+    });
+</script>
+<!-- ---------------------------------------------- -->
+{% endraw %} {% endblock %}
