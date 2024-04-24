@@ -1,0 +1,96 @@
+{% extends 'common/base.html' %}
+{% block content %}
+<div class="search-area">
+    <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-xl">
+        <h1 class="text-2xl font-bold mb-4">Add New App Key</h1>
+        <form id="appKeyForm" action="/submit-your-form-handler" method="POST">
+            <div class="mb-4">
+                <label for="user_id" class="block text-sm font-medium text-gray-700">User ID</label>
+                <input type="text" id="user_id" name="user_id" required
+                       class="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                       maxlength="30">
+            </div>
+
+            <div class="mb-4">
+                <label for="key_name" class="block text-sm font-medium text-gray-700">Key Name</label>
+                <input type="text" id="key_name" name="key_name" required
+                       class="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                       maxlength="30">
+            </div>
+
+            <div class="mb-4">
+                <label for="key_value" class="block text-sm font-medium text-gray-700">Key Value</label>
+                <input type="text" id="key_value" name="key_value" required
+                       class="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                       maxlength="200">
+            </div>
+
+            <div class="mb-4">
+                <label for="issuer" class="block text-sm font-medium text-gray-700">Issuer (Optional)</label>
+                <input type="text" id="issuer" name="issuer"
+                       class="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                       maxlength="100">
+            </div>
+
+            <div class="mb-4">
+                <label for="note" class="block text-sm font-medium text-gray-700">Note (Optional)</label>
+                <textarea id="note" name="note"
+                          class="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                          maxlength="500"></textarea>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg shadow">
+                    Submit
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}{% raw %}
+<!-- ---------------------------------------------- -->
+<script id="error-template" type="text/x-handlebars-template">
+    <div class="p-6 max-w-sm w-full bg-white rounded-lg border border-gray-200 shadow-md">
+        <h2 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">에러 : {{status}}</h2>
+        <!-- 여기에 서버 응답 에러 또는 정보 메시지가 들어갑니다 -->
+        <div class="text-red-500" id="errorMessage">
+            {{message}}
+        </div>
+    </div>
+</script>
+<!-- ---------------------------------------------- -->
+<script>    
+    jQuery(document).ready(function () {
+        $('#appKeyForm').on('submit', function(e) {
+            e.preventDefault(); // 폼 자동 제출 방지
+            const formData = new FormData(this); // 폼 데이터 객체 생성
+            const object = {};
+            formData.forEach((value, key) => object[key] = value); // 폼 데이터를 객체로 변환
+            const json = JSON.stringify(object); // 객체를 JSON 문자열로 변환
+            console.log(json); // 개발 확인용
+            fetch('/appkeys', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: json    
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                window.href.location = '/appkeys/form';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });    
+    });
+</script>
+<!-- ---------------------------------------------- -->
+{% endraw %} {% endblock %}

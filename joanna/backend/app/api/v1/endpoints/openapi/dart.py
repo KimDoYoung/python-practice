@@ -5,8 +5,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import HTMLResponse
 import requests
 from backend.app.core.logger import get_logger
-from backend.app.domains.openapi.appkey_model import AppKey, AppKeyBase
-from backend.app.domains.openapi.appkey_service import AppKeyService
+from backend.app.domains.user.appkey_model import AppKey, AppKeyBase
+from backend.app.domains.user.appkey_service import AppKeyService
 from backend.app.domains.openapi.dart_model import DartCorpCode
 from backend.app.core.dependencies import get_appkey_service, get_dart_service, get_db
 from backend.app.core.template_engine import render_template

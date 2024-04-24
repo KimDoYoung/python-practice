@@ -3,7 +3,7 @@ from typing import  AsyncGenerator
 
 from backend.app.core.database import AsyncSessionLocal
 from backend.app.core.logger import get_logger
-from backend.app.domains.openapi.appkey_service import AppKeyService
+from backend.app.domains.user.appkey_service import AppKeyService
 from backend.app.domains.openapi.dart_service import DartService
 
 logger = get_logger(__name__)

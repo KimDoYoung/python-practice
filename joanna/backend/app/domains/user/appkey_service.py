@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from fastapi import HTTPException
 
-from backend.app.domains.openapi.appkey_model import AppKey, AppKeyBase
+from backend.app.domains.user.appkey_model import AppKey, AppKeyBase
 
 class AppKeyService:
     async def insert(self, app_key: AppKey, session: AsyncSession) -> AppKey:
@@ -60,6 +60,6 @@ class AppKeyService:
         '''
         모든 앱 키를 조회한다.
         '''
-        statement = select(AppKey)
+        statement = select(AppKey).order_by(AppKey.created_at.desc())
         result = await session.execute(statement)
         return result.scalars().all()

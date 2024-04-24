@@ -1,0 +1,103 @@
+{% extends 'common/base.html' %}
+{% block content %}
+
+<div class="result-area container mx-auto">
+    <h1 class="text-2xl font-bold text-center mb-4">App Keys List</h1>
+    <table class="min-w-full bg-white">
+        <thead class="bg-blue-300 text-white">
+            <tr>
+                <th class="w-1/6 py-3 px-4 text-left">user id</th>
+                <th class="w-1/6 py-3 px-4 text-left">Key Name</th>
+                <th class="w-1/6 py-3 px-4 text-left whitespace-normal">Key Value</th>
+                <th class="w-1/6 py-3 px-4 text-left">Issuer</th>
+                <th class="w-1/6 py-3 px-4 text-left">Created At</th>
+                <th class="w-1/6 py-3 px-4 text-left">Use Y/N</th>
+                <th class="w-1/6 py-3 px-4 text-left">
+                    <a href="/appkeys/form?mode=insert" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Add
+                    </a>                    
+                </th>
+            </tr>
+        </thead>
+        <tbody id="appKeyTable">
+            <!-- Data rows will be inserted here -->
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block script %}{% raw %}
+<!-- ---------------------------------------------- -->
+<script id="appkeys-list-template" type="text/x-handlebars-template">
+    {{#each list}}
+    <tr class="text-gray-700">
+        <td class="px-4 py-3 border">{{user_id}}</td>
+        <td class="px-4 py-3 border">{{key_name}}</td>
+        <td class="px-4 py-3 border">{{key_value}}</td>
+        <td class="px-4 py-3 border">{{issuer}}</td>
+        <td class="px-4 py-3 border">{{created_at}}</td>
+        <td class="px-4 py-3 border">{{use_yn}}</td>
+        <td class="px-4 py-3 border">
+            <button class="btnDelete" data-user="{{user_id}}" data-key-name="{{key_name}}">Delete</button>
+        </td>
+    </tr>
+    {{/each}}
+</script>
+<script id="error-template" type="text/x-handlebars-template">
+    <div class="p-6 max-w-sm w-full bg-white rounded-lg border border-gray-200 shadow-md">
+        <h2 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">에러 : {{status}}</h2>
+        <!-- 여기에 서버 응답 에러 또는 정보 메시지가 들어갑니다 -->
+        <div class="text-red-500" id="errorMessage">
+            {{message}}
+        </div>
+    </div>
+</script>
+
+<script>
+    $(document).ready(function () {
+        // debugger;
+        function makeHtml(context) {
+            var source = $('#appkeys-list-template').html();
+                var template = Handlebars.compile(source);
+                var html = template(context);
+                $("#appKeyTable").html(html);
+        }
+        function getList (){
+            fetch('/appkeys', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                makeHtml({list: data.list})
+            }).catch(error => {
+                console.error('Error:', error);
+            });
+        }
+        getList();
+        $(".result-area").on('click','.btnDelete', function(){
+            var user_id = $(this).data('user');
+            var key_name = $(this).data('key-name');
+            fetch('/appkeys', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: user_id,
+                    key_name: key_name
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                makeHtml({list: data.list})
+            }).catch(error => {
+                console.error('Error:', error);
+            });
+        });  
+    });
+</script>
+{% endraw%} {% endblock %}
+
