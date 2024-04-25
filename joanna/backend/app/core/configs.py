@@ -23,7 +23,7 @@ KOREA_INVESTMENT_APP_SECRET = os.getenv('KOREA_INVESTMENT_APP_SECRET')
 KOREA_INVESTMENT_URL_BASE = os.getenv('KOREA_INVESTMENT_URL_BASE')
 
 DATA_GO_KR_API_KEY = os.getenv('DATA_GO_KR_API_KEY')
-
+PROFILE_NAME = env_mode
 if env_mode == "local":
     LOG_FILE = "c:\\tmp\\logs\\joanna\\joanna.log"
 else:  

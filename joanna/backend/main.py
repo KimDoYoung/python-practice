@@ -1,5 +1,6 @@
 import os
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from fastapi.exceptions import RequestValidationError
 from fastapi.staticfiles import StaticFiles
 import uvicorn
 
@@ -10,6 +11,9 @@ from backend.app.api.v1.endpoints import user
 from backend.app.api.v1.endpoints import appkeys
 from backend.app.api.v1.endpoints import home
 from backend.app.core.logger import get_logger
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+from backend.app.core.exception_handler import custom_404_exception_handler, general_exception_handler, http_exception_handler, validation_exception_handler
 
 logger = get_logger(__name__)
 
@@ -25,7 +29,15 @@ def configure(dev_mode: bool):
     # configure_templates(dev_mode)
     configure_routes()
     # configure_db(dev_mode)
+    configure_exception_handlers()
 
+def configure_exception_handlers():
+    """FastAPI 앱에 예외 핸들러를 등록하는 함수"""
+    app.add_exception_handler(HTTPException, http_exception_handler)
+    app.add_exception_handler(RequestValidationError, validation_exception_handler)
+    app.add_exception_handler(Exception, general_exception_handler)
+    app.add_exception_handler(StarletteHTTPException, custom_404_exception_handler)
+            
 def configure_db(dev_mode: bool):
     pass
     # file = (Path(__file__).parent / 'db' / 'pypi.sqlite').absolute()

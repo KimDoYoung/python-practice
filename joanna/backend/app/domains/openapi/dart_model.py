@@ -1,8 +1,10 @@
 from sqlmodel import SQLModel, Field
 from typing import Optional
 
+from backend.app.domains.base_sql_model import BaseSQLModel
 
-class DartCorpCode(SQLModel, table=True, schema="stock"):
+
+class DartCorpCode(BaseSQLModel, table=True, schema="stock"):
     __tablename__ = "dart_corp_code"
     __table_args__ = {'schema': 'stock'}
     corp_code: str = Field(primary_key=True, max_length=8)

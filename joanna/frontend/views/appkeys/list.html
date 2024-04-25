@@ -39,6 +39,7 @@
         <td class="px-4 py-3 border">{{use_yn}}</td>
         <td class="px-4 py-3 border">
             <button class="btnDelete" data-user="{{user_id}}" data-key-name="{{key_name}}">Delete</button>
+            <button class="btnUpdate" data-user="{{user_id}}" data-key-name="{{key_name}}">Update</button>
         </td>
     </tr>
     {{/each}}
@@ -77,10 +78,19 @@
             });
         }
         getList();
+        $(".result-area").on('click','.btnUpdate', function(){
+            var user_id = $(this).data('user');
+            var key_name = $(this).data('key-name');
+            var url = `/appkeys/form?mode=update&user_id=${user_id}&key_name=${key_name}`;
+            window.location.href = url;
+        });
         $(".result-area").on('click','.btnDelete', function(){
             var user_id = $(this).data('user');
             var key_name = $(this).data('key-name');
-            fetch('/appkeys', {
+            var url = `/appkeys/${user_id}/${key_name}`;
+            if( confirm('Are you sure to delete?') == false) return;
+
+            fetch(url, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -92,8 +102,10 @@
             })
             .then(response => response.json())
             .then(data => {
-                makeHtml({list: data.list})
+                //debugger;
+                getList();
             }).catch(error => {
+                alert(error)
                 console.error('Error:', error);
             });
         });  
