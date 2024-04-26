@@ -5,7 +5,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from backend.app.core.logger import get_logger
 from backend.app.core.template_engine import render_template
-from backend.app.core.configs import PROFILE_NAME
+from backend.app.core.configs import config
 
 logger = get_logger(__name__)
 
@@ -30,7 +30,7 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
 
 async def general_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     """일반 예외 처리"""
-    if PROFILE_NAME == "local":
+    if config.PROFILE_NAME == "local":
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={ "message" : f"서버 오류가 발생했습니다. {str(exc)}" }

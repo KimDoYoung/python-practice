@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 from backend.app.core.logger import get_logger
 from backend.app.core.template_engine import render_template
 from backend.app.domains.openapi.godata_model import StockPriceRequest
-from backend.app.core.configs import DATA_GO_KR_API_KEY
+#from backend.app.core.configs import DATA_GO_KR_API_KEY
 
 from requests.adapters import HTTPAdapter
 from urllib3.util.ssl_ import create_urllib3_context
@@ -48,6 +48,7 @@ async def datagokr_stock_prices1(stock_price_request: StockPriceRequest):
     금융위원회 주식시세정보
     '''
     logger.debug("금융위원회 주식시세정보 폼 POST")
+    DATA_GO_KR_API_KEY  = "aaa"
     api_key = DATA_GO_KR_API_KEY
     #api_key = "1ROBN6Q1t6iYO9fc2SbHVby0AruUb78/jd0Ruzvyv33tgJKV7WcOyZ+SmhnNPIYmrR0/ppqifPYDcrywywu9ZQ=="
     api_key = urllib.parse.unquote(api_key)
