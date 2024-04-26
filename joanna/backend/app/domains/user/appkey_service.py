@@ -4,7 +4,7 @@ from sqlalchemy import select, and_
 from fastapi import HTTPException
 
 from backend.app.domains.user.appkey_model import AppKey, AppKeyBase
-from exceptions.business_exceptions import BusinessException
+from backend.app.core.exceptions.business_exceptions import BusinessException
 
 class AppKeyService:
     async def insert(self, app_key: AppKey, session: AsyncSession) -> AppKey:

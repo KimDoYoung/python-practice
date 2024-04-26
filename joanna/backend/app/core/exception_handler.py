@@ -9,14 +9,6 @@ from backend.app.core.configs import PROFILE_NAME
 
 logger = get_logger(__name__)
 
-# def add_exception_handlers(app):
-#     """FastAPI 앱에 예외 핸들러를 등록하는 함수"""
-#     app.add_exception_handler(HTTPException, http_exception_handler)
-#     app.add_exception_handler(RequestValidationError, validation_exception_handler)
-#     app.add_exception_handler(Exception, general_exception_handler)
-#     app.add_exception_handler(StarletteHTTPException, custom_404_exception_handler)
-
-
 async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
     """입력 데이터 유효성 검사 예외 처리"""
     return JSONResponse(

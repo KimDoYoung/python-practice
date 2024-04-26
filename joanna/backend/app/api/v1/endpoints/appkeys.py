@@ -7,7 +7,7 @@ from backend.app.core.template_engine import render_template
 from backend.app.core.dependencies import get_appkey_service, get_db
 from backend.app.domains.user.appkey_model import AppKey, AppKeyBase
 from backend.app.core.logger import get_logger
-from exceptions.business_exceptions import BusinessException
+from backend.app.core.exceptions.business_exceptions import BusinessException
 
 
 router = APIRouter()
@@ -26,7 +26,7 @@ async def appkeys_form(request: Request,mode: str = None, user_id: str = None, k
     return render_template(f"appkeys/{mode}.html", data)
 
 @router.delete("/appkeys/{user_id}/{key_name}")
-async def appkeys_get_all(user_id: str, key_name: str, 
+async def appkeys_delete(user_id: str, key_name: str, 
         session: AsyncSession = Depends(get_db),
         appkey_service = Depends(get_appkey_service)):
     ''' appkeys 레코드  삭제'''
@@ -92,8 +92,9 @@ async def appkeys_insert( appkey : AppKey,  session: AsyncSession = Depends(get_
         raise HTTPException(status_code=500, detail="Internal Server Error")    
 
 @router.put("/appkeys")
-async def appkeys_insert( appkey : AppKey,  session: AsyncSession = Depends(get_db),
-        appkey_service = Depends(get_appkey_service),):
+async def appkeys_update( appkey : AppKey,  
+                    session: AsyncSession = Depends(get_db),
+                    appkey_service = Depends(get_appkey_service)):
     ''' 키 저장'''
     try:
     
