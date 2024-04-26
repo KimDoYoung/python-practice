@@ -7,7 +7,7 @@ from backend.app.core.template_engine import render_template
 from backend.app.core.dependencies import get_appkey_service, get_db
 from backend.app.domains.user.appkey_model import AppKey, AppKeyBase
 from backend.app.core.logger import get_logger
-from backend.app.core.exceptions.joanna_exceptions import JoannaException
+from exceptions.business_exceptions import BusinessException
 
 
 router = APIRouter()
@@ -33,7 +33,7 @@ async def appkeys_get_all(user_id: str, key_name: str,
     appkeybase = AppKeyBase(user_id=user_id, key_name=key_name)
     try:
         await appkey_service.delete(appkeybase, session)
-    except JoannaException as http_exc:
+    except BusinessException as http_exc:
         logger.error(str(http_exc.detail))
         raise HTTPException(status_code=http_exc.status_code, detail=str(http_exc.detail))
     except Exception as e:
@@ -52,7 +52,7 @@ async def appkeys_get_1(user_id:str,key_name:str,
         appkey_dict = appkey.to_dict()
         logger.debug("appkey_dict: %s", appkey.to_string())
         return JSONResponse(content={"result": "success", "appkey": appkey_dict})
-    except JoannaException as http_exc:
+    except BusinessException as http_exc:
         logger.error(str(http_exc.detail))
         raise HTTPException(status_code=http_exc.status_code, detail=str(http_exc.detail))
     except Exception as e:
@@ -75,14 +75,39 @@ async def appkeys_insert( appkey : AppKey,  session: AsyncSession = Depends(get_
         appkey_service = Depends(get_appkey_service),):
     ''' 키 저장'''
     try:
+    
         inserted_appkey = await appkey_service.insert(appkey, session)
-        json = inserted_appkey.to_json()
-        logger.debug("inserted_appkey: %s", json)
-        return JSONResponse(content={"result": "success", "appkey": json})
-    except JoannaException as http_exc:
+        inserted_appkey_dict = inserted_appkey.to_dict()
+        logger.debug("inserted_appkey: %s", inserted_appkey.to_string())
+        return JSONResponse(content={"result": "success", "appkey": inserted_appkey_dict})
+    
+    except BusinessException as http_exc:
+    
         logger.error(str(http_exc.detail))
         raise HTTPException(status_code=http_exc.status_code, detail=str(http_exc.detail))
+    
     except Exception as e:
+    
         logger.error(str(e))
         raise HTTPException(status_code=500, detail="Internal Server Error")    
+
+@router.put("/appkeys")
+async def appkeys_insert( appkey : AppKey,  session: AsyncSession = Depends(get_db),
+        appkey_service = Depends(get_appkey_service),):
+    ''' 키 저장'''
+    try:
     
+        inserted_appkey = await appkey_service.update(appkey, session)
+        inserted_appkey_dict = inserted_appkey.to_dict()
+        logger.debug("inserted_appkey: %s", inserted_appkey.to_string())
+        return JSONResponse(content={"result": "success", "appkey": inserted_appkey_dict})
+    
+    except BusinessException as http_exc:
+    
+        logger.error(str(http_exc.detail))
+        raise HTTPException(status_code=http_exc.status_code, detail=str(http_exc.detail))
+    
+    except Exception as e:
+    
+        logger.error(str(e))
+        raise HTTPException(status_code=500, detail="Internal Server Error")        

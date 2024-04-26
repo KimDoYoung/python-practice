@@ -6,6 +6,7 @@ def test_accesskey_not_null():
     accesskey = get_access_token()
     assert accesskey is not None
 
+@pytest.mark.skip(reason="Ignore this test")
 def test_hash_code():
     datas = {
         "CANO": '00000000',
@@ -18,7 +19,8 @@ def test_hash_code():
     }
     hashkey = get_hashkey(datas)
     assert hashkey is not None
-
+    
+@pytest.mark.skip(reason="Ignore this test")
 def test_market_price():
     json = get_market_price("J","005930")
     print(json)

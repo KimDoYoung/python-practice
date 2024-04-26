@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import aiohttp
 from xml.etree.ElementTree import parse
 
-from backend.app.domains.openapi.query_attr_model import QueryAttr
+from backend.app.domains.query_attr_model import QueryAttr
 
 
 logger = get_logger(__name__)

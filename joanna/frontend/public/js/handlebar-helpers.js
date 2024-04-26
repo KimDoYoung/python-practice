@@ -147,3 +147,11 @@ Handlebars.registerHelper('subtract', function (value, subtraction) {
 Handlebars.registerHelper('incFromStart', function(index, startNumber) {
     return Number(index)+ 1 + Number(startNumber);
 });
+
+Handlebars.registerHelper('ifCond', function(v1, operator, v2, options) {
+    switch (operator) {
+      case '==':
+        return (v1 == v2) ? options.fn(this) : options.inverse(this);
+      // 다른 연산자들도 필요에 따라 추가 가능
+    }
+  });
