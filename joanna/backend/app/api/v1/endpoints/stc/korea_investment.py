@@ -1,7 +1,7 @@
 
 import json
 from fastapi import APIRouter
-import requests
+# import requests
 
 #from backend.app.domains.stc.korea_investment.korea_investment_service import get_access_token, get_hashkey
 
