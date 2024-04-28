@@ -2,6 +2,7 @@ version: '3.8'
 services:
   mongo:
     image: mongo:7.0
+    container_name: mongodb
     environment:
       MONGO_INITDB_ROOT_USERNAME: kdy987
       MONGO_INITDB_ROOT_PASSWORD: kalpa987!
@@ -13,3 +14,6 @@ volumes:
   mongodata:
       driver: local
 
+networks:
+    default: 
+        name: mongodb_network
