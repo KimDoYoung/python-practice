@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  mongo:
+    image: mongo:7.0
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: kdy987
+      MONGO_INITDB_ROOT_PASSWORD: kalpa987!
+    ports:
+      - 27000:27017
+    volumes:
+      - ./mongodata:/data/db
+volumes:
+  mongodata:
+      driver: local
+
