@@ -25,3 +25,9 @@ delete /api/user/{id}
 - run.py 사용
 - python run.py
   
+## pytest
+
+```bash
+export PYTHONPATH=/c/Users/deHong/Documents/kdy/python-practice/mongodb-tes && pytest
+```
+

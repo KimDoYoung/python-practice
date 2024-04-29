@@ -23,6 +23,10 @@ class UserService:
         await user.create()
         return user
 
+    async def get_all_users(self) -> list[User]:
+        users = await User.all().to_list()
+        return users
+    
     async def get_user(self, user_id: str):
         user = await User.find_one(User.user_id == user_id)
         return user
@@ -35,6 +39,8 @@ class UserService:
 
     async def delete_user(self, user_id: str):
         await User.find_one(User.user_id == user_id).delete()
+
+
 
 # DB 클라이언트 설정
 #db_client = AsyncIOMotorClient("mongodb://localhost:27017")

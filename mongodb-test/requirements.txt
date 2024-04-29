@@ -4,3 +4,6 @@ motor
 beanie
 pydantic
 pydantic[email]
+pytest 
+httpx
+starlette
