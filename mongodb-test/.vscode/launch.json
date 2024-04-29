@@ -20,9 +20,9 @@
             "name": "mongotest",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/app/main.py",
+            "program": "${workspaceFolder}/run.py",
             "env": {
-                "MONGO_URI": "mongodb://localhost:27017/stock"
+                //"MONGO_URI": "mongodb://localhost:27017/stock"
             },
             // "preLaunchTask": "echo Preparing for debug",
             // "postDebugTask": "echo Debug completed"

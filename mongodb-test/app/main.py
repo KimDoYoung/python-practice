@@ -1,40 +1,25 @@
-from bson import SON, ObjectId
-from pymongo import MongoClient
+from fastapi import FastAPI
 
-client = MongoClient('mongodb://localhost:27017/')
-db = client['stock']
-people = db['people']
+from app.core.mongodb import MongoDb
+from app.domain.users.user_routes import user_router
+from app.domain.users.user_service import UserService
 
-people.insert_one({'name': 'John', 'age': 25, 'city': 'New York'})  
-inserted_id = people.insert_one({'name': 'Hong', 'age': 23, 'city': 'Seoul', "interests" :['C++','Python','Piano']}).inserted_id
-print(inserted_id)
-print("------------------------------")
-list = people.find()
-for item in list:
-    print(item)
-print("------------------------------")
 
-print([ p for p in people.find( { '_id': ObjectId('662de596535c5c9509ddcf3b')})])
-print("------------------------------")
-print("John count : " , people.count_documents({"name" : "John"}))
-people.update_one({'name': 'John'}, {'$set': {'age': 26}})
-people.delete_one({'name': 'Hong'})
-list = people.find()
-for item in list:
-    print(item)
+app = FastAPI(title="FastAPI with MongoDB", description="FastAPI with MongoDB", version="0.1.0")
 
-pipeline = [
-    {
-        "$group": {
-            "_id": "$city",
-            "avgAge": {"$avg": "$age"}  
-        }
-    },
-    {
-        "$sort": SON([ ("avgAge", -1),("_id", -1) ])
-    }
-]   
-result = people.aggregate(pipeline)
-print("------------------------------")
-for item in result:
-    print(item) 
+@app.on_event("startup")
+async def startup_event():
+    MongoDb.initialize('mongodb://root:root@test.kfs.co.kr:27017')
+    try:
+        app.state.user_service = await UserService.create_instance(db_client=MongoDb.get_client())
+        print("User service created successfully")
+    except Exception as e:
+        print("----> user_service 실패:" , e)
+    
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    MongoDb.close()
+
+app.include_router(user_router, prefix="/api/v1", tags=["users"])
+
