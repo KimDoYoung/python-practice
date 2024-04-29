@@ -10,11 +10,11 @@
 // https://www.mongodb.com/docs/mongodb-vscode/playgrounds/
 
 // Select the database to use.
-use('mongodbVSCodePlaygroundDB');
+use('stockdb');
 
 // Insert a few documents into the sales collection.
-db.getCollection('sales').insertMany([
-  { 'item': 'abc', 'price': 10, 'quantity': 2, 'date': new Date('2014-03-01T08:00:00Z') },
+db.getCollection('users').insertMany([
+  { 'name': 'kdy987', 'price': 10, 'quantity': 2, 'date': new Date('2014-03-01T08:00:00Z') },
   { 'item': 'jkl', 'price': 20, 'quantity': 1, 'date': new Date('2014-03-01T09:00:00Z') },
   { 'item': 'xyz', 'price': 5, 'quantity': 10, 'date': new Date('2014-03-15T09:00:00Z') },
   { 'item': 'xyz', 'price': 5, 'quantity': 20, 'date': new Date('2014-04-04T11:21:39.736Z') },
