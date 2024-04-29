@@ -1,6 +1,8 @@
 import asyncio
 from fastapi.testclient import TestClient
 import pytest
+from app.core.mongodb import MongoDb
+from app.domain.users.user_service import UserService
 from app.main import app  # 여러분의 FastAPI 앱 인스턴스 경로
 from unittest.mock import AsyncMock, patch
 from app.main import app
@@ -16,7 +18,14 @@ async def execute_shutdown():
     await app.router.shutdown()
 
 def test_get_all_users():
-    asyncio.run(execute_startup())  # startup 이벤트를 실행
+    #asyncio.run(execute_startup())  # startup 이벤트를 실행
+    MongoDb.initialize('mongodb://root:root@test.kfs.co.kr:27017')
+    try:
+        app.state.user_service =  UserService.create_instance(db_client=MongoDb.get_client())
+        print("User service created successfully")
+    except Exception as e:
+        print("----> user_service 실패:" , e)    
+    
     with patch('app.core.dependency.get_user_service') as mock_get_user_service:
         mock_service = AsyncMock()
         mock_service.get_all_users.return_value = [{'user_id': '1', 'name': 'Test User'}]
@@ -25,7 +34,8 @@ def test_get_all_users():
         response = client.get("/api/v1/users")
         assert response.status_code == 200
         assert response.json() == [{'user_id': '1', 'name': 'Test User'}]
-    asyncio.run(execute_shutdown())  # startup 이벤트를 실행
+    del app.state.user_service    
+    #asyncio.run(execute_shutdown())  # startup 이벤트를 실행
 
 # def test_get_user():
 #     with patch('app.core.dependency.get_user_service') as mock_get_user_service:
