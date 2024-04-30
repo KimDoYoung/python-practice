@@ -8,19 +8,19 @@ import logging
 logger = logging.getLogger(__name__)
 
 class UserService:
-    _instance = None
+    # _instance = None
     def __init__(self, db_client: AsyncIOMotorClient):
         self.db_client = db_client
 
-    @classmethod
-    async def create_instance(cls, db_client: AsyncIOMotorClient):
-        if cls._instance is None:
-            cls._instance = cls(db_client=db_client)
-            await cls._instance.init_beanie()
-        return cls._instance
+    # @classmethod
+    # async def create_instance(cls, db_client: AsyncIOMotorClient):
+    #     if cls._instance is None:
+    #         cls._instance = cls(db_client=db_client)
+    #         await cls._instance.init_beanie()
+    #     return cls._instance
     
-    async def init_beanie(self):
-        await init_beanie(database=self.db_client.stockdb, document_models=[User]) 
+    # async def init_beanie(self):
+    #     await init_beanie(database=self.db_client.stockdb, document_models=[User]) 
 
     async def create_user(self, user_data: dict):
         user = User(**user_data)

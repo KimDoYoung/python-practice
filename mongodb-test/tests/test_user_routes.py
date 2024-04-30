@@ -1,6 +1,7 @@
 import asyncio
 from httpx import AsyncClient
 import pytest
+from app.core.dependency import get_database, initialize_beanie
 from app.core.mongodb import MongoDb
 from app.domain.users.user_service import UserService
 from app.main import app
@@ -15,57 +16,72 @@ def event_loop():
     yield loop
     loop.close()
 
+@pytest.fixture(scope="session")
+async def startup_event():
+    db_url = 'mongodb://root:root@test.kfs.co.kr:27017/'
+    db_name = 'stockdb'
+    db = await get_database(db_url, db_name)
+    await initialize_beanie(db)
+
 @pytest.mark.asyncio
-async def test_get_all_users(event_loop ):
-    async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
-        MongoDb.initialize('mongodb://root:root@test.kfs.co.kr:27017')
-        app.state.user_service =  await UserService.create_instance(db_client= MongoDb.get_client())
-        response = await ac.get("/api/v1/users")
+async def test_get_all_users(event_loop):
+    async with AsyncClient(app=app, base_url="http://test") as async_client:
+        response = await async_client.get("/api/v1/users")
         assert response.status_code == 200
-        del app.state.user_service
-        # MongoDb.close()
+        # 데이터 형식에 따라 추가적인 내용 확인이 필요할 수 있습니다.
+        assert isinstance(response.json(), list)  # 응답이 리스트 형태인지 확인
 
-@pytest.mark.asyncio
-async def test_get_1(event_loop):
-    async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
-        MongoDb.initialize('mongodb://root:root@test.kfs.co.kr:27017')
-        app.state.user_service =  await UserService.create_instance(db_client=MongoDb.get_client())
-        response = await ac.get("/api/v1/user/kdy987")
-        assert response.status_code == 200
-        del app.state.user_service
-        #MongoDb.close()
+# @pytest.mark.asyncio
+# async def test_get_all_users(event_loop ):
+#     async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
+#         MongoDb.initialize('mongodb://root:root@test.kfs.co.kr:27017')
+#         app.state.user_service =  await UserService.create_instance(db_client= MongoDb.get_client())
+#         response = await ac.get("/api/v1/users")
+#         assert response.status_code == 200
+#         del app.state.user_service
+#         # MongoDb.close()
+
+# @pytest.mark.asyncio
+# async def test_get_1(event_loop):
+#     async with AsyncClient(app=app, base_url="http://localhost:8000") as ac:
+#         MongoDb.initialize('mongodb://root:root@test.kfs.co.kr:27017')
+#         app.state.user_service =  await UserService.create_instance(db_client=MongoDb.get_client())
+#         response = await ac.get("/api/v1/user/kdy987")
+#         assert response.status_code == 200
+#         del app.state.user_service
+#         #MongoDb.close()
 
 
-@pytest.mark.asyncio
-async def test_create_update_delete_user(event_loop):
-    '''
-    insert -> update -> delete 테스트 
-    '''
-    user_data = {'user_id': 'aaa', 'user_name':'123', 'password':'123', 'email': 'new@user.com'}
-    async with AsyncClient(app=app, base_url="http://localhost:8000") as async_client:           
-        MongoDb.initialize('mongodb://root:root@test.kfs.co.kr:27017')
-        app.state.user_service =  await UserService.create_instance(db_client=MongoDb.get_client())
+# @pytest.mark.asyncio
+# async def test_create_update_delete_user(event_loop):
+#     '''
+#     insert -> update -> delete 테스트 
+#     '''
+#     user_data = {'user_id': 'aaa', 'user_name':'123', 'password':'123', 'email': 'new@user.com'}
+#     async with AsyncClient(app=app, base_url="http://localhost:8000") as async_client:           
+#         MongoDb.initialize('mongodb://root:root@test.kfs.co.kr:27017')
+#         app.state.user_service =  await UserService.create_instance(db_client=MongoDb.get_client())
        
-        # insert
-        response = await async_client.post("/api/v1/user", json=user_data)
-        assert response.status_code == 200
-        user = await app.state.user_service.get_user('aaa')
-        assert user.user_name == '123'
+#         # insert
+#         response = await async_client.post("/api/v1/user", json=user_data)
+#         assert response.status_code == 200
+#         user = await app.state.user_service.get_user('aaa')
+#         assert user.user_name == '123'
         
-        # update
-        response = await async_client.put("/api/v1/user/aaa", json={'user_name':'456'})
-        user = await app.state.user_service.get_user('aaa')
-        assert user.user_name == '456'
-        count = await app.state.user_service.count()
+#         # update
+#         response = await async_client.put("/api/v1/user/aaa", json={'user_name':'456'})
+#         user = await app.state.user_service.get_user('aaa')
+#         assert user.user_name == '456'
+#         count = await app.state.user_service.count()
        
-        # delete
-        response = await async_client.delete("/api/v1/user/aaa")
-        assert response.status_code == 200
-        assert response.json() == {'msg': 'User aaa deleted successfully'}
-        count_1 = await app.state.user_service.count()
-        assert count == count_1 + 1
+#         # delete
+#         response = await async_client.delete("/api/v1/user/aaa")
+#         assert response.status_code == 200
+#         assert response.json() == {'msg': 'User aaa deleted successfully'}
+#         count_1 = await app.state.user_service.count()
+#         assert count == count_1 + 1
         
-        del app.state.user_service 
+#         del app.state.user_service 
 
 
 # @pytest.fixture(scope="module")

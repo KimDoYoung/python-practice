@@ -4,7 +4,7 @@ class MongoDb:
     client: AsyncIOMotorClient = None
 
     @classmethod
-    def initialize(cls, uri: str):
+    async def initialize(cls, uri: str):
         cls.client = AsyncIOMotorClient(uri)
 
 
