@@ -1,6 +1,6 @@
-from beanie import Document, Indexed, Link
+from beanie import Document
 from pydantic import BaseModel, EmailStr, Field
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional
 
 class UserAdditionalAttribute(BaseModel):
@@ -9,15 +9,15 @@ class UserAdditionalAttribute(BaseModel):
     use_yn: str = 'Y'
     issuer: Optional[str] = None
     note: Optional[str] = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime =  Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class User(Document):
-    user_id: str = Field(unique=True)
+    user_id: str = Field(json_schema_extra={"unique": True})
     user_name: str
-    email: EmailStr = Field(unique=True)
+    email: EmailStr = Field(json_schema_extra={"unique": True})
     password: str
     kind: str = 'P'
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime =  Field(default_factory=lambda: datetime.now(timezone.utc))
     additional_attributes: List[UserAdditionalAttribute] = []
 
     class Settings:

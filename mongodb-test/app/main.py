@@ -21,5 +21,7 @@ async def startup_event():
 async def shutdown_event():
     MongoDb.close()
 
+
 app.include_router(user_router, prefix="/api/v1", tags=["users"])
+
 

@@ -20,7 +20,7 @@ async def get_user(user_id: str = Path(...), user_service :UserService=Depends(g
 
 @user_router.post("/user", response_model=User)
 async def create_user(user_data: User = Body(...), user_service :UserService=Depends(get_user_service)):
-    user = await user_service.create_user(user_data.dict())
+    user = await user_service.create_user(user_data.model_dump())
     return user
 
 @user_router.put("/user/{user_id}", response_model=User)

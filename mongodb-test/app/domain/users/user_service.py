@@ -44,11 +44,21 @@ class UserService:
         if user:
             await user.set(update_data)
             await user.save()
+            return user
 
-    async def delete_user(self, user_id: str):
-        await User.find_one(User.user_id == user_id).delete()
+    # async def delete_user(self, user_id: str):
+    #     await User.find_one(User.user_id == user_id).delete()
+    async def delete_user(self, user_id: str) -> User:
+        user = await User.find_one(User.user_id == user_id)
+        if user:
+            deleted_user = await user.delete()
+            return deleted_user  
+        else:
+            raise ValueError("User not found with the provided user_id")
 
-
+    async def count(self) -> int:
+        result = await User.count()
+        return result
 
 # DB 클라이언트 설정
 #db_client = AsyncIOMotorClient("mongodb://localhost:27017")
