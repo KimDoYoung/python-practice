@@ -9,7 +9,7 @@ app = FastAPI(title="FastAPI with MongoDB", description="FastAPI with MongoDB", 
 
 @app.on_event("startup")
 async def startup_event():
-    MongoDb.initialize('mongodb://root:root@test.kfs.co.kr:27017')
+    MongoDb.initialize('mongodb://root:root@test.kfs.co.kr:27017/')
     try:
         app.state.user_service = await UserService.create_instance(db_client=MongoDb.get_client())
         print("User service created successfully")

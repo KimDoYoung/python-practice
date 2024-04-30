@@ -28,6 +28,8 @@ delete /api/user/{id}
 ## pytest
 
 ```bash
-export PYTHONPATH=/c/Users/deHong/Documents/kdy/python-practice/mongodb-tes && pytest
+export PYTHONPATH=/c/Users/deHong/Documents/kdy/python-practice/mongodb-test && pytest ./tests
 ```
-
+### 주의 할 점
+1. AsyncClient를 사용해야한다.
+2. @pytest.mark.asyncio를 사용해야한다ㅣ

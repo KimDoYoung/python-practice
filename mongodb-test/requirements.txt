@@ -7,3 +7,4 @@ pydantic[email]
 pytest 
 httpx
 starlette
+pytest-asyncio

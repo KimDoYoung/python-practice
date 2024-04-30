@@ -1,7 +1,11 @@
+from typing import List
 from motor.motor_asyncio import AsyncIOMotorClient
 from beanie import init_beanie
 
 from app.domain.users.user_model import User
+import logging
+
+logger = logging.getLogger(__name__)
 
 class UserService:
     _instance = None
@@ -23,11 +27,15 @@ class UserService:
         await user.create()
         return user
 
-    async def get_all_users(self) -> list[User]:
-        users = await User.all().to_list()
-        return users
+    async def get_all_users(self) -> List[User]:
+        try:
+            users = await User.find_all().to_list()
+            return users
+        except Exception as e:
+            logger.error(f"Failed to retrieve all users: {e}")
+            raise e
     
-    async def get_user(self, user_id: str):
+    async def get_user(self, user_id: str) -> User:
         user = await User.find_one(User.user_id == user_id)
         return user
 
