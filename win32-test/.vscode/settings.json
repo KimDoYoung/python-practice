@@ -1,0 +1,11 @@
+{
+    "terminal.integrated.defaultProfile.windows": "Git Bash",
+    "editor.codeActionsOnSave": {
+        "source.fixAll.markdownlint" : "always"
+    },
+    "python.analysis.extraPaths": [
+        "./backend/app/core"
+    ],
+    "python.pythonPath": "C:\\Users\\deHong\\python-312-win32\\python.exe"
+
+}

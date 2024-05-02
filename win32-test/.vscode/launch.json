@@ -1,0 +1,36 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Merian-Keyboard",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "uvicorn",
+            "args": [
+                "backend.main:app",
+                "--reload",
+                "--port",
+                "8686"  // 원하는 포트 번호로 변경
+            ],
+            "jinja": true
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Jest Current File",
+            "program": "${workspaceFolder}/js_test/node_modules/.bin/jest",
+            "args": [
+              "${fileBasenameNoExtension}", // 현재 열린 파일만 테스트
+              "--config",
+              "${workspaceFolder}/js_test/jest.config.js",
+              "--runInBand"
+            ],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            // Remove the "disableOptimisticBPs" property
+            "windows": {
+              "program": "${workspaceFolder}/js_test/node_modules/jest/bin/jest.js"
+            }
+          }        
+    ]
+}
