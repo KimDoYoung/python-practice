@@ -31,7 +31,9 @@ delete /api/user/{id}
 export PYTHONPATH=/c/Users/deHong/Documents/kdy/python-practice/mongodb-test && pytest -p no:warnings ./tests
 export PYTHONPATH=/c/Users/deHong/Documents/kdy/python-practice/mongodb-test && pytest ./tests
 ```
+
 ### 주의 할 점
+
 1. AsyncClient를 사용해야한다.
 2. @pytest.mark.asyncio를 사용해야한다.
 3. 여러개를 할때 event loop 에러가 난다

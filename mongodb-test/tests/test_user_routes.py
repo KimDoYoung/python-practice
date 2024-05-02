@@ -7,6 +7,8 @@ from app.core.mongodb import MongoDb
 from app.domain.users.user_model import User
 from app.main import app
 
+base_url = "http://localhost:8000"
+
 @pytest.fixture(scope="session")
 def event_loop():
     try:
@@ -25,7 +27,7 @@ async def db_init():
 async def test_get_all_users(event_loop):
 
     await db_init()
-    async with AsyncClient(app=app, base_url="http://localhost:8000") as async_client:
+    async with AsyncClient(app=app, base_url=base_url) as async_client:
         response = await async_client.get("/api/v1/users")
         assert response.status_code == 200
         assert isinstance(response.json(), list)  # 응답이 리스트 형태인지 확인
@@ -34,7 +36,7 @@ async def test_get_all_users(event_loop):
 @pytest.mark.asyncio
 async def test_get_1(event_loop):
     await db_init()
-    async with AsyncClient(app=app, base_url="http://localhost:8000") as async_client:
+    async with AsyncClient(app=app, base_url=base_url) as async_client:
         response = await async_client.get("/api/v1/user/kdy987")
         print(response.json())
         assert response.status_code == 200
@@ -48,7 +50,7 @@ async def test_create_update_delete_user(event_loop):
     '''
     await db_init()
     user_data = {'user_id': 'aaa', 'user_name':'123', 'password':'123', 'email': 'new@user.com'}
-    async with AsyncClient(app=app, base_url="http://localhost:8000") as async_client:           
+    async with AsyncClient(app=app, base_url=base_url) as async_client:           
         # delete
         response = await async_client.delete("/api/v1/user/aaa")
         assert response.status_code == 200

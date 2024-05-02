@@ -1,7 +1,5 @@
 from beanie import init_beanie
 from fastapi import FastAPI
-
-#from app.core.dependency import get_database, init_beanie, initialize_beanie
 from app.core.mongodb import MongoDb
 from app.domain.users.user_model import User
 from app.domain.users.user_routes import user_router

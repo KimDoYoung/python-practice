@@ -39,22 +39,20 @@ class UserService:
         user = await User.find_one(User.user_id == user_id)
         return user
 
-    async def update_user(self, user_id: str, update_data: dict):
+    async def update_user(self, user_id: str, update_data: dict) -> User:
         user = await User.find_one(User.user_id == user_id)
         if user:
             await user.set(update_data)
             await user.save()
             return user
+        else:
+            return None
 
-    # async def delete_user(self, user_id: str):
-    #     await User.find_one(User.user_id == user_id).delete()
     async def delete_user(self, user_id: str) -> User:
         user = await User.find_one(User.user_id == user_id)
         if user:
             deleted_user = await user.delete()
             return deleted_user  
-        else:
-            raise ValueError("User not found with the provided user_id")
 
     async def count(self) -> int:
         result = await User.count()
