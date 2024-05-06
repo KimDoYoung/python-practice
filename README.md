@@ -23,3 +23,4 @@
       5. tailwindcss
 6. joanna : RESTful방식의 주식매매 연습
 7. sofia : Web app - 이미지보기
+8. pytest-test : pytest로 mock 연습
