@@ -1,2 +1,7 @@
 pywin32
 pykiwoom
+python-telegram-bot
+python-dotenv
+requests
+beautifulsoup4
+html5lib
