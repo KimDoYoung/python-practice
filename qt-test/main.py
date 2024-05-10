@@ -9,6 +9,9 @@ from PyQt5.QtCore import QDate
 from config_dialog import ConfigDialog
 from PyQt5.QtWidgets import QLabel
 from closeable_tab_widget import CloseableTabWidget
+from menu1_widget import Menu1Widget
+from menu2_widget import Menu2Widget
+from menu3_widget import Menu3Widget
 
 class ExampleApp(QMainWindow):
     def __init__(self):
@@ -47,11 +50,13 @@ class ExampleApp(QMainWindow):
         # 왼쪽 패널 버튼 추가
         vbox = QVBoxLayout()
         vbox.setAlignment(Qt.AlignTop) 
-        buttons = ['menu1', 'menu2', 'menu3']
-        for btn in buttons:
-            button = QPushButton(btn, self)
+        
+        # 메뉴 버튼 추가
+        self.menu_buttons = {"menu1": Menu1Widget, "menu2": Menu2Widget, "menu3": Menu3Widget}
+        for menu_name, menu_cls in self.menu_buttons.items():
+            button = QPushButton(menu_name.capitalize(), self)
             button.setToolTip("This is a <b>QPushButton</b> widget") # 툴팁 추가
-            button.clicked.connect(lambda _, name=btn: self.handleMenuClick(name))  
+            button.clicked.connect(lambda checked, name=menu_name, cls=menu_cls: self.handleMenuClick(name,cls))
             vbox.addWidget(button)
         left_panel.setLayout(vbox)
 
@@ -95,18 +100,20 @@ class ExampleApp(QMainWindow):
         else:
             event.ignore()
 
-    def handleMenuClick(self, name):
+    def handleMenuClick(self, name, widget_cls):
+        ''' 메뉴 버튼 클릭 시 호출되는 메서드: 
+            1. 탭에 해당 메뉴의 위젯을 생성한 후 추가한다.
+            2. 이미 존재하면 그 탭 현재 탭으로 설정한다.'''
+        active_tab = None
         if name not in self.tabs:
-            # 탭 생성
-            tab = QWidget()
-            layout = QVBoxLayout()
-            label = QLabel(f'Content for {name}')
-            layout.addWidget(label)
-            tab.setLayout(layout)
-            idx = self.tab_widget.addTab(tab, name)
-            self.tabs[name] = idx
-        # 탭 활성화
-        self.tab_widget.setCurrentIndex(self.tabs[name])
+            tab = widget_cls()
+            self.tabs[name] = tab
+            self.tab_widget.addTab(tab, name)
+            active_tab = tab
+        else:
+            active_tab = self.tabs[name]
+
+        self.tab_widget.setCurrentWidget(active_tab)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

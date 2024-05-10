@@ -14,9 +14,3 @@ class CloseableTabWidget(QTabWidget):
         # 탭 이름을 사용하여 self.tabs 딕셔너리에서도 해당 항목을 제거합니다.
         if tab_name in self.parent.tabs:
             del self.parent.tabs[tab_name]
-
-        # parent = self.parent()  # 부모 객체를 가져옵니다.
-        # if parent and hasattr(parent, 'tabs') and tab_name in parent.tabs:
-        #     del parent.tabs[tab_name]
-        # else:
-        #     print("Parent is not set correctly or 'tabs' attribute does not exist.")
