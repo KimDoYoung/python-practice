@@ -7,7 +7,6 @@ html_content = response.text
 
 # BeautifulSoup 객체 생성
 soup = BeautifulSoup(html_content, 'html.parser')
-
 # 투자의견 테이블 찾기
 investment_table = soup.find("caption", string="투자의견").find_parent("table")
 
