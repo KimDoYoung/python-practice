@@ -4,3 +4,4 @@ lxml
 selenium
 pandas
 chromedriver-autoinstaller
+pytest
