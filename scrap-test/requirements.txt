@@ -5,3 +5,5 @@ selenium
 pandas
 chromedriver-autoinstaller
 pytest
+yfinance
+matplotlib

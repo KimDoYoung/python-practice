@@ -16,3 +16,7 @@
 
 - Selenium: 원래 웹 애플리케이션 테스트를 위해 개발된 도구지만, JavaScript를 통해 동적으로 생성된 데이터를 포함한 웹 페이지의 데이터를 추출할 때 유용합니다. 웹 브라우저를 실제로 제어하여 페이지 상호작용을 모방할 수 있습니다.
 
+## 외국에서 제공하는 데이터
+
+- [yahoo finance](https://finance.yahoo.com/quote/005930.KS/history)
+- in
