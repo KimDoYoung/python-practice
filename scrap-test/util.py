@@ -103,5 +103,20 @@ def get_korean_number2(number):
     
     return answer.strip()
 
-# 테스트 코드
+def to_won(amount_str):
+    ''' 금액 문자열을 정수(금액 원)로 변환 '''
+    # 백만원 단위 처리
+    if '백만원' in amount_str:
+        clean_str = re.sub(r'[^0-9.]', '', amount_str)
+        if clean_str:  # clean_str이 비어있지 않은 경우에만 변환
+            return int(float(clean_str) * 1000000)
+        else:
+            raise ValueError(f"Invalid amount string: '{amount_str}'")
+    
+    # 숫자와 점(.)을 제외한 모든 문자 제거
+    clean_str = re.sub(r'[^0-9.]', '', amount_str)
+    if clean_str:  # clean_str이 비어있지 않은 경우에만 변환
+        return int(float(clean_str))
+    else:
+        raise ValueError(f"Invalid amount string: '{amount_str}'")
 

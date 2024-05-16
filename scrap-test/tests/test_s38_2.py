@@ -21,7 +21,7 @@ def test_get_details():
     detail = get_details('https://www.38.co.kr/html/fund/?o=v&no=2036&l=&page=1')
     print(detail)
     assert detail['company_info'] == data['company_info']
-    # assert detail['offering_info'] == data['offering_info']
+    assert detail['offering_info'] == data['offering_info']
     assert detail['schedule_info'] == data['schedule_info']
     assert detail['expected_participation'] == data['expected_participation']
     assert detail['nav_per_share'] == data['nav_per_share']

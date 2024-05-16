@@ -7,3 +7,4 @@ chromedriver-autoinstaller
 pytest
 yfinance
 matplotlib
+pymongo

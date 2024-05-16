@@ -1,3 +1,6 @@
+import datetime
+import logging
+import re
 import time
 import chromedriver_autoinstaller
 from selenium import webdriver
@@ -8,6 +11,10 @@ from util import extract_dates, extract_numbers
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from pymongo import MongoClient
+import datetime
+
+
 
 def install_chrome_driver():
     chromedriver_autoinstaller.install()
@@ -48,7 +55,7 @@ def get_ipo_list(url:str):
     df = pd.read_html(str(table))[0]
 
     #print(df)
-    list = []
+    data_list = []
     for index, row in df.iterrows():
         stk_name = row.iloc[0]  # replace 0 with the index of the 'stk_name' column
         if str(stk_name) == 'nan':
@@ -76,9 +83,9 @@ def get_ipo_list(url:str):
             'detail_url': detail_url,
             'details' : {}
         }
-        list.append(basic)
+        data_list.append(basic)
         # print(basic)
-    return list
+    return data_list
 
 
 def get_soup(url):
@@ -129,6 +136,28 @@ def extract_offering_info(soup):
             if key in ['총공모주식수','액면가','상장공모','희망공모가액','확정공모가','공모금액','주간사']: 
                 value = tds[i + 1].get_text(strip=True)
                 data[key] = value
+    # 주간사 옆에 옆에 주식수와 청약한도
+    td = table.find('td', string=re.compile(r'\s*주간사\s*', re.IGNORECASE))
+
+    if td:
+        tr = td.find_parent('tr')
+        tds = tr.find_all('td')
+        if len(tds) > 2:
+            value = ""
+            txt = tds[2].get_text(strip=True)
+            stock_pattern = re.compile(r'주식수:\s*([\d,~]+ 주)')
+            stock_match = stock_pattern.search(txt)
+            if stock_match:
+                value = stock_match.group(1)
+            data['주식수'] = value
+            value =""
+            # 정규 표현식으로 '15,000~18,000 주' 추출
+            limit_pattern = re.compile(r'청약한도:\s*([\d,~]+ 주)')
+            limit_match = limit_pattern.search(txt)
+            if limit_match:
+                value = limit_match.group(1)            
+            data['청약한도'] = value
+        
     return data
 
 def extract_schedule_info(soup):
@@ -151,6 +180,28 @@ def extract_schedule_info(soup):
             if key in ['수요예측일','공모청약일','납입일','환불일','상장일','IR일자','기관경쟁률','의무보유확약','신규상장일','현재가']: 
                 value = tds[i + 1].get_text(strip=True)
                 data[key] = value.replace('\xa0', '')
+
+    td = table.find('td', string=re.compile(r'\s*일반청약자\s*', re.IGNORECASE))
+    tr = td.find_parent('tr')
+    tds = tr.find_all('td')
+    if len(tds) > 2:
+        value = tds[1].get_text(strip=True)
+        data['일반청약자-주식수'] = value.replace('\xa0', '')
+        value = tds[2].get_text(strip=True)
+        # 정규 표현식으로 '50%' 추출
+        pattern = re.compile(r'청약증거금율\s*:\s*(\d+%)')
+        match = pattern.search(value)
+
+        if match:
+            value = match.group(1)
+            data['일반청약자-청약증거금율'] = value
+    # '청약 최고한도' 텍스트가 포함된 <td> 요소 찾기
+    next_tr = tr.find_next_sibling('tr')
+    td = next_tr.find_all('td')[0]
+    b_tag = td.find('b')
+    if b_tag:
+        limit_value = b_tag.get_text(strip=True)
+        data['일반청약자-청약최고한도'] = limit_value
     return data
 
 def extract_expected_participation(soup):
@@ -371,29 +422,54 @@ def get_details(url: str):
             "financial_ratio" : financial_ratio, "stock_price_indicators" : stock_price_indicators,
             "over_markte_price": over_markte_price} 
 
-def main():
-    driver = install_chrome_driver()
+def insert_or_update_ipo_list(data_list):
+    client = MongoClient('mongodb://root:root@test.kfs.co.kr:27017/')
+    db = client['stockdb']
+    collection = db['ipo']
     
-    urls = ['https://www.38.co.kr/html/fund/index.htm?o=k','https://www.38.co.kr/html/fund/index.htm?o=k&page=2']
-    #urls = ['https://www.38.co.kr/html/fund/index.htm?o=k&page=2']
-    #urls = ['https://www.38.co.kr/html/fund/index.htm?o=k']
-    list = []
-    for url in urls:
-        list = get_ipo_list(url)
-        for basic in list:
-            detail = get_details(basic['detail_url'])
-            basic['details'] = detail
-            print(basic)
-            time.sleep(1)    
-    # print(list)
-    # for basic in list:
-    #     detail = get_details('https://www.38.co.kr/html/fund/?o=v&no=2036&l=&page=1')
-    # print(detail)
-    # 드라이버 종료
-    driver.quit()
+    for data in data_list:
+        # 고유한 식별자를 사용하여 업데이트 또는 삽입
+        collection.update_one(
+            {'stk_name': data['stk_name']},  # 고유한 조건
+            {'$set': data},                  # 데이터 업데이트
+            upsert=True                      # 문서가 없으면 삽입
+        )
+    print('inserted or updated DONE!')
 
+def main():
+    logging.info('Scraping started')
+    try:
+        driver = install_chrome_driver()
+        
+        urls = ['https://www.38.co.kr/html/fund/index.htm?o=k','https://www.38.co.kr/html/fund/index.htm?o=k&page=2']
+        #urls = ['https://www.38.co.kr/html/fund/index.htm?o=k&page=2']
+        urls = ['https://www.38.co.kr/html/fund/index.htm?o=k']
+        data_list = []
+        for url in urls:
+            data_list = get_ipo_list(url)
+            logging.info('Scraping: %s', url)            
+            for basic in data_list:
+                detail = get_details(basic['detail_url'])
+                basic['details'] = detail
+                print(basic)
+                time.sleep(1)
+        driver.quit()
+        logging.info("Inserting or updating the ipo list")
+        insert_or_update_ipo_list(data_list)
+    except Exception as e:
+        logging.error('An error occurred in the main function: %s', e)
+    finally:
+        logging.info('Scraping finished')
 
 if __name__ == "__main__":
-    main()
+    date_time = datetime.datetime.now().strftime("%Y%m%d_%H_%M_%S")
+
+    logging.basicConfig(
+        filename=f'scraping_{date_time}.log',  # 로그 파일 경로
+        level=logging.INFO,  # 로그 레벨 설정
+        format='%(asctime)s - %(levelname)s - %(message)s',  # 로그 메시지 형식
+    )
+
+    main()    
 
 

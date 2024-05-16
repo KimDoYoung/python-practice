@@ -1,6 +1,8 @@
+import pytest
 from util import fmt_number_kor
 from util import fmt_number_kor, extract_dates
 from util import extract_numbers
+from util import to_won
 
 def test_addition():
     k = fmt_number_kor(123)
@@ -28,3 +30,14 @@ def test_extract_numbers():
     start, end = extract_numbers(s)
     assert start == '11000'
     assert end == '14000'
+
+def test_to_won():
+    assert to_won('2,567 (백만원)') == 2567000000
+    assert to_won('2,000원') == 2000
+    assert to_won('1,162,640,000') == 1162640000
+    with pytest.raises(ValueError):
+        to_won('- (백만원)') 
+    with pytest.raises(ValueError):
+        to_won('- 원') 
+    with pytest.raises(ValueError):
+        to_won('-') 
