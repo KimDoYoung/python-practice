@@ -1,7 +1,18 @@
 import re
+from datetime import datetime
 
-def remove_non_numeric_chars(string):
+def remove_non_numeric_chars(string) -> str:
     return re.sub(r'\D', '', string)
+
+def to_ymd(str_date: str) -> str:
+    ''' 날짜 문자열을 8자리 숫자로 변환 '''
+    s = str_date.strip()
+    if s == '':
+        return ''
+    s = remove_non_numeric_chars(s)
+    if len(s) == 4:
+        s =  str(datetime.now().year) + s
+    return s
 
 # 2024.06.05 ~ 06.07 -> sdate: 20240605, edate: 20240607
 # 사용법 : sdate, edate = extract_dates(pattern)
@@ -20,14 +31,18 @@ def extract_dates(date_range_str: str, gubun: str = "~"):
 
 # 1,000 ~ 2,000 -> scost: 1000, ecost: 2000
 def extract_numbers(cost_range: str, gubun: str = "~"):
+    if cost_range.strip() == '':
+        return None, None
     # 숫자와 '~' 주변의 공백을 포함하여 패턴 분할
     split_pattern = r'\s*' + re.escape(gubun) + r'\s*'
     
     # 패턴을 split_pattern으로 분할
     parts = re.split(split_pattern, cost_range.strip())
+    if len(parts) == 1:
+        return int(remove_non_numeric_chars(parts[0])), int(remove_non_numeric_chars(parts[0]))
     parts = [remove_non_numeric_chars(part) for part in parts]
     
-    return parts[0], parts[1]
+    return int(parts[0]), int(parts[1])
 
 
 # print(_fmt_number_kor(1234567890))  # 출력 예: 일십이억삼천사백오십육만칠천팔백구십원
@@ -103,6 +118,13 @@ def get_korean_number2(number):
     
     return answer.strip()
 
+def to_num(s: str) -> int:
+    '''주식수 문자열을 정수로 변환'''
+    if s == '':
+        return None
+    s1 = s.strip()
+    return int(remove_non_numeric_chars(s1))
+
 def to_won(amount_str):
     ''' 금액 문자열을 정수(금액 원)로 변환 '''
     # 백만원 단위 처리
@@ -111,12 +133,34 @@ def to_won(amount_str):
         if clean_str:  # clean_str이 비어있지 않은 경우에만 변환
             return int(float(clean_str) * 1000000)
         else:
-            raise ValueError(f"Invalid amount string: '{amount_str}'")
+            return None  # 유효하지 않은 문자열인 경우 None 반환
     
     # 숫자와 점(.)을 제외한 모든 문자 제거
     clean_str = re.sub(r'[^0-9.]', '', amount_str)
     if clean_str:  # clean_str이 비어있지 않은 경우에만 변환
         return int(float(clean_str))
     else:
-        raise ValueError(f"Invalid amount string: '{amount_str}'")
+        return None  # 유효하지 않은 문자열인 경우 None 반환
 
+
+
+def extract_competition_rates(s: str):
+    '''경쟁률 문자열에서 경쟁률과 비례 경쟁률을 추출'''
+    s = s.strip()
+    
+    if s == '':
+        return None, None
+    
+    # 공백이 여러 개일 경우를 고려하여 split
+    parts = re.split(r'\s+', s)
+    
+    if len(parts) == 1:
+        competition_rate = parts[0].split(':')[0]
+        return float(competition_rate), None
+    
+    elif len(parts) == 2:
+        competition_rate = parts[0].split(':')[0]
+        proportional_rate = re.findall(r'\d+', parts[1])[0]
+        return float(competition_rate), float(proportional_rate)
+    
+    return None, None

@@ -1,4 +1,3 @@
-import datetime
 import logging
 import re
 import time
@@ -12,8 +11,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from pymongo import MongoClient
-import datetime
-
+from io import StringIO
+from datetime import datetime
 
 
 def install_chrome_driver():
@@ -51,8 +50,8 @@ def get_ipo_list(url:str):
     soup = get_soup(url);
     table = soup.find('table', {'summary': '공모주 청약일정'})
 
-    # DataFrame으로 변환
-    df = pd.read_html(str(table))[0]
+    table_str = str(table)
+    df = pd.read_html(StringIO(table_str))[0]
 
     #print(df)
     data_list = []
@@ -74,6 +73,7 @@ def get_ipo_list(url:str):
         detail_url = find_detail_url(table, stk_name)
         basic = {
             'stk_name': f"{stk_name}-{start_ymd}",
+            'name': stk_name,
             'sub_dates': { "start": start_ymd, "end":end_ymd },
             'final_offer_price': final_offer_price,
             'expect_price_range': {"start" : start_cost, "end" : end_cost},
@@ -81,6 +81,7 @@ def get_ipo_list(url:str):
             'lead_bookrunner': lead_bookrunner,
             'fixed': fixed,
             'detail_url': detail_url,
+            'scrap_time' : None,
             'details' : {}
         }
         data_list.append(basic)
@@ -137,27 +138,51 @@ def extract_offering_info(soup):
                 value = tds[i + 1].get_text(strip=True)
                 data[key] = value
     # 주간사 옆에 옆에 주식수와 청약한도
-    td = table.find('td', string=re.compile(r'\s*주간사\s*', re.IGNORECASE))
+    length = len(data['주간사'].split(','))
+    if  length == 1:
+        td = table.find('td', string=re.compile(r'\s*주간사\s*', re.IGNORECASE))
+        company_list = []
+        if td:
+            company = {}
+            company['인수회사'] = data['주간사']
+            tr = td.find_parent('tr')
+            tds = tr.find_all('td')
+            if len(tds) > 2:
+                value = ""
+                txt = tds[2].get_text(strip=True)
+                stock_pattern = re.compile(r'주식수:\s*([\d,~]+ 주)')
+                stock_match = stock_pattern.search(txt)
+                if stock_match:
+                    value = stock_match.group(1)
+                company['주식수'] = value
+                value =""
+                # 정규 표현식으로 '15,000~18,000 주' 추출
+                limit_pattern = re.compile(r'청약한도:\s*([\d,~]+ 주)')
+                limit_match = limit_pattern.search(txt)
+                if limit_match:
+                    value = limit_match.group(1)            
+                company['청약한도'] = value
+                company['기타'] = None
+                company_list.append(company)
+        data['주간사_리스트'] = company_list
+    elif length > 1:
+        next_table = table.find_next('table')
+        rows = next_table.find_all('tr')
+        company_list = []
+        for row in rows[1:]:
+            cols = row.find_all('td')
+            # 각 행의 데이터를 추출하여 딕셔너리로 만듭니다.
+            company = {
+                '인수회사': cols[0].get_text(strip=True),
+                '주식수': cols[1].get_text(strip=True),
+                '청약한도': cols[2].get_text(strip=True),
+                '기타': cols[3].get_text(strip=True)
+            }
+            company_list.append(company)        
+        data['주간사_리스트'] = company_list
+    else:
+        data['주간사_리스트'] = []
 
-    if td:
-        tr = td.find_parent('tr')
-        tds = tr.find_all('td')
-        if len(tds) > 2:
-            value = ""
-            txt = tds[2].get_text(strip=True)
-            stock_pattern = re.compile(r'주식수:\s*([\d,~]+ 주)')
-            stock_match = stock_pattern.search(txt)
-            if stock_match:
-                value = stock_match.group(1)
-            data['주식수'] = value
-            value =""
-            # 정규 표현식으로 '15,000~18,000 주' 추출
-            limit_pattern = re.compile(r'청약한도:\s*([\d,~]+ 주)')
-            limit_match = limit_pattern.search(txt)
-            if limit_match:
-                value = limit_match.group(1)            
-            data['청약한도'] = value
-        
     return data
 
 def extract_schedule_info(soup):
@@ -363,6 +388,8 @@ def extract_over_markte_price(soup):
     for index, row in enumerate(rows):
         cols = row.find_all('td')
         product_name = cols[0].text.strip()
+        if(product_name == ''):
+            continue
         product_name = product_name.split('\n')[-1].strip() if '\n' in product_name else product_name  # 더 안전한 제품 이름 추출
         over_markte_price["seller"].append({
             "product": product_name,
@@ -378,6 +405,8 @@ def extract_over_markte_price(soup):
     for index, row in enumerate(rows):
         cols = row.find_all('td')
         product_name = cols[0].text.strip()
+        if(product_name == ''):
+            continue
         product_name = product_name.split('\n')[-1].strip() if '\n' in product_name else product_name  # 더 안전한 제품 이름 추출
         over_markte_price["buyer"].append({
             "product": product_name,
@@ -390,29 +419,41 @@ def extract_over_markte_price(soup):
 def get_details(url: str):
 
     soup = get_soup(url)
+    logging.info(f'extract_company_info : {url}')
     company_info = extract_company_info(soup)
+
+    logging.info(f'extract_offering_info : {url}')
     offering_info = extract_offering_info(soup)
+
+    logging.info(f'extract_schedule_info : {url}')
     schedule_info = extract_schedule_info(soup)
 
     # 수요예측 참여건수
+    logging.info(f'extract_expected_participation : {url}')
     expected_participation = extract_expected_participation(soup)
 
     # 본질가치 평가 - 주당 순자산가치 평가
+    logging.info(f'extract_nav_per_share : {url}')
     nav_per_share = extract_nav_per_share(soup)
     
     # 본질가치 평가 - 주당 수익가치
+    logging.info(f'extract_earnings_value_per_share : {url}')
     earnings_value_per_share = extract_earnings_value_per_share(soup)
 
     # 주당 본질 가치 평가
+    logging.info(f'extract_intrinsic_value_per_share : {url}')
     intrinsic_value_per_share = extract_intrinsic_value_per_share(soup)
 
     # 재무비율
+    logging.info(f'extract_financial_ratio : {url}')
     financial_ratio = extract_financial_ratio(soup)
 
     #주가 지표
+    logging.info(f'extract_stock_price_indicators : {url}')
     stock_price_indicators = extract_stock_price_indicators(soup)
 
     # 장외시장 가격
+    logging.info(f'extract_over_markte_price : {url}')
     over_markte_price = extract_over_markte_price(soup)
 
     return { "company_info" : company_info, "offering_info" : offering_info ,
@@ -425,7 +466,7 @@ def get_details(url: str):
 def insert_or_update_ipo_list(data_list):
     client = MongoClient('mongodb://root:root@test.kfs.co.kr:27017/')
     db = client['stockdb']
-    collection = db['ipo']
+    collection = db['ipo_scrap_38']
     
     for data in data_list:
         # 고유한 식별자를 사용하여 업데이트 또는 삽입
@@ -434,6 +475,7 @@ def insert_or_update_ipo_list(data_list):
             {'$set': data},                  # 데이터 업데이트
             upsert=True                      # 문서가 없으면 삽입
         )
+
     print('inserted or updated DONE!')
 
 def main():
@@ -450,26 +492,33 @@ def main():
             logging.info('Scraping: %s', url)            
             for basic in data_list:
                 detail = get_details(basic['detail_url'])
+                basic['scrap_time'] = datetime.now()
                 basic['details'] = detail
                 print(basic)
                 time.sleep(1)
         driver.quit()
         logging.info("Inserting or updating the ipo list")
         insert_or_update_ipo_list(data_list)
+
     except Exception as e:
         logging.error('An error occurred in the main function: %s', e)
     finally:
         logging.info('Scraping finished')
 
 if __name__ == "__main__":
-    date_time = datetime.datetime.now().strftime("%Y%m%d_%H_%M_%S")
+    date_time = datetime.now().strftime("%Y%m%d")
 
     logging.basicConfig(
         filename=f'scraping_{date_time}.log',  # 로그 파일 경로
         level=logging.INFO,  # 로그 레벨 설정
         format='%(asctime)s - %(levelname)s - %(message)s',  # 로그 메시지 형식
     )
-
+    logging.info('------------------------------------------------------')
+    logging.info('scrapping_38.py started')
+    logging.info('------------------------------------------------------')
     main()    
+    logging.info('------------------------------------------------------')
+    logging.info('scrapping_38.py ended')
+    logging.info('------------------------------------------------------')
 
 

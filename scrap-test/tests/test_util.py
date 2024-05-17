@@ -1,5 +1,5 @@
 import pytest
-from util import fmt_number_kor
+from util import extract_competition_rates, fmt_number_kor, to_num
 from util import fmt_number_kor, extract_dates
 from util import extract_numbers
 from util import to_won
@@ -28,16 +28,30 @@ def test_extract_dates():
 def test_extract_numbers():
     s="11,000~14,000"    
     start, end = extract_numbers(s)
-    assert start == '11000'
-    assert end == '14000'
+    assert start == 11000
+    assert end == 14000
+
+    s="1,500,000 주"    
+    start, end = extract_numbers(s)
+    assert start == 1500000
+    assert end == 1500000
+
+    start, end = extract_numbers('')
+    assert start == None
+    assert end == None
+
+
+def test_to_num():
+    assert to_num('1') == 1
+    assert to_num(1) == 1
 
 def test_to_won():
     assert to_won('2,567 (백만원)') == 2567000000
     assert to_won('2,000원') == 2000
     assert to_won('1,162,640,000') == 1162640000
-    with pytest.raises(ValueError):
-        to_won('- (백만원)') 
-    with pytest.raises(ValueError):
-        to_won('- 원') 
-    with pytest.raises(ValueError):
-        to_won('-') 
+    assert None == to_won('- (백만원)') 
+    assert None == to_won('-')
+
+def test_extract_competition_rates():
+    assert 2071.41,4143.0 == extract_competition_rates("2071.41:1 (비례 4143:1)")
+    assert 2071.41,None  == extract_competition_rates("2071.41:1 ")
