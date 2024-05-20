@@ -32,8 +32,6 @@ def get_offering(offering_info, expected_participation):
     for company in scrap_company_list:
         item = {}
         item['주간사'] = company['인수회사']
-        # start, end = extract_numbers(company['주식수'])
-        # item['주식수'] = start
         start, end = extract_numbers('' if company['청약한도'] is None else company['청약한도'])
         item['청약한도'] = start
         company_list.append(item)
