@@ -19,4 +19,8 @@
 ## 외국에서 제공하는 데이터
 
 - [yahoo finance](https://finance.yahoo.com/quote/005930.KS/history)
-- in
+
+## 파일 설명
+
+- s38_2.py : 38커뮤니케이션에서 2 페이지를 가져와서 mongodb ipo_scrp collection에 넣음.
+- f38_2.py : ipo_scrap -> ipo collection으로 필요한 데이터만 format바꿔서 넣음.

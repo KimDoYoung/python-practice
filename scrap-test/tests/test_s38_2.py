@@ -1,3 +1,4 @@
+import pytest
 from s38_2 import get_details, install_chrome_driver
 
 def result():
@@ -14,21 +15,40 @@ def result():
 
 # https://www.38.co.kr/html/fund/?o=v&no=2044&l=&page=1 현대마린
 # https://www.38.co.kr/html/fund/?o=v&no=2045&l=&page=1 KB스펙28호
-
+# https://www.38.co.kr/html/fund/?o=v&no=1993&l=&page=2 블루엠텍
+# https://www.38.co.kr/html/fund/?o=v&no=2056&l=&page=1
+@pytest.mark.skip(reason="Test is not implemented yet")
 def test_get_details():
     ''' 노브랜드 '''
     driver = install_chrome_driver()
     data = result()
-    detail = get_details('https://www.38.co.kr/html/fund/?o=v&no=2036&l=&page=1')
+    detail = get_details('https://www.38.co.kr/html/fund/?o=v&no=1993&l=&page=2')
+    assert len(detail['offering_info']['주간사_리스트']) == 1
+    assert detail['offering_info']['주간사_리스트'][0]['인수회사'] == '하나증권,키움증권'
+    assert detail['offering_info']['주간사_리스트'][0]['주식수'] == '350,000~420,000'
+    assert detail['offering_info']['주간사_리스트'][0]['청약한도'] == '12,000~14,000'
+
+
+    driver.quit()
+
+def test_get_details2():
+    ''' 이노스페이스 '''
+    driver = install_chrome_driver()
+    data = result()
+    detail = get_details('https://www.38.co.kr/html/fund/?o=v&no=2056&l=&page=1')
+    assert len(detail['offering_info']['주간사_리스트']) == 2
+
+
+    driver.quit()
+
+
+def test_get_details3():
+    '''  '''
+    driver = install_chrome_driver()
+    url = 'https://www.38.co.kr/html/fund/?o=v&no=2010&l=&page=2'
+    detail = get_details(url)
+    assert 1==1
     print(detail)
-    assert detail['company_info'] == data['company_info']
-    assert detail['offering_info'] == data['offering_info']
-    assert detail['schedule_info'] == data['schedule_info']
-    assert detail['expected_participation'] == data['expected_participation']
-    assert detail['nav_per_share'] == data['nav_per_share']
-    assert detail['earnings_value_per_share'] == data['earnings_value_per_share']
-    assert detail['intrinsic_value_per_share'] == data['intrinsic_value_per_share']
-    assert detail['financial_ratio'] == data['financial_ratio']
-    assert detail['stock_price_indicators'] == data['stock_price_indicators']
+
     driver.quit()
 

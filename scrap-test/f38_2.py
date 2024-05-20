@@ -34,7 +34,7 @@ def get_offering(offering_info, expected_participation):
         item['주간사'] = company['인수회사']
         # start, end = extract_numbers(company['주식수'])
         # item['주식수'] = start
-        start, end = extract_numbers(company['청약한도'])
+        start, end = extract_numbers('' if company['청약한도'] is None else company['청약한도'])
         item['청약한도'] = start
         company_list.append(item)
 
@@ -52,7 +52,7 @@ def get_offering(offering_info, expected_participation):
 
 def scrap_2_ipo(all=False):
     
-    ''' 38사이트에서 스크랩한 데이터를 ipo 컬렉션에 저장 '''
+    ''' 38사이트에서 스크랩한 원본 collection ipo_scrap에서 ipo 컬렉션으로 옮긴다. 1.필요한것만, 2.format변환 '''
 
     client = MongoClient('mongodb://root:root@test.kfs.co.kr:27017/')
     db = client['stockdb']
@@ -75,6 +75,8 @@ def scrap_2_ipo(all=False):
     ipo_list = []
 
     for doc in documents:
+        name = doc['stk_name']
+        logging.info(f"-------->Processing document for {name}")
         details = doc['details']
         company_info = details['company_info']
         schedule_info = details['schedule_info']

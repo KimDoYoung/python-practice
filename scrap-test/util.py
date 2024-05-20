@@ -30,7 +30,7 @@ def extract_dates(date_range_str: str, gubun: str = "~"):
     return parts[0], parts[1]
 
 # 1,000 ~ 2,000 -> scost: 1000, ecost: 2000
-def extract_numbers(cost_range: str, gubun: str = "~"):
+def extract_numbers(cost_range : str, gubun: str = "~"):
     if cost_range.strip() == '':
         return None, None
     # 숫자와 '~' 주변의 공백을 포함하여 패턴 분할
@@ -146,21 +146,40 @@ def to_won(amount_str):
 
 def extract_competition_rates(s: str):
     '''경쟁률 문자열에서 경쟁률과 비례 경쟁률을 추출'''
-    s = s.strip()
-    
     if s == '':
         return None, None
+    # 정규 표현식을 사용하여 첫 번째 비율 추출
+    primary_ratio_match = re.search(r'([\d,]+\.\d+):1', s)
+    if primary_ratio_match:
+        primary_ratio = float(primary_ratio_match.group(1).replace(',', ''))
+    else:
+        primary_ratio = None
     
-    # 공백이 여러 개일 경우를 고려하여 split
-    parts = re.split(r'\s+', s)
+    # 정규 표현식을 사용하여 비례 비율 추출
+    proportional_ratio_match = re.search(r'비례 ([\d,]+):1', s)
+    if proportional_ratio_match:
+        proportional_ratio = float(proportional_ratio_match.group(1).replace(',', ''))
+    else:
+        proportional_ratio = None
     
-    if len(parts) == 1:
-        competition_rate = parts[0].split(':')[0]
-        return float(competition_rate), None
+    return primary_ratio, proportional_ratio
+
+def extract_stock_and_limit(s):
+    '''주식수 청약한도 추출'''
+    stock_match = re.search(r'주식수: ([0-9,~,]+) 주', s)
+    stock = stock_match.group(1) if stock_match else ''
     
-    elif len(parts) == 2:
-        competition_rate = parts[0].split(':')[0]
-        proportional_rate = re.findall(r'\d+', parts[1])[0]
-        return float(competition_rate), float(proportional_rate)
+    # 청약한도 추출
+    limit_match = re.search(r'청약한도: ([0-9,~,]+) 주', s)
+    limit = limit_match.group(1) if limit_match else ''
     
-    return None, None
+    # 주식수 및 청약한도 범위 처리
+    if '~' not in stock:
+        stock = f'{int(stock.replace(",", "")):,}~{int(stock.replace(",", "")):,}'
+    if limit:
+        if '~' not in limit:
+            limit = f'{int(limit.replace(",", "")):,}~{int(limit.replace(",", "")):,}'
+    else:
+        limit = None    
+    return stock, limit
+

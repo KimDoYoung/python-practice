@@ -6,7 +6,7 @@ from selenium import webdriver
 from bs4 import BeautifulSoup
 import pandas as pd
 from selenium.webdriver.chrome.options import Options
-from util import extract_dates, extract_numbers
+from util import extract_dates, extract_numbers, extract_stock_and_limit
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
@@ -150,36 +150,50 @@ def extract_offering_info(soup):
             if len(tds) > 2:
                 value = ""
                 txt = tds[2].get_text(strip=True)
-                stock_pattern = re.compile(r'주식수:\s*([\d,~]+ 주)')
-                stock_match = stock_pattern.search(txt)
-                if stock_match:
-                    value = stock_match.group(1)
-                company['주식수'] = value
-                value =""
-                # 정규 표현식으로 '15,000~18,000 주' 추출
-                limit_pattern = re.compile(r'청약한도:\s*([\d,~]+ 주)')
-                limit_match = limit_pattern.search(txt)
-                if limit_match:
-                    value = limit_match.group(1)            
-                company['청약한도'] = value
+                stk_num, limit_num = extract_stock_and_limit(txt)
+                company['주식수'] = stk_num
+                company['청약한도'] = limit_num
                 company['기타'] = None
                 company_list.append(company)
         data['주간사_리스트'] = company_list
     elif length > 1:
         next_table = table.find_next('table')
-        rows = next_table.find_all('tr')
-        company_list = []
-        for row in rows[1:]:
-            cols = row.find_all('td')
-            # 각 행의 데이터를 추출하여 딕셔너리로 만듭니다.
+        found = False
+        for td in next_table.find_all('td'):
+            if td.text.strip() == '인수회사':
+                found = True
+                break
+        if found:
+            rows = next_table.find_all('tr')
+            company_list = []
+            for row in rows[1:]:
+                cols = row.find_all('td')
+                # 각 행의 데이터를 추출하여 딕셔너리로 만듭니다.
+                company = {
+                    '인수회사': cols[0].get_text(strip=True),
+                    '주식수': cols[1].get_text(strip=True),
+                    '청약한도': cols[2].get_text(strip=True),
+                    '기타': cols[3].get_text(strip=True)
+                }
+                company_list.append(company)
+                data['주간사_리스트'] = company_list
+        else:
+            # 주간사가 여러 개인 경우인데 하위에 테이블이 없음
+            company_list = []
+            td = table.find('td', string=re.compile(r'\s*주간사\s*', re.IGNORECASE))
+            tr = td.find_parent('tr')
+            tds = tr.find_all('td')            
+            td_next = tds[2]
+            text = td_next.get_text(strip=True)
+            stk_num, limit_num = extract_stock_and_limit(text)
             company = {
-                '인수회사': cols[0].get_text(strip=True),
-                '주식수': cols[1].get_text(strip=True),
-                '청약한도': cols[2].get_text(strip=True),
-                '기타': cols[3].get_text(strip=True)
+                '인수회사': data['주간사'],
+                '주식수': stk_num,
+                '청약한도': limit_num,
+                '기타': None
             }
-            company_list.append(company)        
-        data['주간사_리스트'] = company_list
+            company_list.append(company)
+            data['주간사_리스트'] = company_list
     else:
         data['주간사_리스트'] = []
 
@@ -484,21 +498,26 @@ def main():
         driver = install_chrome_driver()
         
         urls = ['https://www.38.co.kr/html/fund/index.htm?o=k','https://www.38.co.kr/html/fund/index.htm?o=k&page=2']
-        #urls = ['https://www.38.co.kr/html/fund/index.htm?o=k&page=2']
-        urls = ['https://www.38.co.kr/html/fund/index.htm?o=k']
+        # urls = ['https://www.38.co.kr/html/fund/index.htm?o=k&page=2']
+        #urls = ['https://www.38.co.kr/html/fund/index.htm?o=k']
         data_list = []
         for url in urls:
-            data_list = get_ipo_list(url)
             logging.info('Scraping: %s', url)            
+            data_list = get_ipo_list(url)
+            logging.info('Scrapping count : %s', len(data_list))
             for basic in data_list:
-                detail = get_details(basic['detail_url'])
+                detail_url = basic['detail_url']
+                logging.info('---------------------------------------------------------')
+                logging.info('Scraping details: %s', detail_url)
+                logging.info('---------------------------------------------------------')
+                detail = get_details(detail_url)
                 basic['scrap_time'] = datetime.now()
                 basic['details'] = detail
-                print(basic)
+                print(detail_url + " done!")
                 time.sleep(1)
+            logging.info("Inserting or updating the ipo list")
+            insert_or_update_ipo_list(data_list)
         driver.quit()
-        logging.info("Inserting or updating the ipo list")
-        insert_or_update_ipo_list(data_list)
 
     except Exception as e:
         logging.error('An error occurred in the main function: %s', e)
