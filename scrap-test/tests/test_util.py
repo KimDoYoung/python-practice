@@ -55,6 +55,9 @@ def test_extract_competition_rates():
     v1, v2 = extract_competition_rates("2071.41:1 (비례 4143:1)")
     assert v1 == 2071.41
     assert v2 == 4143.0
+    v1, v2 = extract_competition_rates("2,071.41:1 (비례 4,143:1)")
+    assert v1 == 2071.41
+    assert v2 == 4143.0
     v1, v2 = extract_competition_rates("2071.41:1 ")
     assert v1 == 2071.41
     assert v2 == None

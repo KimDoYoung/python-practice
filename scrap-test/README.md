@@ -24,3 +24,27 @@
 
 - s38_2.py : 38커뮤니케이션에서 2 페이지를 가져와서 mongodb ipo_scrp collection에 넣음.
 - f38_2.py : ipo_scrap -> ipo collection으로 필요한 데이터만 format바꿔서 넣음.
+
+## 수식
+
+- 간단한 수식 계산기가 필요할 듯 해서 만들어 달라고 하다
+
+1. 수식을 계산하는 모듈을 만들고 싶음
+2. 다음과 같은 수식(문자열)들을 db에 저장해 둠
+   예1) (buyer_high + seller_high ) / 2  * bias
+3. module명 lucy_calc.py
+4. 다음과 같이 사용
+
+    ```text
+
+    varialbes  = {
+        buyer_high = 10
+        seller_high = 20
+        bias = 0.2
+    }
+    template = (buyer_high + seller_high ) / 2  * bias
+    value = calc(template, varialbes)
+    print(value)
+    ```
+
+5. calc.py를 만들어 줘
