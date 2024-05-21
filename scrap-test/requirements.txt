@@ -9,3 +9,4 @@ yfinance
 matplotlib
 pymongo
 sympy
+xmltodict
