@@ -24,7 +24,9 @@
 
 - s38_2.py : 38커뮤니케이션에서 2 페이지를 가져와서 mongodb ipo_scrp collection에 넣음.
 - f38_2.py : ipo_scrap -> ipo collection으로 필요한 데이터만 format바꿔서 넣음.
+- judal_scrap_1.py : [judal사이트](https://www.judal.co.kr/)에서 모두 scrap해서 csv로 만든다.
 
+ 
 ## 수식
 
 - 간단한 수식 계산기가 필요할 듯 해서 만들어 달라고 하다
@@ -48,3 +50,4 @@
     ```
 
 5. calc.py를 만들어 줘
+

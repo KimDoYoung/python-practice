@@ -33,32 +33,6 @@ def split_title_count(span_text):
     else:
         return None, None
 
-# def split_title_count(span_text):
-#     # 정규 표현식 패턴 정의
-#     pattern = r'([\w\s]+)(?:\((\d+)\))?'
-    
-#     # 패턴 매칭 시도
-#     match = re.match(pattern, span_text)
-    
-#     if match:
-#         word = match.group(1)  # 첫 번째 그룹: 단어
-#         number = match.group(2)  # 두 번째 그룹: 숫자 (있을 경우)
-        
-#         if number:
-#             return word, int(number)
-#         else:
-#             return word, None
-#     else:
-#         return span_text, None  # 패턴에 맞지 않는 경우 원본 문자열과 None 반환
-
-# def get_save_path(theme):
-#     # Create a directory to save the data
-#     today = datetime.datetime.now().strftime("%Y_%m_%d")
-#     save_path = f'data/{today}'
-#     os.makedirs(save_path, exist_ok=True)
-#     theme = theme.replace(" ", "_")
-#     filename = f'{save_path}/{theme}.csv'
-#     return filename
 
 def create_base_folder(base):
     now_time = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
@@ -70,16 +44,23 @@ def df_change(df):
     
     cost_range_pattern = r'([0-9,-]+)\s*([0-9,-]+)'
     percent_range_pattern = r'(-?\d+\.\d+%)\s*(-?\d+\.\d+%)?'
+    if '종목명' in df.columns:
+        array1 = df['종목명'].str.split(' ')
+        df['종목명'] = array1.str[0]
+        df['시장종류'] = array1.str[1]
+        df['종목코드'] = array1.str[2]
+
     if '현재가격' in df.columns:
         try:
-            df[['전일가', '등락가']] = df['현재가격'].str.extract(cost_range_pattern)
-            df['전일가'] = df['전일가'].fillna(0)
+            df[['현재가', '등락가']] = df['현재가격'].str.extract(cost_range_pattern)
+            df['현재가'] = df['현재가'].fillna(0)
             df['등락가'] = df['등락가'].fillna(0)
         except ValueError as e:
             print(f"Error extracting '현재가격': {e}")
 
-        df['전일가'] = df['전일가'].str.replace(',', '').astype(int)
+        df['현재가'] = df['현재가'].str.replace(',', '').astype(int)
         df['등락가'] = df['등락가'].str.replace(',', '').astype(int)
+        df.drop(columns=['현재가격'], inplace=True)
 
     if '52주 최고최저' in df.columns:
         try:
@@ -92,6 +73,7 @@ def df_change(df):
         
         df['52주최고'] = df['52주최고'].str.replace(',', '').astype(int)
         df['52주최저'] = df['52주최저'].str.replace(',', '').astype(int)
+        df.drop(columns=['52주 최고최저'], inplace=True)
 
 #52주 변동률
     if '52주 변동률' in df.columns:
@@ -104,6 +86,7 @@ def df_change(df):
 
         df['52주변동률최저'] = df['52주변동률최저'].astype(str).str.replace('%', '').astype(float)
         df['52주변동률최저'] = df['52주변동률최저'].astype(str).str.replace('%', '').astype(float)
+        df.drop(columns=['52주 변동률'], inplace=True)
 
     if '3년 최고최저' in df.columns:
         try:
@@ -115,6 +98,7 @@ def df_change(df):
         
         df['3년최고'] = df['3년최고'].str.replace(',', '').astype(int)
         df['3년최저'] = df['3년최저'].str.replace(',', '').astype(int)
+        df.drop(columns=['3년 최고최저'], inplace=True)
 
 #3년 최고최저
     percent_range_pattern = r'(-?\d+\.\d+%)\s*(-?\d+\.\d+%)?'
@@ -128,10 +112,18 @@ def df_change(df):
 
         df['3년변동률최저'] = df['3년변동률최저'].astype(str).str.replace('%', '').astype(float)
         df['3년변동률최고'] = df['3년변동률최고'].astype(str).str.replace('%', '').astype(float)
+        df.drop(columns=['3년 변동률'], inplace=True)
 
     # df['3년변동률최고'] = df['3년변동률최고'].str.replace(',', '').astype(int)
     if '시가총액' in df.columns:
-        df['시가총액억'] = df['시가총액'].apply(to_eak)    
+        df['시가총액'] = df['시가총액'].apply(to_eak)    
+    
+    if '기대수익률' in df.columns:
+        df['기대수익률'] = df['기대수익률'].str.replace('%', '').str.replace(',','').astype(float)
+
+    if '버핏초이스' in df.columns:
+        df['버핏초이스'] = df['버핏초이스'].astype(str).str.replace(' ', '').str.replace('위', '')
+        df['버핏초이스'] = df['버핏초이스'].replace('nan', '99999').astype(int)        
 
     return df
 
@@ -166,12 +158,6 @@ def main():
     if len(divs) == 2:
         start_div, end_div = divs
 
-
-    # # 첫 번째 <div> 태그를 span 텍스트로 찾습니다.
-    # start_div = soup.find('div', class_='list-group-item list-group-item-action disabled', string=lambda x: x and '테마 보기' in x)
-
-    # # 두 번째 <div> 태그를 span 텍스트로 찾습니다.
-    # end_div = soup.find('div', class_='list-group-item list-group-item-action disabled', string=lambda x: x and '테마별 종목' in x)
 
     # theme 별 href 수집
     theme_tag_list = []
