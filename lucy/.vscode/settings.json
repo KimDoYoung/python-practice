@@ -11,7 +11,8 @@
         "**/.pytest_cache": true,
     },
     "python.analysis.extraPaths": [
-        "./backend/app/core"
+        "./backend/app/core",
+        "./backend/app/utils/scrap_"
     ],
     "python.testing.pytestArgs": [
         "backend"

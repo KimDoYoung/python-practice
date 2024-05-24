@@ -1,0 +1,61 @@
+
+from datetime import timedelta
+from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.responses import HTMLResponse, RedirectResponse
+
+from backend.app.core.template_engine import render_template
+from backend.app.core.config import config
+from backend.app.core.security import create_access_token
+from fastapi import status
+
+from backend.app.domains.user.user_model import AccessToken, LoginFormData
+from backend.app.domains.user.user_service import UserService
+from backend.app.core.dependency import get_user_service
+
+router = APIRouter()
+
+@router.get("/", response_class=HTMLResponse, include_in_schema=False)
+def display_main(request: Request):
+    ''' 메인 '''
+    context = {"request": request, "message": "Welcome to Joanna API!-주식(공모주) 자동 매매시스템"}
+    return render_template("main.html", context)
+
+
+@router.get("/login", response_class=HTMLResponse)
+async def login(request: Request):
+    return render_template("login.html", {"request": request})
+
+@router.post("/login", response_model=AccessToken)
+async def login_for_access_token(form_data: LoginFormData, user_service :UserService=Depends(get_user_service)):
+    
+    user = await user_service.authenticate_user(form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = timedelta(minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"user_id": user.user_id, "name": user.user_name}, expires_delta=access_token_expires
+    )
+    access_token = AccessToken(access_token=access_token, token_type="bearer",username=user.id) 
+    return access_token
+    # return {"access_token": access_token, "token_type": "bearer"}
+
+# @router.post("/login")
+# async def login(request: Request):
+#     form = await request.form()
+#     username = form.get("username")
+#     password = form.get("password")
+    
+#     access_token_name = config.ACCESS_TOKEN_NAME
+    
+#     # 여기에 실제 인증 로직을 추가하세요
+#     if username == "test" and password == "test":
+#         access_token = create_access_token(data={"user_id": username})
+#         response = RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+#         response.set_cookie(key=access_token_name, value=access_token, httponly=True)
+#         return response
+#     else:
+#         raise HTTPException(status_code=400, detail="Invalid credentials")

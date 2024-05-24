@@ -1,0 +1,12 @@
+fastapi 
+uvicorn 
+beanie 
+motor
+pytest
+pyjwt
+pymongo
+python-dotenv
+concurrent-log-handler
+jinja2
+python-jose
+passlib

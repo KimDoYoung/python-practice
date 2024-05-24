@@ -6,30 +6,31 @@
     1. 공모주 청약일정
     2. 예상체결가 산정
     3. 38커뮤니티 등에서 데이터를 가져온다.(배치)
-   
+    4. 정해진 일시에 자동으로 주식매매을 수행한다.
+    5. cron기능을 가지고 있어서 정해진 시간에 특정사이트에서 scrapping을 한다.
+
 * 2단계 개발
   1. 계좌관리
-  2. 수익금관리 
+  2. 수익금관리
 
 ## 기술스택
 
 * backend
+
 1. python, fastapi, uvicorn
 2. mongodb
    1. db : stockdb
    2. collections : users, ipo, ipo_scrap_38, configs
-   
+
 3. async db : use beanie
-4. pytest 
+4. pytest
 5. jwt 인증
 
-
 * frontend
+
 1. jquery 사용, ajax는 pure javascript의 fetch사용
 2. handlebar-template사용
 3. bootstrap5 사용
-
-
 
 ## 주요기능
 
@@ -38,8 +39,38 @@
 3. 가져온 데이터로 일정을 달력에 보여준다.
 4. 가져온 데이터로 예상체결가를 산정해 본다.
 
+## 프로그램 설명
+
+## 실행환경
+
+```bash
+    export LUCY_MODE=local
+    uvicorn backend.main:app --reload --port $PORT
+```
+
+### config.py
+
+* LUCY_MODE=local 과 같이 설정된 파일로 .env.local 파일을 읽는다.
+
+* DB설정값,로그파일
+* config.DB_URL 과 같이 사용
+
+### logger.py
+
+```python
+from backend.app.core.logger import get_logger
+logger = get_logger(__name__)
+
+logger.debug(...) 
+
+```
+
+### login
+
+- login.html에서 fetch로 username, password를 보낸다.
+- /login 에서 
+
 
 ## history
 
 2024-05-21 : 프로젝트 시작
-

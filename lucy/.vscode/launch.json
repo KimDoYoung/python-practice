@@ -5,14 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python Debugger: FastAPI",
+            "name": "Debug-Lucy",
             "type": "debugpy",
             "request": "launch",
             "module": "uvicorn",
             "args": [
                 "backend.main:app",
-                "--reload"
-            ],
+                "--reload",
+                "--port",
+                "8000"  // 원하는 포트 번호로 변경
+            ],           
             "jinja": true,
             // "justMyCode": false,
             "console": "integratedTerminal"

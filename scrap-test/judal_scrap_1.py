@@ -152,12 +152,10 @@ def main():
     url = "https://www.judal.co.kr/"
     response = requests.get(url)
 
-    # Create a BeautifulSoup object to parse the HTML content
     soup = BeautifulSoup(response.content, "html.parser")
     divs = soup.find_all('div', class_='list-group-item list-group-item-action disabled')
     if len(divs) == 2:
         start_div, end_div = divs
-
 
     # theme 별 href 수집
     theme_tag_list = []
@@ -187,12 +185,10 @@ def main():
                 a_tags.append(sibling)
             else:
                 break            
-    # Loop over the 'a' tags
+
     for tag in a_tags:
-        # Extract the href attribute
         href = tag.get('href')
         name, count = split_title_count(tag.find('span').text.strip())
-        # name = tag.find('span').text.strip()
         href_list.append({"name": name,  "href": href})
 
     df = pd.DataFrame(href_list)
@@ -216,10 +212,8 @@ def main():
         if table1:
             print(f"parsing 시작 : {name}, url : {url}")
             table = StringIO(str(table1))
-            # Convert table to dataframe
             df = pd.read_html(table)[0]
-            # data preprocessing
-            # '현재가격' 컬럼을 '전일가'와 '등락가'로 분리
+            # 현재가격이 있는 것은 종목, 테마차트(90일)이 있는 것은 테마
             if '현재가격' in df.columns:
                 df = df_change(df)
             elif '테마차트(90일)' in df.columns:
@@ -228,9 +222,10 @@ def main():
             filepath = f'{base_folder}/{name.replace("/","_").replace(" ", "_")}.csv'
             df.to_csv(filepath, index=False)
             
-            print(filepath + " is saved!")
+            print(filepath + " 저장됨")
             scraped_urls.add(url)
-            # Generate a random sleep time between 1 and 3 seconds
+
+            # random 1초~5초 사이의 sleep
             sleep_time = random.uniform(1, 5)
             time.sleep(sleep_time)
         else:
