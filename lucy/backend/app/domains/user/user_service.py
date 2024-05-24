@@ -46,3 +46,5 @@ class UserService:
         result = await User.count()
         return result
 
+    async def authenticate_user(self, user_id, password) -> User:
+        user = self.find_one(User.user_id == user_id)
