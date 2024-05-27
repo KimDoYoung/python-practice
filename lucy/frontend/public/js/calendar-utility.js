@@ -374,9 +374,9 @@ const CalendarMaker = (function() {
                 html += '<div class="row">';
                 saveCloseDiv = '</div>';
             }
-            if(i%7 == 0){
+            if(i%7 == 0){ //일요일
 				html += '<div class="col day text-danger">' + Number(ymd.toString().substring(6)) + "</div>";	
-			}else if(i%7 == 6){
+			}else if(i%7 == 6){ //토요일
 				html += '<div class="col day text-primary">' + Number(ymd.toString().substring(6)) + "</div>";				
 			}else{
 				html += '<div class="col day">' + Number(ymd.toString().substring(6)) + "</div>";

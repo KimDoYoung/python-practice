@@ -1,7 +1,7 @@
 
 from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 
 from backend.app.core.template_engine import render_template
 from backend.app.core.config import config
@@ -20,14 +20,28 @@ def display_main(request: Request):
     context = {"request": request, "message": "Welcome to Joanna API!-주식(공모주) 자동 매매시스템"}
     return render_template("main.html", context)
 
+@router.get("/main", response_class=HTMLResponse, include_in_schema=False)
+def display_main(request: Request):
+    ''' 메인 '''
+    context = {}
+
+    return render_template("main.html", context)
+
+@router.get("/calendar", response_class=HTMLResponse, include_in_schema=False)
+def display_main(request: Request):
+    ''' 달력-스케줄 '''
+    context = {}
+
+    return render_template("template/calendar.html", context)
 
 @router.get("/login", response_class=HTMLResponse)
 async def login(request: Request):
+    ''' 로그인 페이지 '''
     return render_template("login.html", {"request": request})
 
 @router.post("/login", response_model=AccessToken)
 async def login_for_access_token(form_data: LoginFormData, user_service :UserService=Depends(get_user_service)):
-    
+    ''' 로그인 프로세스'''
     user = await user_service.authenticate_user(form_data.username, form_data.password)
     if not user:
         raise HTTPException(

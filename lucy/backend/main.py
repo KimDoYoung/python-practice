@@ -1,6 +1,8 @@
+import os
 from beanie import init_beanie
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from backend.app.api.v1.endpoints.user_routes import router as user_router
 from backend.app.api.v1.endpoints.home_routes import router as home_router
 from backend.app.domains.user.user_model import User
@@ -10,6 +12,13 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from backend.app.core.middleware import jwt_auth_middleware
 
 app = FastAPI(title="Lucy Project - 공모주청약(개인용)")
+
+#public
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+static_files_path = os.path.join(BASE_DIR, 'frontend', 'public')
+
+app.mount("/public", StaticFiles(directory=static_files_path), name="public")
+
 
 # 미들웨어 추가
 app.add_middleware(BaseHTTPMiddleware, dispatch=jwt_auth_middleware)
@@ -38,6 +47,8 @@ async def shutdown_event():
 # Adding event handlers to the application lifecycle
 app.add_event_handler("startup", startup_event)
 app.add_event_handler("shutdown", shutdown_event)
+
+
 
 # API 라우터 포함
 app.include_router(user_router, prefix="/api/v1/users", tags=["users"])
