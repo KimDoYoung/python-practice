@@ -20,7 +20,7 @@
 1. python, fastapi, uvicorn
 2. mongodb
    1. db : stockdb
-   2. collections : users, ipo, ipo_scrap_38, configs
+   2. collections : users, ipo, ipo_scrap_38, configs, holiday
 
 3. async db : use beanie
 4. pytest
@@ -67,10 +67,18 @@ logger.debug(...)
 
 ### login
 
-- login.html에서 fetch로 username, password를 보낸다.
-- /login 에서 
-
+* login.html에서 fetch로 username, password를 보낸다.
+* /login 에서
 
 ## history
 
 2024-05-21 : 프로젝트 시작
+
+## todo
+
+1. calendar에 조회해서 공휴일과 일정넣기
+2. cron에 걸기
+   * 공휴일
+   * 38사이트
+   * 주달
+3.
