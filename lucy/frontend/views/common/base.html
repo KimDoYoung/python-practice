@@ -31,5 +31,20 @@
 <script src="/public/js/common.js"></script>
 <script src="/public/js/handlebar-helpers.js"></script>
 {% block script %}{% endblock %}
+<script>
+    $(document).ready(function() {
+        $('#logout').click(function() {
+            localStorage.removeItem('lucy_token');  // JWT 토큰 삭제
+            removeCookie('lucy_token');
+            fetch('/logout', {
+                method: 'GET'
+            }).then(function(response) {
+                if (response.ok) {
+                    location.href = '/login';
+                }
+            });
+        });
+    });
+</script>
 </body>
 </html>

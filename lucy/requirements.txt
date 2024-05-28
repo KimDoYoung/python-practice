@@ -10,3 +10,5 @@ concurrent-log-handler
 jinja2
 python-jose
 passlib
+pytest-asyncio
+korean-lunar-calendar

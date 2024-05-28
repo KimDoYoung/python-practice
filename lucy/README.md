@@ -32,6 +32,11 @@
 2. handlebar-template사용
 3. bootstrap5 사용
 
+## 기술적 고찰
+
+1. pytest로 async db test가 잘되지 않는다.
+2. mongodb의 collection와 beanie의 클래스명을 일치시키자
+
 ## 주요기능
 
 1. batch(scheduler)로 site [38커뮤니케이션](https://www.38.co.kr/html/fund/index.htm?o=k)에서 데이터를 가져와서 mongodb의 collection을 채운다
@@ -71,7 +76,9 @@ logger.debug(...)
 * /login 에서
 
 ### calendar
+
 * holiday, ipo, user
+
 1. holiday->빨간색
 2. ipdo event에서
    1. 6글짜이상...
@@ -79,7 +86,7 @@ logger.debug(...)
    3. 청약일 파란색
    4. 납일일 회색
    5. 환불일 회색
-   6. 상장일 빨간색 
+   6. 상장일 빨간색
 
 ## history
 

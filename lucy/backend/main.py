@@ -3,12 +3,18 @@ from beanie import init_beanie
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from backend.app.api.v1.endpoints.user_routes import router as user_router
-from backend.app.api.v1.endpoints.home_routes import router as home_router
+from backend.app.domains.system.config_model import DbConfig
+from backend.app.domains.system.eventdays_model import EventDays
+from backend.app.domains.system.ipo_model import Ipo
 from backend.app.domains.user.user_model import User
 from backend.app.core.mongodb import MongoDb
 from backend.app.core.config import config
 from backend.app.core.jwtmiddleware import JWTAuthMiddleware
+from backend.app.api.v1.endpoints.user_routes import router as user_router
+from backend.app.api.v1.endpoints.home_routes import router as home_router
+from backend.app.api.v1.endpoints.eventdays_routes import router as eventdays_router
+from backend.app.api.v1.endpoints.ipo_routes import router as ipo_router
+
 
 app = FastAPI(title="Lucy Project - 공모주청약(개인용)")
 
@@ -32,6 +38,9 @@ async def startup_event():
     
     db = MongoDb.get_client()[db_name]
     await init_beanie(database=db, document_models=[User])
+    await init_beanie(database=db, document_models=[EventDays])
+    await init_beanie(database=db, document_models=[Ipo])
+    await init_beanie(database=db, document_models=[DbConfig])
     
 async def shutdown_event():
     await MongoDb.close()
@@ -48,6 +57,8 @@ app.mount("/public", StaticFiles(directory=static_files_path), name="public")
 # API 라우터 포함
 app.include_router(user_router, prefix="/api/v1/users", tags=["users"])
 app.include_router(home_router)
+app.include_router(eventdays_router)
+app.include_router(ipo_router)
 
 if __name__ == "__main__":
     import uvicorn

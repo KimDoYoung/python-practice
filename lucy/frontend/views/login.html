@@ -31,8 +31,8 @@
                 </div>
                 <button type="submit" class="btn btn-primary w-100">Login</button>
             </form>
+            <div id="error-message-area"></div>
         </div>
-        <div id="error-message-area"></div>
     </div>
 
     <!-- Bootstrap JS and dependencies -->
@@ -69,18 +69,19 @@
                     localStorage.setItem('lucy_token', responseData.access_token);
                     localStorage.setItem('lucy_token_type', responseData.token_type);
                     // /main 페이지로 리디렉션
-                    setCookie('lucytoken', responseData.access_token, 1);
+                    setCookie('lucytoken', responseData.access_token, 100);
                     window.location.href = '/main';
                 })
                 .catch(error => {
-                    error.text().then(errorMessage => {
-                        // 오류 메시지를 화면에 표시
-                        const errorArea = document.getElementById('error-message-area');
-                        if (errorArea) {
-                            var err = JSON.parse(errorMessage);
-                            errorArea.innerHTML = `<div class="text-red-500 text-sm mt-2">Error: ${err.message}</div>`;
-                        }
-                    });
+                    let message = "unknown error."
+                    if (error.status != 500){
+                        message ="Invalid username or password."
+                    }
+                    const errorArea = document.getElementById('error-message-area');
+                    if (errorArea) {
+                        errorArea.innerHTML = `<div class="text-red-500 text-sm mt-2">Error: ${message}</div>`;
+                    }
+
                 });                
                 return false;
             });

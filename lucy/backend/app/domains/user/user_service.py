@@ -47,4 +47,9 @@ class UserService:
         return result
 
     async def authenticate_user(self, user_id, password) -> User:
-        user = self.find_one(User.user_id == user_id)
+        user = await self.get_user(user_id)
+        if user:
+            if user.password == password:
+                return user
+        else:
+            return None    

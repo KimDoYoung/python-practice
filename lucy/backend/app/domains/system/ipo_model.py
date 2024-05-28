@@ -25,17 +25,19 @@ class Days(BaseModel):
     환불일: str
     상장일: Optional[str] = None
 
-class ProcessedTime(BaseModel):
-    date: datetime
+class IpoDays(BaseModel):
+    company: str
+    name: str
+    ymd: str    
 
 class Ipo(Document):
     stk_name: str
     days: Days
     name: str
     offering: Offering
-    processed_time: ProcessedTime
+    processed_time: datetime
     scrap_id: PydanticObjectId
     title: str
 
     class Settings:
-        collection = "ipo"
+        collection = "Ipo"

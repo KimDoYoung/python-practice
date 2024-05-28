@@ -21,4 +21,4 @@ class EventDays(Document):
     repeat: Optional[str] = None
 
     class Settings:
-        collection = "eventdays"  # 변경된 컬렉션 이름
+        collection = "EventDays"  # 변경된 컬렉션 이름

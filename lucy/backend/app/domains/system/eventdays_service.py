@@ -18,9 +18,15 @@ class EventDaysService:
         await eventday.create()
         return eventday
 
-    async def get_all(self) -> List[EventDays]:
+    async def get_all(self, yyyymm:str) -> List[EventDays]:
         try:
-            eventdays = await EventDays.find_all().to_list()
+#            eventdays = await EventDays.find(EventDays.locdate.startswith(yyyymm)).to_list()
+            if yyyymm == 'all':
+                eventdays = await EventDays.find().to_list()
+            else:
+                eventdays = await EventDays.find({"locdate": {"$regex": f'^{yyyymm}'}}).to_list()
+            return eventdays            
+ #           return eventdays            
             return eventdays
         except Exception as e:
             logger.error(f"Failed to retrieve all EventDays: {e}")

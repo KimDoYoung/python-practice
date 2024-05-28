@@ -17,7 +17,7 @@ class Config:
         self.SECRET_KEY = os.getenv('SECRET_KEY','lucy_secret_key_1234_!@#$')
         self.ALGORITHM = os.getenv('ALGORITHM','HS256')
         self.ACCESS_TOKEN_EXPIRE_MINUTES = os.getenv('ACCESS_TOKEN_EXPIRE_MINUTES', 30)
-        self.ACCESS_TOKEN_NAME = os.getenv('ACCESS_TOKEN_NAME', 'lucy_access_token')
+        self.ACCESS_TOKEN_NAME = os.getenv('ACCESS_TOKEN_NAME', 'lucy_token')
         # 로그 디렉토리 생성
         log_dir = os.path.dirname(self.LOG_FILE)
 

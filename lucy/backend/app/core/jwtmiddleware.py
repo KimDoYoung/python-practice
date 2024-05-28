@@ -4,10 +4,13 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from backend.app.core.config import config
 from backend.app.core.security import verify_token
 
+
 class JWTAuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
+        # 토큰이 필요 없는 URL 경로 정의
         STATIC_PATHS = ["/public", "/favicon.ico"]
-        if request.url.path in ["/login", "/api/v1/users/login", "/calendar", "/main"] or any(request.url.path.startswith(path) for path in STATIC_PATHS):    
+        print(request.url.path)
+        if request.url.path in ["/login", "/logout", "/calendar", "/main"] or any(request.url.path.startswith(path) for path in STATIC_PATHS):    
             response = await call_next(request)
             return response
         # Authorization 헤더에서 토큰 추출

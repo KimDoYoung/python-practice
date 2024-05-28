@@ -5,6 +5,7 @@ from typing import List, Optional
 
 class LoginFormData(BaseModel):
     username: str
+    email:Optional[str] = None
     password: Optional[str] = None
 
 class AccessToken(LoginFormData):
@@ -29,4 +30,4 @@ class User(Document):
     additional_attributes: List[UserAdditionalAttribute] = []
 
     class Settings:
-        name = "users"  # MongoDB에서 사용할 컬렉션 이름
+        name = "Users"  # MongoDB에서 사용할 컬렉션 이름

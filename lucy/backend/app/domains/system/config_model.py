@@ -11,4 +11,4 @@ class DbConfig(Document):
     value: str
 
     class Settings:
-        collection = "config"  # MongoDB에서 사용할 컬렉션 이름
+        collection = "Config"  # MongoDB에서 사용할 컬렉션 이름

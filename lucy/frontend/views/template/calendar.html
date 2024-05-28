@@ -72,19 +72,64 @@
 {% raw %}
 <script src="/public/js/calendar-utility.js"></script>
 <script>
-    $( document ).ready(function() {
-        console.log('calendar.... ');
-        // var scheduleOffcanvas = new bootstrap.Offcanvas(document.getElementById('scheduleOffcanvas'));
-        // var specialDayOffcanvas= new bootstrap.Offcanvas(document.getElementById('specialDayOffcanvas'));
-        
-        function drawCalendar(yyyy,mm){
+    async function fetchData(url) {
+        const token = localStorage.getItem('lucy_token');
+
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const responseData = await response.json();
+            return responseData;
+        } catch (error) {
+            console.error('에러 발생:', error);
+            return null;
+        }
+    }
+    async function fetchDataAndDrawCalendar() {
+        try {
+            // 두 개의 fetchData 호출을 동시에 실행하고, 모두 완료될 때까지 기다림
+            const [eventDaysData, ipoDaysData] = await Promise.all([
+                fetchData('/eventdays/all'),
+                fetchData('/ipo/days/202405')
+            ]);
+            
+            console.log(eventDaysData);
+            console.log(ipoDaysData);
+
+            var date = new Date();
+            var yyyy = date.getFullYear();
+            var mm = date.getMonth() + 1;
+            
+            // 두 개의 데이터가 모두 준비되면 drawCalendar를 호출
+            // drawCalendar(yyyy, mm, eventDaysData, ipoDaysData);
+            drawCalendar(yyyy, mm);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    } 
+    function drawCalendar(yyyy,mm){
             $('#currentYyyy').text(yyyy);
             $('#currentMm').text(mm);		
             var html = CalendarMaker.calendarHtml(yyyy, mm);
             $('#mainCalendar').html(html);
             $('#mainCalendar').find('.week').addClass('calendar-border-week');
             $('#mainCalendar').find('.day').addClass('calendar-border-day');
-        }
+    }       
+    $( document ).ready(function() {
+        console.log('calendar.... ');
+        // var scheduleOffcanvas = new bootstrap.Offcanvas(document.getElementById('scheduleOffcanvas'));
+        // var specialDayOffcanvas= new bootstrap.Offcanvas(document.getElementById('specialDayOffcanvas'));
+        
+
         
         $("#prevMonth").on('click', function(){
             let ym = CalendarMaker.currentYearMonth();
@@ -215,11 +260,27 @@
                 }
             })
         });
-        //로딩시 수행
-        var date = new Date();
-        var yyyy = date.getFullYear();
-        var mm = date.getMonth() + 1;
-        drawCalendar(yyyy,mm);
+
+        // 함수 호출
+        fetchDataAndDrawCalendar();
+        // try {
+        //     // 두 개의 fetchData 호출을 동시에 실행하고, 모두 완료될 때까지 기다림
+        //     const [eventDaysData, ipoDaysData] =  Promise.all([
+        //         fetchData('/eventdays/all'),
+        //         fetchData('/ipo/days/202405')
+        //     ]);
+        //     console.log(eventDaysData);
+        //     console.log(ipoDaysData);
+        //     var date = new Date();
+        //     var yyyy = date.getFullYear();
+        //     var mm = date.getMonth() + 1;
+        //     drawCalendar(yyyy,mm);
+    
+        //     // 두 개의 데이터가 모두 준비되면 drawCalendar를 호출
+        //     //drawCalendar(eventDaysData, ipoDaysData);
+        // } catch (error) {
+        //         console.error('Error fetching data:', error);
+        // }
         
     });
     </script>	
