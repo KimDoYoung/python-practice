@@ -70,6 +70,17 @@ logger.debug(...)
 * login.html에서 fetch로 username, password를 보낸다.
 * /login 에서
 
+### calendar
+* holiday, ipo, user
+1. holiday->빨간색
+2. ipdo event에서
+   1. 6글짜이상...
+   2. "일"자 빼기
+   3. 청약일 파란색
+   4. 납일일 회색
+   5. 환불일 회색
+   6. 상장일 빨간색 
+
 ## history
 
 2024-05-21 : 프로젝트 시작

@@ -3,7 +3,6 @@ from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime, timezone
 from typing import List, Optional
 
-
 class LoginFormData(BaseModel):
     username: str
     password: Optional[str] = None
