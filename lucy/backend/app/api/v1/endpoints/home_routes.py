@@ -42,18 +42,20 @@ async def login(request: Request):
 @router.post("/login", response_model=AccessToken)
 async def login_for_access_token(form_data: LoginFormData, user_service :UserService=Depends(get_user_service)):
     ''' 로그인 프로세스'''
-    user = await user_service.authenticate_user(form_data.username, form_data.password)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    access_token_expires = timedelta(minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES)
+    # user = await user_service.authenticate_user(form_data.username, form_data.password)
+    # if not user:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_401_UNAUTHORIZED,
+    #         detail="Incorrect username or password",
+    #         headers={"WWW-Authenticate": "Bearer"},
+    #     )
+    access_token_expires = timedelta(minutes=int(config.ACCESS_TOKEN_EXPIRE_MINUTES))
+    user_id = form_data.username
+    user_name = form_data.username
     access_token = create_access_token(
-        data={"user_id": user.user_id, "name": user.user_name}, expires_delta=access_token_expires
+        data={"user_id": user_id, "name": user_name}, expires_delta=access_token_expires
     )
-    access_token = AccessToken(access_token=access_token, token_type="bearer",username=user.id) 
+    access_token = AccessToken(access_token=access_token, token_type="bearer",username=user_name) 
     return access_token
     # return {"access_token": access_token, "token_type": "bearer"}
 

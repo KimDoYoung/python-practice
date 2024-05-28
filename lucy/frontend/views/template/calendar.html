@@ -11,12 +11,40 @@
         border: 1px solid #dee2e6; /* 테두리 스타일 및 색상 지정 */
         padding: 10px; /* 선택적으로 패딩 추가 */
     }    
+    .bg-today {
+        background-color: #ffffe0;
+    }
+    .circle {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
+    border-radius: 50%;
+    border: 2px solid red;
+    }
 
- .border-icon {
-   border: 1px solid #007bff; /* 보더 색상 */
-   padding: 8px 12px; /* 보더 주변의 여백을 조절할 수 있습니다 */
-   border-radius: 5px; /* 보더의 모서리를 둥글게 만들기 위해 사용 */
- }
+    .holiday, .event {
+        font-size: 0.8em;
+        color: black;
+        background-color: #f5c592;
+        padding: 2px;
+        border-radius: 5px;
+        margin-bottom: 1px;
+    }
+
+    .day-data1 {
+        margin-top: 5px;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }   
+  
+    .border-icon {
+    border: 1px solid #007bff; /* 보더 색상 */
+    padding: 8px 12px; /* 보더 주변의 여백을 조절할 수 있습니다 */
+    border-radius: 5px; /* 보더의 모서리를 둥글게 만들기 위해 사용 */
+    }
 
 </style>
 {% endblock %}

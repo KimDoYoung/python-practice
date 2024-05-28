@@ -6,10 +6,10 @@ from typing import List, Optional
 
 class LoginFormData(BaseModel):
     username: str
-    password: str
+    password: Optional[str] = None
 
 class AccessToken(LoginFormData):
-    ccess_token: str
+    access_token: str
     token_type: str
 
 class UserAdditionalAttribute(BaseModel):
