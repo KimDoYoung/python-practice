@@ -24,10 +24,43 @@
     border: 2px solid red;
     }
 
-    .holiday, .event {
+    .holiday {
+        font-size: 0.8em;
+        color: red;
+        /* background-color: #f5c592; */
+        padding: 2px;
+        border-radius: 5px;
+        margin-bottom: 1px;
+    }
+    .event {
         font-size: 0.8em;
         color: black;
         background-color: #f5c592;
+        padding: 2px;
+        border-radius: 5px;
+        margin-bottom: 1px;
+    }
+    .event-nap, .event-whan {
+        font-size: 0.8em;
+        color: black;
+        background-color: #eae6e3;
+        padding: 2px;
+        border-radius: 5px;
+        margin-bottom: 1px;
+    }
+    .event-sang {
+        font-size: 0.8em;
+        color: black;
+        background-color: #f2b1b1;
+        padding: 2px;
+        border-radius: 5px;
+        margin-bottom: 1px;
+    }
+
+    .event-cheong {
+        font-size: 0.8em;
+        color: black;
+        background-color: #9bd7ec;
         padding: 2px;
         border-radius: 5px;
         margin-bottom: 1px;
@@ -58,11 +91,6 @@
         <a href="#" id="nextMonth" class="text-decoration-none  border-icon mx-2"  title="next month"><i class="bi bi-caret-right"></i></a>
         <a href="#" id="nextYear" class="text-decoration-none  border-icon me-2" title="next year"><i class="bi bi-caret-right-fill"></i></a>
         <a href="#" id="todayYearMonth" class="text-decoration-none  border-icon me-2" title="today"><i class="bi bi-calendar-check today-icon" title="오늘"></i></a>
-        <a href="#" id="btnSpecialDay" class="text-decoration-none  border-icon me-1" title="공휴일정보"><i class="bi bi-box2-heart"></i></a>
-        <a href="#" id="btnEditSchedule" class="text-decoration-none  border-icon" title="schedule"><i class="bi bi-pencil" title="일정추가"></i></a>
-        <button class="btn btn-primary" id="btnHolidayApiDbInsert">holidayApiDb저장</button>
-        <button class="btn btn-primary" id="btn24DivisionApiDbInsert">24DivisionApiDb저장</button>
-        <button class="btn btn-primary" id="btnFillLunarCalendar">음력달력저장</button>
     </div>
     <div id="mainCalendar" class="mt-2 vh-100"></div>
 </section>
@@ -94,31 +122,38 @@
             return null;
         }
     }
-    async function fetchDataAndDrawCalendar() {
+    async function fetchDataAndDrawCalendar(yyyy, mm) {
         try {
             // 두 개의 fetchData 호출을 동시에 실행하고, 모두 완료될 때까지 기다림
+            let yyyymm = yyyy + '' + (mm < 10 ? '0' + mm : mm);
             const [eventDaysData, ipoDaysData] = await Promise.all([
-                fetchData('/eventdays/all'),
-                fetchData('/ipo/days/202405')
+                fetchData('/eventdays/' + yyyymm ),
+                fetchData('/ipo/days/' + yyyymm)
             ]);
             
             console.log(eventDaysData);
             console.log(ipoDaysData);
-
-            var date = new Date();
-            var yyyy = date.getFullYear();
-            var mm = date.getMonth() + 1;
+            const holidays = eventDaysData
+                .filter(item => item.isHoliday === "Y")
+                .map(item => ({
+                    name: item.dateName,
+                    ymd: item.locdate
+                }));
             
+            const eventDays = ipoDaysData
+            console.log(holidays);
+            console.log(eventDays);
             // 두 개의 데이터가 모두 준비되면 drawCalendar를 호출
-            // drawCalendar(yyyy, mm, eventDaysData, ipoDaysData);
-            drawCalendar(yyyy, mm);
+            drawCalendar(yyyy, mm, holidays, eventDays);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
     } 
-    function drawCalendar(yyyy,mm){
+    function drawCalendar(yyyy,mm, holidays,eventDays){
             $('#currentYyyy').text(yyyy);
-            $('#currentMm').text(mm);		
+            $('#currentMm').text(mm);
+            CalendarMaker.setHolidays(holidays);
+            CalendarMaker.setEventDays(eventDays);
             var html = CalendarMaker.calendarHtml(yyyy, mm);
             $('#mainCalendar').html(html);
             $('#mainCalendar').find('.week').addClass('calendar-border-week');
@@ -134,154 +169,33 @@
         $("#prevMonth").on('click', function(){
             let ym = CalendarMaker.currentYearMonth();
             ym  = CalendarMaker.prevYearMonth(ym[0], ym[1]);
-            drawCalendar(ym[0], ym[1]);
+            fetchDataAndDrawCalendar(ym[0], ym[1]);
         });
         $("#prevYear").on('click', function(){
             let ym = CalendarMaker.currentYearMonth();
-            drawCalendar(ym[0]-1, ym[1]);		
+            fetchDataAndDrawCalendar(ym[0]-1, ym[1]);		
         });
         $("#nextMonth").on('click', function(){
             let ym = CalendarMaker.currentYearMonth();
             ym  = CalendarMaker.nextYearMonth(ym[0], ym[1]);
-            drawCalendar(ym[0], ym[1]);
+            fetchDataAndDrawCalendar(ym[0], ym[1]);
         });
         $("#nextYear").on('click', function(){
             let ym = CalendarMaker.currentYearMonth();
-            drawCalendar(ym[0]+1, ym[1]);					
+            fetchDataAndDrawCalendar(ym[0]+1, ym[1]);					
         });
         $('#todayYearMonth').on('click', function(){
             let today = new Date();
             let y = today.getFullYear();
             let m= today.getMonth() + 1;
-            drawCalendar(y,m);
+            fetchDataAndDrawCalendar(y,m);
         });
-        $("#btnSchedulaInsert").on('click', function(){
-            let $form = $('#formSchedule');
-            let lunarOrSolar =  $form.find('input[name=lunar_or_solar]:checked').val();
-            let repeatOption =  $form.find('input[name=repeat_option]:checked').val();
-            let ymd =  $form.find('input[name=ymd]').val();
-            let content =  $form.find('input[name=content]').val();
-            if(ymd.length < 1){
-                alert('날짜를 넣어주세요');
-                return ;
-            }
-            if(content.length < 1){
-                alert('내용을 넣어주세요');
-                return ;
-            }
-            if(repeatOption == 'Y' && ymd.length != 4){
-                alert("매년 옵션에서는 월일(숫자4자리)를 넣어주셔야합니다");
-                return ;
-            }else if(repeatOption == 'M' && ymd.length != 2){
-                alert("매월 옵션에서는 일(숫자2자리)를 넣어주셔야합니다");
-                return ;
-            }else if(repeatOption == 'S' && ymd.length != 8){
-                alert("특정일 옵션에서는 년월일(숫자8자리)를 넣어주셔야합니다");
-                return ;			
-            }
-            var data = {
-                    lunarOrSolar: lunarOrSolar,
-                    repeatOption: repeatOption,
-                    ymd: ymd,
-                    content: content
-                };
-            
-            JuliaUtil.ajax("/insert", data, {
-                method:'POST',
-                success : (response) => {
-                    console.log(response);
-                    if(response.result == 'OK'){
-                        $form.find('input[name=ymd]').val('');
-                        $form.find('input[name=content]').val('');
-                        alert('저장되었습니다');
-                    }
-                },
-            } );
-        });
-        $('#btnSecialDayInsert').on('click', function(){
-            let $form = $('#formSpecialDay');
-            let locDate =  $form.find('#locDate').val();
-            let dateKind =  $form.find('#dateKind').val();
-            let holidayYn =  $form.find('input[name=holidayYn]:checked').val();
-            let dateName =  $form.find('#dateName').val();
-            if(dateName.length < 1){
-                alert('명칭을 넣어주세요');
-                return ;
-            }
-            var data = {
-                    locDate: locDate,
-                    dateKind: dateKind,
-                    holidayYn: holidayYn,
-                    dateName: dateName
-                };
-            
-            JuliaUtil.ajax("/sepcialday/insert", data, {
-                method:'POST',
-                success : (response) => {
-                    console.log(response);
-                    if(response.result == 'OK'){
-                        $form.find('#locDate').val('');
-                        $form.find('#dateName').val('');
-                        alert('저장되었습니다');
-                    }
-                },
-            } );
-        });
-        //-------------------------------------------------
-        //offcanva show hide
-        $('#btnEditSchedule').on('click', function(){
-            scheduleOffcanvas.show();
-        });
-        $('#btnSchedulaClose').on('click', function(){
-            scheduleOffcanvas.hide();
-        });
-        $('#btnSpecialDay').on('click', function(){
-            specialDayOffcanvas.show();
-        });
-        //-------------------------------------------------
-        $('#btnHolidayApiDbInsert').on('click', function(){
-            JuliaUtil.ajax('/openApi/holiday',null,{
-                success : (response)=>{
-                    console.log(response);
-                }
-            })
-        });
-        $('#btn24DivisionApiDbInsert').on('click', function(){
-            JuliaUtil.ajax('/openApi/division24',null,{
-                success : (response)=>{
-                    console.log(response);
-                }
-            })
-        });
-        $('#btnFillLunarCalendar').on('click', function(){
-            JuliaUtil.ajax('/openApi/fill-lunar-calendar',null,{
-                success : (response)=>{
-                    console.log(response);
-                }
-            })
-        });
+        // 달력 호출 
+        var date = new Date();
+        var yyyy = date.getFullYear();
+        var mm = date.getMonth() + 1; 
+        fetchDataAndDrawCalendar(yyyy, mm);
 
-        // 함수 호출
-        fetchDataAndDrawCalendar();
-        // try {
-        //     // 두 개의 fetchData 호출을 동시에 실행하고, 모두 완료될 때까지 기다림
-        //     const [eventDaysData, ipoDaysData] =  Promise.all([
-        //         fetchData('/eventdays/all'),
-        //         fetchData('/ipo/days/202405')
-        //     ]);
-        //     console.log(eventDaysData);
-        //     console.log(ipoDaysData);
-        //     var date = new Date();
-        //     var yyyy = date.getFullYear();
-        //     var mm = date.getMonth() + 1;
-        //     drawCalendar(yyyy,mm);
-    
-        //     // 두 개의 데이터가 모두 준비되면 drawCalendar를 호출
-        //     //drawCalendar(eventDaysData, ipoDaysData);
-        // } catch (error) {
-        //         console.error('Error fetching data:', error);
-        // }
-        
     });
     </script>	
     

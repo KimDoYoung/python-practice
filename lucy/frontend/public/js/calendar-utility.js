@@ -310,13 +310,13 @@ var LunarCalendar = (function(){
 const CalendarMaker = (function() {
 	let currentYear;
 	let currentMonth;
-    const holidays = [
+    let holidays = [
         { name: '개천절1111', ymd: '20240506' },
         { name: '정선생일', ymd: '20240506' },
         { name: '설날', ymd: '20240501' }
         // 추가적인 휴일을 여기에 추가하세요.
     ];
-    const event_days = [
+    let event_days = [
         { company: '노브랜드', name: '상장일', ymd: '20240516' },
         { company: '에이치엠씨아이비스팩7호', name: '청약일', ymd: '20240521' },
         { company: '노브랜드', name: '청약일', ymd: '20240527' },
@@ -358,6 +358,36 @@ const CalendarMaker = (function() {
         let date = new Date();
         return date.getFullYear().toString() + zeroPad(date.getMonth() + 1) + zeroPad(date.getDate());
     }
+    const choice_day_number_class = function (yoil, ymd){
+        let found = holidays.find(holiday => holiday.ymd === ymd)
+        if(found){
+            return 'text-danger';
+        }
+        if(yoil % 7 === 0){ // 일요일
+            return 'text-danger';
+        }else if( yoil % 7 === 6){ // 토요일
+            return 'text-primary';
+        }
+        return "";
+    }
+    const cutString = function(str, len){
+        if(str.length > len){
+            return str.substring(0, len) + '...';
+        }
+        return str;
+    }
+    const get_event_class_name = function(event_name){
+        if(event_name.indexOf('상장일') > -1){
+            return 'event-sang';
+        }else if (event_name.indexOf('청약일') > -1){
+            return 'event-cheong';
+        }else if (event_name.indexOf('환불일') > -1){
+            return 'event-whan';
+        }else if( event_name.indexOf('납입일') > -1){
+            return 'event-nap';
+        }
+        return '';
+    }
     // 주어진 년도와 월에 대한 달력 HTML을 생성하는 함수
     const calendarHtml = function(yyyy, mm) {
 		currentYear = yyyy;
@@ -392,15 +422,18 @@ const CalendarMaker = (function() {
             }
             let isToday = (ymd === today) ? true: false;
             let dayHtml = `<div class="col day ${isToday ? ' bg-today' : ''}" >`;
-            if (i % 7 === 0) { // 일요일
-                dayHtml += `<span class="text-danger">${Number(ymd.substring(6))}</span>`;
-            } else if (i % 7 === 6) { // 토요일
-                dayHtml += `<span class="text-primary">${Number(ymd.substring(6))}</span>`;
-            } else {
-                dayHtml += `<span>${Number(ymd.substring(6))}</span>`;
-            }
+
+            // if (i % 7 === 0) { // 일요일
+            //     dayHtml += `<span class="text-danger">${Number(ymd.substring(6))}</span>`;
+            // } else if (i % 7 === 6) { // 토요일
+            //     dayHtml += `<span class="text-primary">${Number(ymd.substring(6))}</span>`;
+            // } else {
+            //     dayHtml += `<span>${Number(ymd.substring(6))}</span>`;
+            // }
+
+            let clsName = choice_day_number_class(i, ymd)
+            dayHtml += `<span class="${clsName}">${Number(ymd.substring(6))}</span>`;
             // 휴일과 이벤트 표시
-            // dayHtml += '<div class="day-data">';
             let holidayEvents = holidays.filter(holiday => holiday.ymd === ymd);
             holidayEvents.forEach(holiday => {
                 dayHtml += `<div class="holiday">${holiday.name}</div>`;
@@ -408,16 +441,11 @@ const CalendarMaker = (function() {
 
             let eventDays = event_days.filter(event => event.ymd === ymd);
             eventDays.forEach(event => {
-                dayHtml += `<div class="event">${event.company} ${event.name}</div>`;
+                let company = cutString(event.company,6);
+                let eventClsName = get_event_class_name(event.name);
+                dayHtml += `<div class="${eventClsName}">${company} ${event.name}</div>`;
             });
-            // dayHtml+= '</div>';
-            // if(i%7 == 0){ //일요일
-			// 	html += '<div class="col day text-danger">' + Number(ymd.toString().substring(6)) + "</div>";	
-			// }else if(i%7 == 6){ //토요일
-			// 	html += '<div class="col day text-primary">' + Number(ymd.toString().substring(6)) + "</div>";				
-			// }else{
-			// 	html += '<div class="col day">' + Number(ymd.toString().substring(6)) + "</div>";
-			// }
+
             dayHtml += '</div>';
             html += dayHtml;
             
@@ -464,7 +492,9 @@ const CalendarMaker = (function() {
         calendarHtml: calendarHtml,
         nextYearMonth : nextYearMonth,
         prevYearMonth : prevYearMonth,
-        currentYearMonth : () => [currentYear, currentMonth]
+        currentYearMonth : () => [currentYear, currentMonth],
+        setHolidays: function(h) { holidays = h; },
+        setEventDays: function(e) { event_days = e; }
     };
 })();
 
