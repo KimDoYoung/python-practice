@@ -103,3 +103,10 @@ logger.debug(...)
    * 38사이트
    * 주달
 3.
+
+```
+        .not-this-month {
+            color: rgba(128, 128, 128, 0.7); /* 흐릿한 회색 (rgba 사용) */
+            font-style: italic; /* 기울기 */
+        }
+```        
