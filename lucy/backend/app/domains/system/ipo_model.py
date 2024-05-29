@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 class Underwriter(BaseModel):
     주간사: str
-    청약한도: int
+    청약한도: Optional[int] = 0
 
 class CompetitionRate(BaseModel):
     균등: Optional[float] = None

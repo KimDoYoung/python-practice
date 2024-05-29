@@ -1,9 +1,9 @@
 from typing import List
 from motor.motor_asyncio import AsyncIOMotorClient
 from backend.app.domains.user.user_model import User
-import logging
+from backend.app.core.logger import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 class UserService:
     # _instance = None

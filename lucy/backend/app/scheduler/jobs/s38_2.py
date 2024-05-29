@@ -1,19 +1,33 @@
-import logging
+# s38_2.py
+"""
+모듈 설명: 
+    - 공모주 사이트 38커뮤니케이션의 청약일정 2페이지를 scrapping한다.
+    - 각각의 공모주회사의 페이지를 scrapping한다
+    - 각각의 공모주회사의 내용을 collection ipo_scrap_38 에 넣는다.
+부가설명
+    - 스크래핑기법으로는 selenium을 사용함
+
+작성자: 김도영
+작성일: 2024-05-29
+버전: 1.0
+"""
 import re
 import time
 import chromedriver_autoinstaller
-from selenium import webdriver
+from selenium import webdriver 
 from bs4 import BeautifulSoup
 import pandas as pd
 from selenium.webdriver.chrome.options import Options
-from util import extract_dates, extract_numbers, extract_stock_and_limit
+from backend.app.utils.scrap_util import extract_dates, extract_numbers, extract_stock_and_limit
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from pymongo import MongoClient
+# from pymongo import MongoClient
 from io import StringIO
 from datetime import datetime
+from backend.app.core.logger import get_logger
 
+logging = get_logger(__name__)
 
 def install_chrome_driver():
     chromedriver_autoinstaller.install()
@@ -478,8 +492,11 @@ def get_details(url: str):
             "over_markte_price": over_markte_price} 
 
 def insert_or_update_ipo_list(data_list):
-    client = MongoClient('mongodb://root:root@test.kfs.co.kr:27017/')
-    db = client['stockdb']
+    
+    client = MongoDb.get_client()
+    db_name = config.DB_NAME;
+    #client = MongoClient('mongodb://root:root@test.kfs.co.kr:27017/')
+    db = client[db_name]
     collection = db['ipo_scrap_38']
     
     for data in data_list:
@@ -490,9 +507,7 @@ def insert_or_update_ipo_list(data_list):
             upsert=True                      # 문서가 없으면 삽입
         )
 
-    print('inserted or updated DONE!')
-
-def main():
+def scrapping_38_fill_ipo_38():
     logging.info('Scraping started')
     try:
         driver = install_chrome_driver()
@@ -513,11 +528,13 @@ def main():
                 detail = get_details(detail_url)
                 basic['scrap_time'] = datetime.now()
                 basic['details'] = detail
-                print(detail_url + " done!")
+
+                logging.debug(detail_url + " done!")
                 time.sleep(1)
-            logging.info("Inserting or updating the ipo list")
             #데이터베이스에 넣는다
+            logging.info("컬렉션 ipo_scrap_38 에 넣기 시작 ")
             insert_or_update_ipo_list(data_list)
+            logging.info("컬렉션 ipo_scrap_38 에 넣기 종료 ")
         driver.quit()
 
     except Exception as e:
@@ -525,20 +542,20 @@ def main():
     finally:
         logging.info('Scraping finished')
 
-if __name__ == "__main__":
-    date_time = datetime.now().strftime("%Y%m%d")
+# if __name__ == "__main__":
+#     date_time = datetime.now().strftime("%Y%m%d")
 
-    logging.basicConfig(
-        filename=f'scraping_{date_time}.log',  # 로그 파일 경로
-        level=logging.INFO,  # 로그 레벨 설정
-        format='%(asctime)s - %(levelname)s - %(message)s',  # 로그 메시지 형식
-    )
-    logging.info('------------------------------------------------------')
-    logging.info('scrapping_38.py started')
-    logging.info('------------------------------------------------------')
-    main()    
-    logging.info('------------------------------------------------------')
-    logging.info('scrapping_38.py ended')
-    logging.info('------------------------------------------------------')
+#     logging.basicConfig(
+#         filename=f'scraping_{date_time}.log',  # 로그 파일 경로
+#         level=logging.INFO,  # 로그 레벨 설정
+#         format='%(asctime)s - %(levelname)s - %(message)s',  # 로그 메시지 형식
+#     )
+#     logging.info('------------------------------------------------------')
+#     logging.info('scrapping_38.py started')
+#     logging.info('------------------------------------------------------')
+#     main()    
+#     logging.info('------------------------------------------------------')
+#     logging.info('scrapping_38.py ended')
+#     logging.info('------------------------------------------------------')
 
 

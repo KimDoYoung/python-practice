@@ -20,7 +20,6 @@ class EventDaysService:
 
     async def get_all(self, yyyymm:str) -> List[EventDays]:
         try:
-#            eventdays = await EventDays.find(EventDays.locdate.startswith(yyyymm)).to_list()
             if yyyymm == 'all':
                 eventdays = await EventDays.find().to_list()
             else:

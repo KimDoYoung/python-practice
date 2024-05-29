@@ -73,7 +73,6 @@ logger.debug(...)
 ### login
 
 * login.html에서 fetch로 username, password를 보낸다.
-* /login 에서
 
 ### calendar
 
@@ -87,6 +86,9 @@ logger.debug(...)
    4. 납일일 회색
    5. 환불일 회색
    6. 상장일 빨간색
+3. div click 각 event클릭
+4. url과 종목코드 가져가기
+5. 이번달이 아닌것은 이태리체로.
 
 ## history
 
@@ -95,7 +97,8 @@ logger.debug(...)
 ## todo
 
 1. calendar에 조회해서 공휴일과 일정넣기
-2. cron에 걸기
+2. div click
+3. cron에 걸기
    * 공휴일
    * 38사이트
    * 주달

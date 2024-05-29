@@ -31,3 +31,6 @@ class User(Document):
 
     class Settings:
         name = "Users"  # MongoDB에서 사용할 컬렉션 이름
+
+
+

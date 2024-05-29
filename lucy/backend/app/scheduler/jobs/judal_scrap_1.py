@@ -1,3 +1,19 @@
+# judal_scrap_1.py
+"""
+모듈 설명: 
+    - '주달' 사이트를 scrapping한다 
+    - database를 사용하지 않고 csv파일을 사용한다.
+    - 검색기능으로 투자할 종목을 찾을 때 사용하려는 의도로 scrapping함
+
+주요 기능:
+    - site "https://www.judal.co.kr/" 을 scrapping
+    - scrapping한 파일들은  config DATA_FOLDER 폴더 하위에 judal 밑에 ymd_time 폴더밑에 csv로 쌓인다.
+    - 크론으로 동작하게끔한다.
+
+작성자: 김도영
+작성일: 29
+버전: 1.0
+"""
 from io import StringIO
 import os
 import random
@@ -7,7 +23,10 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import re
 import datetime
+import backend.app.core.config as config
+from backend.app.core.logger import get_logger
 
+logging = get_logger(__name__)
 
 def to_eak(value):
     # '조'와 '억원' 단위를 처리하여 숫자로 변환하는 함수
@@ -56,7 +75,7 @@ def df_change(df):
             df['현재가'] = df['현재가'].fillna(0)
             df['등락가'] = df['등락가'].fillna(0)
         except ValueError as e:
-            print(f"Error extracting '현재가격': {e}")
+            logging.error(f"Error extracting '현재가격': {e}")
 
         df['현재가'] = df['현재가'].str.replace(',', '').astype(int)
         df['등락가'] = df['등락가'].str.replace(',', '').astype(int)
@@ -69,7 +88,7 @@ def df_change(df):
             df['52주최고'] = df['52주최고'].fillna(0)
             df['52주최저'] = df['52주최저'].fillna(0)
         except ValueError as e:
-            print(f"Error extracting '52주 최고최저': {e}")
+            logging.error(f"Error extracting '52주 최고최저': {e}")
         
         df['52주최고'] = df['52주최고'].str.replace(',', '').astype(int)
         df['52주최저'] = df['52주최저'].str.replace(',', '').astype(int)
@@ -82,7 +101,7 @@ def df_change(df):
             df['52주변동률최저'] = df['52주변동률최저'].fillna(0)
             df['52주변동률최고'] = df['52주변동률최고'].fillna(0)
         except ValueError as e:
-            print(f"Error extracting '52주 변동률': {e}")
+            logging.error(f"Error extracting '52주 변동률': {e}")
 
         df['52주변동률최저'] = df['52주변동률최저'].astype(str).str.replace('%', '').astype(float)
         df['52주변동률최저'] = df['52주변동률최저'].astype(str).str.replace('%', '').astype(float)
@@ -94,7 +113,7 @@ def df_change(df):
             df['3년최고'] = df['3년최고'].fillna(0)
             df['3년최저'] = df['3년최저'].fillna(0)
         except ValueError as e:
-            print(f"Error extracting '3년 최고최저': {e}")
+            logging.error(f"Error extracting '3년 최고최저': {e}")
         
         df['3년최고'] = df['3년최고'].str.replace(',', '').astype(int)
         df['3년최저'] = df['3년최저'].str.replace(',', '').astype(int)
@@ -108,7 +127,7 @@ def df_change(df):
             df['3년변동률최저'] = df['3년변동률최저'].fillna(0)
             df['3년변동률최고'] = df['3년변동률최고'].fillna(0)
         except ValueError as e:
-            print(f"Error extracting '3년 변동률': {e}")
+            logging.error(f"Error extracting '3년 변동률': {e}")
 
         df['3년변동률최저'] = df['3년변동률최저'].astype(str).str.replace('%', '').astype(float)
         df['3년변동률최고'] = df['3년변동률최고'].astype(str).str.replace('%', '').astype(float)
@@ -146,7 +165,9 @@ def df_change_theme(df):
 
     return df
 
-def main():
+def scrap_judal():
+    data_folder = config.DATA_FOLDER
+
     base_folder = create_base_folder('data')
     # Send a GET request to the website
     url = "https://www.judal.co.kr/"
@@ -210,7 +231,7 @@ def main():
         table1 = soup.find('table', class_='table table-sm table-bordered table-hover align-middle small')
         
         if table1:
-            print(f"parsing 시작 : {name}, url : {url}")
+            logging.debug(f"parsing 시작 : {name}, url : {url}")
             table = StringIO(str(table1))
             df = pd.read_html(table)[0]
             # 현재가격이 있는 것은 종목, 테마차트(90일)이 있는 것은 테마
@@ -222,16 +243,16 @@ def main():
             filepath = f'{base_folder}/{name.replace("/","_").replace(" ", "_")}.csv'
             df.to_csv(filepath, index=False)
             
-            print(filepath + " 저장됨")
+            logging.debug(filepath + " 저장됨")
             scraped_urls.add(url)
 
             # random 1초~5초 사이의 sleep
             sleep_time = random.uniform(1, 5)
             time.sleep(sleep_time)
         else:
-            print(f"No table found for {name} at {url}")
+            logging.error(f"No table found for {name} at {url}")
 
-    print ("Data scraping is done!")    
+    logging.debug("Data scraping is done!")    
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()

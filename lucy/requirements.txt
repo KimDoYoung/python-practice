@@ -12,3 +12,9 @@ python-jose
 passlib
 pytest-asyncio
 korean-lunar-calendar
+apscheduler
+requests
+beautifulsoup4
+chromedriver-autoinstaller
+selenium
+pandas

@@ -25,3 +25,4 @@ class UserInfo(BaseModel):
     use_yn: Optional[str] = 'Y'
     issuer: Optional[str] = None
     note: Optional[str] = None
+

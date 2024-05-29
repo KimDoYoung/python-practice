@@ -18,8 +18,19 @@ class Config:
         self.ALGORITHM = os.getenv('ALGORITHM','HS256')
         self.ACCESS_TOKEN_EXPIRE_MINUTES = os.getenv('ACCESS_TOKEN_EXPIRE_MINUTES', 30)
         self.ACCESS_TOKEN_NAME = os.getenv('ACCESS_TOKEN_NAME', 'lucy_token')
+        
+        self.DATA_FOLDER = os.getenv('DATA_FOLDER', './data')
+        self.FILE_FOLDER = os.getenv('FILE_FOLDER', './files')
+
         # 로그 디렉토리 생성
         log_dir = os.path.dirname(self.LOG_FILE)
+
+        # DATA_FOLDER 디렉토리 생성
+        if not os.path.exists(self.DATA_FOLDER):
+            os.makedirs(self.DATA_FOLDER)
+        
+        if not os.path.exists(self.FILE_FOLDER):
+            os.makedirs(self.FILE_FOLDER)
 
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)
