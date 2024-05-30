@@ -28,7 +28,9 @@ class Days(BaseModel):
 class IpoDays(BaseModel):
     company: str
     name: str
-    ymd: str    
+    ymd: str
+    title: str
+    scrap_url: Optional[str] = None    
 
 class Ipo(Document):
     stk_name: str
@@ -38,6 +40,7 @@ class Ipo(Document):
     processed_time: datetime
     scrap_id: PydanticObjectId
     title: str
+    scrap_url : Optional[str] = None
 
     class Settings:
         collection = "Ipo"

@@ -6,7 +6,7 @@ from backend.app.scheduler.schedule_mapping import task_mapping
 
 router = APIRouter()
 
-@router.get("/jobs")
+@router.get("/")
 def get_jobs():
     ''' 스케줄러 job 목록 조회 '''
     scheduler = Scheduler.get_instance()

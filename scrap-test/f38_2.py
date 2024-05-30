@@ -55,8 +55,8 @@ def scrap_2_ipo(all=False):
     client = MongoClient('mongodb://root:root@test.kfs.co.kr:27017/')
     db = client['stockdb']
     collection_scrap = db['ipo_scrap_38']
-    collection_ipo = db['ipo']
-    collection_config = db['config']
+    collection_ipo = db['Ipo']
+    collection_config = db['Config']
     
     last_fetch_config = collection_config.find_one({'key': 'last-fetch-time'})
     if last_fetch_config:
@@ -86,7 +86,9 @@ def scrap_2_ipo(all=False):
             'title' : get_title(company_info),
             'days' : get_days(schedule_info),
             'offering' : get_offering(offering_info, expected_participation),
+            'scrap_url' : doc['detail_url'],
             'processed_time': datetime.now(),
+
             'scrap_id': doc['_id'],  # 원본 문서의 ObjectId 추가
         }
         ipo_list.append(processed_entry)

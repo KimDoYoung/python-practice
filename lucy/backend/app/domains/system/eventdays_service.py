@@ -18,6 +18,14 @@ class EventDaysService:
         await eventday.create()
         return eventday
 
+    async def get_days_between(self, startYmd: str, endYmd: str)-> List[EventDays]:
+        eventdays = await EventDays.find({
+            "$or": [
+                {"locdate": {"$gte": startYmd, "$lte": endYmd}},
+            ]
+        }).to_list()
+        return eventdays
+    
     async def get_all(self, yyyymm:str) -> List[EventDays]:
         try:
             if yyyymm == 'all':

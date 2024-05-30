@@ -27,12 +27,25 @@ def display_main(request: Request):
 
     return render_template("main.html", context)
 
-@router.get("/calendar", response_class=HTMLResponse, include_in_schema=False)
+@router.get("/ipo/calendar", response_class=HTMLResponse, include_in_schema=False)
 def display_main(request: Request):
     ''' 달력-스케줄 '''
     context = {}
+    return render_template("template/ipo/calendar.html", context)
 
-    return render_template("template/calendar.html", context)
+@router.get("/ipo", response_class=HTMLResponse, include_in_schema=False)
+def display_main(request: Request):
+    ''' ipo list '''
+    context = {}
+    return render_template("template/ipo/list.html", context)
+
+
+@router.get("/scheduler", response_class=HTMLResponse, include_in_schema=False)
+def display_main(request: Request):
+    ''' ipo list '''
+    context = {}
+    return render_template("template/scheduler/list.html", context)
+
 
 @router.get("/login", response_class=HTMLResponse)
 async def login(request: Request):
@@ -64,21 +77,3 @@ async def login_for_access_token(form_data: LoginFormData, user_service :UserSer
     )
     access_token = AccessToken(access_token=access_token, token_type="bearer",username=user_name, email=user.email) 
     return access_token
-    # return {"access_token": access_token, "token_type": "bearer"}
-
-# @router.post("/login")
-# async def login(request: Request):
-#     form = await request.form()
-#     username = form.get("username")
-#     password = form.get("password")
-    
-#     access_token_name = config.ACCESS_TOKEN_NAME
-    
-#     # 여기에 실제 인증 로직을 추가하세요
-#     if username == "test" and password == "test":
-#         access_token = create_access_token(data={"user_id": username})
-#         response = RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
-#         response.set_cookie(key=access_token_name, value=access_token, httponly=True)
-#         return response
-#     else:
-#         raise HTTPException(status_code=400, detail="Invalid credentials")

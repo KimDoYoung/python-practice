@@ -22,6 +22,19 @@ class IpoService:
         await ipo.create()
         return ipo
     
+
+    async def get_days_between(self, startYmd: str, endYmd: str)-> List[Ipo]:
+        ipo_list = await Ipo.find({
+            "$or": [
+                {"days.청약일": {"$gte": startYmd, "$lte": endYmd}},
+                {"days.납입일": {"$gte": startYmd, "$lte": endYmd}},
+                {"days.환불일": {"$gte": startYmd, "$lte": endYmd}},
+                {"days.상장일": {"$gte": startYmd, "$lte": endYmd}}
+            ]
+        }).to_list()
+
+        return ipo_list
+
     async def get_days(self, yyyymm:str) -> List[Ipo]:
         ''' ipo class에서 days의 각각의 청약일, 납입일, 환불일, 상장일 을 각각 yyyymm과 비교해서 한개라도 해당하면 ipo 데이터를 가져온다.'''
         pattern = f'^{yyyymm}'
@@ -40,13 +53,31 @@ class IpoService:
             logger.error(f"Failed to retrieve all Ipos: {e}")
             raise e
 
-    async def get_all(self) -> List[Ipo]:
+    async def get_all(self, onlyFuture:bool=False, sorting:bool= True) -> List[Ipo]:
         try:
-            ipos = await Ipo.find_all().to_list()
+            current_date = datetime.now().strftime('%Y%m%d')
+            query = {}
+            if onlyFuture:
+                query = {
+                    "$or": [
+                        {"days.청약일": {"$gte": current_date}},
+                        {"days.납입일": {"$gte": current_date}},
+                        {"days.환불일": {"$gte": current_date}},
+                        {"days.상장일": {"$gte": current_date}}
+                    ]
+                }
+            
+            ipos = await Ipo.find(query).to_list()
+            
+            if sorting:
+                ipos = sorted(ipos, key=lambda x: x.processed_time, reverse=True)
+            else:
+                ipos = sorted(ipos, key=lambda x: x.processed_time)
+
             return ipos
         except Exception as e:
-            logger.error(f"Failed to retrieve all Ipos: {e}")
-            raise e
+            print(f"An error occurred: {e}")
+            return []
     
     async def update_by_id(self, id: PydanticObjectId, data: Dict[str, Any]) -> Optional[Ipo]:
         ipo = await Ipo.get(id)

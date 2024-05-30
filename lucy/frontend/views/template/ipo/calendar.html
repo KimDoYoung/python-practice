@@ -15,23 +15,15 @@
         background-color: #ffffe0;
     }
     .circle {
-    display: inline-block;
-    width: 24px;
-    height: 24px;
-    line-height: 24px;
-    text-align: center;
-    border-radius: 50%;
-    border: 2px solid red;
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        line-height: 24px;
+        text-align: center;
+        border-radius: 50%;
+        border: 2px solid red;
     }
 
-    .holiday {
-        font-size: 0.8em;
-        color: red;
-        /* background-color: #f5c592; */
-        padding: 2px;
-        border-radius: 5px;
-        margin-bottom: 1px;
-    }
     .event {
         font-size: 0.8em;
         color: black;
@@ -79,17 +71,50 @@
     border-radius: 5px; /* 보더의 모서리를 둥글게 만들기 위해 사용 */
     }
 
+    .not-this-month {
+        color: rgba(128, 128, 128, 0.5); /* 흐릿한 회색 (rgba 사용) */
+        font-style: italic; /* 기울기 */
+    }
+
+    .not-this-month-holiday {
+        color: rgba(220, 53, 69, 0.5); /* #dc3545 색상에 투명도 0.5 */
+        font-style: italic; /* 기울기 */
+    }
+    .not-this-month-saterday {
+        color: rgba(13, 110, 253, 0.5); /* #0d6efd 색상에 투명도 0.5 */
+        font-style: italic; /* 기울기 */
+    }
+
+    .text-holiday {
+        color: #dc3545; /* Bootstrap 5의 text-danger 색상 값 */
+    }
+    .text-saterday {
+        color: #0d6efd; /* Bootstrap 5의 text-primary 색상 값 */
+    }
+
+    .holiday {
+        font-size: 0.8em;
+        color:#dc3545;
+        /* background-color: #f5c592; */
+        padding: 2px;
+        border-radius: 5px;
+        margin-bottom: 1px;
+    }    
+    .ipo_event > a {
+        text-decoration: none;
+        color: black;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <section id="calendar-area" class="container">
     <div id="headerCalendar" class="mt-5 text-center d-flex align-items-center">
-        <a href="#" id="prevYear" class="text-decoration-none border-icon"  title="prev year"><i class="bi bi-caret-left-fill"></i></a>
+        <!-- <a href="#" id="prevYear" class="text-decoration-none border-icon"  title="prev year"><i class="bi bi-caret-left-fill"></i></a> -->
         <a href="#" id="prevMonth"  class="text-decoration-none  border-icon mx-2" title="prev month"><i class="bi bi-caret-left"></i></a>
         <h3 class="d-inline"><span id="currentYyyy"></span>년 <span id="currentMm"></span>월</h3>
         <a href="#" id="nextMonth" class="text-decoration-none  border-icon mx-2"  title="next month"><i class="bi bi-caret-right"></i></a>
-        <a href="#" id="nextYear" class="text-decoration-none  border-icon me-2" title="next year"><i class="bi bi-caret-right-fill"></i></a>
+        <!-- <a href="#" id="nextYear" class="text-decoration-none  border-icon me-2" title="next year"><i class="bi bi-caret-right-fill"></i></a> -->
         <a href="#" id="todayYearMonth" class="text-decoration-none  border-icon me-2" title="today"><i class="bi bi-calendar-check today-icon" title="오늘"></i></a>
     </div>
     <div id="mainCalendar" class="mt-2 vh-100"></div>
@@ -100,51 +125,30 @@
 {% raw %}
 <script src="/public/js/calendar-utility.js"></script>
 <script>
-    async function fetchData(url) {
-        const token = localStorage.getItem('lucy_token');
 
-        try {
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const responseData = await response.json();
-            return responseData;
-        } catch (error) {
-            console.error('에러 발생:', error);
-            return null;
-        }
-    }
     async function fetchDataAndDrawCalendar(yyyy, mm) {
         try {
             // 두 개의 fetchData 호출을 동시에 실행하고, 모두 완료될 때까지 기다림
             let yyyymm = yyyy + '' + (mm < 10 ? '0' + mm : mm);
-            const [eventDaysData, ipoDaysData] = await Promise.all([
-                fetchData('/eventdays/' + yyyymm ),
-                fetchData('/ipo/days/' + yyyymm)
+            const [startYmd, endYmd] = CalendarMaker.startEndYmd(yyyy, mm);
+
+            const [holidays,ipoDays] = await Promise.all([
+                // fetchData('/eventdays/' + yyyymm ),
+                // fetchData('/ipo/days/' + yyyymm),
+                fetchData('/api/v1/eventdays/calendar/' + startYmd + '/' + endYmd),
+                fetchData('/api/v1/ipo/calendar/' + startYmd + '/' + endYmd)
             ]);
             
-            console.log(eventDaysData);
-            console.log(ipoDaysData);
-            const holidays = eventDaysData
+            console.log(holidays);
+            console.log(ipoDays);
+            const holidaysY = holidays
                 .filter(item => item.isHoliday === "Y")
                 .map(item => ({
                     name: item.dateName,
                     ymd: item.locdate
                 }));
-            
-            const eventDays = ipoDaysData
-            console.log(holidays);
-            console.log(eventDays);
             // 두 개의 데이터가 모두 준비되면 drawCalendar를 호출
-            drawCalendar(yyyy, mm, holidays, eventDays);
+            drawCalendar(yyyy, mm, holidaysY, ipoDays);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -158,12 +162,15 @@
             $('#mainCalendar').html(html);
             $('#mainCalendar').find('.week').addClass('calendar-border-week');
             $('#mainCalendar').find('.day').addClass('calendar-border-day');
+       
+            $('#mainCalendar').on('click', '.day', function(e) {
+                // 클릭 이벤트 핸들러 로직
+                e.stopPropagation();
+                console.log($(this).data('ymd'));
+            });
     }       
     $( document ).ready(function() {
         console.log('calendar.... ');
-        // var scheduleOffcanvas = new bootstrap.Offcanvas(document.getElementById('scheduleOffcanvas'));
-        // var specialDayOffcanvas= new bootstrap.Offcanvas(document.getElementById('specialDayOffcanvas'));
-        
 
         
         $("#prevMonth").on('click', function(){

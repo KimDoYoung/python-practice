@@ -1,0 +1,90 @@
+{% extends 'common/base.html' %}
+{% block style %}
+<style>
+</style>
+{% endblock %}
+
+{% block content %}
+<section id="ipo-list" class="container">
+    <div id="table-area"></div>
+</section>
+
+{% raw %} 
+<script id="ipo-table" type="text/x-handlebars-template">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">종목명</th>
+                <th scope="col">종류</th>
+                <th scope="col">일자</th>
+            </tr>
+        </thead>
+        <tbody>    
+    {{#each list}}
+    <tr>
+        <td>{{@index}}</td>
+        <td><a href="{{scrap_url}}" target="_blank">{{name}}</a></td>
+        <td>{{stock_type}}/{{market_type}}</td>
+        <td>
+            {{#if days.청약일}}
+            <span class="badge bg-primary">{{displayYmd days.청약일}}</span>
+            {{/if}}
+            {{#if days.납입일}}
+            <span class="badge bg-secondary">{{displayYmd days.납입일}}</span>
+            {{/if}}
+            {{#if days.환불일}}
+            <span class="badge bg-secondary">{{displayYmd days.환불일}}</span>
+            {{/if}}
+            {{#if days.상장일}}
+            <span class="badge bg-danger">{{displayYmd days.상장일}}</span>
+            {{/if}}
+        </td>
+    </tr>
+    {{/each}}
+        </tbody>
+    </table>
+</script>
+{% endraw %}
+{% endblock %}
+
+
+
+{% block script %}
+{% raw %}
+<script>
+    $( document ).ready(function() {
+        console.log('ipo list.... ');
+        async function initialize() {
+            await fetchData('/api/v1/ipo').then(data => {
+                console.log(data);
+                var source = $('#ipo-table').html();
+                var template = Handlebars.compile(source);
+
+                newList = data.map(item => {
+                    const regex = /(.+)-(.+)-(.+)\((.+)\)/;
+                    const match = item.title.match(regex);
+                    if (match) {
+                        return {
+                            ...item,
+                            company: match[1],
+                            stock_type: match[2],
+                            market_type: match[3],
+                            stock_code: match[4]
+                        };
+                    } else {
+                        return item;
+                    }
+                });
+
+                var html = template({list: newList});
+
+                $('#table-area').html(html);
+            });
+        }
+        initialize();
+    });
+    </script>	
+    
+{% endraw %}
+{% endblock %}

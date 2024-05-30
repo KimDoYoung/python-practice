@@ -403,3 +403,26 @@ function getCookie(key) {
 function removeCookie(name) {
     document.cookie = name + '=; Max-Age=-99999999;';  
 }
+
+async function fetchData(url) {
+    const token = localStorage.getItem('lucy_token');
+
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const responseData = await response.json();
+        return responseData;
+    } catch (error) {
+        console.error('에러 발생:', error);
+        return null;
+    }
+}

@@ -87,3 +87,21 @@
             return options.inverse(this);
         }
     });    
+    /**
+     * displayYmd : 20200101 -> 2020-01-01
+     */
+    Handlebars.registerHelper('displayYmd', function(dateStr) {
+        var year = dateStr.slice(0, 4);
+        var month = dateStr.slice(4, 6);
+        var day = dateStr.slice(6, 8);
+
+        return year + '-' + month + '-' + day;
+    });
+
+        /**
+     * displayYmd : 20200101 -> 2020-01-01
+     */
+    Handlebars.registerHelper('naverUrl', function(stockCode) {
+        const anchor = "<a href='https://finance.naver.com/item/main.nhn?code=" + stockCode + "' target='_blank'>" + stockCode + "</a>";
+        return new Handlebars.SafeString(anchor);
+    });

@@ -26,6 +26,8 @@ from selenium.webdriver.common.by import By
 from io import StringIO
 from datetime import datetime
 from backend.app.core.logger import get_logger
+from backend.app.core.mongodb import MongoDb
+from backend.app.core.config import config
 
 logging = get_logger(__name__)
 

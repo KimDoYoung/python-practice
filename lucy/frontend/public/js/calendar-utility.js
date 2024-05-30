@@ -317,9 +317,9 @@ const CalendarMaker = (function() {
         // 추가적인 휴일을 여기에 추가하세요.
     ];
     let event_days = [
-        { company: '노브랜드', name: '상장일', ymd: '20240516' },
-        { company: '에이치엠씨아이비스팩7호', name: '청약일', ymd: '20240521' },
-        { company: '노브랜드', name: '청약일', ymd: '20240527' },
+        { company: '노브랜드', name: '상장일', ymd: '20240516', title:"한국스팩15호-공모주-코스닥(479880)", scrap_url:''},
+        { company: '에이치엠씨아이비스팩7호', name: '청약일', ymd: '20240521' , title:"aaaa-공모주-코스닥(479880)", scrap_url:''},
+        { company: '노브랜드', name: '청약일', ymd: '20240527' , title:"bbb-공모주-코스닥(479880)", scrap_url:''},
         // 추가적인 이벤트 날짜를 여기에 추가하세요.
     ];
 
@@ -359,16 +359,37 @@ const CalendarMaker = (function() {
         return date.getFullYear().toString() + zeroPad(date.getMonth() + 1) + zeroPad(date.getDate());
     }
     const choice_day_number_class = function (yoil, ymd){
-        let found = holidays.find(holiday => holiday.ymd === ymd)
-        if(found){
-            return 'text-danger';
+        //이번달인가?
+        //일요일,노는날인가?
+        //토요일인가?
+        let thisym = String(currentYear) + zeroPad(currentMonth);
+        let isHoliday = holidays.find(holiday => holiday.ymd === ymd);
+        let isThisMonth = ymd.startsWith(thisym);
+        let isSumday = yoil % 7 === 0;
+        let isSaterday = yoil % 7 === 6;
+
+        //1. 이번달이 아닌 날짜 : not-this-month-holiday not-this-month-saterday, not-this-month
+        //2. 이번달인 날짜 : this-month-holiday-or-sunday this-month-saterday
+        if(!isThisMonth){
+            if(isHoliday){ //휴일
+                return  'not-this-month-holiday';
+            }else if(isSumday){ // 일요일
+                return  'not-this-month-holiday';
+            }else if(isSaterday){ // 토요일
+                return  'not-this-month-saterday';
+            }
+            return 'not-this-month';
+        }else {
+            if(isHoliday){ //휴일
+                return  'text-holiday';
+            }else if(isSumday){ // 일요일
+                return  'text-holiday';
+            }else if(isSaterday){ // 토요일
+                return  'text-saterday';
+            }
+
         }
-        if(yoil % 7 === 0){ // 일요일
-            return 'text-danger';
-        }else if( yoil % 7 === 6){ // 토요일
-            return 'text-primary';
-        }
-        return "";
+        return ""
     }
     const cutString = function(str, len){
         if(str.length > len){
@@ -388,10 +409,7 @@ const CalendarMaker = (function() {
         }
         return '';
     }
-    // 주어진 년도와 월에 대한 달력 HTML을 생성하는 함수
-    const calendarHtml = function(yyyy, mm) {
-		currentYear = yyyy;
-		currentMonth = mm;
+    const startEndYmd = function(yyyy, mm){
         let startYoil = yoilNumber(yyyy, mm, 1);
         let endYmd = getEndYmd(yyyy, mm);
         let dd = endYmd.substring(6);
@@ -400,6 +418,13 @@ const CalendarMaker = (function() {
         let startYmd = String(yyyy) + zeroPad(mm) + "01";
         startYmd = substractYmd(startYmd, startYoil);
         endYmd = addYmd(endYmd, 6 - endYoil);
+        return [startYmd, endYmd];
+    }
+    // 주어진 년도와 월에 대한 달력 HTML을 생성하는 함수
+    const calendarHtml = function(yyyy, mm) {
+		currentYear = yyyy;
+		currentMonth = mm;
+        const [startYmd, endYmd] = startEndYmd(yyyy, mm); 
 
         let html = '<div class="row">';
         html += '<div class="col bg-light text-center text-danger week">일</div>';
@@ -421,16 +446,8 @@ const CalendarMaker = (function() {
                 saveCloseDiv = '</div>';
             }
             let isToday = (ymd === today) ? true: false;
-            let dayHtml = `<div class="col day ${isToday ? ' bg-today' : ''}" >`;
-
-            // if (i % 7 === 0) { // 일요일
-            //     dayHtml += `<span class="text-danger">${Number(ymd.substring(6))}</span>`;
-            // } else if (i % 7 === 6) { // 토요일
-            //     dayHtml += `<span class="text-primary">${Number(ymd.substring(6))}</span>`;
-            // } else {
-            //     dayHtml += `<span>${Number(ymd.substring(6))}</span>`;
-            // }
-
+            let dayHtml = `<div class="col day ${isToday ? ' bg-today' : ''}" data-ymd="${ymd}" >`;
+            //일요일, 토요일, 휴일 날짜숫자 색상 변경
             let clsName = choice_day_number_class(i, ymd)
             dayHtml += `<span class="${clsName}">${Number(ymd.substring(6))}</span>`;
             // 휴일과 이벤트 표시
@@ -443,7 +460,9 @@ const CalendarMaker = (function() {
             eventDays.forEach(event => {
                 let company = cutString(event.company,6);
                 let eventClsName = get_event_class_name(event.name);
-                dayHtml += `<div class="${eventClsName}">${company} ${event.name}</div>`;
+                let url = event.scrap_url;
+                let title = event.title;
+                dayHtml += `<div class="${eventClsName} ipo_event" title="${title}"><a href="${url}" target="_blank">${company}</a> ${event.name}</div>`;
             });
 
             dayHtml += '</div>';
@@ -494,7 +513,8 @@ const CalendarMaker = (function() {
         prevYearMonth : prevYearMonth,
         currentYearMonth : () => [currentYear, currentMonth],
         setHolidays: function(h) { holidays = h; },
-        setEventDays: function(e) { event_days = e; }
+        setEventDays: function(e) { event_days = e; },
+        startEndYmd : startEndYmd
     };
 })();
 
