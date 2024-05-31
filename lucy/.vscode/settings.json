@@ -30,6 +30,6 @@
         "strings": true
     },
     "css.validate": false ,
-    "editor.inlineSuggest.enabled": true
+    "editor.inlineSuggest.enabled": true,
 
 }

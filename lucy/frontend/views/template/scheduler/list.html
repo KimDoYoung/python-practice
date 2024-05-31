@@ -11,25 +11,42 @@
     </div>
     <div id="table-area"></div>
 </section>
-
 {% raw %} 
 <script id="scheduler-table" type="text/x-handlebars-template">
     <table class="table">
         <thead>
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">Id</th>
-                <th scope="col">Name</th>
+                <th scope="col">Job Id</th>
+                <th scope="col">Job Name</th>
+                <th scope="col">Type</th>
+                <th scope="col">Run Time Or Cron</th>
+                <th scope="col">Func Name</th>
+                <th scope="col">Arguments</th>
+                <th scope="col">Running</th>
                 <th scope="col">Next Run Time</th>
-                <th scope="col">Action</th>
             </tr>
         </thead>
         <tbody>    
     {{#each list}}
     <tr>
-        <td>{{@index}}</td>
-        <td>{{id}}</td>
-        <td>{{name}}</td>
+        <!-- job_list: [{'job_id': 'test_job', 'job_name': 'test1', 'job_type': 'cron', 'run_type': 'cron', 'func_name': 'test1', 
+        'args': ['Hello, World!'], 'cron': '*/5 * * * *', 'run_date': None, 'id': '6659b2d42d947ba0391d6b4d', 'is_running': True, 'next_run_time': '2024-05-31 20:51:00+09:00'} -->
+        
+        <td>{{inc @index}}</td>
+        <td>{{job_id}}</td>
+        <td>{{job_name}}</td>
+        <td>{{job_type}}/{{run_type}}</td>
+        <td>
+            {{#test "run_type == 'cron'" }}
+                {{cron}}
+            {{else}}
+                {{run_date}}
+            {{/test}}
+        </td>
+        <td>{{func_name}}</td>
+        <td>{{args}}</td>
+        <td>{{is_running}}</td>
         <td>{{next_run_time}}</td>
         <td>삭제</td>
     </tr>

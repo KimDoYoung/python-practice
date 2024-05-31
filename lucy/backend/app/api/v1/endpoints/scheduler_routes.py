@@ -13,19 +13,21 @@ router = APIRouter()
 
 @router.get("/")
 async def get_jobs(scheduler_job_servce: SchedulerJobService = Depends(get_scheduler_job_service)):
-    ''' 스케줄러 job 목록 조회 '''
-    db_jobs = await scheduler_job_servce.get_all()
-    scheduler = Scheduler.get_instance()
-    scheduler_jobs = scheduler.get_jobs()
-    scheduler_job_ids = {job.id for job in scheduler_jobs}
+    ''' 스케줄러 job 목록 조회  '''
+    job_list = await scheduler_job_servce.get_schedule_list()
 
-    job_list = []
-    for job in db_jobs:
-        job_dict = job.model_dump()
-        job_dict["is_running"] = job.job_id in scheduler_job_ids
-        job_dict["next_run_time"] = str(next((j.next_run_time for j in scheduler_jobs if j.id == job.job_id), None))
-        job_list.append(job_dict)
+    # db_jobs = await scheduler_job_servce.get_all()
+    # scheduler = Scheduler.get_instance()
+    # scheduler_jobs = scheduler.get_jobs()
+    # scheduler_job_ids = {job.id for job in scheduler_jobs}
 
+    # job_list = []
+    # for job in db_jobs:
+    #     job_dict = job.model_dump()
+    #     job_dict["is_running"] = job.job_id in scheduler_job_ids
+    #     job_dict["next_run_time"] = str(next((j.next_run_time for j in scheduler_jobs if j.id == job.job_id), None))
+    #     job_list.append(job_dict)
+    logger.debug(f"job_list: {job_list}")
     return job_list    
 
 @router.post("/add")

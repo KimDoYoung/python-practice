@@ -60,27 +60,56 @@
     /**
      * gcTest가 호출하는 함수로 직접 html에는 사용하지 않아야함
      */
-    Handlebars.registerHelper("t", function( exp, options){
-        // debugger;
-        // logger.log(this);
-        var r = (function(){
-                try {
-                    var r =  eval(exp);
-                    return r;
-                } catch (error) {
-                    logger.error("gctest : " + error + ' [' + exp +']');
-                }
-            }).call(this);
-        return r;
-    }); 
+    // Handlebars.registerHelper("t", function( exp, options){
+    //     // debugger;
+    //     // logger.log(this);
+    //     var r = (function(){
+    //             try {
+    //                 var r =  eval(exp);
+    //                 return r;
+    //             } catch (error) {
+    //                 logger.error("gctest : " + error + ' [' + exp +']');
+    //             }
+    //         }).call(this);
+    //     return r;
+    // }); 
+    Handlebars.registerHelper("t", function(exp, options) {
+        var context = this;
+        var result;
+
+        try {
+            var func = new Function('context', 'with(context) { return ' + exp + '; }');
+            result = func(context);
+        } catch (error) {
+            if (typeof logger !== 'undefined' && logger.error) {
+                logger.error("gctest : " + error + ' [' + exp + ']');
+            } else {
+                console.error("gctest : " + error + ' [' + exp + ']');
+            }
+            return false;
+        }
+
+        return result;
+    });    
     /**
      * javascript문법으로 논리식을 판별
+     * 
      */       
-    Handlebars.registerHelper("test", function(expression, options){
-        // logger.log(this);
-        var exp = '(' + expression.replace(/^\s+|\s+$/,'') +')';
+    // Handlebars.registerHelper("test", function(expression, options){
+    //     // logger.log(this);
+    //     var exp = '(' + expression.replace(/^\s+|\s+$/,'') +')';
         
+    //     var result = Handlebars.helpers["t"].call(this, exp, options);
+    //     if(result === true){
+    //         return options.fn(this);
+    //     } else {
+    //         return options.inverse(this);
+    //     }
+    // });    
+    Handlebars.registerHelper("test", function(expression, options){
+        var exp = '(' + expression.replace(/^\s+|\s+$/,'') +')';
         var result = Handlebars.helpers["t"].call(this, exp, options);
+
         if(result === true){
             return options.fn(this);
         } else {
@@ -105,3 +134,4 @@
         const anchor = "<a href='https://finance.naver.com/item/main.nhn?code=" + stockCode + "' target='_blank'>" + stockCode + "</a>";
         return new Handlebars.SafeString(anchor);
     });
+
