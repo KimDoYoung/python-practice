@@ -1,9 +1,9 @@
 from typing import List
 from motor.motor_asyncio import AsyncIOMotorClient
 from backend.app.domains.system.config_model import DbConfig
-import logging
+from backend.app.core.logger import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 class DbConfigService:
     # _instance = None

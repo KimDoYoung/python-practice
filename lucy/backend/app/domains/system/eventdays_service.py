@@ -2,11 +2,12 @@ from typing import Any, Dict, List, Optional
 from beanie import PydanticObjectId
 from motor.motor_asyncio import AsyncIOMotorClient
 from backend.app.domains.system.config_model import DbConfig
-import logging
 
 from backend.app.domains.system.eventdays_model import EventDays
+from backend.app.core.logger import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
+
 
 class EventDaysService:
     # _instance = None

@@ -1,14 +1,24 @@
 from datetime import datetime
 from typing import Any, List, Optional
+from beanie import Document
 from pydantic import BaseModel
 
-class JobRequest(BaseModel):
-    task_name: str
+class JobBase(BaseModel):
     job_id: str
-    args: List[Any]
-    run_type: str # cron, date
+    job_name: str
+    job_type: str  # 'system' 또는 'user'
+    run_type: str  # 'cron' 또는 'date'
+    func_name: str
+    args: List[Any] = []  # 기본값을 빈 리스트로 설정
     cron: Optional[str] = None
     run_date: Optional[datetime] = None
+
+class JobRequest(JobBase):
+    pass
+
+class SchedulerJob(Document, JobBase):
+    class Settings:
+        collection = "SchedulerJob"        
 
 
 # {

@@ -1,6 +1,6 @@
 
 from datetime import timedelta
-from fastapi import APIRouter, Depends, HTTPException, Request, Response
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 
 from backend.app.core.template_engine import render_template
@@ -11,6 +11,8 @@ from fastapi import status
 from backend.app.domains.user.user_model import AccessToken, LoginFormData
 from backend.app.domains.user.user_service import UserService
 from backend.app.core.dependency import get_user_service
+from backend.app.core.logger import get_logger
+logger = get_logger(__name__)
 
 router = APIRouter()
 
@@ -27,25 +29,17 @@ def display_main(request: Request):
 
     return render_template("main.html", context)
 
-@router.get("/ipo/calendar", response_class=HTMLResponse, include_in_schema=False)
-def display_main(request: Request):
-    ''' 달력-스케줄 '''
-    context = {}
-    return render_template("template/ipo/calendar.html", context)
+@router.get("/page", response_class=HTMLResponse, include_in_schema=False)
+def page(request: Request, id: str = Query(..., description="The ID of the page")):
+    ''' id 페이지를 가져와서 보낸다. '''
+    context = {"request": request, "id": id}
+    # id = ipo_calendar 와 같은 형식이고 이를 분리한다.
+    path_array = id.split("_")
+    template_path = "/".join(path_array)
+    template_page = f"template/{template_path}.html"
+    logger.debug(f"template_page 호출됨: {template_page}")
 
-@router.get("/ipo", response_class=HTMLResponse, include_in_schema=False)
-def display_main(request: Request):
-    ''' ipo list '''
-    context = {}
-    return render_template("template/ipo/list.html", context)
-
-
-@router.get("/scheduler", response_class=HTMLResponse, include_in_schema=False)
-def display_main(request: Request):
-    ''' ipo list '''
-    context = {}
-    return render_template("template/scheduler/list.html", context)
-
+    return render_template(template_page, context)    
 
 @router.get("/login", response_class=HTMLResponse)
 async def login(request: Request):

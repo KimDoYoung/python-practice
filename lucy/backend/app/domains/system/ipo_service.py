@@ -9,8 +9,9 @@ import logging
 from backend.app.domains.system.eventdays_model import EventDays
 from backend.app.domains.system.ipo_model import Ipo
 
+from backend.app.core.logger import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 class IpoService:
     # _instance = None
