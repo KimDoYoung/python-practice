@@ -23,7 +23,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import re
 import datetime
-import backend.app.core.config as config
+from backend.app.core.config import config
 from backend.app.core.logger import get_logger
 
 logging = get_logger(__name__)
@@ -166,9 +166,9 @@ def df_change_theme(df):
     return df
 
 def scrap_judal():
-    data_folder = config.DATA_FOLDER
-
-    base_folder = create_base_folder('data')
+    
+    data_folder = config.DATA_FOLDER+"/judal"
+    base_folder = create_base_folder(data_folder)
     # Send a GET request to the website
     url = "https://www.judal.co.kr/"
     response = requests.get(url)

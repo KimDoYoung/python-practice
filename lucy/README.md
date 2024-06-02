@@ -60,6 +60,34 @@
 * DB설정값,로그파일
 * config.DB_URL 과 같이 사용
 
+## scheduler
+
+### 관련 모듈들
+
+1. judal_scrap_1.py
+
+   * judal 사이트에서 모든 데이터를 가져와서
+   * config DATA폴더 하위의 judal 밑에 날짜시간으로 넣는다.
+
+2. s38_2.py
+
+    * ipo_scrap_38 collection을 모두 지운다.
+
+        * history를 가져가지 않는다. 지난 간 것은 그냥 없는 것으로
+        * scrapping 로직이 오류를 일으키면 버그인 것으로
+
+    * 38커뮤니케이션에서 1,2 페이지를 가져와서
+    * ipo_scrap_38 collection에 채운다.
+
+3. f38_2.py
+    * ipo collection을 모두 지운다.
+    * ipo_scrap_38 collection에서 Ipo collection으로 데이터를 옮긴다.
+    * 옮기면서 **판정정보**를 채운다.
+
+### 호출
+
+* /api/v1/scheduler/run/scrap_judal
+
 ### logger.py
 
 ```python

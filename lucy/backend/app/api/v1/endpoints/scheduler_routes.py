@@ -64,3 +64,14 @@ def remove_job(job_id: str, scheduler_job_servce: SchedulerJobService = Depends(
         return {"message": "Job removed successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/run/{program_id}")
+def run(program_id: str):
+    ''' 
+        테스트로 프로그램을 돌려본다.
+        /api/v1/scheduler/run/scrap_judal
+    '''
+    if program_id == 'scrap_judal':
+        task_mapping['scrap_judal']()
+
+    return {"message": "running program successfully"}    

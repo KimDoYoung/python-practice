@@ -18,3 +18,4 @@ beautifulsoup4
 chromedriver-autoinstaller
 selenium
 pandas
+lxml

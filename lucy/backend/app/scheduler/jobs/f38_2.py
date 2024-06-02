@@ -75,8 +75,8 @@ def scrap38_2_ipo(all=False):
     collection_scrap = db['ipo_scrap_38']
     collection_ipo = db['Ipo']
     collection_config = db['Config']
-    
-    last_fetch_config = collection_config.find_one({'key': 'last-fetch-time'})
+
+    last_fetch_config = collection_config.find_one({'key': 'scap_to_ipo_time'})
     if last_fetch_config:
         last_fetch_time = last_fetch_config['value']
     else:

@@ -1,6 +1,5 @@
 from dotenv import load_dotenv
 import os
-
 class Config:
     def __init__(self):
         self.PROFILE_NAME = os.getenv('LUCY_MODE', 'local')
