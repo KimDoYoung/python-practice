@@ -10,3 +10,4 @@ matplotlib
 pymongo
 sympy
 xmltodict
+python-dotenv
