@@ -32,7 +32,7 @@ def install_chrome_driver():
     chrome_options.add_argument("--disable-gpu")  # GPU 가속 비활성화
     chrome_options.add_argument('--no-sandbox')  # Bypass OS security model, 크롬의 일반적인 문제 해결 옵션
     chrome_options.add_argument('--disable-dev-shm-usage')  # 컨테이너 환경에서 메모리 문제를 해결
-    chrome_options.add_argument(f'--proxy-server={proxy}')
+    #chrome_options.add_argument(f'--proxy-server={proxy}')
 
     global driver 
     driver = webdriver.Chrome(options=chrome_options)
@@ -126,7 +126,7 @@ def main():
                 label = div_desc.find('label', id='d')
                 if label:
                     anchors = label.find_all('a')
-                    file.write(f"<div style='background-color: #d3d3d3;'><p>{row['name']}</p>{anchors[1]}</div>\n")
+                    file.write(f"<div style='background-color: #d3d3d3;'><p>${index} : {row['name']}</p>{anchors[1]}</div>\n")
                     print("------------------")
                     print(f"-->{anchors[1]}")
             # break

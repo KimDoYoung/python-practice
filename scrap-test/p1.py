@@ -21,8 +21,8 @@ def install_chrome_driver():
 # 209.79.65.132	8080	United States	
 # 178.254.143.82	6666	Serbia	
 
-    proxy_ip = "178.254.143.82"
-    proxy_port = "6666"
+    proxy_ip = "209.79.65.132"
+    proxy_port = "8080"
     proxy = f"http://{proxy_ip}:{proxy_port}"
 
     # Chrome 옵션 설정
@@ -31,7 +31,7 @@ def install_chrome_driver():
     chrome_options.add_argument("--disable-gpu")  # GPU 가속 비활성화
     chrome_options.add_argument('--no-sandbox')  # Bypass OS security model, 크롬의 일반적인 문제 해결 옵션
     chrome_options.add_argument('--disable-dev-shm-usage')  # 컨테이너 환경에서 메모리 문제를 해결
-    chrome_options.add_argument(f'--proxy-server={proxy}')
+    #chrome_options.add_argument(f'--proxy-server={proxy}')
 
     global driver 
     driver = webdriver.Chrome(options=chrome_options)
@@ -107,12 +107,12 @@ def main():
     baseUrl = os.getenv('P_URL')
 
     df_all = pd.DataFrame()
-    for i in range(0, 1):
+    for i in range(1, 2):
         url = f"{baseUrl}/search.php?q=user:Cristie65:{i}"
         new_df = get_hrefs(url)
         df_all = pd.concat([df_all, new_df], ignore_index=True)
 
-    df_all['href'] = baseUrl + "/" + df_all['href']
+    df_all['href'] = baseUrl +  df_all['href']
 
     df_all.to_csv('torrent.csv', index=False)    
 

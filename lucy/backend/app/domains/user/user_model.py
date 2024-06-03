@@ -37,5 +37,13 @@ class User(Document):
     created_at: datetime =  Field(default_factory=lambda: datetime.now(timezone.utc))
     additional_attributes: List[UserAdditionalAttribute] = []
 
+    def to_dict(self):
+        return {
+            "user_id" : self.user_id,
+            "user_name" : self.user_name,
+            "email" : self.email,
+            "kind" : self.kind
+        }
+
     class Settings:
         name = "Users"

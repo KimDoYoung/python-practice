@@ -36,19 +36,23 @@ def display_root(request: Request):
 async def display_main(request: Request):
     ''' 메인 '''
     current_user = await get_current_user(request)
-    context = {"request": request}
-    # context = {"request": request,  "user_id": current_user["user_id"], "user_name": current_user["user_name"]}    
-    # logger.debug(f"current_user: {current_user}")
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Invalid token-현재 사용자 정보가 없습니다")
+    
+    context = {"request": request,  "user_id":  current_user["user_id"], "user_name": current_user["user_name"]}    
     return render_template("main.html", context)
 
 @router.get("/page", response_class=HTMLResponse, include_in_schema=False)
-async def page(request: Request, page_id: str = Query(..., description="The ID of the page"), token: str = Depends(oauth2_scheme)):
+async def page(request: Request, id: str = Query(..., description="The ID of the page")):
     ''' id 페이지를 가져와서 보낸다. '''
     current_user = await get_current_user(request)
-
-    context = {"request": request, "page-id": page_id, "user_id": current_user["user_id"], "user_name": current_user["user_name"]}
+    
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Invalid token-현재 사용자 정보가 없습니다")
+    
+    context = {"request": request, "page-id": id, "user_id": current_user["user_id"], "user_name": current_user["user_name"]}
     # id = ipo_calendar 와 같은 형식이고 이를 분리한다.
-    path_array = page_id.split("_")
+    path_array = id.split("_")
     template_path = "/".join(path_array)
     template_page = f"template/{template_path}.html"
     logger.debug(f"template_page 호출됨: {template_page}")

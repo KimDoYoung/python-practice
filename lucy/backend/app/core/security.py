@@ -76,7 +76,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 #         raise credentials_exception
 #     return user
 
-async def get_current_user(request: Request):
+async def get_current_user(request: Request) -> dict:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -84,19 +84,17 @@ async def get_current_user(request: Request):
     )
     
     # Authorization 헤더에서 토큰 추출
+    token: Optional[str] = None
     authorization: str = request.headers.get("Authorization")
     if authorization is None or not authorization.startswith("Bearer "):
-        raise credentials_exception
-    
-    token = authorization[len("Bearer "):]
-    
+        #없으면 쿠키에서 토큰 추출
+        token = request.cookies.get(config.ACCESS_TOKEN_NAME)
+    else:
+        token = authorization[len("Bearer "):]
+
     if token is None:
-            ACCESS_TOKEN_NAME = config.ACCESS_TOKEN_NAME
-            token = request.cookies.get(ACCESS_TOKEN_NAME)
-    
-    if not token:
-        return credentials_exception
-    
+        raise credentials_exception
+
     try:
         payload = jwt.decode(token, config.SECRET_KEY, algorithms=[config.ALGORITHM])
         user_id: str = payload.get("user_id")
@@ -109,4 +107,7 @@ async def get_current_user(request: Request):
     user = await User.find_one(User.user_id == user_id)
     if user is None:
         raise credentials_exception
-    return user
+    
+    user_dict = user.to_dict()
+
+    return user_dict
