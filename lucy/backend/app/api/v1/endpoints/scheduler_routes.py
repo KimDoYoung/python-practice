@@ -1,11 +1,12 @@
 # scheduler_routes.py
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from backend.app.core.scheduler import Scheduler
+from backend.app.domains.system.config_service import DbConfigService
 from backend.app.domains.system.scheduler_job_model import JobRequest
 from backend.app.domains.system.scheduler_job_service import SchedulerJobService
 from backend.app.scheduler.schedule_mapping import task_mapping
 from backend.app.core.logger import get_logger
-from backend.app.core.dependency import get_scheduler_job_service
+from backend.app.core.dependency import get_config_service, get_scheduler_job_service
 
 logger = get_logger(__name__)
 
@@ -66,12 +67,22 @@ def remove_job(job_id: str, scheduler_job_servce: SchedulerJobService = Depends(
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/run/{program_id}")
-def run(program_id: str):
+def run(program_id: str, background_tasks: BackgroundTasks, config_service: DbConfigService = Depends(get_config_service)):
     ''' 
         테스트로 프로그램을 돌려본다.
         /api/v1/scheduler/run/scrap_judal
     '''
-    if program_id == 'scrap_judal':
-        task_mapping['scrap_judal']()
+    process = task_mapping[program_id]
+    if process is None:
+        raise HTTPException(status_code=400, detail="Task not found")
 
-    return {"message": "running program successfully"}    
+    status = config_service.get_process_status(program_id)
+    if status:
+        if status.value == 'running':
+            raise HTTPException(status_code=400, detail=f"{program_id} is already running")
+    
+    config_service.set_background_status({"key":"scrap_judal_status", "value":"running", 'note':f'백그라운드 프로세스 {program_id} is running'})
+    background_tasks.add_task(process)
+        
+
+    return {"detail": f"{program_id} is started successfully"}    

@@ -1,5 +1,5 @@
 # Define your scheduled tasks
-from backend.app.scheduler.jobs.judal_scrap_1 import scrap_judal
+from backend.app.background.jobs.judal_scrap_1 import scrap_judal
 
 
 def test_task(message : str):

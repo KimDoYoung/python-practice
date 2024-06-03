@@ -18,6 +18,7 @@ from io import StringIO
 import os
 import random
 import time
+from fastapi import Depends
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -25,6 +26,8 @@ import re
 import datetime
 from backend.app.core.config import config
 from backend.app.core.logger import get_logger
+from backend.app.domains.system.config_service import DbConfigService
+from dependency import get_config_service
 
 logging = get_logger(__name__)
 
@@ -165,8 +168,10 @@ def df_change_theme(df):
 
     return df
 
-def scrap_judal():
+def scrap_judal(config_service : DbConfigService=Depends(get_config_service)):
     
+    config_service.set_process_status({"key":"scrap_judal", "value":"running", 'note':'백그라운드 프로세스 scrap_judal is running'})
+
     data_folder = config.DATA_FOLDER+"/judal"
     base_folder = create_base_folder(data_folder)
     # Send a GET request to the website
@@ -253,6 +258,7 @@ def scrap_judal():
             logging.error(f"No table found for {name} at {url}")
 
     logging.debug("Data scraping is done!")    
+    config_service.remove_process_status("scrap_judal")
 
 # if __name__ == "__main__":
 #     main()

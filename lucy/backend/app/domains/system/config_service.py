@@ -45,3 +45,31 @@ class DbConfigService:
     async def count(self) -> int:
         result = await DbConfig.count()
         return result
+
+    async def get_process_status(self, process_id: str) -> DbConfig:
+        ''' 백그라운드 상태를 가져온다. running or stopped '''
+        dbconfig = await self.get_dbconfig(process_id)
+        if dbconfig:
+            return dbconfig
+        else:
+            return None
+
+    async def set_process_status(self, data: dict):
+        ''' 백그라운드 상태를 설정한다. running or stopped '''
+        data['mode'] = 'System'
+        dbconfig = await self.get_dbconfig(data.key)
+        if dbconfig:
+            await dbconfig.set(data)
+            await dbconfig.save()
+            return dbconfig
+        else:
+            self.create_dbconfig(data)
+    
+    async def remove_process_status(self, key: str) -> None:
+        ''' 백그라운드 상태를 삭제한다. '''
+        dbconfig = await self.get_dbconfig(key)
+        if dbconfig:
+            await dbconfig.delete()
+            return None
+        else:
+            return None
