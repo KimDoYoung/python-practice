@@ -2,7 +2,7 @@ from backend.app.core.logger import get_logger
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from backend.app.domains.system.scheduler_job_model import SchedulerJob
-from backend.app.scheduler.jobs.job_test import test1
+from backend.app.background.jobs.job_test import test1
 
 logger = get_logger(__name__)
 

@@ -4,7 +4,7 @@ from backend.app.core.scheduler import Scheduler
 from backend.app.domains.system.config_service import DbConfigService
 from backend.app.domains.system.scheduler_job_model import JobRequest
 from backend.app.domains.system.scheduler_job_service import SchedulerJobService
-from backend.app.scheduler.schedule_mapping import task_mapping
+from backend.app.background.schedule_mapping import task_mapping
 from backend.app.core.logger import get_logger
 from backend.app.core.dependency import get_config_service, get_scheduler_job_service
 

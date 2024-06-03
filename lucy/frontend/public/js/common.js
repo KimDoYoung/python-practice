@@ -294,6 +294,34 @@ var JuliaUtil = (function(){
    var navigateTo = function navigateToURL(url) {
     	window.location.href = url;
    }
+    /**
+     * javascript object객체에서 key에 해당하는 속성을 제거한다.
+     */
+   var removeElement = function (obj,key) {
+    if (obj.hasOwnProperty(key)) {
+        delete obj[key];
+    }
+    return obj;
+   }
+   
+   var objectFromFrom = function($form){
+    const formArray = $form.serializeArray();
+    const formObject = {};
+
+    $.map(formArray, function(item) {
+        if (formObject[item.name]) {
+            if (!Array.isArray(formObject[item.name])) {
+                formObject[item.name] = [formObject[item.name]];
+            }
+            formObject[item.name].push(item.value);
+        } else {
+            formObject[item.name] = item.value;
+        }
+    });
+
+    //console.log(formObject);
+    return formObject;
+   }
 
     return {
         isString : isString,
@@ -326,7 +354,9 @@ var JuliaUtil = (function(){
         addRemoveStickyAtTable: addRemoveStickyAtTable, /* dropdown이 펼쳐졌을 때 테이블에서 sticky 제거*/
         tableToString : tableToString, /* table html을  string으로 */
         isValidYmd : isValidYmd,
-        contextPath : contextPath
+        contextPath : contextPath,
+        removeElement : removeElement,
+        objectFromForm : objectFromFrom
     };    
 })();
 
@@ -423,6 +453,79 @@ async function fetchData(url) {
         return responseData;
     } catch (error) {
         console.error('에러 발생:', error);
-        return null;
+        throw error;
+    }
+}
+
+async function postData(url, data) {
+    const token = localStorage.getItem('lucy_token');
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const responseData = await response.json();
+        return responseData;
+    } catch (error) {
+        console.error('에러 발생:', error);
+        throw error;
+    }
+}
+
+
+async function putData(url, data) {
+    const token = localStorage.getItem('lucy_token');
+
+    try {
+        const response = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const responseData = await response.json();
+        return responseData;
+    } catch (error) {
+        console.error('에러 발생:', error);
+        throw error;
+    }
+}
+
+async function deleteData(url, data) {
+    const token = localStorage.getItem('lucy_token');
+
+    try {
+        const response = await fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const responseData = await response.json();
+        return responseData;
+    } catch (error) {
+        console.error('에러 발생:', error);
+        throw error;
     }
 }

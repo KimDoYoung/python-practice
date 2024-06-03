@@ -10,12 +10,12 @@ class DbConfigService:
     def __init__(self, db_client: AsyncIOMotorClient):
         self.db_client = db_client
 
-    async def create_dbconfig(self, keyvalue: dict):
+    async def create(self, keyvalue: dict):
         dbconfig = DbConfig(**keyvalue)
         await dbconfig.create()
         return dbconfig
 
-    async def get_all_users(self) -> List[DbConfig]:
+    async def get_all(self) -> List[DbConfig]:
         try:
             dbconfigs = await DbConfig.find_all().to_list()
             return dbconfigs
@@ -23,12 +23,12 @@ class DbConfigService:
             logger.error(f"Failed to retrieve all dbconfigs: {e}")
             raise e
     
-    async def get_dbconfig(self,key: str) -> DbConfig:
+    async def get_1(self,key: str) -> DbConfig:
         dbconfig = await DbConfig.find_one(DbConfig.key == key)
         return dbconfig
 
-    async def update_user(self, update_data:dict) -> DbConfig:
-        user = await DbConfig.find_one(DbConfig.key == update_data.key)
+    async def update_1(self, key:str, update_data:dict) -> DbConfig:
+        user = await DbConfig.find_one(DbConfig.key == key)
         if user:
             await user.set(update_data)
             await user.save()
@@ -36,11 +36,12 @@ class DbConfigService:
         else:
             return None
 
-    async def delete_user(self, key: str) -> DbConfig:
+    async def delete_1(self, key: str) -> DbConfig:
         dbconfig = await DbConfig.find_one(DbConfig.key == key)
         if dbconfig:
-            dbconfig = await dbconfig.delete()
+            await dbconfig.delete()
             return dbconfig
+        return None
 
     async def count(self) -> int:
         result = await DbConfig.count()

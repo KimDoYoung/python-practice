@@ -1,0 +1,77 @@
+{% extends 'common/base.html' %}
+{% block style %}
+<style>
+</style>
+{% endblock %}
+
+{% block content %}
+<section id="list" class="container">
+    <h2>Edit User</h2>
+    <form id="user-form">
+        <div class="mb-3">
+            <label for="user_id" class="form-label">User ID</label>
+            <input type="text" class="form-control" id="user_id" name="user_id" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="user_name" class="form-label">User Name</label>
+            <input type="text" class="form-control" id="user_name" name="user_name" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password">
+        </div>
+
+        <div class="mb-3">
+            <label for="kind" class="form-label">Kind</label>
+            <input type="text" class="form-control" id="kind" name="kind" value="P">
+        </div>
+
+        <div class="mb-3">
+            <label for="created_at" class="form-label">Created At</label>
+            <input type="text" class="form-control" id="created_at" name="created_at" readonly>
+        </div>
+
+        <div id="additional-attributes">
+            <h4>Additional Attributes</h4>
+            <div id="attribute-template" class="attribute-item mb-3 d-none">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="key_name[]" placeholder="Key Name" required>
+                    <input type="text" class="form-control" name="key_value[]" placeholder="Key Value" required>
+                    <select class="form-select" name="use_yn[]">
+                        <option value="Y">Y</option>
+                        <option value="N">N</option>
+                    </select>
+                    <input type="text" class="form-control" name="issuer[]" placeholder="Issuer">
+                    <input type="text" class="form-control" name="note[]" placeholder="Note">
+                    <input type="text" class="form-control" name="created_at[]" placeholder="Created At" readonly>
+                    <button type="button" class="btn btn-danger btn-remove-attribute">Remove</button>
+                </div>
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-secondary" id="add-attribute">Add Attribute</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>    
+</section>
+{% raw %} 
+<script id="table1-area" type="text/x-handlebars-template">
+</script>
+{% endraw %}
+{% endblock %}
+
+{% block script %}
+{% raw %}
+<script>
+    $( document ).ready(function() {
+        console.log('ready.... ');
+    });
+    </script>	    
+{% endraw %}
+{% endblock %}

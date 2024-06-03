@@ -1,0 +1,10 @@
+{
+    "event on some element" : {
+        "prefix": "onon",
+        "body":  [
+            "$(${1: container element}).on(\"click\", \"${2: element}\", function() {",
+                "alert(\"두 번째 버튼을 클릭했습니다.\");",
+            "});"
+            ],
+    },
+}

@@ -5,36 +5,42 @@ from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 
 from backend.app.core.template_engine import render_template
 from backend.app.core.config import config
-from backend.app.core.security import create_access_token
+from backend.app.core.security import create_access_token, get_current_user
 from fastapi import status
 
 from backend.app.domains.user.user_model import AccessToken, LoginFormData
 from backend.app.domains.user.user_service import UserService
 from backend.app.core.dependency import get_user_service
 from backend.app.core.logger import get_logger
+from backend.app.core.security import oauth2_scheme
+
 logger = get_logger(__name__)
 
 router = APIRouter()
 
 @router.get("/", response_class=HTMLResponse, include_in_schema=False)
-def display_main(request: Request):
+def display_root(request: Request):
     ''' 메인 '''
-    context = {"request": request, "message": "Welcome to Joanna API!-주식(공모주) 자동 매매시스템"}
-    return render_template("main.html", context)
+    return RedirectResponse(url="/main")
+
 
 @router.get("/main", response_class=HTMLResponse, include_in_schema=False)
-def display_main(request: Request):
+async def display_main(request: Request, token: str = Depends(oauth2_scheme)):
     ''' 메인 '''
-    context = {}
+    current_user = await get_current_user(token)
 
+    context = {"request": request,  "user_id": current_user["user_id"], "user_name": current_user["user_name"]}    
+    logger.debug(f"current_user: {current_user}")
     return render_template("main.html", context)
 
 @router.get("/page", response_class=HTMLResponse, include_in_schema=False)
-def page(request: Request, id: str = Query(..., description="The ID of the page")):
+async def page(request: Request, page_id: str = Query(..., description="The ID of the page"), token: str = Depends(oauth2_scheme)):
     ''' id 페이지를 가져와서 보낸다. '''
-    context = {"request": request, "id": id}
+    current_user = await get_current_user(token)
+
+    context = {"request": request, "page-id": page_id, "user_id": current_user["user_id"], "user_name": current_user["user_name"]}
     # id = ipo_calendar 와 같은 형식이고 이를 분리한다.
-    path_array = id.split("_")
+    path_array = page_id.split("_")
     template_path = "/".join(path_array)
     template_page = f"template/{template_path}.html"
     logger.debug(f"template_page 호출됨: {template_page}")

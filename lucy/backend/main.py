@@ -20,9 +20,10 @@ from backend.app.api.v1.endpoints.home_routes import router as home_router
 from backend.app.api.v1.endpoints.eventdays_routes import router as eventdays_router
 from backend.app.api.v1.endpoints.ipo_routes import router as ipo_router
 from backend.app.api.v1.endpoints.scheduler_routes import router as scheduler_router
+from backend.app.api.v1.endpoints.config_routes import router as config_router
 
 from backend.app.core.scheduler import Scheduler
-from backend.app.scheduler.jobs.job_test import test1
+from backend.app.background.jobs.job_test import test1
 
 
 logger = get_logger(__name__)
@@ -54,7 +55,7 @@ async def startup_event():
     await init_beanie(database=db, document_models=[Ipo])
     await init_beanie(database=db, document_models=[DbConfig])
     await init_beanie(database=db, document_models=[SchedulerJob])
-
+    
     # 스케줄러 시작
     logger.info("스케줄러 시작")
     scheduler = Scheduler.get_instance()   
@@ -87,11 +88,12 @@ static_files_path = os.path.join(BASE_DIR, 'frontend', 'public')
 app.mount("/public", StaticFiles(directory=static_files_path), name="public")
 
 # API 라우터 포함
+app.include_router(home_router) # 화면
 app.include_router(user_router, prefix="/api/v1/users", tags=["users"])
-app.include_router(home_router)
 app.include_router(eventdays_router, prefix="/api/v1/eventdays", tags=["eventdays"])
 app.include_router(ipo_router, prefix="/api/v1/ipo", tags=["ipo"])
 app.include_router(scheduler_router,prefix="/api/v1/scheduler", tags=["scheduler"])
+app.include_router(config_router,prefix="/api/v1/config", tags=["config"])
 
 if __name__ == "__main__":
     import uvicorn

@@ -1,0 +1,40 @@
+{% extends 'common/base.html' %}
+{% block style %}
+<style>
+</style>
+{% endblock %}
+
+{% block content %}
+<section id="list" class="container">
+</section>
+{% raw %} 
+<script id="table1-area" type="text/x-handlebars-template">
+    <table class="table1">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Job Id</th>
+            </tr>
+        </thead>
+        <tbody>    
+    {{#each list}}
+    <tr>
+        <td>{{inc @index}}</td>
+        <td>{{job_id}}</td>
+    </tr>
+    {{/each}}
+        </tbody>
+    </table>
+</script>
+{% endraw %}
+{% endblock %}
+
+{% block script %}
+{% raw %}
+<script>
+    $( document ).ready(function() {
+        console.log('ready.... ');
+    });
+    </script>	    
+{% endraw %}
+{% endblock %}

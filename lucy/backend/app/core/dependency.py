@@ -20,5 +20,5 @@ def get_config_service() -> DbConfigService:
     return DbConfigService(MongoDb.get_client()["stockdb"])
 
 def get_scheduler_job_service() -> SchedulerJobService:
-    scheduler = Scheduler.get_instance()
+    scheduler = Scheduler.get_instance() 
     return SchedulerJobService(scheduler=scheduler)

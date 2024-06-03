@@ -27,7 +27,7 @@ import datetime
 from backend.app.core.config import config
 from backend.app.core.logger import get_logger
 from backend.app.domains.system.config_service import DbConfigService
-from dependency import get_config_service
+from backend.app.core.dependency import get_config_service
 
 logging = get_logger(__name__)
 

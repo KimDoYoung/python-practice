@@ -5,16 +5,54 @@
 {% endblock %}
 
 {% block content %}
-<section id="config-list" class="container">
+<section id="list-area" class="container">
     <div id="button-area">
-        <a href="#" id="config-add">추가</a>
+        <a href="#"  class="btnDisplayForm btn btn-success" data-mode="insert">추가</a>
     </div>
     <div id="table-area"></div>
 </section>
+<section id="form-area" class="container d-none" >
+    <h2 id="title">Config Add </h2>
+    <form id="dbconfig-form" action="/api/v1/config" method="post">
+        <input type="hidden" name="db_action" id="db_action" value="insert">
+
+        <div class="mb-3">
+            <label for="mode" class="form-label">Mode</label><br>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="mode" id="modeSystem" value="System" checked readonly>
+                <label class="form-check-label" for="modeSystem">System</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="mode" id="modeUser" value="User" readonly>
+                <label class="form-check-label" for="modeUser">User</label>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="key" class="form-label">Key</label>
+            <input type="text" class="form-control" id="key" name="key"  required>
+        </div>
+
+        <div class="mb-3">
+            <label for="value" class="form-label">Value</label>
+            <input type="text" class="form-control" id="value" name="value" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="note" class="form-label">Note</label>
+            <textarea class="form-control" id="note" name="note" rows="3"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-secondary btnHideForm">Cancel</button>
+    </form>
+</section>
+    
+
 
 {% raw %} 
-<script id="ipo-table" type="text/x-handlebars-template">
-    <table class="table">
+<script id="table1-template" type="text/x-handlebars-template">
+    <table id="table1" class="table">
         <thead>
             <tr>
                 <th scope="col">#</th>
@@ -27,22 +65,16 @@
         <tbody>    
     {{#each list}}
     <tr>
-        <td>{{@index}}</td>
-        <td><a href="{{scrap_url}}" target="_blank">{{name}}</a></td>
-        <td>{{stock_type}}/{{market_type}}</td>
+        <td>{{inc @index}}</td>
+        <td>{{mode}}</td>
+        <td>{{key}}</td>
+        <td>{{value}}</td>
+        <td>{{note}}</td>
         <td>
-            {{#if days.청약일}}
-            <span class="badge bg-primary">{{displayYmd days.청약일}}</span>
-            {{/if}}
-            {{#if days.납입일}}
-            <span class="badge bg-secondary">{{displayYmd days.납입일}}</span>
-            {{/if}}
-            {{#if days.환불일}}
-            <span class="badge bg-secondary">{{displayYmd days.환불일}}</span>
-            {{/if}}
-            {{#if days.상장일}}
-            <span class="badge bg-danger">{{displayYmd days.상장일}}</span>
-            {{/if}}
+            {{#test "mode == 'User'"}}
+                <button type="button" class="btn btn-primary btnDisplayForm" data-key="{{key}}" data-mode="update">Edit</button>
+                <button type="button" class="btn btn-danger btnDelete" data-key="{{key}}">Delete</button>
+            {{/test}}
         </td>
     </tr>
     {{/each}}
@@ -58,35 +90,114 @@
 {% raw %}
 <script>
     $( document ).ready(function() {
-        console.log('ipo list.... ');
+        console.log('config list.... ');
         async function initialize() {
-            await fetchData('/api/v1/ipo').then(data => {
+            await fetchData('/api/v1/config').then(data => {
                 console.log(data);
-                var source = $('#ipo-table').html();
+                var source = $('#table1-template').html();
                 var template = Handlebars.compile(source);
 
-                newList = data.map(item => {
-                    const regex = /(.+)-(.+)-(.+)\((.+)\)/;
-                    const match = item.title.match(regex);
-                    if (match) {
-                        return {
-                            ...item,
-                            company: match[1],
-                            stock_type: match[2],
-                            market_type: match[3],
-                            stock_code: match[4]
-                        };
-                    } else {
-                        return item;
-                    }
-                });
-
-                var html = template({list: newList});
+                var html = template({list: data});
 
                 $('#table-area').html(html);
             });
         }
+        async function getConfigFromDb(key) {
+            try{
+                const data = await fetchData('/api/v1/config/'+key);
+                $('#db_action').val('update');
+                $('#mode').val(data.mode);
+                $('#key').val(data.key);
+                $('#value').val(data.value);
+                $('#note').val(data.note);
+            }catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        async function upsertConfig(configData) {
+
+            try {
+                let response;
+                if(configData.db_action == 'insert') {
+                    const data = JuliaUtil.removeElement(configData, 'db_action')
+                    response = await postData('/api/v1/config', data);
+                }else if(configData.db_action == 'update') {
+
+                    const data = JuliaUtil.removeElement(configData, 'db_action')
+                    response = await putData('/api/v1/config/'+data.key,data);
+                }
+                console.log('응답 데이터:', response);
+                window.location.reload();
+            } catch (error) {
+                console.error('addConfig 중 에러 발생:', error);
+                alert('Failed to add configuration. Please try again later.');
+            }
+        }
+        async function deleteConfig(key) {
+            try {
+                const response = await deleteData('/api/v1/config/'+key);
+                console.log('응답 데이터:', response);
+                window.location.reload();
+            } catch (error) {
+                console.error('deleteConfig 중 에러 발생:', error);
+                alert('Failed to delete configuration. Please try again later.');
+            }
+        }
+
         initialize();
+        
+        //-------------------------------
+        //events
+        //-------------------------------
+        // function events_initialize(){
+            $('.container').on('click', '.btnHideForm', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                $('#form-area').addClass('d-none');
+                $('#list-area').removeClass('d-none');
+            });
+
+            $('#dbconfig-form').on('submit', function(event) {
+                event.preventDefault();
+                const dataObject = JuliaUtil.objectFromForm($(this));
+                console.log(dataObject);
+                upsertConfig(dataObject);
+            });
+            $('.container').on('click', '.btnDisplayForm', function(e){
+                e.preventDefault();
+                e.stopPropagation();
+                $('#form-area').removeClass('d-none');
+                $('#list-area').addClass('d-none');
+
+                let mode = $(this).data('mode');
+                if(mode =='insert') {
+                    $('#title').text('New Config Add');
+                    $('#db_action').val('insert');
+                    $('#key').val('');
+                    $('#value').val('');
+                    $('#note').val('');
+                    $('#modeSystem').prop('disabled', true);
+                    $('#modeUser').prop('checked', true);
+                } else {
+                    $('#db_action').val('update');
+                    $('#title').text('Config Update');
+                    debugger;
+                    var key = $(this).data('key');
+                    getConfigFromDb(key);
+
+                }
+            });
+            $('.container').on('click', '.btnDelete', function(e){
+                e.preventDefault();
+                e.stopPropagation();
+
+                const key = $(this).data('key');
+                if(confirm('Are you sure you want to delete this configuration?')){
+                    deleteConfig(key);
+                }
+            });            
+        // }
     });
     </script>	
     
