@@ -24,6 +24,7 @@ from backend.app.api.v1.endpoints.config_routes import router as config_router
 
 from backend.app.core.scheduler import Scheduler
 from backend.app.background.jobs.job_test import test1
+from backend.app.core.exception_handler import add_exception_handlers
 
 
 logger = get_logger(__name__)
@@ -94,6 +95,9 @@ app.include_router(eventdays_router, prefix="/api/v1/eventdays", tags=["eventday
 app.include_router(ipo_router, prefix="/api/v1/ipo", tags=["ipo"])
 app.include_router(scheduler_router,prefix="/api/v1/scheduler", tags=["scheduler"])
 app.include_router(config_router,prefix="/api/v1/config", tags=["config"])
+
+# Exception Handler 추가
+add_exception_handlers(app)
 
 if __name__ == "__main__":
     import uvicorn

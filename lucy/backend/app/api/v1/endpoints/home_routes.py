@@ -24,19 +24,27 @@ def display_root(request: Request):
     return RedirectResponse(url="/main")
 
 
-@router.get("/main", response_class=HTMLResponse, include_in_schema=False)
-async def display_main(request: Request, token: str = Depends(oauth2_scheme)):
-    ''' 메인 '''
-    current_user = await get_current_user(token)
+# @router.get("/main", response_class=HTMLResponse, include_in_schema=False)
+# async def display_main(request: Request, token: str = Depends(oauth2_scheme)):
+#     ''' 메인 '''
+#     current_user = await get_current_user(token)
 
-    context = {"request": request,  "user_id": current_user["user_id"], "user_name": current_user["user_name"]}    
-    logger.debug(f"current_user: {current_user}")
+#     context = {"request": request,  "user_id": current_user["user_id"], "user_name": current_user["user_name"]}    
+#     logger.debug(f"current_user: {current_user}")
+#     return render_template("main.html", context)
+@router.get("/main", response_class=HTMLResponse, include_in_schema=False)
+async def display_main(request: Request):
+    ''' 메인 '''
+    current_user = await get_current_user(request)
+    context = {"request": request}
+    # context = {"request": request,  "user_id": current_user["user_id"], "user_name": current_user["user_name"]}    
+    # logger.debug(f"current_user: {current_user}")
     return render_template("main.html", context)
 
 @router.get("/page", response_class=HTMLResponse, include_in_schema=False)
 async def page(request: Request, page_id: str = Query(..., description="The ID of the page"), token: str = Depends(oauth2_scheme)):
     ''' id 페이지를 가져와서 보낸다. '''
-    current_user = await get_current_user(token)
+    current_user = await get_current_user(request)
 
     context = {"request": request, "page-id": page_id, "user_id": current_user["user_id"], "user_name": current_user["user_name"]}
     # id = ipo_calendar 와 같은 형식이고 이를 분리한다.
