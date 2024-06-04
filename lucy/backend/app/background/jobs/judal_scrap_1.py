@@ -18,13 +18,14 @@ import asyncio
 from io import StringIO
 import os
 import random
+import shutil
 import time
 from fastapi import Depends
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import re
-import datetime
+from  datetime import datetime, timedelta
 from backend.app.core.config import config
 from backend.app.core.logger import get_logger
 from backend.app.domains.system.config_service import DbConfigService
@@ -59,7 +60,7 @@ def split_title_count(span_text):
 
 
 def create_base_folder(base : str):
-    now_time = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+    now_time = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
     save_path = f'{base}/{now_time}'
     os.makedirs(save_path, exist_ok=True)
     return save_path
@@ -170,11 +171,38 @@ def df_change_theme(df):
 
     return df
 
+def remove_old_folders(base_folder):
+    current_date = datetime.now()
+    seven_days_ago = current_date - timedelta(days=7)
+
+    # 폴더 리스트 가져오기
+    folders = [f for f in os.listdir(base_folder) if os.path.isdir(os.path.join(base_folder, f))]
+
+    # 폴더 이름을 날짜로 변환하고 7일 이전 폴더 삭제
+    for folder_name in folders:
+        try:
+            # 폴더 이름을 날짜로 변환
+            folder_date = datetime.strptime(folder_name, '%Y_%m_%d_%H_%M_%S')
+            
+            # 폴더가 7일 이전인지 확인하고 삭제
+            if folder_date < seven_days_ago:
+                folder_path = os.path.join(base_folder, folder_name)
+                shutil.rmtree(folder_path)
+                logging.info(f"삭제된 폴더: {folder_path}")
+        except ValueError:
+            # 폴더 이름이 날짜 형식이 아니면 건너뜀
+            logging.error(f"잘못된 폴더 이름 형식: {folder_name}")
+
+    logging.info("오래된 폴더 삭제 작업 완료")
+
 def scrap_judal(config_service : DbConfigService=Depends(get_config_service)):
     
     config_service.set_process_status({"key":"scrap_judal", "value":"running", 'note':'백그라운드 프로세스 scrap_judal is running'})
 
     data_folder = config.DATA_FOLDER+"/judal"
+
+    # 오래된 폴더삭제 및 새로운 폴더 생성
+    remove_old_folders(data_folder)
     base_folder = create_base_folder(data_folder)
     # Send a GET request to the website
     url = "https://www.judal.co.kr/"

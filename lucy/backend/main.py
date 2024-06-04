@@ -63,11 +63,6 @@ async def startup_event():
     scheduler.start()
     scheduler_service = SchedulerJobService(scheduler=scheduler)
     await scheduler_service.register_system_jobs()
-    # test_job = SchedulerJob.find_one({"job_id": "test_job"})
-    # count = await test_job.count()
-    # if count == 0:
-    #     test_Job = SchedulerJob(job_id="test_job", job_name="test1", job_type="cron", run_type="cron", func_name="test1", cron="*/5 * * * *", args=["Hello, World!"])
-    #     await test_Job.insert()
     
     
 async def shutdown_event():
