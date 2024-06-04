@@ -3,17 +3,7 @@
 모듈 설명: 
     - exception_handler.py는 FastAPI 앱의 예외 처리를 담당하는 모듈입니다.
 에러 메시지:
-{
-    "detail": "입력 데이터가 유효하지 않습니다.",
-    "errors": [
-        {
-            "loc": ["body", "item", "description"],
-            "msg": "ensure this value has at most 10 characters",
-            "type": "value_error.any_str.max_length",
-            "ctx": {"limit_value": 10}
-        }
-    ]
-}
+
     
 작성자: 김도영
 작성일: 03

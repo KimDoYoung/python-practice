@@ -11,6 +11,8 @@
 작성일: 2024-05-29
 버전: 1.0
 """
+import asyncio
+import random
 import re
 import time
 import chromedriver_autoinstaller
@@ -509,19 +511,23 @@ def insert_or_update_ipo_list(data_list):
             upsert=True                      # 문서가 없으면 삽입
         )
 
-def scrapping_38_fill_ipo_38():
+def scrapping_38_fill_ipo_38(is_test = False) -> bool:
     logging.info('Scraping started')
+    if is_test:
+        limit_count = 2
     try:
         driver = install_chrome_driver()
         
         urls = ['https://www.38.co.kr/html/fund/index.htm?o=k','https://www.38.co.kr/html/fund/index.htm?o=k&page=2']
         # urls = ['https://www.38.co.kr/html/fund/index.htm?o=k&page=2']
-        #urls = ['https://www.38.co.kr/html/fund/index.htm?o=k']
+        if is_test:
+            urls = ['https://www.38.co.kr/html/fund/index.htm?o=k']
         data_list = []
         for url in urls:
             logging.info('Scraping: %s', url)            
             data_list = get_ipo_list(url)
             logging.info('Scrapping count : %s', len(data_list))
+            i = 0
             for basic in data_list:
                 detail_url = basic['detail_url']
                 logging.info('---------------------------------------------------------')
@@ -532,32 +538,28 @@ def scrapping_38_fill_ipo_38():
                 basic['details'] = detail
 
                 logging.debug(detail_url + " done!")
-                time.sleep(1)
+                i += 1
+                if i > limit_count:
+                    break
+                time.sleep(random.randint(1, 5))
+                
             #데이터베이스에 넣는다
             logging.info("컬렉션 ipo_scrap_38 에 넣기 시작 ")
             insert_or_update_ipo_list(data_list)
             logging.info("컬렉션 ipo_scrap_38 에 넣기 종료 ")
         driver.quit()
-
+        return True
     except Exception as e:
         logging.error('An error occurred in the main function: %s', e)
+        return False
     finally:
-        logging.info('Scraping finished')
+        logging.info('38커뮤니케이션 Scraping finished')
 
-# if __name__ == "__main__":
-#     date_time = datetime.now().strftime("%Y%m%d")
-
-#     logging.basicConfig(
-#         filename=f'scraping_{date_time}.log',  # 로그 파일 경로
-#         level=logging.INFO,  # 로그 레벨 설정
-#         format='%(asctime)s - %(levelname)s - %(message)s',  # 로그 메시지 형식
-#     )
-#     logging.info('------------------------------------------------------')
-#     logging.info('scrapping_38.py started')
-#     logging.info('------------------------------------------------------')
-#     main()    
-#     logging.info('------------------------------------------------------')
-#     logging.info('scrapping_38.py ended')
-#     logging.info('------------------------------------------------------')
-
-
+async def main():
+    await MongoDb.initialize(config.DB_URL)   
+    scrapping_38_fill_ipo_38(is_test=True)
+if __name__ == "__main__":
+    try:
+        asyncio.run(main())
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")

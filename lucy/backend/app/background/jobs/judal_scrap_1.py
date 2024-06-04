@@ -14,6 +14,7 @@
 작성일: 29
 버전: 1.0
 """
+import asyncio
 from io import StringIO
 import os
 import random
@@ -28,6 +29,7 @@ from backend.app.core.config import config
 from backend.app.core.logger import get_logger
 from backend.app.domains.system.config_service import DbConfigService
 from backend.app.core.dependency import get_config_service
+from backend.app.core.mongodb import MongoDb
 
 logging = get_logger(__name__)
 
@@ -260,5 +262,16 @@ def scrap_judal(config_service : DbConfigService=Depends(get_config_service)):
     logging.debug("Data scraping is done!")    
     config_service.remove_process_status("scrap_judal")
 
-# if __name__ == "__main__":
-#     main()
+async def main():
+    await MongoDb.initialize(config.DB_URL)
+    config_service = get_config_service()
+    scrap_judal(config_service=config_service)
+
+
+if __name__ == "__main__":
+    try:
+        asyncio.run(main())
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
+    finally:
+        logging.info("Main execution completed.")

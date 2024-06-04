@@ -10,6 +10,8 @@
         "**/__pycache__": true,
         "**/.pytest_cache": true,
     },
+    "python.pythonPath": "C:/Users/deHong/Documents/kdy/python-practice/lucy",
+    
     "python.analysis.extraPaths": [
         "./backend/app/core",
         "./backend/app/utils/scrap_"

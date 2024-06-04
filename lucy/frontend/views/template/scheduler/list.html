@@ -8,7 +8,8 @@
 <section id="ipo-list" class="container">
     <div id="button-area">
         <a href="/scheduler/add" class="btn btn-primary">스케줄러 추가</a>
-        <a href="/api/v1/scheduler/run/scrap_judal" class="btn btn-primary">주달Scrapping</a>
+        <a href="#" data-program-id="/api/v1/scheduler/run/scrap_judal" class="btnRun btn btn-success">주달Scrapping</a>
+        <a href="#" data-program-id="/api/v1/scheduler/run/site38_work" class="btnRun btn btn-warning">커뮤니케이션38(IPO) Scrapping</a>
     </div>
     <div id="table-area"></div>
 </section>
@@ -77,6 +78,23 @@
             });
         }
         initialize();
+        $('.btnRun').on('click', function(){
+            var programId = $(this).data('program-id');
+            console.log('programId: ', programId);
+            $.ajax({
+                url: programId,
+                type: 'GET',
+                success: function(data) {
+                    console.log('data: ', data);
+                    alert('성공');
+                },
+                error: function(err) {
+                    console.log('err: ', err);
+                    alert('실패' + err);
+                }
+            });
+        
+        })
     });
     </script>	
     

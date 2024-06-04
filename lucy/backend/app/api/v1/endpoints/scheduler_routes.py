@@ -32,11 +32,11 @@ async def get_jobs(scheduler_job_servce: SchedulerJobService = Depends(get_sched
     return job_list    
 
 @router.post("/add")
-def add_job(job_request: JobRequest, scheduler_job_servce: SchedulerJobService = Depends(get_scheduler_job_service)):
+async def add_job(job_request: JobRequest, scheduler_job_servce: SchedulerJobService = Depends(get_scheduler_job_service)):
     
     try:
         # Save job to db
-        scheduler_job_servce.create(job_request.model_dump())
+        await scheduler_job_servce.create(job_request.model_dump())
 
         scheduler = Scheduler.get_instance()
         if job_request.run_type == "date":
@@ -56,18 +56,18 @@ def add_job(job_request: JobRequest, scheduler_job_servce: SchedulerJobService =
         raise HTTPException(status_code=500, detail=str(e))    
 
 @router.delete("/remove/{job_id}")
-def remove_job(job_id: str, scheduler_job_servce: SchedulerJobService = Depends(get_scheduler_job_service)):
+async def remove_job(job_id: str, scheduler_job_servce: SchedulerJobService = Depends(get_scheduler_job_service)):
 
-    scheduler = Scheduler.get_instance()
-    scheduler_job_servce.delete(job_id)
     try:
+        scheduler = Scheduler.get_instance()
+        await scheduler_job_servce.delete(job_id)
         scheduler.remove_job(job_id)
-        return {"message": "Job removed successfully"}
+        return {"message": f"Job {job_id} removed successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/run/{program_id}")
-def run(program_id: str, background_tasks: BackgroundTasks, config_service: DbConfigService = Depends(get_config_service)):
+async def run(program_id: str, background_tasks: BackgroundTasks, config_service: DbConfigService = Depends(get_config_service)):
     ''' 
         테스트로 프로그램을 돌려본다.
         /api/v1/scheduler/run/scrap_judal
@@ -76,12 +76,12 @@ def run(program_id: str, background_tasks: BackgroundTasks, config_service: DbCo
     if process is None:
         raise HTTPException(status_code=400, detail="Task not found")
 
-    status = config_service.get_process_status(program_id)
+    status = await config_service.get_process_status(program_id)
     if status:
         if status.value == 'running':
             raise HTTPException(status_code=400, detail=f"{program_id} is already running")
     
-    config_service.set_background_status({"key":"scrap_judal_status", "value":"running", 'note':f'백그라운드 프로세스 {program_id} is running'})
+    await config_service.set_process_status({"mode":"System", "key":f"{program_id}", "value":"running", 'note':f'백그라운드 프로세스 {program_id} is running'})
     background_tasks.add_task(process)
         
 
