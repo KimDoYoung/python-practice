@@ -1,9 +1,11 @@
 import json
 from typing import List
 from fastapi import HTTPException
+from pydantic import ValidationError
 import requests
 
 from backend.app.core.logger import get_logger
+from backend.app.domains.stc.kis.kis_inquire_balance_model import KisInquireBalance
 from backend.app.domains.user.user_model import KeyValueData, User
 from backend.app.core.dependency import get_user_service
 from backend.app.domains.user.user_service import UserService
@@ -95,7 +97,7 @@ class KoreaInvestmentApi:
         #return json['output']['stck_prpr']
         return int(json['output']['stck_prpr'])
     
-    def get_balance(self) ->dict:
+    def get_balance(self) ->KisInquireBalance:
         ''' 주식 잔고 조회 '''
         # url = self._PATHS["주식잔고조회"]
         url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/inquire-balance"
@@ -126,16 +128,16 @@ class KoreaInvestmentApi:
         if response.status_code != 200:
             raise HTTPException(status_code=response.status_code, detail=f"Error fetching balance: {response.text}")
 
-
         try:
             json = response.json()
-            logger.debug(f"response(주식잔고조회) : [{json}]")
-            
+            kis_inquire_balance = KisInquireBalance(**json)
         except requests.exceptions.JSONDecodeError:
             logger.error(f"Error decoding JSON: {response.text}")
-            raise HTTPException(status_code=500, detail="Invalid JSON response")
+            raise HTTPException(status_code=500, detail="Invalid JSON response")            
+        except ValidationError as e:
+            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
 
-        return json
+        return kis_inquire_balance
 
     # def get_stock_balance(self, headers:dict,  param: dict ) ->dict:
     #     ''' 주식 잔고 조회 '''
