@@ -12,9 +12,9 @@ class AccessToken(LoginFormData):
     access_token: str
     token_type: str
 
-class UserAdditionalAttribute(BaseModel):
-    key_name: str
-    key_value: str
+class KeyValueData(BaseModel):
+    key: str
+    value: str
     use_yn: str = 'Y'
     issuer: Optional[str] = None
     note: Optional[str] = None
@@ -26,7 +26,7 @@ class UserRequest(BaseModel):
     email: EmailStr
     password: str
     kind: str = 'P'
-    additional_attributes: List[UserAdditionalAttribute] = []
+    additional_attributes: List[KeyValueData] = []
 
 class User(Document):
     user_id: str = Field(json_schema_extra={"unique": True})
@@ -35,14 +35,16 @@ class User(Document):
     password: str
     kind: str = 'P'
     created_at: datetime =  Field(default_factory=lambda: datetime.now(timezone.utc))
-    additional_attributes: List[UserAdditionalAttribute] = []
+    key_values: List[KeyValueData] = []
 
     def to_dict(self):
+        kv = [kv.model_dump() for kv in self.key_values]
         return {
             "user_id" : self.user_id,
             "user_name" : self.user_name,
             "email" : self.email,
-            "kind" : self.kind
+            "kind" : self.kind,
+            "key_values" : kv
         }
 
     class Settings:

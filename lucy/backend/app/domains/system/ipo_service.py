@@ -55,6 +55,7 @@ class IpoService:
             raise e
 
     async def get_all(self, onlyFuture:bool=False, sorting:bool= True) -> List[Ipo]:
+        ''' onlyFuture가 True이면 현재 날짜 이후의 데이터만 가져온다. sorting이 True이면 processed_time을 기준으로 내림차순으로 정렬한다.'''
         try:
             current_date = datetime.now().strftime('%Y%m%d')
             query = {}

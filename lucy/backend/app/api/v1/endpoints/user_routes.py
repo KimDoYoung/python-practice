@@ -10,7 +10,8 @@ router = APIRouter()
 async def get_all_users(user_service :UserService=Depends(get_user_service)):
     users = await user_service.get_all_users()
     return users
-
+#TODO : 사용자 정보 특히 key를 수정 추가할 수 있어야한다.
+#TODO : 처음에 어떻게 할 것인가? admin이 있어서 사용자를 추가할 것인가? 아니면 사용자가 직접 추가할 것인가?
 @router.get("/user/{user_id}", response_model=User)
 async def get_user(user_id: str = Path(...), user_service :UserService=Depends(get_user_service)):
     user = await user_service.get_user(user_id)

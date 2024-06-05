@@ -93,5 +93,6 @@ def main():
         print(f"{year}년 {month}월 데이터 처리 완료")
         time.sleep(2)
 
+#TODO main 함수를 호출하는 코드 추가
 if __name__ == "__main__":
     main()

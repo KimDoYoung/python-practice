@@ -21,6 +21,7 @@ from backend.app.api.v1.endpoints.eventdays_routes import router as eventdays_ro
 from backend.app.api.v1.endpoints.ipo_routes import router as ipo_router
 from backend.app.api.v1.endpoints.scheduler_routes import router as scheduler_router
 from backend.app.api.v1.endpoints.config_routes import router as config_router
+from backend.app.api.v1.endpoints.kis_routes import router as kis_router
 
 from backend.app.core.scheduler import Scheduler
 from backend.app.background.jobs.job_test import test1
@@ -90,6 +91,7 @@ app.include_router(eventdays_router, prefix="/api/v1/eventdays", tags=["eventday
 app.include_router(ipo_router, prefix="/api/v1/ipo", tags=["ipo"])
 app.include_router(scheduler_router,prefix="/api/v1/scheduler", tags=["scheduler"])
 app.include_router(config_router,prefix="/api/v1/config", tags=["config"])
+app.include_router(kis_router,prefix="/api/v1/kis", tags=["kis"])
 
 # Exception Handler 추가
 add_exception_handlers(app)

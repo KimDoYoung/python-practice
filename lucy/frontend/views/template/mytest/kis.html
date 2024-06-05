@@ -1,0 +1,39 @@
+{% extends 'common/base.html' %}
+{% block style %}
+<style>
+</style>
+{% endblock %}
+
+{% block content %}
+<section id="list" class="container">
+    <h1>KIS(한국투자증권) TEST</h1>
+    
+</section>
+{% raw %} 
+{% endraw %}
+{% endblock %}
+
+{% block script %}
+{% raw %}
+<script>
+    function initalize() {
+        // Fetch code goes here
+        fetch('/api/v1/kis')
+            .then(response => response.json())
+            .then(data => {
+                // Process the fetched data here
+                console.log(data);
+            })
+            .catch(error => {
+                // Handle any errors that occur during the fetch
+                console.error(error);
+            });
+    }
+    $( document ).ready(function() {
+        console.log('ready.... ');
+        initalize();
+
+    });
+    </script>	    
+{% endraw %}
+{% endblock %}
