@@ -5,6 +5,7 @@
 - 2가지 툴을 연습
 - web browser 자동화 (매크로 작성)
 - selenium으로 웹페이지 테스트
+- [kis api](https://apiportal.koreainvestment.com/apiservice/oauth2#L_5c87ba63-740a-4166-93ac-803510bb9c02) 문서를 scrapping해서 python 소스를 만든다.
 
 ## 3가지 tools
 
@@ -26,7 +27,6 @@
 - f38_2.py : ipo_scrap -> ipo collection으로 필요한 데이터만 format바꿔서 넣음.
 - judal_scrap_1.py : [judal사이트](https://www.judal.co.kr/)에서 모두 scrap해서 csv로 만든다.
 
- 
 ## 수식
 
 - 간단한 수식 계산기가 필요할 듯 해서 만들어 달라고 하다
@@ -50,4 +50,3 @@
     ```
 
 5. calc.py를 만들어 줘
-

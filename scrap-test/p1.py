@@ -107,14 +107,15 @@ def main():
     baseUrl = os.getenv('P_URL')
 
     df_all = pd.DataFrame()
-    for i in range(1, 2):
+    for i in range(0, 1):
         url = f"{baseUrl}/search.php?q=user:Cristie65:{i}"
         new_df = get_hrefs(url)
         df_all = pd.concat([df_all, new_df], ignore_index=True)
 
     df_all['href'] = baseUrl +  df_all['href']
 
-    df_all.to_csv('torrent.csv', index=False)    
+    df_all.to_csv('torrent.csv', index=False)
+    print("Done!")    
 
 if __name__ == "__main__":
     main()
