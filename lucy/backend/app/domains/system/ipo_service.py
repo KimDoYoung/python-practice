@@ -105,3 +105,7 @@ class IpoService:
             ipo = await ipo.delete()
             return ipo
 
+
+    async def get_ipo(self, stk_code: str) -> Ipo:
+        ipo = await Ipo.find_one(Ipo.stk_code == stk_code)
+        return ipo

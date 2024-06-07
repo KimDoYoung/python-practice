@@ -1,7 +1,8 @@
 # kisdoc.py
 """
 모듈 설명: 
-    https://apiportal.koreainvestment.com/apiservice/oauth2#L_5c87ba63-740a-4166-93ac-803510bb9c02-  [kis api](https://apiportal.koreainvestment.com/apiservice/oauth2#L_5c87ba63-740a-4166-93ac-803510bb9c02) 를 scrapping해서 python code를 만든다.
+    kis api document 를 scrapping해서 python code를 만든다.
+    https://apiportal.koreainvestment.com/apiservice/oauth2#L_5c87ba63-740a-4166-93ac-803510bb9c02-  
 주요 기능:
     - kis api를 selenium을 이용하여 scrapping
     - path에 따른 request/response를 해석해서 python code를 만든다.

@@ -9,6 +9,7 @@ from backend.app.core.logger import get_logger
 from backend.app.domains.system.config_model import DbConfig
 from backend.app.domains.system.eventdays_model import EventDays
 from backend.app.domains.system.ipo_model import Ipo
+from backend.app.domains.system.mystock_model import MyStock
 from backend.app.domains.system.scheduler_job_model import SchedulerJob
 from backend.app.domains.system.scheduler_job_service import SchedulerJobService
 from backend.app.domains.user.user_model import User
@@ -22,6 +23,7 @@ from backend.app.api.v1.endpoints.ipo_routes import router as ipo_router
 from backend.app.api.v1.endpoints.scheduler_routes import router as scheduler_router
 from backend.app.api.v1.endpoints.config_routes import router as config_router
 from backend.app.api.v1.endpoints.kis_routes import router as kis_router
+from backend.app.api.v1.endpoints.mystock_routes import router as mystock_router
 
 from backend.app.core.scheduler import Scheduler
 from backend.app.background.jobs.job_test import test1
@@ -57,6 +59,7 @@ async def startup_event():
     await init_beanie(database=db, document_models=[Ipo])
     await init_beanie(database=db, document_models=[DbConfig])
     await init_beanie(database=db, document_models=[SchedulerJob])
+    await init_beanie(database=db, document_models=[MyStock])
     
     # 스케줄러 시작
     logger.info("스케줄러 시작")
@@ -92,6 +95,7 @@ app.include_router(ipo_router, prefix="/api/v1/ipo", tags=["ipo"])
 app.include_router(scheduler_router,prefix="/api/v1/scheduler", tags=["scheduler"])
 app.include_router(config_router,prefix="/api/v1/config", tags=["config"])
 app.include_router(kis_router,prefix="/api/v1/kis", tags=["kis"])
+app.include_router(mystock_router,prefix="/api/v1/mystock", tags=["mystock"])
 
 # Exception Handler 추가
 add_exception_handlers(app)
