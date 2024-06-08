@@ -116,6 +116,7 @@
         <a href="#" id="nextMonth" class="text-decoration-none  border-icon mx-2"  title="next month"><i class="bi bi-caret-right"></i></a>
         <!-- <a href="#" id="nextYear" class="text-decoration-none  border-icon me-2" title="next year"><i class="bi bi-caret-right-fill"></i></a> -->
         <a href="#" id="todayYearMonth" class="text-decoration-none  border-icon me-2" title="today"><i class="bi bi-calendar-check today-icon" title="오늘"></i></a>
+        <a href="#" id="printToImage" class="text-decoration-none  border-icon me-2" title="save as image"><i class="bi bi-print"></i></a>
     </div>
     <div id="mainCalendar" class="mt-2 vh-100"></div>
 </section>
@@ -123,6 +124,7 @@
 
 {% block script %}
 {% raw %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="/public/js/calendar-utility.js"></script>
 <script>
 
@@ -196,6 +198,20 @@
             let y = today.getFullYear();
             let m= today.getMonth() + 1;
             fetchDataAndDrawCalendar(y,m);
+        });
+        $('#printToImage').on('click', function(){
+            html2canvas(document.querySelector("#mainCalendar")).then(canvas => {
+                // 캡처된 이미지 데이터를 URL로 변환
+                var imgData = canvas.toDataURL("image/png");
+
+                // 가상의 링크를 생성하여 이미지 다운로드
+                var link = document.createElement('a');
+                link.href = imgData;
+                link.download = 'calendar.png';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);           
+            });
         });
         // 달력 호출 
         var date = new Date();
