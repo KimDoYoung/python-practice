@@ -510,8 +510,18 @@ def insert_or_update_ipo_list(data_list):
             upsert=True                      # 문서가 없으면 삽입
         )
 
+def delete_ipo_38():
+    ''' ipo_scrapping_38 컬렉션의 모든 데이터를 삭제'''
+    client = MongoDb.get_client()
+    db_name = config.DB_NAME
+    db = client[db_name]
+    collection = db['ipo_scrap_38']
+    collection.delete_many({})
+
 def scrapping_38_fill_ipo_38(is_test = False) -> bool:
+    ''' 38커뮤니케이션 사이트의 공모주 일정 2페이지를 스크래핑하여 데이터베이스에 넣는 함수'''
     logging.info('Scraping started')
+    limit_count = 10000
     if is_test:
         limit_count = 2
     try:
@@ -555,8 +565,9 @@ def scrapping_38_fill_ipo_38(is_test = False) -> bool:
         logging.info('38커뮤니케이션 Scraping finished')
 
 async def main():
-    await MongoDb.initialize(config.DB_URL)   
-    scrapping_38_fill_ipo_38(is_test=True)
+    await MongoDb.initialize(config.DB_URL)
+    delete_ipo_38()   
+    scrapping_38_fill_ipo_38(is_test=False)
 if __name__ == "__main__":
     try:
         asyncio.run(main())

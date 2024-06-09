@@ -14,7 +14,6 @@ import asyncio
 from datetime import datetime
 from beanie import init_beanie
 from dateutil.relativedelta import relativedelta
-import logging
 import time
 import requests
 import xml.etree.ElementTree as ET
@@ -28,7 +27,6 @@ from backend.app.domains.user.user_model import User
 
 logging = get_logger(__name__)
 
-# TODO DbConfigService에서 API_KEY를 가져오도록 수정
 async def fetch_holidays(year, month):
     sYear = str(year)
     sMonth = str(month).zfill(2)

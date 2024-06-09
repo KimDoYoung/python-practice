@@ -15,7 +15,7 @@ collection ipo_scrap_38 에 쌓여 있는 데이터를 1. 가공하고  2. 필�
 """
 
 import asyncio
-from pymongo import  MongoClient, UpdateOne
+from pymongo import   UpdateOne
 from datetime import datetime
 from backend.app.core.mongodb import MongoDb
 from backend.app.utils.scrap_util import extract_competition_rates, extract_dates, extract_numbers, to_num, to_won, to_ymd
@@ -171,4 +171,4 @@ if __name__ == "__main__":
     except Exception as e:
         logging.error(f"An error occurred: {e}")
     finally:
-        logging.info("Main execution completed.")
+        logging.info("Main execution completed.") 

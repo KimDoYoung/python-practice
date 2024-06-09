@@ -201,6 +201,10 @@ def scrap_judal(config_service : DbConfigService=Depends(get_config_service)):
 
     data_folder = config.DATA_FOLDER+"/judal"
 
+    # 없으면 폴더를 만들어 준다
+    if not os.path.exists(data_folder):
+        os.makedirs(data_folder)
+
     # 오래된 폴더삭제 및 새로운 폴더 생성
     remove_old_folders(data_folder)
     base_folder = create_base_folder(data_folder)
