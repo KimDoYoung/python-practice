@@ -47,6 +47,12 @@ class User(Document):
             "kind" : self.kind,
             "key_values" : kv
         }
+    
+    def get_value_by_key(self, key: str) -> Optional[str]:
+        for kv in self.key_values:
+            if kv.key == key:
+                return kv.value
+        return None
 
     class Settings:
         name = "Users"

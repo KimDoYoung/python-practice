@@ -1,4 +1,4 @@
 *.exe
 data/
-torrent.*
+torrent*.*
 kis*.txt

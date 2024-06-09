@@ -25,6 +25,8 @@ class UserService:
     
     async def get_1(self, user_id: str) -> User:
         user = await User.find_one(User.user_id == user_id)
+        if user is None:
+            raise ValueError(f"User {user_id} not found")
         return user
 
     async def update_user(self, user_id: str, update_data: dict) -> User:

@@ -12,18 +12,19 @@
 """
 import asyncio
 from datetime import datetime
+from beanie import init_beanie
 from dateutil.relativedelta import relativedelta
 import logging
-import os
 import time
 import requests
-import pymongo
 import xml.etree.ElementTree as ET
 from backend.app.core.logger import get_logger
 from backend.app.core.mongodb import MongoDb
 from backend.app.core.config import config
-from dependency import get_eventdays_service, get_user_service
+from backend.app.core.dependency import get_eventdays_service, get_user_service
 from backend.app.core.exception import lucy_exception
+from backend.app.domains.system.eventdays_model import EventDays
+from backend.app.domains.user.user_model import User
 
 logging = get_logger(__name__)
 
@@ -38,7 +39,7 @@ async def fetch_holidays(year, month):
     #TODO 사용자가 고정되는 것이 맞는가?
     user = await user_service.get_1('kdy987')
     if user:
-        API_KEY = user.additional_attributes['GODATA_DECODE']
+        API_KEY = user.get_value_by_key('GODATA_DECODE')
 
     if not API_KEY:
         raise lucy_exception('GODATA_DECODE 키값이 없습니다.')
@@ -86,12 +87,6 @@ def parse_xml_and_update_days(xml_data):
 
 async def upsert_holidays(days):
     
-    client = MongoDb.get_client()
-    db_name = config.DB_NAME
-    #client = MongoClient('mongodb://root:root@test.kfs.co.kr:27017/')
-    db = client[db_name]
-
-    collection = db['EventDays']
     service = get_eventdays_service()
 
     for item in days:
@@ -106,19 +101,33 @@ def future_12_months(year, month):
         result.append((future_date.year, future_date.month))
     return result
 
-async def main():
-    await MongoDb.initialize()
+def db_init():
+    mongodb_url = config.DB_URL
+    db_name = config.DB_NAME
+    logging.info(f"MongoDB 연결: {mongodb_url} / {db_name}")
+    MongoDb.initialize(mongodb_url)
 
+    db = MongoDb.get_client()[db_name]
+    init_beanie(database=db, document_models=[User])
+    init_beanie(database=db, document_models=[EventDays])
+
+async def fetch_and_upsert_holiday():
     year = datetime.now().year
     month = datetime.now().month
 
     for year, month in future_12_months(year, month):
-        xml_data = fetch_holidays(year, month)
+        xml_data = await fetch_holidays(year, month)
         if xml_data:
             days = parse_xml_and_update_days(xml_data)
-            upsert_holidays(days)
+            await upsert_holidays(days)
         print(f"{year}년 {month}월 데이터 처리 완료")
         time.sleep(2)
+
+
+async def main():
+    db_init()
+    await fetch_and_upsert_holiday()
+
 
 #TODO main 함수를 호출하는 코드 추가
 if __name__ == "__main__":

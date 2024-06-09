@@ -499,7 +499,6 @@ def insert_or_update_ipo_list(data_list):
     
     client = MongoDb.get_client()
     db_name = config.DB_NAME
-    #client = MongoClient('mongodb://root:root@test.kfs.co.kr:27017/')
     db = client[db_name]
     collection = db['ipo_scrap_38']
     
