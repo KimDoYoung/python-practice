@@ -106,6 +106,18 @@ class KoreaInvestmentApi:
         hashkey = res.json()["HASH"]
         return hashkey
 
+    
+
+    def check_access_token(self, json:dict) -> None:
+        ''' 토큰 만료 여부 확인 '''
+        if json['rt_cd'] == '1' and json['msg_cd'] == 'EGW00123':
+            raise KisAccessTokenExpireException("KIS Access Token Expired")
+        if json['rt_cd'] == '1' and json['msg_cd'] == 'EGW00121':
+            raise KisAccessTokenInvalidException("KIS Access Token Invalid")
+
+        return None
+    
+
     def get_current_price(self, stk_code:str ) ->int:
         ''' 현재가 조회 '''
         url = self._PATHS["현재가조회"]
@@ -127,17 +139,7 @@ class KoreaInvestmentApi:
         logger.debug(f"현재가: {stk_code} : {json['output']['stck_prpr']}")
         #return json['output']['stck_prpr']
         return int(json['output']['stck_prpr'])
-    
-
-    def check_access_token(self, json:dict) -> None:
-        ''' 토큰 만료 여부 확인 '''
-        if json['rt_cd'] == '1' and json['msg_cd'] == 'EGW00123':
-            raise KisAccessTokenExpireException("KIS Access Token Expired")
-        if json['rt_cd'] == '1' and json['msg_cd'] == 'EGW00121':
-            raise KisAccessTokenInvalidException("KIS Access Token Invalid")
-
-        return None
-    
+        
     def get_balance(self) ->KisInquireBalance:
         ''' 주식 잔고 조회 '''
         # url = self._PATHS["주식잔고조회"]

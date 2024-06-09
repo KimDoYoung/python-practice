@@ -89,7 +89,7 @@ app.mount("/public", StaticFiles(directory=static_files_path), name="public")
 
 # API 라우터 포함
 app.include_router(home_router) # 화면
-app.include_router(user_router, prefix="/api/v1/users", tags=["users"])
+app.include_router(user_router, prefix="/api/v1/user", tags=["user"])
 app.include_router(eventdays_router, prefix="/api/v1/eventdays", tags=["eventdays"])
 app.include_router(ipo_router, prefix="/api/v1/ipo", tags=["ipo"])
 app.include_router(scheduler_router,prefix="/api/v1/scheduler", tags=["scheduler"])

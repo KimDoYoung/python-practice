@@ -6,62 +6,48 @@
 
 {% block content %}
 <section id="list" class="container">
-    <h2>Edit User</h2>
+    <h2>사용자정보</h2>
     <form id="user-form">
-        <div class="mb-3">
-            <label for="user_id" class="form-label">User ID</label>
-            <input type="text" class="form-control" id="user_id" name="user_id" required>
-        </div>
-
-        <div class="mb-3">
-            <label for="user_name" class="form-label">User Name</label>
-            <input type="text" class="form-control" id="user_name" name="user_name" required>
-        </div>
-
-        <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" name="email" required>
-        </div>
-
-        <div class="mb-3">
-            <label for="password" class="form-label">Password</label>
-            <input type="password" class="form-control" id="password" name="password">
-        </div>
-
-        <div class="mb-3">
-            <label for="kind" class="form-label">Kind</label>
-            <input type="text" class="form-control" id="kind" name="kind" value="P">
-        </div>
-
-        <div class="mb-3">
-            <label for="created_at" class="form-label">Created At</label>
-            <input type="text" class="form-control" id="created_at" name="created_at" readonly>
-        </div>
-
-        <div id="additional-attributes">
-            <h4>Additional Attributes</h4>
-            <div id="attribute-template" class="attribute-item mb-3 d-none">
-                <div class="input-group">
-                    <input type="text" class="form-control" name="key_name[]" placeholder="Key Name" required>
-                    <input type="text" class="form-control" name="key_value[]" placeholder="Key Value" required>
-                    <select class="form-select" name="use_yn[]">
-                        <option value="Y">Y</option>
-                        <option value="N">N</option>
-                    </select>
-                    <input type="text" class="form-control" name="issuer[]" placeholder="Issuer">
-                    <input type="text" class="form-control" name="note[]" placeholder="Note">
-                    <input type="text" class="form-control" name="created_at[]" placeholder="Created At" readonly>
-                    <button type="button" class="btn btn-danger btn-remove-attribute">Remove</button>
+        <div class="row">
+            <div class="col-md-6">
+                <h4>기본정보</h4>
+                <div class="mb-3">
+                    <label for="user_id" class="form-label">User ID</label>
+                    <input type="text" class="form-control" id="user_id" name="user_id" required readonly>
                 </div>
+        
+                <div class="mb-3">
+                    <label for="user_name" class="form-label">User Name</label>
+                    <input type="text" class="form-control" id="user_name" name="user_name" required>
+                </div>
+        
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+        
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password">
+                </div>                        
             </div>
-        </div>
-
-        <button type="button" class="btn btn-secondary" id="add-attribute">Add Attribute</button>
+            <div class="col-md-6" id="additional-attributes">
+            </div>
+        </div> 
+        <div id="error-area" class="text-danger p-3 mt-3"></div>       
         <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="button" class="btn btn-secondary" id="add-attribute">Add Key&Value</button>
     </form>    
 </section>
 {% raw %} 
-<script id="table1-area" type="text/x-handlebars-template">
+<script id="keyvalue-list-template" type="text/x-handlebars-template">
+    <h4>키-값</h4>
+    {{#each list}}
+    <div class="mb-3">
+        <label for="{{key}}" class="form-label">{{key}}<label>
+        <input type="text" class="form-control" data-key="{{key}}" id="{{key}}" name="{{key}}" value="{{value}}" required>
+    </div>
+    {{/each}}
 </script>
 {% endraw %}
 {% endblock %}
@@ -69,9 +55,85 @@
 {% block script %}
 {% raw %}
 <script>
+    function get_value_from_keyvalues(keyvalues, key) {
+        for (let i = 0; i < keyvalues.length; i++) {
+            if (keyvalues[i].key === key) {
+                return keyvalues[i].value;
+            }
+        }
+        return '';
+    }
+        
     $( document ).ready(function() {
         console.log('ready.... ');
-    });
+        const user_id = $('#logout').data('user-id');
+        const url = '/api/v1/user/'+user_id;
+
+        const data =  fetchData(url).then(function(data) {
+            $('#user_id').val(data.user_id);
+            $('#user_name').val(data.user_name);
+            $('#email').val(data.email);
+            $('#password').val(data.password);
+            
+            const source = $('#keyvalue-list-template').html();
+            const template = Handlebars.compile(source);
+            const html = template({list: data.key_values});
+            $('#additional-attributes').html(html);
+        });
+    
+        $('#user-form').submit(function(e) {
+            e.preventDefault();
+            const user_id = $('#user_id').val();
+            const user_name = $('#user_name').val();
+            const email = $('#email').val();
+            const password = $('#password').val();
+            const key_values = [];
+            $('#additional-attributes input').each(function() {
+                const key = $(this).data('key');
+                const value = $(this).val();
+                key_values.push({key: key, value: value});
+            });
+            const data = {
+                user_id: user_id,
+                user_name: user_name,
+                email: email,
+                password: password,
+                key_values: key_values
+            };
+            console.log(data);
+            const url = '/api/v1/user/'+user_id;
+            fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            }).then(function(response) {
+                if (response.ok) {
+                    alert('수정되었습니다.');
+                    window.location.href = 'page?id=user_form';
+                }else{
+                    return response.json().then(function(errorData) {
+                        $('#error-area').html('수정에 실패했습니다. 다시 시도해 주세요. 오류: ' + errorData.detail);
+                        //throw new Error('HTTP error! status: ' + response.status);
+                    });                    
+                }
+            }).catch(function(error) {
+                console.error('Error:', error);
+                $('#error-area').html('수정에 실패했습니다. 다시 시도해 주세요.' + error);
+            });
+        });
+        $('#add-attribute').click(function() {
+            const source = $('#keyvalue-list-template').html();
+            const template = Handlebars.compile(source);
+            list = [{
+                key: '',
+                value: ''
+            }]
+            const html = template({list: data.key_values});
+            $('#additional-attributes').append(html);
+        });
+});
     </script>	    
 {% endraw %}
 {% endblock %}

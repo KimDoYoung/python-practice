@@ -20,13 +20,22 @@ class KeyValueData(BaseModel):
     note: Optional[str] = None
     created_at: datetime =  Field(default_factory=lambda: datetime.now(timezone.utc))
 
-class UserRequest(BaseModel):
-    user_id: str
-    user_name: str
-    email: EmailStr
-    password: str
-    kind: str = 'P'
-    additional_attributes: List[KeyValueData] = []
+# class UserRequest(BaseModel):
+#     user_id: str
+#     user_name: str
+#     email: EmailStr
+#     password: str
+#     kind: str = 'P'
+#     additional_attributes: List[KeyValueData] = []
+
+# class KeyValueData(BaseModel):
+#     GODATA_DECODE : str
+#     GODATA_ENCODE : str
+#     DART_OPENAPI : str
+#     KIS_ACCTNO : str
+#     KIS_ACCTPW : str
+#     KIS_APP_KEY : str
+
 
 #TODO upsert addtion을 빼는 것이 좋지 않을까?
 class User(Document):

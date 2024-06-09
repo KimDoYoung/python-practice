@@ -26,7 +26,8 @@
             ],
             "jinja": true,
             // "justMyCode": false,
-            "console": "integratedTerminal"
+            // "console": "integratedTerminal"
+            "console": "externalTerminal"
         }
     ]
 }
