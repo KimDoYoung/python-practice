@@ -50,6 +50,19 @@ class EventDaysService:
             logger.error(f"EventDay with id {event_id} not found")
             return None
 
+    async def upsert(self, keyvalue: dict) -> EventDays:
+        eventday = await EventDays.find_one({"locdate": keyvalue['locdate']})
+        if eventday:
+            await eventday.set(keyvalue)
+            await eventday.save()
+            logger.debug(f"eventday update됨 {eventday}")
+            return eventday
+        else:
+            eventday = EventDays(**keyvalue)
+            await eventday.create()
+            logger.debug(f"eventday insert됨 {eventday}")
+            return eventday
+
     async def delete(self, event_id: PydanticObjectId) -> EventDays:
         eventday = await EventDays.get(event_id)
         if eventday:

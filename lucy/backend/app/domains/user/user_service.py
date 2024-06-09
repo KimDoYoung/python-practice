@@ -23,7 +23,7 @@ class UserService:
             logger.error(f"Failed to retrieve all users: {e}")
             raise e
     
-    async def get_user(self, user_id: str) -> User:
+    async def get_1(self, user_id: str) -> User:
         user = await User.find_one(User.user_id == user_id)
         return user
 
@@ -47,7 +47,7 @@ class UserService:
         return result
 
     async def authenticate_user(self, user_id, password) -> User:
-        user = await self.get_user(user_id)
+        user = await self.get_1(user_id)
         if user:
             if user.password == password:
                 return user

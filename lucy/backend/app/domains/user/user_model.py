@@ -28,6 +28,7 @@ class UserRequest(BaseModel):
     kind: str = 'P'
     additional_attributes: List[KeyValueData] = []
 
+#TODO upsert addtion을 빼는 것이 좋지 않을까?
 class User(Document):
     user_id: str = Field(json_schema_extra={"unique": True})
     user_name: str

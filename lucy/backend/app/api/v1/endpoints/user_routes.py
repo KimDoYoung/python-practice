@@ -14,7 +14,7 @@ async def get_all_users(user_service :UserService=Depends(get_user_service)):
 #TODO : 처음에 어떻게 할 것인가? admin이 있어서 사용자를 추가할 것인가? 아니면 사용자가 직접 추가할 것인가?
 @router.get("/user/{user_id}", response_model=User)
 async def get_user(user_id: str = Path(...), user_service :UserService=Depends(get_user_service)):
-    user = await user_service.get_user(user_id)
+    user = await user_service.get_1(user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user

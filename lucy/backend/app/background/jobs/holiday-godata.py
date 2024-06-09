@@ -1,7 +1,8 @@
 # holiday-godata.py
 """
 모듈 설명: 
-    - 공공데이터(https://www.data.go.kr/)에서 공휴일 정보를 가져와서 MongoDB에 저장하는 모듈
+    - 공공데이터(https://www.data.go.kr/)에서 공휴일 정보를 가져와서 
+    - MongoDB, EventDays collection에  저장하는 모듈
 주요 기능:
     
 
@@ -9,31 +10,48 @@
 작성일: 04
 버전: 1.0
 """
+import asyncio
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 import logging
 import os
 import time
 import requests
 import pymongo
 import xml.etree.ElementTree as ET
+from backend.app.core.logger import get_logger
+from backend.app.core.mongodb import MongoDb
+from backend.app.core.config import config
+from dependency import get_eventdays_service, get_user_service
+from backend.app.core.exception import lucy_exception
+
+logging = get_logger(__name__)
 
 # TODO DbConfigService에서 API_KEY를 가져오도록 수정
-def fetch_holidays(year, month):
+async def fetch_holidays(year, month):
     sYear = str(year)
     sMonth = str(month).zfill(2)
 
     API_URL = 'http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo'
-    API_KEY = os.environ.get('GODATA_KEY')
+
+    user_service = get_user_service()
+    #TODO 사용자가 고정되는 것이 맞는가?
+    user = await user_service.get_1('kdy987')
+    if user:
+        API_KEY = user.additional_attributes['GODATA_DECODE']
+
+    if not API_KEY:
+        raise lucy_exception('GODATA_DECODE 키값이 없습니다.')
 
     params ={'serviceKey' : API_KEY, 'solYear' : sYear, 'solMonth' : sMonth }
 
     response = requests.get(API_URL, params=params)
     
     if response.status_code == 200:
-        print(response.content)
+        logging.debug(response.content)
         return response.content.decode('utf-8')
     else:
-        print(f"네트워크오류: Failed to fetch data for {year}-{month}: {response.status_code}")
+        logging.error(f"네트워크오류: Failed to fetch data for {year}-{month}: {response.status_code}")
         return None
 
 def parse_xml_and_update_days(xml_data):
@@ -61,31 +79,40 @@ def parse_xml_and_update_days(xml_data):
     else:
         error_message = root.find(".//cmmMsgHeader/errMsg")
         if error_message is not None:
-            print(f"가져온 데이터 오류: {error_message.text}")
+            logging.error(f"가져온 데이터 오류: {error_message.text}")
         else:
-            print("알려지지 않은 오류")
+            logging.error("알려지지 않은 오류")
     return days
 
-def upsert_holidays(days):
-    client = pymongo.MongoClient('mongodb://root:root@test.kfs.co.kr:27017/')
-    db = client['stockdb']
-    collection = db['holidays']
+async def upsert_holidays(days):
+    
+    client = MongoDb.get_client()
+    db_name = config.DB_NAME
+    #client = MongoClient('mongodb://root:root@test.kfs.co.kr:27017/')
+    db = client[db_name]
+
+    collection = db['EventDays']
+    service = get_eventdays_service()
 
     for item in days:
-        filter = {'locdate': item.get('locdate')}
-        update = {'$set': item}
-        collection.update_one(filter, update, upsert=True)
+        await service.upsert(item)
 
-def main():
-    date_time = datetime.now().strftime("%Y%m%d")
+def future_12_months(year, month):
+    ''' year, month를 기준으로 12개월 후까지의 연도와 월을 반환하는 함수 '''
+    start_date = datetime(year, month, 1)
+    result = []
+    for i in range(12):
+        future_date = start_date + relativedelta(months=i)
+        result.append((future_date.year, future_date.month))
+    return result
 
-    logging.basicConfig(
-        filename=f'holiday_{date_time}.log',  # 로그 파일 경로
-        level=logging.INFO,  # 로그 레벨 설정
-        format='%(asctime)s - %(levelname)s - %(message)s',  # 로그 메시지 형식
-    )    
+async def main():
+    await MongoDb.initialize()
+
     year = datetime.now().year
-    for month in range(1, 13):
+    month = datetime.now().month
+
+    for year, month in future_12_months(year, month):
         xml_data = fetch_holidays(year, month)
         if xml_data:
             days = parse_xml_and_update_days(xml_data)
@@ -95,4 +122,7 @@ def main():
 
 #TODO main 함수를 호출하는 코드 추가
 if __name__ == "__main__":
-    main()
+    try:
+        asyncio.run(main())
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")

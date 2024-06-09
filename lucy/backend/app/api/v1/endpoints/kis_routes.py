@@ -24,7 +24,7 @@ async def get_token_from_kis(request:Request, user_service :UserService=Depends(
     current_user = await get_current_user(request)
     logger.debug(f"current_user : {current_user}")
     user_id = current_user.get('user_id')
-    user = await user_service.get_user(user_id)
+    user = await user_service.get_1(user_id)
     
     if not user:
         raise HTTPException(status_code=401, detail="Invalid token-사용자 정보가 없습니다")
@@ -52,7 +52,7 @@ async def info(request:Request, user_service :UserService=Depends(get_user_servi
     current_user = await get_current_user(request)
     logger.debug(f"current_user : {current_user}")
     user_id = current_user.get('user_id')
-    user = await user_service.get_user(user_id)
+    user = await user_service.get_1(user_id)
     
     if not user:
         raise HTTPException(status_code=401, detail="Invalid token-사용자 정보가 없습니다")

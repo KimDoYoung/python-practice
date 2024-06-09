@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "현재파일",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
             "name": "Debug-Lucy",
             "type": "debugpy",
             "request": "launch",
@@ -13,8 +20,8 @@
                 "backend.main:app",
                 "--reload",
                 "--port",
-                "8000"  // 원하는 포트 번호로 변경
-            ],           
+                "8000" // 원하는 포트 번호로 변경
+            ],
             "jinja": true,
             // "justMyCode": false,
             "console": "integratedTerminal"
