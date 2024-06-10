@@ -14,5 +14,15 @@
             "  .then(data => { console.log(data); })",
             "  .catch(error=> { console.error(error); });"
         ]
+    },
+    "postData 전형적인 것" : {
+        "prefix": "mypostData",
+        "body" :[
+            "cosnt url = '${1: url}';",
+            "const data = { abc : 'abc', def : 'def'};",
+            "postData(url, data)",
+            "  .then(data => { console.log(data); })",
+            "  .catch(error=> { console.error(error); });"
+        ]
     }
 }

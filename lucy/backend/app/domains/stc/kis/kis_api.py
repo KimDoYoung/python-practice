@@ -19,6 +19,7 @@ import requests
 
 from backend.app.core.logger import get_logger
 from backend.app.domains.stc.kis.kis_inquire_balance_model import KisInquireBalance
+from backend.app.domains.stc.kis.kis_order_cash import KisOrderCash, OrderCashDto
 from backend.app.domains.user.user_model import KeyValueData, User
 from backend.app.core.dependency import get_user_service
 from backend.app.domains.user.user_service import UserService
@@ -144,7 +145,8 @@ class KoreaInvestmentApi:
         ''' 주식 잔고 조회 '''
         # url = self._PATHS["주식잔고조회"]
         url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/inquire-balance"
-        headers = {"Content-Type":"application/json", 
+        headers = {
+            "Content-Type":"application/json", 
             "authorization":f"Bearer {self.ACCESS_TOKEN}",
             "appKey":self.APP_KEY,
             "appSecret":self.APP_SECRET,
@@ -172,8 +174,8 @@ class KoreaInvestmentApi:
             raise HTTPException(status_code=response.status_code, detail=f"Error fetching balance: {response.text}")
 
         try:
-            json = response.json()
-            kis_inquire_balance = KisInquireBalance(**json)
+            json_data = response.json()
+            kis_inquire_balance = KisInquireBalance(**json_data)
         except requests.exceptions.JSONDecodeError:
             logger.error(f"Error decoding JSON: {response.text}")
             raise HTTPException(status_code=500, detail="Invalid JSON response")            
@@ -182,9 +184,39 @@ class KoreaInvestmentApi:
 
         return kis_inquire_balance
 
-    # def get_stock_balance(self, headers:dict,  param: dict ) ->dict:
-    #     ''' 주식 잔고 조회 '''
-    #     url = self._PATHS["주식잔고조회"]
-    #     response = requests.get(url, headers=headers, params=param)
-    #     logger.debug(f"response : {response.json()}")
-    #     return response.json()
+
+    def order_cash(self,  order_cash : OrderCashDto ) -> KisOrderCash:
+        ''' 현금 매수 or 매도 '''
+        logger.info(f"현금 매수 매도(order_cash) : {order_cash}")
+        url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/order-cash"
+        tr_id = "TTTC0802U" if order_cash.buy_sell_gb == "매수" else "TTTC0801U"
+        headers = {
+            "Content-Type":"application/json", 
+            "authorization":f"Bearer {self.ACCESS_TOKEN}",
+            "appkey":self.APP_KEY,
+            "appsecret":self.APP_SECRET,
+            "tr_id":tr_id,
+            "custtype":"P"
+        }
+        data = {
+            "CANO": self.ACCTNO[0:8],
+            "ACNT_PRDT_CD": self.ACCTNO[8:10],
+            "PDNO" : order_cash.stk_code,
+            "ORD_DVSN" : "01", # 시장가
+            "ORD_QTY" : str(order_cash.qty), 
+            "ORD_UNPR" : "0" 
+        }
+        response = requests.post(url, headers=headers, data=json.dumps(data))
+        logger.debug(f"response : {response.text}")
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail=f"Error fetching balance: {response.text}")
+        try:
+            json_data = response.json()
+            kis_order_cash = KisOrderCash(**json_data)
+            logger.info(f"주문결과 : {kis_order_cash}")
+        except requests.exceptions.JSONDecodeError:
+            logger.error(f"Error decoding JSON: {response.text}")
+            raise HTTPException(status_code=500, detail="Invalid JSON response")
+        except ValidationError as e:
+            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
+        return kis_order_cash
