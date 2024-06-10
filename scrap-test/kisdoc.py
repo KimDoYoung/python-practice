@@ -65,13 +65,15 @@ def get_url_and_tables(url:str, main_menu:str, sub_menu:str):
         if main_menu_anchor is None:
             print(f"{main_menu} 로 찾지 못함")
             return None        
+        driver.execute_script("arguments[0].scrollIntoView();", main_menu_anchor)
         main_menu_anchor.click()
-
-        #  api 주제를 클릭
+        time.sleep(3)
+        #  api 주제를 클릭`
         sub_menu_anchor = driver.find_element(By.XPATH, f"//span[text()='{sub_menu}']/parent::a")
         if sub_menu_anchor is None:
             print(f"{sub_menu} 로 찾지 못함")
             return None
+        time.sleep(3)
         sub_menu_anchor.click()
 
         # 페이지가 로드될 때까지 대기
@@ -133,6 +135,50 @@ def json_pretty(json_str):
     except json.JSONDecodeError as e:
         return json_str
 
+def maker_header_code(df):
+    s = "{\n"
+    for i in range(len(df)):
+        element_name = df.loc[i, 'Element'].lower()
+        required = df.loc[i, 'Required']
+        desc = df.loc[i, 'Description']
+        if required == 'Y':
+            if element_name == "content-type" :
+                s += f'"{element_name}": "{desc}",\n'
+            elif element_name == "authorization":
+                s += f'"{element_name}": f"Bearer {{self.ACCESS_TOKEN}}",\n'
+            elif element_name == "appkey":
+                s += f'"{element_name}": self.APP_KEY,\n'
+            elif element_name == "appsecret":
+                s += f'"{element_name}": self.APP_SECRET,\n'
+            else:
+                s += f'"{element_name}": "{desc}",\n'
+    s += "}\n"
+    return s
+
+def maker_params_code(df):
+    s = "{\n"
+
+    for i in range(len(df)):
+        element_name = df.loc[i, 'Element'].lower()
+        required = df.loc[i, 'Required']
+        desc = df.loc[i, 'Description']
+        if required == 'Y':
+            s += f'"{element_name}": "{desc}",\n'
+    s += "}\n"
+    return s
+
+def make_pydantic_model(class_name, df):
+    s = "from pydantic import BaseModel\n\n"
+    s += f"class {class_name}Dto(BaseModel):\n"
+    for i in range(len(df)):
+        element_name = df.loc[i, 'Element']
+        required = df.loc[i, 'Required']
+        _type = 'str' if df.loc[i, 'Type'] == 'String' else df.loc[i, 'Type']
+        desc = df.loc[i, 'Description']
+        if required == 'Y':
+            s += f'    {element_name}: {_type} # {desc}\n'
+        
+    return s
 
 def main(main_menu:str, sub_menu:str):
     driver = install_chrome_driver()
@@ -170,7 +216,22 @@ def main(main_menu:str, sub_menu:str):
         s = json_pretty(response_example)
         f.write(s)
         f.write("\n---------------------------------\n")
-        s = field_mapping_string(response_body_df)
+        s = maker_header_code(request_header_df)
+        f.write("heaer = \n")
+        f.write(s)
+        
+        s = maker_params_code(request_query_df)
+        f.write("params = \n")
+        f.write(s)
+
+        s = make_pydantic_model(response_body_df)
+        f.write("pydantic model = \n")
+        f.write(s)
+        
+        
+        class_name = ''.join([word.capitalize() for word in kis_path.split('_')])
+        
+        s = field_mapping_string(class_name, response_body_df)
         f.write(s)
 
     print(f"file write: {file_name} Done!")
@@ -178,6 +239,8 @@ def main(main_menu:str, sub_menu:str):
     driver.quit()
 
 if __name__ == "__main__":
-    main_menu  = "[국내주식] 주문/계좌"
-    sub_menu = "주식잔고조회"
+    main_menu  = "[국내주식] 종목정보"
+    sub_menu = "주식기본조회"
+    
     main(main_menu, sub_menu)
+    print("Done!")
