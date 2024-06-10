@@ -166,19 +166,50 @@ def maker_params_code(df):
             s += f'"{element_name}": "{desc}",\n'
     s += "}\n"
     return s
-
+def item_script(df, class_name, ele_name):
+    s = f"class {class_name}Item(BaseModel):\n"
+    start : bool = False
+    for i in range(len(df)):
+        element_name = df.loc[i, 'Element']
+        han_name = df.loc[i, '한글명']
+        required = df.loc[i, 'Required']
+        _type = 'str' if df.loc[i, 'Type'] == 'String' else df.loc[i, 'Type']
+        desc = df.loc[i, 'Description']
+        if element_name == ele_name:
+            start = True
+            continue
+        if start:
+            if element_name.startswith('-'):
+                s += f'    {element_name[1:]}: str # {han_name} {desc}\n'
+            elif element_name.startswith('output'):
+                start = False
+    return s
 def make_pydantic_model(class_name, df):
+    item_str= ""
     s = "from pydantic import BaseModel\n\n"
     s += f"class {class_name}Dto(BaseModel):\n"
     for i in range(len(df)):
         element_name = df.loc[i, 'Element']
+        han_name = df.loc[i, '한글명']
         required = df.loc[i, 'Required']
         _type = 'str' if df.loc[i, 'Type'] == 'String' else df.loc[i, 'Type']
         desc = df.loc[i, 'Description']
         if required == 'Y':
-            s += f'    {element_name}: {_type} # {desc}\n'
-        
-    return s
+            if element_name.startswith('-'):
+                continue
+            if element_name.startswith('output'):
+                item_str = item_script(df,class_name, element_name)
+                if  df.loc[i, 'Type'] == 'Object' :
+                    s += f'    {element_name}: {class_name}\n'
+                    continue
+                elif df.loc[i, 'Type'] == 'Array' :
+                    s += f'    {element_name}: List[{class_name}Item]\n'
+                    continue
+            s += f'    {element_name}: {_type} # {han_name} {desc}\n'
+    
+    return_str = item_str + s
+    
+    return return_str
 
 def main(main_menu:str, sub_menu:str):
     driver = install_chrome_driver()
@@ -224,14 +255,12 @@ def main(main_menu:str, sub_menu:str):
         f.write("params = \n")
         f.write(s)
 
-        s = make_pydantic_model(response_body_df)
+        class_name = ''.join([word.capitalize() for word in kis_path.split('-')])
+        s = make_pydantic_model(class_name, response_body_df)
         f.write("pydantic model = \n")
         f.write(s)
         
-        
-        class_name = ''.join([word.capitalize() for word in kis_path.split('_')])
-        
-        s = field_mapping_string(class_name, response_body_df)
+        s = field_mapping_string(response_body_df)
         f.write(s)
 
     print(f"file write: {file_name} Done!")
