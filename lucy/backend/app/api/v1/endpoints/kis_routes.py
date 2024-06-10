@@ -58,10 +58,7 @@ async def info(request:Request, user_service :UserService=Depends(get_user_servi
         raise HTTPException(status_code=401, detail="Invalid token-사용자 정보가 없습니다")
     
     kis_api = KoreaInvestmentApi(user)
-    stk_code = "034020"
-    cost = kis_api.get_current_price(stk_code)
-    logger.debug(f"종목: {stk_code} : {cost}")
-    balance = kis_api.get_balance()
-    logger.debug(f"잔고 : {balance}")
-    return {"message": "Hello, World!"}
+    kis_inquire_balance =  kis_api.get_inquire_balance()
+    logger.debug(f"주식잔고 조회 : {kis_inquire_balance}")
+    return kis_inquire_balance
 

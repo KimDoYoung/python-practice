@@ -135,3 +135,12 @@
         return new Handlebars.SafeString(anchor);
     });
 
+    Handlebars.registerHelper('displayWon', function(number) {
+        // 숫자를 int형으로 변환
+        var intNumber = parseInt(number, 10);
+    
+        // 천 단위로 컴마를 찍어서 문자열로 변환
+        return intNumber.toLocaleString();
+    });
+    
+

@@ -7,9 +7,45 @@
 {% block content %}
 <section id="list" class="container">
     <h1>KIS(한국투자증권) TEST</h1>
-    <button id="btnTesTToken">Test-AccessToken</button>   
+    <button id="btnTesTToken">Test-AccessToken</button>
+    <button id="btnInquireBalance">계좌잔고</button>
+    <button id="btn">계좌잔고</button>
+
+    <div id="inquire-balance-area"></div>
+    <div id="message-area"></div> 
 </section>
 {% raw %} 
+<script id="inquire-balance-table-template" type="text/x-handlebars-template">
+    <h2>예수금총액 : {{displayWon output2.dnca_tot_amt}}</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>상품번호</th>
+                <th>상품명</th>
+                <th class="text-end">매입평균가격</th>
+                <th class="text-end">현재가</th>
+                <th class="text-end">보유수량</th>
+                <th class="text-end">매입금액</th>
+                <th class="text-end">평가금액</th>
+                <th class="text-end">평가손익율</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each list}}
+            <tr>
+                <td>{{pdno}}</td>
+                <td>{{prdt_name}}</td=>
+                <td class="text-end">{{displayWon pchs_avg_pric}}</td>
+                <td class="text-end">{{displayWon prpr}}</td>
+                <td class="text-end">{{hldg_qty}}</td>
+                <td class="text-end">{{displayWon pchs_amt}}</td>
+                <td class="text-end">{{displayWon evlu_amt}}</td>
+                <td class="text-end">{{displayWon evlu_pfls_amt}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</script>
 {% endraw %}
 {% endblock %}
 
@@ -17,31 +53,44 @@
 {% raw %}
 <script>
     function initalize() {
-        // Fetch code goes here
-        fetch('/api/v1/kis')
-            .then(response => response.json())
-            .then(data => {
-                // Process the fetched data here
-                console.log(data);
-            })
-            .catch(error => {
-                // Handle any errors that occur during the fetch
-                console.error(error);
-            });
+        fetchData('/api/v1/kis')
+          .then(data => { 
+            if(data.rt_cd == "1"){
+                console.log(data); 
+                $('#message-area').html(data.msg1)
+                return;
+            }
+            let output1 = data.output1;
+            let output2 = data.output2[0];
+            let template = Handlebars.compile(document.getElementById('inquire-balance-table-template').innerHTML);
+            let html = template({list : output1, output2: output2});
+            $('#inquire-balance-area').html(html)
+            console.log(data); 
+          })
+          .catch(error=> { console.error(error); });
     }
     $( document ).ready(function() {
         console.log('ready.... ');
         $('#btnTesTToken').on('click', function() {
             console.log('btnTesTToken click.... ');
-            fetch('/api/v1/kis/token')
-            .then(response => response.json())
+
+            fetchData('/api/v1/kis/token')
             .then(data => {
                 console.log(data);
+                $('#message-area').html(data.detail)
             }).catch(error => {
                 console.error(error);
+                $('#message-area').html(error)
             });
+            // fetch('/api/v1/kis/token')
+            // .then(response => response.json())
+            // .then(data => {
+            //     console.log(data);
+            // }).catch(error => {
+            //     console.error(error);
+            // });
         });
-        //initalize();
+        initalize();
 
     });
     </script>	    

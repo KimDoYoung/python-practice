@@ -140,7 +140,7 @@ class KoreaInvestmentApi:
         #return json['output']['stck_prpr']
         return int(json['output']['stck_prpr'])
         
-    def get_balance(self) ->KisInquireBalance:
+    def get_inquire_balance(self) ->KisInquireBalance:
         ''' 주식 잔고 조회 '''
         # url = self._PATHS["주식잔고조회"]
         url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/inquire-balance"
