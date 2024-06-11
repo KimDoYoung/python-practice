@@ -1,7 +1,7 @@
 from typing import List, Literal
 
 from pydantic import BaseModel, constr, field_validator, validator
-from backend.app.domains.stc.kis.kis_base_model import KisBaseModel
+from backend.app.domains.stc.kis.model.kis_base_model import KisBaseModel
 
 '''
 주식 주문내역 조회

@@ -1,4 +1,4 @@
-from backend.app.domains.stc.kis.kis_base_model import KisBaseModel
+from backend.app.domains.stc.kis.model.kis_base_model import KisBaseModel
 
 class SearchStockInfoItem(KisBaseModel):
     pdno: str # 상품번호 

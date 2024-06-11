@@ -14,16 +14,14 @@
 <section id="list-section" class="container">
     <h1>KIS(한국투자증권) TEST</h1>
     <button id="btnTesTToken">Test-AccessToken</button>
-    <button id="btnInquireBalance">계좌잔고</button>
-    <button id="btnBuySellCash">현금매수/매도</button>
-
-    <div id="inquire-balance-area"></div>
+    <button id="btnPsearchTitle">조건식리스트</button>
     <div id="message-area"></div> 
+    <div id="inquire-balance-area"></div>
 </section>
 <section id="buy-sell-cash-section" class="container">
     <h1>현금 매수-매도</h1>
     <div class="row">
-        <div class="col bg-buy p-3">
+        <div class="col bg-buy p-3 me-3">
             <h2>매수</h2>
             <form action="" id="buy-form">
                 <div class="mb-3">
@@ -53,31 +51,8 @@
         </div>
     </div>
     <div id="buy-sell-message-area"></div>
-    1 <br>
-    1 <br>
-    1 <br>
-    1 <br>
-    1 <br>
-    1 <br>
-    1 <br>
-    1 <br>
-    1 <br>
-    1 <br>
-    1 <br>
-    1 <br>
-    1 <br>
-    1 <br>
-    1 <br>
-    1 <br>
-    1 <br>
-    1 <br>
-    1 <br>
-    1 <br>
-    1 <br>
-    1 <br>
-    1 <br>
-    1 <br>
-
+    <br><br><br><br><br><br><br><br><br><br><br><br>
+    
 </section>
 
 {% raw %} 
@@ -99,8 +74,8 @@
         <tbody>
             {{#each list}}
             <tr>
-                <td>{{pdno}}</td>
-                <td>{{prdt_name}}</td=>
+                <td><a href="#" class="btnStockInfo" data-stk-code="{{pdno}}">{{pdno}}</a></td>
+                <td><a href="#" class="btnStockInfo" data-stk-code="{{pdno}}">{{prdt_name}}</a></td>
                 <td class="text-end">{{displayWon pchs_avg_pric}}</td>
                 <td class="text-end">{{displayWon prpr}}</td>
                 <td class="text-end">{{hldg_qty}}</td>
@@ -149,6 +124,18 @@
     }
     $( document ).ready(function() {
         console.log('ready.... ');
+        //조건식 목록 조회
+        $('#btnPsearchTitle').on('click', function() {
+            window.location.href = '/page?id=mytest_kis-psearch';            
+        });
+
+        $('#inquire-balance-area').on("click", ".btnStockInfo", function(e) {
+            e.preventDefault();
+            const stk_code = $(this).data('stk-code');
+            setCookie('stk_code', stk_code, 5);
+            window.location.href = '/page?id=mytest_kis-stock-info';
+            
+        });
         $('#btnTesTToken').on('click', function() {
             console.log('btnTesTToken click.... ');
 

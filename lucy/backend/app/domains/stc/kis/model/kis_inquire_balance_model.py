@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from backend.app.domains.stc.kis.kis_base_model import KisBaseModel
+from backend.app.domains.stc.kis.model.kis_base_model import KisBaseModel
 
 class InquireBalanceItem1(KisBaseModel):
     pdno: str

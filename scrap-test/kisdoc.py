@@ -268,8 +268,10 @@ def main(main_menu:str, sub_menu:str):
     driver.quit()
 
 if __name__ == "__main__":
-    main_menu  = "[국내주식] 종목정보"
-    sub_menu = "주식기본조회"
+    # main_menu  = "[국내주식] 종목정보"
+    # sub_menu = "주식기본조회"
+    main_menu  = "[국내주식] 시세분석"
+    sub_menu = "종목조건검색조회"
     
     main(main_menu, sub_menu)
     print("Done!")

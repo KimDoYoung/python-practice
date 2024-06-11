@@ -49,8 +49,14 @@ async def page(request: Request, id: str = Query(..., description="The ID of the
     
     if not current_user:
         raise HTTPException(status_code=401, detail="Invalid token-현재 사용자 정보가 없습니다")
-    
-    context = {"request": request, "page-id": id, "user_id": current_user["user_id"], "user_name": current_user["user_name"]}
+    stk_code = request.cookies.get("stk_code")
+    context = {
+        "request": request, 
+        "page-id": id, 
+        "user_id": current_user["user_id"], 
+        "user_name": current_user["user_name"],
+        "stk_code" : stk_code
+    }
     # id = ipo_calendar 와 같은 형식이고 이를 분리한다.
     path_array = id.split("_")
     template_path = "/".join(path_array)

@@ -1,0 +1,84 @@
+{% extends 'common/base.html' %}
+{% block style %}
+<style>
+</style>
+{% endblock %}
+
+{% block content %}
+<section id="list" class="container">
+    <input type="hidden" name="stk_code" id="stk_code" value="{{stk_code}}">
+    <div id="stock-info"></div>
+    </section>
+    
+    {% raw %} 
+    <script id="stock-info-template" type="text/x-handlebars-template">
+        <div class="container">
+           <h2 class="text-primary">{{stk_name}}-{{stk_code}}</h2>
+          {{#each rows}}
+          <div class="row mb-3">
+            {{#each this}}
+            <div class="col-md-4">
+              <strong>{{title}}:</strong> {{value}}
+            </div>
+            {{/each}}
+          </div>
+          {{/each}}
+        </div>
+</script>
+{% endraw %}
+{% endblock %}
+
+{% block script %}
+{% raw %}
+<script src="/public/js/kis/stock_info.js"></script>
+<script>
+    Handlebars.registerHelper('groupItems', function(items, groupSize, options) {
+      let out = '';
+      for (let i = 0; i < items.length; i += groupSize) {
+        out += options.fn(items.slice(i, i + groupSize));
+      }
+      return out;
+    });
+
+    function make_stock_info(data){
+        // output 객체를 rows로 변환
+        const rows = [];
+        let currentRow = [];
+        const output = data.output;
+        for (const key in output) {
+        if (stock_info_mapping.hasOwnProperty(key)) {
+            currentRow.push({ title: stock_info_mapping[key], value: output[key] });
+            if (currentRow.length === 3) {
+            rows.push(currentRow);
+            currentRow = [];
+            }
+        }
+        }
+
+        // 마지막 남은 row가 있으면 추가
+        if (currentRow.length > 0) {
+        rows.push(currentRow);
+        }
+
+        // Handlebars 템플릿 컴파일 및 렌더링
+        const source = document.getElementById('stock-info-template').innerHTML;
+        const template = Handlebars.compile(source);
+        const stk_code = $('#stk_code').val();
+        const stk_name = output.prdt_abrv_name;
+        const html = template({ rows: rows, stk_code: stk_code, stk_name: stk_name});
+        $('#stock-info').html(html);
+        //document.getElementById('stock-info-container').innerHTML = html;
+
+    }
+    $( document ).ready(function() {
+        const stk_code = $('#stk_code').val();
+        fetchData('/api/v1/kis/stock-info/' + stk_code)
+          .then(data => { 
+            console.log(data); 
+            make_stock_info(data)
+          })
+          .catch(error=> { console.error(error); })
+    });
+    </script>	    
+{% endraw %}
+{% endblock %}

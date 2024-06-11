@@ -18,8 +18,11 @@ from pydantic import ValidationError
 import requests
 
 from backend.app.core.logger import get_logger
-from backend.app.domains.stc.kis.kis_inquire_balance_model import KisInquireBalance
-from backend.app.domains.stc.kis.kis_order_cash import KisOrderCash, OrderCashDto
+from backend.app.domains.stc.kis.model.kis_inquire_balance_model import KisInquireBalance
+from backend.app.domains.stc.kis.model.kis_order_cash_model import KisOrderCash, OrderCashDto
+from backend.app.domains.stc.kis.model.kis_psearch_result_model import PsearchResultDto
+from backend.app.domains.stc.kis.model.kis_search_stock_info_model import SearchStockInfoDto
+from backend.app.domains.stc.kis.model.kis_psearch_title_model import PsearchTitleDto
 from backend.app.domains.user.user_model import KeyValueData, User
 from backend.app.core.dependency import get_user_service
 from backend.app.domains.user.user_service import UserService
@@ -39,6 +42,7 @@ class KoreaInvestmentApi:
     
     def __init__(self, user: User):
         self.user = user
+        self.HTS_USER_ID = self.get_key_value(self.user.key_values,"KIS_HTS_USER_ID")
         self.APP_KEY = self.get_key_value(self.user.key_values,"KIS_APP_KEY")
         self.APP_SECRET = self.get_key_value(self.user.key_values,"KIS_APP_SECRET")
         self.ACCTNO = self.get_key_value(self.user.key_values,"KIS_ACCTNO")
@@ -82,7 +86,7 @@ class KoreaInvestmentApi:
         
         ACCESS_TOKEN = res.json()["access_token"]
         
-        self.KIS_ACCESS_TOKEN = ACCESS_TOKEN
+        self.ACCESS_TOKEN = ACCESS_TOKEN
         
         logger.debug("----------------------------------------------")
         logger.debug(f"ACCESS_TOKEN : [{ACCESS_TOKEN}]")
@@ -107,8 +111,6 @@ class KoreaInvestmentApi:
         hashkey = res.json()["HASH"]
         return hashkey
 
-    
-
     def check_access_token(self, json:dict) -> None:
         ''' 토큰 만료 여부 확인 '''
         if json['rt_cd'] == '1' and json['msg_cd'] == 'EGW00123':
@@ -117,7 +119,6 @@ class KoreaInvestmentApi:
             raise KisAccessTokenInvalidException("KIS Access Token Invalid")
 
         return None
-    
 
     def get_current_price(self, stk_code:str ) ->int:
         ''' 현재가 조회 '''
@@ -220,3 +221,99 @@ class KoreaInvestmentApi:
         except ValidationError as e:
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
         return kis_order_cash
+    
+    def search_stock_info(self, stk_code:str) -> SearchStockInfoDto:
+        ''' 국내 상품정보 '''
+        logger.info(f"상품정보 : {stk_code}")
+        url = self._BASE_URL + "/uapi/domestic-stock/v1/quotations/search-stock-info"
+        headers ={
+            "content-type": "application/json; charset=utf-8",
+            'Accept': 'application/json',
+            "authorization": f"Bearer {self.ACCESS_TOKEN}",
+            "appkey": self.APP_KEY,
+            "appsecret": self.APP_SECRET,
+            "tr_id": "CTPF1002R",
+            "custtype": "P" # B : 법인 P : 개인",
+        }        
+        data = {
+            "PRDT_TYPE_CD": "300", #300 주식, ETF, ETN, ELW 301 : 선물옵션 302 : 채권 306 : ELS'",
+            "PDNO" : stk_code
+        }
+        response = requests.get(url, headers=headers, params=data)
+        logger.debug(f"response : {response.text}")
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail=f"Error fetching balance: {response.text}")
+        try:
+            json_data = response.json()
+            stock_info = SearchStockInfoDto(**json_data)
+            logger.info(f"상품정보 : {stock_info}")
+        except requests.exceptions.JSONDecodeError:
+            logger.error(f"Error decoding JSON: {response.text}")
+            raise HTTPException(status_code=500, detail="Invalid JSON response")
+        except ValidationError as e:
+            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
+        return stock_info
+
+    def psearch_title(self) -> PsearchTitleDto:
+        ''' 조건식 목록 조회 '''
+        logger.info(f"조건식 목록 조회 ")
+        url = self._BASE_URL + "/uapi/domestic-stock/v1/quotations/psearch-title"
+        data = {
+            "user_id": self.HTS_USER_ID
+        }        
+        headers ={
+            "content-type": "application/json; charset=utf-8",
+            "authorization": f"Bearer {self.ACCESS_TOKEN}",
+            "appkey": self.APP_KEY,
+            "appsecret": self.APP_SECRET,
+            "tr_id": "HHKST03900300",
+            "custtype": "P", # B : 법인 P : 개인",
+            "tr_cont" : ""
+        }        
+
+        response = requests.get(url, headers=headers, params=data)
+        logger.debug(f"response : {response.text}")
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail=f"Error fetching balance: {response.text}")
+        try:
+            json_data = response.json()
+            psearch_title = PsearchTitleDto(**json_data)
+            logger.info(f"조건식 목록 조회 : {psearch_title}")
+        except requests.exceptions.JSONDecodeError:
+            logger.error(f"Error decoding JSON: {response.text}")
+            raise HTTPException(status_code=500, detail="Invalid JSON response")
+        except ValidationError as e:
+            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
+        return psearch_title
+    
+    def psearch_result(self, seq: str) -> PsearchResultDto:
+        ''' 조건식 결과 리스트  '''
+        logger.info(f"조건식 결과 조회 ")
+        url = self._BASE_URL + "/uapi/domestic-stock/v1/quotations/psearch-result"
+        data = {
+            "user_id": self.HTS_USER_ID,
+            "seq" : seq
+        }        
+        headers ={
+            "content-type": "application/json; charset=utf-8",
+            "authorization": f"Bearer {self.ACCESS_TOKEN}",
+            "appkey": self.APP_KEY,
+            "appsecret": self.APP_SECRET,
+            "tr_id": "HHKST03900400",
+            "custtype": "P"
+        }        
+
+        response = requests.get(url, headers=headers, params=data)
+        logger.debug(f"response : {response.text}")
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail=f"Error fetching balance: {response.text}")
+        try:
+            json_data = response.json()
+            psearch_result = PsearchResultDto(**json_data)
+            logger.info(f"조건식 목록 조회 : {psearch_result}")
+        except requests.exceptions.JSONDecodeError:
+            logger.error(f"Error decoding JSON: {response.text}")
+            raise HTTPException(status_code=500, detail="Invalid JSON response")
+        except ValidationError as e:
+            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
+        return psearch_result    

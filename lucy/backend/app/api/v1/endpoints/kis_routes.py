@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Body, Path, Request
 from fastapi.responses import JSONResponse
 from backend.app.core.dependency import get_user_service
 from backend.app.domains.stc.kis.kis_api import KoreaInvestmentApi
-from backend.app.domains.stc.kis.kis_order_cash import OrderCashDto
+from backend.app.domains.stc.kis.model.kis_order_cash_model import OrderCashDto
 from backend.app.domains.user.user_model import User
 from backend.app.domains.user.user_service import UserService
 
@@ -81,3 +81,46 @@ async def order_cash(request:Request, order_cash: OrderCashDto, user_service :Us
     else:
         logger.debug(f"주식매도 : {kis_order_cash}")
     return kis_order_cash
+
+@router.get("/stock-info/{stk_code}", response_class=JSONResponse)
+async def info(request:Request, stk_code:str,  user_service :UserService=Depends(get_user_service)):
+    current_user = await get_current_user(request)
+    logger.debug(f"current_user : {current_user}")
+    user_id = current_user.get('user_id')
+    user = await user_service.get_1(user_id)
+    
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid token-사용자 정보가 없습니다")
+    
+    kis_api = KoreaInvestmentApi(user)
+    kis_stock_info = kis_api.search_stock_info(stk_code)
+    return kis_stock_info
+
+@router.get("/psearch/title", response_class=JSONResponse)
+async def psearch_title(request:Request, user_service :UserService=Depends(get_user_service)):
+    current_user = await get_current_user(request)
+    logger.debug(f"current_user : {current_user}")
+    user_id = current_user.get('user_id')
+    user = await user_service.get_1(user_id)
+    
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid token-사용자 정보가 없습니다")
+    
+    kis_api = KoreaInvestmentApi(user)
+    kis_psearch_title = kis_api.psearch_title()
+    return kis_psearch_title
+
+@router.get("/psearch/result/{seq}", response_class=JSONResponse)
+async def psearch_title(request:Request,  seq:str, user_service :UserService=Depends(get_user_service)):
+    '''조건식 '''
+    current_user = await get_current_user(request)
+    logger.debug(f"current_user : {current_user}")
+    user_id = current_user.get('user_id')
+    user = await user_service.get_1(user_id)
+    
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid token-사용자 정보가 없습니다")
+    
+    kis_api = KoreaInvestmentApi(user)
+    kis_psearch_result = kis_api.psearch_result(seq)
+    return kis_psearch_result
