@@ -123,6 +123,7 @@ async def work1(db, all_data=False):
             'offering' : get_offering(offering_info, expected_participation),
             'processed_time': datetime.now(),
             'scrap_id': doc['_id'],  # 원본 문서의 ObjectId 추가
+            'scrap_url' : doc['detail_url']
         }
         ipo_list.append(processed_entry)
 

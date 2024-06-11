@@ -30,7 +30,7 @@ class IpoDays(BaseModel):
     name: str
     ymd: str
     title: str
-    scrap_url: Optional[str] = None    
+    #scrap_url: Optional[str] = None    
 
 class Ipo(Document):
     stk_name: str

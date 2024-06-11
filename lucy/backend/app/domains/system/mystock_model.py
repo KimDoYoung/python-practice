@@ -11,9 +11,7 @@
 """
 from typing import List, Optional
 from beanie import Document, PydanticObjectId
-from pydantic import BaseModel, field_validator, validator
-
-
+from pydantic import BaseModel, field_validator
 class MyStockBase(BaseModel):
     stk_code: str
     stk_name: Optional[str] = None

@@ -143,4 +143,15 @@
         return intNumber.toLocaleString();
     });
     
+    Handlebars.registerHelper('displayPercent', function(value) {
+        // 문자열을 숫자로 변환
+        const number = parseFloat(value);
+        // 소수점 둘째 자리까지 반올림
+        const roundedNumber = number.toFixed(2);
+        return roundedNumber;
+    });
 
+    Handlebars.registerHelper('goNaver', function(code) {
+        const url = `https://finance.naver.com/item/coinfo.naver?code=${code}`;
+        return new Handlebars.SafeString(`<a href="${url}" target="_blank" title="naver증권으로 이동" >${code}</a>`);
+    });
