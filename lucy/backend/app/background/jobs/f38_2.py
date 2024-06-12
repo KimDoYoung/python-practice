@@ -66,6 +66,7 @@ def get_offering(offering_info, expected_participation):
     offering['경쟁율'] = competition_rate
     return offering
 
+#TODO 판정정보를 넣어야하지 않을까?
 async def work1(db, all_data=False):
     
     ''' 38사이트에서 스크랩한 원본 collection ipo_scrap에서 ipo 컬렉션으로 옮긴다. 1.필요한것만, 2.format변환 '''
@@ -153,6 +154,7 @@ async def work1(db, all_data=False):
         upsert=True
     )
     logging.info("Config collection updated with current fetch time.")
+
 
 async def main():
     url = config.DB_URL
