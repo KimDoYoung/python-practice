@@ -19,6 +19,7 @@ import requests
 
 from backend.app.core.logger import get_logger
 from backend.app.domains.stc.kis.model.kis_inquire_balance_model import KisInquireBalance
+from backend.app.domains.stc.kis.model.kis_inquire_daily_ccld_model import InquireDailyCcldDto
 from backend.app.domains.stc.kis.model.kis_order_cash_model import KisOrderCash, OrderCashDto
 from backend.app.domains.stc.kis.model.kis_psearch_result_model import PsearchResultDto
 from backend.app.domains.stc.kis.model.kis_search_stock_info_model import SearchStockInfoDto
@@ -310,3 +311,46 @@ class KoreaInvestmentApi:
         except ValidationError as e:
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
         return psearch_result    
+
+    def inquire_daily_ccld(self, startYmd, endYmd: str) -> InquireDailyCcldDto:
+        '''주식일별주문체결조회 '''
+        logger.info(f"조건식 결과 조회 ")
+        url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/inquire-daily-ccld"
+        params =  {
+            "cano": self.ACCTNO[0:8],
+            "acnt_prdt_cd": self.ACCTNO[8:10],
+            "inqr_strt_dt": startYmd,
+            "inqr_end_dt": endYmd,
+            "sll_buy_dvsn_cd": "00", # 00 : 전체, 01 : 매도, 02 : 매수",
+            "inqr_dvsn": "00",   # 00 : 역순 01 : 정순",
+            "pdno": "",
+            "ccld_dvsn": "00", #00 : 전체 01 : 체결 02 : 미체결",
+            "ord_gno_brno": "",
+            "odno": "",
+            "inqr_dvsn_3": "00", # 00 : 전체 01 : 현금 02 : 융자 03 : 대출 04 : 대주",
+            "inqr_dvsn_1": "", # 공란 : 전체 1 : ELW 2 : 프리보드",
+            "ctx_area_fk100": "", #"란 : 최초 조회시 이전 조회 Output CTX_AREA_FK100 값 : 다음페이지 조회시(2번째부터)",
+            "ctx_area_nk100": ""  #공란 : 최초 조회시 이전 조회 Output CTX_AREA_NK100 값 : 다음페이지 조회시(2번째부터)",
+        }   
+        headers ={
+            "authorization": f"Bearer {self.ACCESS_TOKEN}",
+            "appkey": self.APP_KEY,
+            "appsecret": self.APP_SECRET,
+            "tr_id": "TTTC8001R" # TTTC8001R: 주식 일별 주문 체결 조회(3개월이내) CTSC9115R : 주식 일별 주문 체결 조회(3개월이전)
+        }        
+
+        response = requests.get(url, headers=headers, params=params)
+        logger.debug(f"response : {response.text}")
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail=f"Error 주식일별주문체결조회 : {response.text}")
+        try:
+            json_data = response.json()
+            inquire_daily_cclt = InquireDailyCcldDto(**json_data)
+            logger.info(f"주식일별주문체결조회 : {inquire_daily_cclt}")
+        except requests.exceptions.JSONDecodeError:
+            logger.error(f"Error decoding JSON: {response.text}")
+            raise HTTPException(status_code=500, detail="Invalid JSON response")
+        except ValidationError as e:
+            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
+        return inquire_daily_cclt    
+    

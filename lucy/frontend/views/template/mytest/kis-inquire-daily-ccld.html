@@ -1,0 +1,79 @@
+{% extends 'common/base.html' %}
+{% block style %}
+<style>
+</style>
+{% endblock %}
+
+{% block content %}
+<section id="list" class="container">
+    <h2>주식일별주문체결</h2>
+    <div id="psearch-table-area"></div>
+    <div id="psearch-reuslt-area"></div>
+</section>
+    
+{% raw %} 
+<script id="psearch-table-template" type="text/x-handlebars-template">
+    <table class="table">
+        <thead>
+            <tr>
+                <!-- {
+                    "user_id": "kdy8017",
+                    "seq": "0",
+                    "grp_nm": "임시그룹",
+                    "condition_nm": "변동성0"
+                }                 -->
+                <th>사용자ID</th>
+                <th>그룹명</th>
+                <th>조건식 명칭</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each list}}
+            <tr>
+                <td>{{this.user_id}}</td>
+                <td>{{this.grp_nm}}</td>
+                <td><a href="#" data-seq="{{this.seq}}" class="btnPsearchResult">{{this.condition_nm}}</a></td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</script>
+<script id="result-table-template" type="text/x-handlebars-template">
+    <div class="row">
+        {{#each list}}
+        {{/each}}
+    </div>    
+</script>
+{% endraw %}
+{% endblock %}
+
+{% block script %}
+{% raw %}
+<script>
+
+    $( document ).ready(function() {
+        const stk_code = $('#stk_code').val();
+        fetchData('/api/v1/kis/inquire-daily-ccld')
+        .then(data => { 
+            console.log(data);
+            // let template = Handlebars.compile(document.getElementById('psearch-table-template').innerHTML); 
+            // const output2 = data.output2;
+            // let html = template({list : output2});
+            // $('#psearch-table-area').html(html)
+        })
+        .catch(error=> { console.error(error); })
+
+        //조건식 결과 조회
+        $('#psearch-table-area').on("click", ".btnPsearchResult", function() {
+            const seq = $(this).data('seq');
+            fetchData('/api/v1/kis/psearch/result/'+seq)
+            .then(data => { 
+                console.log(data);
+                make_result_html(data)
+            })
+            .catch(error=> { console.error(error); });
+        });
+    });
+    </script>	    
+{% endraw %}
+{% endblock %}

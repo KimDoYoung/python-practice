@@ -54,31 +54,49 @@ def find_url(parent_div):
     span_text = span_tag.get_text(strip=True) if span_tag else None    
     return span_text
 
+def find_and_click_js(driver, xpath):
+    try:
+        element = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, xpath))
+        )
+        driver.execute_script("arguments[0].click();", element)
+        return True
+    except Exception as e:
+        print(f"Error finding or clicking element with xpath '{xpath}': {e}")
+        return False
+
 def get_url_and_tables(url:str, main_menu:str, sub_menu:str):
     driver.get(url)
-    
+    # page_source = driver.page_source
+    # with open("page_source.html", "w", encoding="utf-8") as f:
+    #     f.write(page_source)
     try:
-        # 대메뉴 클릭
-        main_menu_anchor = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, f"//span[text()='{main_menu}']"))
+        WebDriverWait(driver, 10).until(
+            lambda d: d.execute_script('return document.readyState') == 'complete'
         )
-        if main_menu_anchor is None:
-            print(f"{main_menu} 로 찾지 못함")
-            return None        
-        driver.execute_script("arguments[0].scrollIntoView();", main_menu_anchor)
-        main_menu_anchor.click()
-        time.sleep(3)
-        #  api 주제를 클릭`
-        sub_menu_anchor = driver.find_element(By.XPATH, f"//span[text()='{sub_menu}']/parent::a")
-        if sub_menu_anchor is None:
-            print(f"{sub_menu} 로 찾지 못함")
-            return None
-        time.sleep(3)
-        sub_menu_anchor.click()
+        # # 대메뉴 클릭
+        # main_menu_anchor = WebDriverWait(driver, 10).until(
+        #     EC.element_to_be_clickable((By.XPATH, f"//span[text()='{main_menu}']"))
+        # )
+        # if main_menu_anchor is None:
+        #     print(f"{main_menu} 로 찾지 못함")
+        #     return None        
+        # main_menu_anchor.click()
 
-        # 페이지가 로드될 때까지 대기
-        # element_present = EC.presence_of_element_located((By.ID, 'kis-list'))
-        # WebDriverWait(driver, 10).until(element_present)
+        # anchor = WebDriverWait(driver, 10).until(
+        #     EC.element_to_be_clickable((By.XPATH, f"//span[text()='{sub_menu}']"))
+        # )
+        # anchor.click()
+        main_menu_xpath = f"//span[text()='{main_menu}']"
+        if not find_and_click_js(driver, main_menu_xpath):
+            print(f"{main_menu} 로 찾지 못함")
+            return
+        
+        sub_menu_xpath = f"//span[text()='{sub_menu}']"
+        if not find_and_click_js(driver, sub_menu_xpath):
+            print(f"{sub_menu} 로 찾지 못함")
+            return
+
 
         time.sleep(5)
 
@@ -116,7 +134,7 @@ def get_url_and_tables(url:str, main_menu:str, sub_menu:str):
         print("페이지 parsing 시간 초과")
         driver.quit()
 
-    return url, df_array , example_array
+    return url, df_array, example_array
 
 def field_mapping_string(df):
     s = ""
@@ -213,7 +231,7 @@ def make_pydantic_model(class_name, df):
 
 def main(main_menu:str, sub_menu:str):
     driver = install_chrome_driver()
-    url = "https://apiportal.koreainvestment.com/apiservice/oauth2#L_5c87ba63-740a-4166-93ac-803510bb9c02"
+    url = "https://apiportal.koreainvestment.com/apiservice/"
     url, df_array, example_array = get_url_and_tables(url, main_menu, sub_menu)
     print(f"url: {url}")
     request_header_df = df_array[0]
@@ -270,8 +288,10 @@ def main(main_menu:str, sub_menu:str):
 if __name__ == "__main__":
     # main_menu  = "[국내주식] 종목정보"
     # sub_menu = "주식기본조회"
-    main_menu  = "[국내주식] 시세분석"
-    sub_menu = "종목조건검색조회"
+    # main_menu  = "[국내주식] 시세분석"
+    # sub_menu = "종목조건검색조회"
     
+    main_menu  = "[국내주식] 종목정보"
+    sub_menu = "주식일별주문체결조회"
     main(main_menu, sub_menu)
     print("Done!")

@@ -135,3 +135,19 @@ async def psearch_result(request:Request,  seq:str, user_service :UserService=De
     kis_api = KoreaInvestmentApi(user)
     kis_psearch_result = kis_api.psearch_result(seq)
     return kis_psearch_result
+
+
+@router.get("/inquire-daily-ccld", response_class=JSONResponse)
+async def inquire_daily_ccld(request:Request, user_service :UserService=Depends(get_user_service)):
+    '''조건식 '''
+    current_user = await get_current_user(request)
+    logger.debug(f"current_user : {current_user}")
+    user_id = current_user.get('user_id')
+    user = await user_service.get_1(user_id)
+    
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid token-사용자 정보가 없습니다")
+    
+    kis_api = KoreaInvestmentApi(user)
+    kis_inquire_daily_ccld = kis_api.inquire_daily_ccld(seq)
+    return kis_inquire_daily_ccld
