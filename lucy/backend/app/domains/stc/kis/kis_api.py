@@ -33,12 +33,6 @@ class KoreaInvestmentApi:
     # _instance = None
 
     _BASE_URL = 'https://openapi.koreainvestment.com:9443'
-    _PATHS = {
-        "토큰발급" : f'{_BASE_URL}/oauth2/tokenP',
-        "암호화" : f'{_BASE_URL}/uapi/hashkey',
-        "현재가조회" : f'{_BASE_URL}/uapi/domestic-stock/v1/quotations/inquire-price',
-        "주식잔고조회" : f'{_BASE_URL}/uapi/domestic-stock/v1/quotations/inquire-stock-balance',
-    }
     
     def __init__(self, user: User):
         self.user = user
@@ -51,7 +45,7 @@ class KoreaInvestmentApi:
             self.ACCESS_TOKEN = access_token
         else:
             self.set_access_token_from_kis()
-    
+    #TODO : 모델 쪽으로 뻴 것을 고려해보자    
     def get_key_value(self, key_values:List[KeyValueData], key_name:str) -> str:
         for item in key_values:
             if item.key == key_name:
@@ -101,7 +95,7 @@ class KoreaInvestmentApi:
     
     def hashkey(self, datas):
         """암호화"""
-        url = self._PATHS['암호화']
+        url = self.BASE_URL + "/uapi/hashkey" #self._PATHS['암호화']
         headers = {
         'content-Type' : 'application/json',
         'appKey' : self.APP_KEY,
@@ -122,7 +116,7 @@ class KoreaInvestmentApi:
 
     def get_current_price(self, stk_code:str ) ->int:
         ''' 현재가 조회 '''
-        url = self._PATHS["현재가조회"]
+        url = self._BASE_URL + '/uapi/domestic-stock/v1/quotations/inquire-price' 
         headers = {"Content-Type":"application/json", 
                 "authorization": f"Bearer {self.ACCESS_TOKEN}",
                 "appKey":self.APP_KEY,
@@ -139,7 +133,7 @@ class KoreaInvestmentApi:
 
         logger.debug(f"response : {json}")        
         logger.debug(f"현재가: {stk_code} : {json['output']['stck_prpr']}")
-        #return json['output']['stck_prpr']
+
         return int(json['output']['stck_prpr'])
         
     def get_inquire_balance(self) ->KisInquireBalance:
@@ -151,7 +145,6 @@ class KoreaInvestmentApi:
             "authorization":f"Bearer {self.ACCESS_TOKEN}",
             "appKey":self.APP_KEY,
             "appSecret":self.APP_SECRET,
-            # "tr_id":"TTTC8908R",
             "tr_id":"TTTC8434R"
         }
         CANO = self.ACCTNO[0:8]

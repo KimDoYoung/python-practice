@@ -134,7 +134,7 @@
         const anchor = "<a href='https://finance.naver.com/item/main.nhn?code=" + stockCode + "' target='_blank'>" + stockCode + "</a>";
         return new Handlebars.SafeString(anchor);
     });
-
+    //TODO displayHanWon을 12345 -> 1조 2345억으로 변경
     Handlebars.registerHelper('displayWon', function(number) {
         // 숫자를 int형으로 변환
         var intNumber = parseInt(number, 10);

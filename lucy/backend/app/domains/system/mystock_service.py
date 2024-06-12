@@ -9,10 +9,10 @@
 작성일: 07
 버전: 1.0
 """
+from typing import List
 from bson import ObjectId
 from fastapi import HTTPException
 from backend.app.core.logger import get_logger
-from motor.motor_asyncio import AsyncIOMotorClient
 
 from backend.app.domains.system.mystock_model import MyStock, MyStockDto
 from backend.app.core.dependency import get_ipo_service
@@ -28,7 +28,7 @@ class MyStockService:
         await mystock.create()
         return mystock
     
-    async def get_all(self) -> list[MyStock]:
+    async def get_all(self) -> List[MyStock]:
         ''' MyStock Collection에서 모든 document를 가져온다.'''
         try:
             mystocks = await MyStock.find().to_list()
