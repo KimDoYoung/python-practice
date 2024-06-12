@@ -19,8 +19,8 @@ class MyStockBase(BaseModel):
 
     @field_validator('stk_code')
     def validate_stk_code(cls, v):
-        if not v.isdigit() or len(v) != 6:
-            raise ValueError('stk_code must be a string of 6 digits')
+        if len(v) != 6:
+            raise ValueError('종목코드는 6개의 숫자입니다.')
         return v
 
     @field_validator('stk_types', mode='before')

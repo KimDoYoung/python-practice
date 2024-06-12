@@ -1,12 +1,14 @@
 # s38_2.py
 """
 모듈 설명: 
-    - 공모주 사이트 38커뮤니케이션의 청약일정 2페이지를 scrapping한다.
-    - 각각의 공모주회사의 페이지를 scrapping한다
+    - 공모주 사이트 38커뮤니케이션의 청약일정 2페이지(List)를 scrapping한다.
+    - 리스트에서 각각의 공모주회사의 페이지를 scrapping한다
     - 각각의 공모주회사의 내용을 collection ipo_scrap_38 에 넣는다.
 부가설명
     - 스크래핑기법으로는 selenium을 사용함
-
+    - 단독으로 main 함수를 실행할 수 있음
+    - 단독실행시 export PYTHONPATH=/c/Users/deHong/Documents/kdy/python-practice/lucy 
+    - 단독실행시 python -m backend.app.background.jobs.s38_2
 작성자: 김도영
 작성일: 2024-05-29
 버전: 1.0
@@ -24,7 +26,6 @@ from backend.app.utils.scrap_util import extract_dates, extract_numbers, extract
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-# from pymongo import MongoClient
 from io import StringIO
 from datetime import datetime
 from backend.app.core.logger import get_logger
