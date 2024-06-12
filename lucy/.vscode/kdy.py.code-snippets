@@ -8,14 +8,14 @@
     //     "description": "Log output to console"
     // }
     "logger" : {
-        "prefix": "logger",
+        "prefix": "my_logger",
         "body":  [
             "from backend.app.core.logger import get_logger",
             "logger = get_logger(__name__)"
         ],
     },
     "router file starter" : {
-        "prefix": "router",
+        "prefix": "my_router",
         "body":  [
             "# $TM_FILENAME_BASE.py",
             "from fastapi import APIRouter",
@@ -25,7 +25,7 @@
         ],
     },
     "file comments" : {
-        "prefix": "filecomments",
+        "prefix": "my_filecomments",
         "body":  [
             "# $TM_FILENAME_BASE.py",
             "\"\"\"",
@@ -41,7 +41,7 @@
         ]
     },
     "import backend.config" :{
-        "prefix" : "imconfig",
+        "prefix" : "my_config",
         "body" :[
             "from backend.app.core.config import config"
         ]

@@ -48,9 +48,9 @@ async def get_token_from_kis(request:Request, user_service :UserService=Depends(
         return {"detail": "기존 Access Token이 유효하지 않아 재발급받음. 이제 Access Token 은 유효함"}
     
 
-#TODO : 주식 잔고 조회
 @router.get("/", response_class=JSONResponse)
 async def info(request:Request, user_service :UserService=Depends(get_user_service)):
+    '''1.주식잔고조회, 2. 보유주식을 mystock에 등록'''
     current_user = await get_current_user(request)
     logger.debug(f"current_user : {current_user}")
     user_id = current_user.get('user_id')

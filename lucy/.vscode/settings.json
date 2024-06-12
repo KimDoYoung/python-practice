@@ -33,5 +33,6 @@
     },
     "css.validate": false ,
     "editor.inlineSuggest.enabled": true,
+    "todo-tree.tree.scanMode": "workspace only",
 
 }

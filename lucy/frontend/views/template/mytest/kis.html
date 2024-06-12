@@ -115,7 +115,7 @@
         .then(data => {
             console.log(data);
             alert(data.msg1)
-            window.location.href = '/mytest/kis';
+            window.location.href = '/page?id=mytest_kis';
         }).catch(error => {
             console.error(error);
             $('#buy-sell-message-area').html(error)
@@ -148,6 +148,7 @@
                 $('#message-area').html(error)
             });
         });
+        //매수
         $('#buy-form').on('submit', function(e){
             e.preventDefault();
             console.log('click 매수.... ');
