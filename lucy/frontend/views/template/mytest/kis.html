@@ -1,12 +1,7 @@
 {% extends 'common/base.html' %}
 {% block style %}
 <style>
-    .bg-buy {
-        background-color: rgb(83, 146, 241);
-    }
-    .bg-sell {
-        background-color: #eb9999;
-    }
+
 </style>
 {% endblock %}
 
@@ -25,29 +20,55 @@
         <div class="col bg-buy p-3 me-3">
             <h2>매수</h2>
             <form action="" id="buy-form">
-                <div class="mb-3">
-                    <label for="pdno" class="form-label">상품번호</label>
-                    <input type="text" class="form-control" name="pdno" required>
+                <div class="row mb-3">
+                    <div class="col">
+                        <label for="pdno" class="form-label">상품번호</label>
+                        <input type="text" class="form-control" name="pdno" required>
+                    </div>
+                    <div class="col">
+                        <label for="pdno" class="form-label">상품명칭</label>
+                        <input type="text" class="form-control" name="pdnm" readonly required>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label for="qty" class="form-label">수량</label>
-                    <input type="number" class="form-control" name="qty" required>
+                <div class="row mb-3">
+                    <div class="col">
+                        <label for="qty" class="form-label">수량</label>
+                        <input type="number" class="form-control" name="qty" required min="1">
+                    </div>
+                    <div class="col">
+                        <label for="cost" class="form-label">지정가</label>
+                        <input type="number" class="form-control" name="cost" required min="0">
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-primary btnBuyCash">매수</button>
+                <button type="submit" class="btn btn-primary  btnBuyCash">매수</button>
+                <button type="button" class="btn btn-secondary btnClearBuy">초기화</button>
             </form>                    
         </div>
         <div class="col bg-sell p-3">
                 <h2>매도</h2>
                 <form action="" id="sell-form">
-                    <div class="mb-3">
-                        <label for="pdno" class="form-label">상품번호</label>
-                        <input type="text" class="form-control" name="pdno" required>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="pdno" class="form-label">상품번호</label>
+                            <input type="text" class="form-control" name="pdno" required>
+                        </div>
+                        <div class="col">
+                            <label for="pdno" class="form-label">상품명칭</label>
+                            <input type="text" class="form-control" name="pdnm" readonly required>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="qty" class="form-label">수량</label>
-                        <input type="number" class="form-control" name="qty" required>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="qty" class="form-label">수량</label>
+                            <input type="number" class="form-control" name="qty"  min="1" required>
+                        </div>
+                        <div class="col">
+                            <label for="cost" class="form-label">지정가</label>
+                            <input type="number" class="form-control" name="cost" min="0" required>
+                        </div>
                     </div>
                     <button type="submit" class="btn btn-danger btnSellCash">매도</button>
+                    <button type="button" class="btn btn-secondary btnClearSell">초기화</button>
                 </form>                    
         </div>
     </div>
@@ -75,7 +96,7 @@
         <tbody>
             {{#each list}}
             <tr>
-                <td><a href="#" class="btnStockInfo" data-stk-code="{{pdno}}">{{pdno}}</a></td>
+                <td><a href="#" class="btnSetSellBuy" data-stk-code="{{pdno}}" data-stk-name="{{prdt_name}}">{{pdno}}</a></td>
                 <td><a href="#" class="btnStockInfo" data-stk-code="{{pdno}}">{{prdt_name}}</a></td>
                 <td class="text-end">{{displayWon pchs_avg_pric}}</td>
                 <td class="text-end">{{displayWon prpr}}</td>
@@ -137,6 +158,31 @@
             window.location.href = '/page?id=mytest_kis-stock-info';
             
         });
+        
+        //매수 매도 폼 초기화
+        $('#buy-form').on("click", ".btnClearBuy", function(e) {
+            e.preventDefault();
+            $('#buy-form input').val('');
+        });
+        $('#sell-form').on("click", ".btnClearSell", function(e) {
+            e.preventDefault();
+            $('#sell-form input').val('');
+        });
+        //매수, 매도 상품번호 설정
+        $('#inquire-balance-area').on("click", ".btnSetSellBuy", function(e) {
+            e.preventDefault();
+            const stk_code = $(this).data('stk-code');
+            const stk_name = $(this).data('stk-name');
+            $('#buy-form input[name=pdno]').val(stk_code);
+            $('#sell-form input[name=pdno]').val(stk_code);
+            $('#buy-form input[name=pdnm]').val(stk_name);
+            $('#sell-form input[name=pdnm]').val(stk_name);
+            $('#buy-form input[name=qty]').val(1)
+            $('#sell-form input[name=qty]').val(1)
+            $('#buy-form input[name=cost]').val(0)
+            $('#sell-form input[name=cost]').val(0)
+        });
+        //
         $('#btnTesTToken').on('click', function() {
             console.log('btnTesTToken click.... ');
 
@@ -155,26 +201,54 @@
             console.log('click 매수.... ');
             const stk_code = $('#buy-form input[name=pdno]').val();
             const qty = $('#buy-form input[name=qty]').val();
+            const cost = $('#buy-form input[name=cost]').val();
+            let msg = '';
+            if( cost == 0){
+                msg = '시장가로 매수하시겠습니까?';
+            }else{
+                msg = `지정가 ${cost}로 매수하시겠습니까?`;
+            }
+            if(!confirm(msg)) return;
+            
             const data = {
                 buy_sell_gb : '매수',
                 stk_code: stk_code,
-                qty: Number(qty)
+                qty: Number(qty),
+                cost: Number(cost)
                 }
             order_cash(data);
 
         });
+        //매도
         $('#sell-form').on('submit', function(e){
             e.preventDefault();
             console.log('click 매도.... ');
+            
             const stk_code = $('#sell-form input[name=pdno]').val();
             const qty = $('#sell-form input[name=qty]').val();
+            const cost = $('#sell-form input[name=cost]').val();
+            let msg = '';
+            if( cost == 0){
+                msg = '시장가로 매도하시겠습니까?';
+            }else{
+                msg = `지정가 ${cost}로 매도하시겠습니까?`;
+            }        
+            if(!confirm(msg)) return;    
             const data = {
                 buy_sell_gb : '매도',
                 stk_code: stk_code,
-                qty: Number(qty)
+                qty: Number(qty),
+                cost: Number(cost)
             }
             order_cash(data);
         })
+        //주식일별주문체결조회
+        $('#btnInquireDailyCcld').on('click', function() {
+            console.log('주식일별주문체결조회 click.... ');
+            window.location.href = '/page?id=mytest_kis-inquire-daily-ccld';
+
+        });
+
         initalize();
 
     });

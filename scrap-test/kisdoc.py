@@ -87,10 +87,10 @@ def get_url_and_tables(url:str, main_menu:str, sub_menu:str):
         #     EC.element_to_be_clickable((By.XPATH, f"//span[text()='{sub_menu}']"))
         # )
         # anchor.click()
-        main_menu_xpath = f"//span[text()='{main_menu}']"
-        if not find_and_click_js(driver, main_menu_xpath):
-            print(f"{main_menu} 로 찾지 못함")
-            return
+        # main_menu_xpath = f"//span[text()='{main_menu}']"
+        # if not find_and_click_js(driver, main_menu_xpath):
+        #     print(f"{main_menu} 로 찾지 못함")
+        #     return
         
         sub_menu_xpath = f"//span[text()='{sub_menu}']"
         if not find_and_click_js(driver, sub_menu_xpath):
@@ -291,7 +291,9 @@ if __name__ == "__main__":
     # main_menu  = "[국내주식] 시세분석"
     # sub_menu = "종목조건검색조회"
     
-    main_menu  = "[국내주식] 종목정보"
-    sub_menu = "주식일별주문체결조회"
+    # main_menu  = "[국내주식] 종목정보"
+    # sub_menu = "주식일별주문체결조회"
+    main_menu  = "[국내주식] 주문계좌"
+    sub_menu = "주식주문(정정취소)"
     main(main_menu, sub_menu)
     print("Done!")

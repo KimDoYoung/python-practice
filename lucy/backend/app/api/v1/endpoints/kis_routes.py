@@ -1,8 +1,10 @@
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Body, Path, Request
 from fastapi.responses import JSONResponse
 from backend.app.core.dependency import get_mystock_service, get_user_service
 from backend.app.domains.stc.kis.kis_api import KoreaInvestmentApi
-from backend.app.domains.stc.kis.model.kis_order_cash_model import OrderCashDto
+from backend.app.domains.stc.kis.model.kis_inquire_daily_ccld_model import InquireDailyCcldRequest
+from backend.app.domains.stc.kis.model.kis_order_cash_model import OrderCancelRequest, OrderCashDto
 from backend.app.domains.system.mystock_model import MyStockDto
 from backend.app.domains.user.user_model import User
 from backend.app.domains.user.user_service import UserService
@@ -77,6 +79,7 @@ async def info(request:Request, user_service :UserService=Depends(get_user_servi
 
 @router.post("/order_cash", response_class=JSONResponse)
 async def order_cash(request:Request, order_cash: OrderCashDto, user_service :UserService=Depends(get_user_service)):
+    '''주식매수, 주식매도 주문'''
     current_user = await get_current_user(request)
     logger.debug(f"current_user : {current_user}")
     user_id = current_user.get('user_id')
@@ -92,6 +95,25 @@ async def order_cash(request:Request, order_cash: OrderCashDto, user_service :Us
     else:
         logger.debug(f"주식매도 : {kis_order_cash}")
     return kis_order_cash
+
+@router.post("/order-cancel", response_class=JSONResponse)
+async def order_cancel(request:Request, order_cancel: OrderCancelRequest, user_service :UserService=Depends(get_user_service)):
+    '''주식매수, 주식매도 취소'''
+    current_user = await get_current_user(request)
+    logger.debug(f"current_user : {current_user}")
+    user_id = current_user.get('user_id')
+    user = await user_service.get_1(user_id)
+    
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid token-사용자 정보가 없습니다")
+    
+    kis_api = KoreaInvestmentApi(user)
+    cancel_response =   kis_api.order_cancel(order_cancel)
+    if order_cash.buy_sell_gb == "매수":
+        logger.debug(f"주식매수 : {cancel_response}")
+    else:
+        logger.debug(f"주식매도 : {cancel_response}")
+    return cancel_response
 
 @router.get("/stock-info/{stk_code}", response_class=JSONResponse)
 async def stock_info(request:Request, stk_code:str,  user_service :UserService=Depends(get_user_service)):
@@ -137,8 +159,8 @@ async def psearch_result(request:Request,  seq:str, user_service :UserService=De
     return kis_psearch_result
 
 
-@router.get("/inquire-daily-ccld", response_class=JSONResponse)
-async def inquire_daily_ccld(request:Request, user_service :UserService=Depends(get_user_service)):
+@router.post("/inquire-daily-ccld", response_class=JSONResponse)
+async def inquire_daily_ccld(request:Request, ccld: InquireDailyCcldRequest, user_service :UserService=Depends(get_user_service)):
     '''조건식 '''
     current_user = await get_current_user(request)
     logger.debug(f"current_user : {current_user}")
@@ -149,5 +171,8 @@ async def inquire_daily_ccld(request:Request, user_service :UserService=Depends(
         raise HTTPException(status_code=401, detail="Invalid token-사용자 정보가 없습니다")
     
     kis_api = KoreaInvestmentApi(user)
-    kis_inquire_daily_ccld = kis_api.inquire_daily_ccld(seq)
-    return kis_inquire_daily_ccld
+    # todayYmd = datetime.today().strftime("%Y%m%d")
+    # ccld = InquireDailyCcldRequest(inqr_strt_dt=todayYmd, inqr_end_dt=todayYmd)
+    ccld_result = kis_api.inquire_daily_ccld(inquire_daily_ccld=ccld)
+    logger.debug("주식일별주문체결조회:["+ccld_result.to_str()+"]")
+    return ccld_result

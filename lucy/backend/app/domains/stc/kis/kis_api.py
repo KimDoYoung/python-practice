@@ -19,8 +19,8 @@ import requests
 
 from backend.app.core.logger import get_logger
 from backend.app.domains.stc.kis.model.kis_inquire_balance_model import KisInquireBalance
-from backend.app.domains.stc.kis.model.kis_inquire_daily_ccld_model import InquireDailyCcldDto
-from backend.app.domains.stc.kis.model.kis_order_cash_model import KisOrderCash, OrderCashDto
+from backend.app.domains.stc.kis.model.kis_inquire_daily_ccld_model import InquireDailyCcldDto, InquireDailyCcldRequest
+from backend.app.domains.stc.kis.model.kis_order_cash_model import KisOrderCash, OrderCancelRequest, OrderCashDto, OrderRvsecnclDto
 from backend.app.domains.stc.kis.model.kis_psearch_result_model import PsearchResultDto
 from backend.app.domains.stc.kis.model.kis_search_stock_info_model import SearchStockInfoDto
 from backend.app.domains.stc.kis.model.kis_psearch_title_model import PsearchTitleDto
@@ -193,14 +193,25 @@ class KoreaInvestmentApi:
             "tr_id":tr_id,
             "custtype":"P"
         }
-        data = {
-            "CANO": self.ACCTNO[0:8],
-            "ACNT_PRDT_CD": self.ACCTNO[8:10],
-            "PDNO" : order_cash.stk_code,
-            "ORD_DVSN" : "01", # 시장가
-            "ORD_QTY" : str(order_cash.qty), 
-            "ORD_UNPR" : "0" 
-        }
+        if order_cash.cost == 0:
+            data = {
+                "CANO": self.ACCTNO[0:8],
+                "ACNT_PRDT_CD": self.ACCTNO[8:10],
+                "PDNO" : order_cash.stk_code,
+                "ORD_DVSN" : "01", # 시장가
+                "ORD_QTY" : str(order_cash.qty), 
+                "ORD_UNPR" : "0" 
+            }
+        else:
+            data = {
+                "CANO": self.ACCTNO[0:8],
+                "ACNT_PRDT_CD": self.ACCTNO[8:10],
+                "PDNO" : order_cash.stk_code,
+                "ORD_DVSN" : "00", # 시장가
+                "ORD_QTY" : str(order_cash.qty), 
+                "ORD_UNPR" : str(order_cash.cost)
+            }
+
         response = requests.post(url, headers=headers, data=json.dumps(data))
         logger.debug(f"response : {response.text}")
         if response.status_code != 200:
@@ -312,25 +323,25 @@ class KoreaInvestmentApi:
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
         return psearch_result    
 
-    def inquire_daily_ccld(self, startYmd, endYmd: str) -> InquireDailyCcldDto:
+    def inquire_daily_ccld(self, inquire_daily_ccld: InquireDailyCcldRequest) -> InquireDailyCcldDto:
         '''주식일별주문체결조회 '''
-        logger.info(f"조건식 결과 조회 ")
+        logger.info(f"주식일별주문체결조회")
         url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/inquire-daily-ccld"
         params =  {
             "cano": self.ACCTNO[0:8],
             "acnt_prdt_cd": self.ACCTNO[8:10],
-            "inqr_strt_dt": startYmd,
-            "inqr_end_dt": endYmd,
-            "sll_buy_dvsn_cd": "00", # 00 : 전체, 01 : 매도, 02 : 매수",
-            "inqr_dvsn": "00",   # 00 : 역순 01 : 정순",
-            "pdno": "",
-            "ccld_dvsn": "00", #00 : 전체 01 : 체결 02 : 미체결",
+            "inqr_strt_dt": inquire_daily_ccld.inqr_strt_dt,
+            "inqr_end_dt": inquire_daily_ccld.inqr_end_dt,
+            "sll_buy_dvsn_cd": inquire_daily_ccld.sll_buy_dvsn_cd, # 00 : 전체, 01 : 매도, 02 : 매수",
+            "inqr_dvsn": inquire_daily_ccld.inqr_dvsn,   # 00 : 역순 01 : 정순",
+            "pdno": inquire_daily_ccld.pdno,
+            "ccld_dvsn": inquire_daily_ccld.ccld_dvsn, #00 : 전체 01 : 체결 02 : 미체결",
             "ord_gno_brno": "",
             "odno": "",
-            "inqr_dvsn_3": "00", # 00 : 전체 01 : 현금 02 : 융자 03 : 대출 04 : 대주",
+            "inqr_dvsn_3": inquire_daily_ccld.inqr_dvsn_3, # 00 : 전체 01 : 현금 02 : 융자 03 : 대출 04 : 대주",
             "inqr_dvsn_1": "", # 공란 : 전체 1 : ELW 2 : 프리보드",
-            "ctx_area_fk100": "", #"란 : 최초 조회시 이전 조회 Output CTX_AREA_FK100 값 : 다음페이지 조회시(2번째부터)",
-            "ctx_area_nk100": ""  #공란 : 최초 조회시 이전 조회 Output CTX_AREA_NK100 값 : 다음페이지 조회시(2번째부터)",
+            "ctx_area_fk100": inquire_daily_ccld.CTX_AREA_FK100, #"란 : 최초 조회시 이전 조회 Output CTX_AREA_FK100 값 : 다음페이지 조회시(2번째부터)",
+            "ctx_area_nk100": inquire_daily_ccld.CTX_AREA_NK100  #공란 : 최초 조회시 이전 조회 Output CTX_AREA_NK100 값 : 다음페이지 조회시(2번째부터)",
         }   
         headers ={
             "authorization": f"Bearer {self.ACCESS_TOKEN}",
@@ -345,12 +356,48 @@ class KoreaInvestmentApi:
             raise HTTPException(status_code=response.status_code, detail=f"Error 주식일별주문체결조회 : {response.text}")
         try:
             json_data = response.json()
-            inquire_daily_cclt = InquireDailyCcldDto(**json_data)
-            logger.info(f"주식일별주문체결조회 : {inquire_daily_cclt}")
+            inquire_daily_ccld = InquireDailyCcldDto(**json_data)
+            logger.debug(f"주식일별주문체결조회 됨")
         except requests.exceptions.JSONDecodeError:
             logger.error(f"Error decoding JSON: {response.text}")
             raise HTTPException(status_code=500, detail="Invalid JSON response")
         except ValidationError as e:
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
-        return inquire_daily_cclt    
+        return inquire_daily_ccld    
     
+    def order_cancel(self, order_cancel: OrderCancelRequest) -> OrderRvsecnclDto:
+        '''주식 주문 취소 '''
+        logger.info(f"주식 주문 취소")
+        url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/order-rvsecncl"
+        body =  {
+            "CANO": self.ACCTNO[0:8],
+            "ACNT_PRDT_CD": self.ACCTNO[8:10],
+            "KRX_FWDG_ORD_ORGNO": "",  # (Null 값 설정) 주문시 한국투자증권 시스템에서 지정된 영업점코드",
+            "ORGN_ODNO": order_cancel.orgn_odno,   #"주식일별주문체결조회 API output1의 odno(주문번호) 값 입력 주문시 한국투자증권 시스템에서 채번된 주문번호",
+            "ORD_DVSN": order_cancel.ord_dvsn_cd, #"00 : 지정가 01 : 시장가 02 : 조건부지정가 03 : 최유리지정가 04 : 최우선지정가 05 : 장전 시간외 06 : 장후 시간외 07 : 시간외 단일가 08 : 자기주식 09 : 자기주식S-Option 10 : 자기주식금전신탁 11 : IOC지정가 (즉시체결,잔량취소) 12 : FOK지정가 (즉시체결,전량취소) 13 : IOC시장가 (즉시체결,잔량취소) 14 : FOK시장가 (즉시체결,전량취소) 15 : IOC최유리 (즉시체결,잔량취소) 16 : FOK최유리 (즉시체결,전량취소)",
+            "RVSE_CNCL_DVSN_CD": "02", #정정 : 01 취소 : 02",
+            "ORD_QTY": "0", # [잔량전부 취소/정정주문] "0" 설정 ( QTY_ALL_ORD_YN=Y 설정 ) [잔량일부 취소/정정주문] 취소/정정 수량",
+            "ORD_UNPR": "0",  #[정정] (지정가) 정정주문 1주당 가격 (시장가) "0" 설정 [취소] "0" 설정",
+            "QTY_ALL_ORD_YN": "Y" #[정정/취소] Y : 잔량전부 N : 잔량일부",
+        }   
+        headers ={
+            "authorization": f"Bearer {self.ACCESS_TOKEN}",
+            "appkey": self.APP_KEY,
+            "appsecret": self.APP_SECRET,
+            "tr_id": "TTTC0803U" #[실전투자] TTTC0803U : 주식 정정 취소 주문 [모의투자] VTTC0803U : 주식 정정 취소 주문",                        
+        }        
+
+        response = requests.get(url, headers=headers, data=json.dumps(body))
+        logger.debug(f"response : {response.text}")
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail=f"Error 주식일별주문체결조회 : {response.text}")
+        try:
+            json_data = response.json()
+            order_cancel = OrderRvsecnclDto(**json_data)
+            logger.debug(f"주식 주문 잔량 전부 취소 됨")
+        except requests.exceptions.JSONDecodeError:
+            logger.error(f"Error decoding JSON: {response.text}")
+            raise HTTPException(status_code=500, detail="Invalid JSON response")
+        except ValidationError as e:
+            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
+        return order_cancel  

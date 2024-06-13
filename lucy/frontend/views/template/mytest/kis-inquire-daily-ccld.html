@@ -7,32 +7,87 @@
 {% block content %}
 <section id="list" class="container">
     <h2>주식일별주문체결</h2>
-    <div id="psearch-table-area"></div>
-    <div id="psearch-reuslt-area"></div>
+    <div id="ccld-search-area">
+        <form id="form_ccld">
+            <div class="row g-3">
+                <div class="col-md-3">
+                <label for="stockCode" class="form-label">종목코드</label>
+                <input type="text" class="form-control" id="pdno" placeholder="종목코드를 입력하세요">
+                </div>
+                <div class="col-md-3">
+                <label for="startDate" class="form-label">시작날짜</label>
+                <input type="date" class="form-control" id="inqr_strt_dt" required>
+                </div>
+                <div class="col-md-3">
+                <label for="endDate" class="form-label">종료날짜</label>
+                <input type="date" class="form-control" id="inqr_end_dt" required>
+                </div>
+                <div class="col-md-3">
+                    <br>
+                    <button type="submit" class="btn btn-primary">조회</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div id="error-area"></div>
+    <div id="ccld-result-area" class="mt-3"></div>
 </section>
     
 {% raw %} 
-<script id="psearch-table-template" type="text/x-handlebars-template">
+<script id="ccld-error-template" type="text/x-handlebars-template">
+    <div class="alert alert-danger" role="alert">
+        {{data.msg1}}
+    </div>
+</script>
+</script>
+<script id="ccld-table-template" type="text/x-handlebars-template">
     <table class="table">
         <thead>
             <tr>
-                <!-- {
-                    "user_id": "kdy8017",
-                    "seq": "0",
-                    "grp_nm": "임시그룹",
-                    "condition_nm": "변동성0"
-                }                 -->
-                <th>사용자ID</th>
-                <th>그룹명</th>
-                <th>조건식 명칭</th>
+                <th>상품</th>
+                <th>주문일시</th>
+                <th>매수/매도</th>
+                <th>주문번호</th>
+                <th>주문구분</th>
+                <th>구분</th>
+                <th>주문수량</th>
+                <th>주문단가</th>
+                <th>체결수량</th>
+                <th>잔여수량</th>
+                <th>체결금액</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
-            {{#each list}}
+            {{#each data.output1}}
             <tr>
-                <td>{{this.user_id}}</td>
-                <td>{{this.grp_nm}}</td>
-                <td><a href="#" data-seq="{{this.seq}}" class="btnPsearchResult">{{this.condition_nm}}</a></td>
+                <td>{{this.prdt_name}}({{this.pdno}})</td>
+                <td>{{this.ord_dt}} {{this.ord_tmd}}</td>
+                <td>
+                    {{#test "sll_buy_dvsn_cd == '01'"}}
+                        매도
+                    {{/test}}
+                    {{#test "sll_buy_dvsn_cd == '02'"}}
+                        매수
+                    {{/test}}
+                </td>
+                <td>{{this.odno}}</td>
+                <td>{{this.ord_dvsn_name}}</td>
+                <td>{{this.sll_buy_dvsn_cd_name}}</td>
+                <td>{{this.ord_qty}}</td>
+                <td>{{this.ord_unpr}}</td>
+                <td>{{this.tot_ccld_qty}}</td>
+                <td>{{this.rmn_qty}}</td>
+                <td>{{this.tot_ccld_amt}}</td>
+                <td>
+                    {{#test "rmn_qty > 0"}}
+                    <a href="#" 
+                    data-ord-gno-brno="{{this.ord_gno_brno}}" 
+                    data-orgn-odno="{{this.odno}}"
+                    data-ord-dvsn-cd="{{this.ord_dvsn_cd}}"
+                    data-ord-unpr="{{this.ord_unpr}}"
+                    class="btnOrderCancel">잔량전부취소</a></td>
+                    {{/test}}
             </tr>
             {{/each}}
         </tbody>
@@ -53,26 +108,68 @@
 
     $( document ).ready(function() {
         const stk_code = $('#stk_code').val();
-        fetchData('/api/v1/kis/inquire-daily-ccld')
-        .then(data => { 
-            console.log(data);
-            // let template = Handlebars.compile(document.getElementById('psearch-table-template').innerHTML); 
-            // const output2 = data.output2;
-            // let html = template({list : output2});
-            // $('#psearch-table-area').html(html)
-        })
-        .catch(error=> { console.error(error); })
-
-        //조건식 결과 조회
-        $('#psearch-table-area').on("click", ".btnPsearchResult", function() {
-            const seq = $(this).data('seq');
-            fetchData('/api/v1/kis/psearch/result/'+seq)
-            .then(data => { 
-                console.log(data);
-                make_result_html(data)
+        function initalize(){
+            $('#inqr_strt_dt').val(JuliaUtil.today());
+            $('#inqr_end_dt').val(JuliaUtil.today());
+            //$('#form_ccld').trigger('submit');
+        }
+        //주문취소 버튼 
+        $("#ccld-result-area").on("click", ".btnOrderCancel", function(e) {
+            e.preventDefault();
+            if(!confirm('주문을 취소하시겠습니까?')) return;
+            const url ='/api/v1/kis/order-cancel';
+            const data = {
+                ord_gno_brno: $(this).data('ord-gno-brno'),
+                orgn_odno: $(this).data('orgn-odno'),
+                ord_dvsn_cd: $(this).data('ord-dvsn-cd'),
+                ord_unpr: $(this).data('ord-unpr')
+            }
+            postData(url, data)
+            .then(response => { 
+                console.log(response);
+                if(response.result == 'success'){
+                    alert('주문취소가 완료되었습니다.');
+                    $('#form_ccld').trigger('submit');
+                }else{
+                    alert('주문취소가 실패하였습니다.');
+                }
             })
-            .catch(error=> { console.error(error); });
-        });
+            .catch(error=> { 
+                $('#error-area').html(String(error));
+                console.error(error); 
+            });
+        })
+        $('#form_ccld').on('submit', function(e){
+            e.preventDefault();
+            
+            const url ='/api/v1/kis/inquire-daily-ccld';
+            const data = {
+                pdno: $('#pdno').val(),
+                inqr_strt_dt: $('#inqr_strt_dt').val().replace(/-/g, ''),
+                inqr_end_dt: $('#inqr_end_dt').val().replace(/-/g, '')
+            }
+             postData(url, data)
+              .then(response => { 
+                console.log(response);
+                const output2 = response.output2;
+                if(output2.tot_ord_qty == 0){
+                    let template = Handlebars.compile(document.getElementById('ccld-error-template').innerHTML); 
+                    let html = template({data : response});
+                    $('#ccld-result-area').html(html)
+                }else{
+                    let template = Handlebars.compile(document.getElementById('ccld-table-template').innerHTML); 
+                    let html = template({data : response});
+                    $('#ccld-result-area').html(html)
+                }
+              })
+              .catch(error=> { 
+                debugger;
+                console.error(error); 
+
+              });
+        })
+
+        initalize();
     });
     </script>	    
 {% endraw %}

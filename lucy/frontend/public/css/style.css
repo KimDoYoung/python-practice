@@ -1,0 +1,7 @@
+/* 매수/매도 div의 바탕색 */
+.bg-buy {
+    background-color: #eb9999;
+}
+.bg-sell {
+    background-color: rgb(83, 146, 241);
+}

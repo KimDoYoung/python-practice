@@ -2,10 +2,14 @@ from fastapi import Request, HTTPException
 from fastapi.responses import RedirectResponse
 from backend.app.core.security import verify_token
 from backend.app.core.config import config
+from backend.app.core.logger import get_logger
+
+logger = get_logger(__name__)
 
 STATIC_PATHS = ["/public", "/favicon.ico"]
 async def jwt_auth_middleware(request: Request, call_next):
-    
+
+    logger.debug(f">>> request.url.path : {request.url.path}")    
     # if request.url.path in ["/login", "/api/v1/users/login", "/calendar", "/main"] or any(request.url.path.startswith(path) for path in STATIC_PATHS):    
     if request.url.path in ["/login"] or any(request.url.path.startswith(path) for path in STATIC_PATHS):    
     # if request.url.path in ["/login", "/api/v1/users/login","/calendar","/main"]:

@@ -45,6 +45,7 @@ async def custom_404_exception_handler(request: Request, exc: StarletteHTTPExcep
 
 async def create_error_response(request: Request, exc: Exception, errors=None) -> Union[JSONResponse, HTMLResponse]:
     """에러 응답 생성 함수"""
+    logger.error(f"XXXX--> Unhandled exception: {exc}")
     context = {
         "request": request.url.path,
         "status_code": getattr(exc, "status_code", 500),

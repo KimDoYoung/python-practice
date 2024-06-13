@@ -11,6 +11,7 @@ class OrderCashDto(BaseModel):
     buy_sell_gb: Literal['매수', '매도']
     stk_code: str
     qty: int
+    cost: int = 0 # cost가 0이면 시장가로 주문
 
     @field_validator('stk_code')
     def stk_code_must_be_six_digits(cls, value):
@@ -35,9 +36,29 @@ class OrderCashItem(KisBaseModel):
     ODNO: str
     ORD_TMD: str
 
+# 주문 응답
 class KisOrderCash(KisBaseModel):
     '''order_cash 조회 결과'''
     rt_cd: str
     msg_cd: str
     msg1: str
     output: OrderCashItem
+
+# 주문취소 응답
+class OrderRvsecnclItem(BaseModel):
+    KRX_FWDG_ORD_ORGNO: str # 한국거래소전송주문조직번호 주문시 한국투자증권 시스템에서 지정된 영업점코드
+    ODNO: str # 주문번호 정정 주문시 한국투자증권 시스템에서 채번된 주문번호
+    ORD_TMD: str # 주문시각 주문시각(시분초HHMMSS)
+
+# 주문취소 응답
+class OrderRvsecnclDto(KisBaseModel):
+    rt_cd: str # 성공 실패 여부 0 : 성공 0 이외의 값 : 실패
+    msg_cd: str # 응답코드 응답코드
+    msg1: str # 응답메세지 응답메세지
+    output: List[OrderRvsecnclItem]
+
+class OrderCancelRequest(BaseModel):
+    ord_gno_brno:str # 주문지점번호 주문시 한국투자증권 시스템에서 지정된 영업점코드
+    orgn_odno:str # 원주문번호 정정 주문시 한국투자증권 시스템에서 채번된 주문번호
+    ord_dvsn_cd:str # 주문구분코드 1 : 정상주문 2 : 정정주문 3 : 취소주문
+    ord_unpr:str # 주문단가 주문단가
