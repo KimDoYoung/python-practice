@@ -1,0 +1,103 @@
+    /* 사용자 정의 CSS 스타일 */
+    .calendar-border-day {
+        border: 1px solid #dee2e6; /* 테두리 스타일 및 색상 지정 */
+        padding: 10px; /* 선택적으로 패딩 추가 */
+        height : 150px;
+    }
+    .calendar-border-week {
+        border: 1px solid #dee2e6; /* 테두리 스타일 및 색상 지정 */
+        padding: 10px; /* 선택적으로 패딩 추가 */
+    }    
+    .bg-today {
+        background-color: #ffffe0;
+    }
+    .circle {
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        line-height: 24px;
+        text-align: center;
+        border-radius: 50%;
+        border: 2px solid red;
+    }
+
+    .event {
+        font-size: 0.8em;
+        color: black;
+        background-color: #f5c592;
+        padding: 2px;
+        border-radius: 5px;
+        margin-bottom: 1px;
+    }
+    .event-nap, .event-whan {
+        font-size: 0.8em;
+        color: black;
+        background-color: #eae6e3;
+        padding: 2px;
+        border-radius: 5px;
+        margin-bottom: 1px;
+    }
+    .event-sang {
+        font-size: 0.8em;
+        color: black;
+        background-color: #f2b1b1;
+        padding: 2px;
+        border-radius: 5px;
+        margin-bottom: 1px;
+    }
+
+    .event-cheong {
+        font-size: 0.8em;
+        color: black;
+        background-color: #9bd7ec;
+        padding: 2px;
+        border-radius: 5px;
+        margin-bottom: 1px;
+    }
+
+    .day-data1 {
+        margin-top: 5px;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }   
+  
+    .border-icon {
+        border: 1px solid #007bff; /* 보더 색상 */
+        padding: 8px 12px; /* 보더 주변의 여백을 조절할 수 있습니다 */
+        border-radius: 5px; /* 보더의 모서리를 둥글게 만들기 위해 사용 */
+    }
+
+    .not-this-month {
+        color: rgba(128, 128, 128, 0.5); /* 흐릿한 회색 (rgba 사용) */
+        font-style: italic; /* 기울기 */
+    }
+
+    .not-this-month-holiday {
+        color: rgba(220, 53, 69, 0.5); /* #dc3545 색상에 투명도 0.5 */
+        font-style: italic; /* 기울기 */
+    }
+    .not-this-month-saterday {
+        color: rgba(13, 110, 253, 0.5); /* #0d6efd 색상에 투명도 0.5 */
+        font-style: italic; /* 기울기 */
+    }
+
+    .text-holiday {
+        color: #dc3545; /* Bootstrap 5의 text-danger 색상 값 */
+    }
+    .text-saterday {
+        color: #0d6efd; /* Bootstrap 5의 text-primary 색상 값 */
+    }
+
+    .holiday {
+        font-size: 0.8em;
+        color:#dc3545;
+        /* background-color: #f5c592; */
+        padding: 2px;
+        border-radius: 5px;
+        margin-bottom: 1px;
+    }    
+    .ipo_event > a {
+        text-decoration: none;
+        color: black;
+    }

@@ -19,7 +19,7 @@
   </div>
 
 <!-- Offcanvas component -->
-<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasBuySell" aria-labelledby="offcanvasExampleLabel">
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasBuySell" aria-labelledby="offcanvasExampleLabel" >
 <div class="offcanvas-header">
     <h5 class="offcanvas-title" id="offcanvasExampleLabel">매수/매도</h5>
     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -44,7 +44,7 @@
                     <input type="number" class="form-control" name="qty" required min="1">
                 </div>
                 <div class="col">
-                    <label for="cost" class="form-label">지정가</label>
+                    <label for="cost" class="form-label">지정가<small>(0:시장가)</small></label>
                     <input type="number" class="form-control" name="cost" required min="0">
                 </div>
             </div>
@@ -71,7 +71,7 @@
                     <input type="number" class="form-control" name="qty"  min="1" required>
                 </div>
                 <div class="col">
-                    <label for="cost" class="form-label">지정가</label>
+                    <label for="cost" class="form-label">지정가<small>(0:시장가)</small></label>
                     <input type="number" class="form-control" name="cost" min="0" required>
                 </div>
             </div>
@@ -97,10 +97,20 @@
 {% block script %}{% endblock %}
 <script>
     $(document).ready(function() {
-        const offcanvasBuySell = new bootstrap.Offcanvas($('#offcanvasExample').get(0), {
-        backdrop: 'static',
-        keyboard: false
-      });
+        // let canvasElm = document.getElementById('offcanvasBuySell');
+        // const offcanvasBuySell = undefined
+        // if (canvasElm) {
+        //     offcanvasBuySell = new bootstrap.Offcanvas(canvasElm, {
+        //         backdrop: 'static',
+        //         keyboard: false
+        //     });
+        // } else {
+        //         console.error('Offcanvas element not found');
+        // }
+        // const offcanvasBuySell = new bootstrap.Offcanvas(canvasElm, {
+        //     backdrop: 'static',
+        //     keyboard: false
+        // });
         function showBuySell(stk_code, stk_name){
             offcanvasBuySell.show();
         }
@@ -115,9 +125,16 @@
                 }
             });
         });
-        $('#offcanvasExample').on("click", ".btnClearBuySell", function() {
+        $('.btnClearBuySell').on("click", function() {
             let $form = $(this).closest('form')
             $form.find('input').val('');
+        });
+
+        $('#btnTest').on("click", function() {
+            console.log('btnTest clicked');
+            $('#sell-form').find('input[name="qty"]').val('1');
+            $('#sell-form').find('input[name="cost"]').val('0');
+            $('#offcanvasBuySell').addClass('show');
         });
     });
 </script>
