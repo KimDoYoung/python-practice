@@ -434,6 +434,19 @@ function removeCookie(name) {
     document.cookie = name + '=; Max-Age=-99999999;';  
 }
 
+
+/**
+ * fetch API 호출시 server로 부터 받은 response가 에러인 경우 
+ * status와 detail을 저장하는 Error클래스
+ */
+class LucyError extends Error {
+    constructor(status, detail) {
+        super(`status: ${status}, detail: ${detail}`);
+        this.status = status;
+        this.detail = detail;
+    }
+}
+
 async function fetchData(url) {
     const token = localStorage.getItem('lucy_token');
 
@@ -448,7 +461,7 @@ async function fetchData(url) {
 
         if (!response.ok) {
             let errorData = await response.json();
-            throw new Error(`status : ${response.status},  ${errorData.detail}`);
+            throw new LucyError(response.status, errorData.detail);
         }
         const responseData = await response.json();
         return responseData;

@@ -149,7 +149,7 @@ async def work1(db, all_data=False):
     current_time = datetime.now()
     current_time_str = current_time.isoformat()
     await collection_config.update_one(
-        {'key': '38-scrapping-time'},
+        {'key': '38-scrapping-time', 'mode': 'System'},
         {'$set': {'value': current_time_str}},
         upsert=True
     )

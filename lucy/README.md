@@ -60,6 +60,23 @@
 * DB설정값,로그파일
 * config.DB_URL 과 같이 사용
 
+## naming
+
+### model
+
+* Response -> Collection과 같은 명칭을 사용
+* Request 를 붙인다.
+
+```python
+class DbConfigRequest(BaseModel):
+    mode:str
+...
+class DbConfig(Document):
+    ...
+    class Settings:
+            name = "Config" 
+```
+
 ## scheduler
 
 ### 관련 모듈들
@@ -138,4 +155,4 @@ logger.debug(...)
 9. 약정매도
 10. 회사규모, 경쟁률, 장외가격
 11. docker로 말아보기
-12. 
+12.

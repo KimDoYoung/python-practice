@@ -72,8 +72,8 @@
         <td>{{note}}</td>
         <td>
             {{#test "mode == 'User'"}}
-                <button type="button" class="btn btn-primary btnDisplayForm" data-key="{{key}}" data-mode="update">Edit</button>
-                <button type="button" class="btn btn-danger btnDelete" data-key="{{key}}">Delete</button>
+                <button type="button" class="btn btn-sm btn-primary btnDisplayForm" data-key="{{key}}" data-mode="update">Edit</button>
+                <button type="button" class="btn btn-sm btn-danger btnDelete" data-key="{{key}}">Delete</button>
             {{/test}}
         </td>
     </tr>
@@ -100,6 +100,9 @@
                 var html = template({list: data});
 
                 $('#table-area').html(html);
+            }).catch(error => {
+                console.error('upsertConfig 중 에러 발생:', error);
+                showToastError(error);
             });
         }
         async function getConfigFromDb(key) {
@@ -111,7 +114,8 @@
                 $('#value').val(data.value);
                 $('#note').val(data.note);
             }catch (error) {
-                console.error('Error:', error);
+                console.error('upsertConfig 중 에러 발생:', error);
+                showToastError(error);
             }
         }
         async function upsertConfig(configData) {
@@ -129,8 +133,8 @@
                 console.log('응답 데이터:', response);
                 window.location.reload();
             } catch (error) {
-                console.error('addConfig 중 에러 발생:', error);
-                alert('Failed to add configuration. Please try again later.');
+                console.error('upsertConfig 중 에러 발생:', error);
+                showToastError(error);
             }
         }
         async function deleteConfig(key) {

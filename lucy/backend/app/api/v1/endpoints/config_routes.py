@@ -14,7 +14,7 @@ router = APIRouter()
 
 @router.get("/", response_model=List[DbConfig])
 async def get_config_list(config_service :DbConfigService=Depends(get_config_service)) -> List[DbConfig]:
-    ''' Config'''
+    ''' Config 모두 조회'''
     list = await config_service.get_all()
     return list
 
@@ -35,13 +35,13 @@ async def create_1(dbconfig : DbConfigRequest, config_service :DbConfigService=D
 
 @router.put("/{key}",  response_model=DbConfig)
 async def update_1(key:str, dbconfig : DbConfigRequest, config_service :DbConfigService=Depends(get_config_service)) -> DbConfig:
-    ''' Config'''
+    ''' Config document 수정'''
     dbconfig = await config_service.update_1(key, dbconfig.model_dump())
     return dbconfig
 
 @router.delete("/{key}",  response_model=DbConfig)
 async def delete_1(key:str, config_service :DbConfigService=Depends(get_config_service)) -> DbConfig:
-    ''' Config'''
+    ''' Config 삭제'''
     dbconfig = await config_service.delete_1(key)
     if not dbconfig:
         raise HTTPException(status_code=404, detail="Config not found")
