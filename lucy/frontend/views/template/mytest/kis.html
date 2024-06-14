@@ -14,68 +14,6 @@
     <div id="message-area"></div> 
     <div id="inquire-balance-area"></div>
 </section>
-<!-- <section id="buy-sell-cash-section" class="container">
-    <h1>현금 매수-매도</h1>
-    <div class="row">
-        <div class="col bg-buy p-3 me-3">
-            <h2>매수</h2>
-            <form action="" id="buy-form">
-                <div class="row mb-3">
-                    <div class="col">
-                        <label for="pdno" class="form-label">상품번호</label>
-                        <input type="text" class="form-control" name="pdno" required>
-                    </div>
-                    <div class="col">
-                        <label for="pdno" class="form-label">상품명칭</label>
-                        <input type="text" class="form-control" name="pdnm" readonly required>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col">
-                        <label for="qty" class="form-label">수량</label>
-                        <input type="number" class="form-control" name="qty" required min="1">
-                    </div>
-                    <div class="col">
-                        <label for="cost" class="form-label">지정가</label>
-                        <input type="number" class="form-control" name="cost" required min="0">
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary  btnBuyCash">매수</button>
-                <button type="button" class="btn btn-secondary btnClearBuy">초기화</button>
-            </form>                    
-        </div>
-        <div class="col bg-sell p-3">
-                <h2>매도</h2>
-                <form action="" id="sell-form">
-                    <div class="row mb-3">
-                        <div class="col">
-                            <label for="pdno" class="form-label">상품번호</label>
-                            <input type="text" class="form-control" name="pdno" required>
-                        </div>
-                        <div class="col">
-                            <label for="pdno" class="form-label">상품명칭</label>
-                            <input type="text" class="form-control" name="pdnm" readonly required>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col">
-                            <label for="qty" class="form-label">수량</label>
-                            <input type="number" class="form-control" name="qty"  min="1" required>
-                        </div>
-                        <div class="col">
-                            <label for="cost" class="form-label">지정가</label>
-                            <input type="number" class="form-control" name="cost" min="0" required>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-danger btnSellCash">매도</button>
-                    <button type="button" class="btn btn-secondary btnClearSell">초기화</button>
-                </form>                    
-        </div>
-    </div>
-    <div id="buy-sell-message-area"></div>
-    <br><br><br><br><br><br><br><br><br><br><br><br>
-    
-</section> -->
 
 {% raw %} 
 <script id="inquire-balance-table-template" type="text/x-handlebars-template">
@@ -96,7 +34,8 @@
         </thead>
         <tbody>
             {{#each list}}
-            <tr>
+            {{#test "hldg_qty > 0"}}
+            <tr class="align-middle">
                 <td><a href="#" class="btnSetSellBuy" data-stk-code="{{pdno}}" data-stk-name="{{prdt_name}}">{{pdno}}</a></td>
                 <td><a href="#" class="btnStockInfo" data-stk-code="{{pdno}}">{{prdt_name}}</a></td>
                 <td class="text-end">{{displayWon pchs_avg_pric}}</td>
@@ -106,10 +45,11 @@
                 <td class="text-end">{{displayWon evlu_amt}}</td>
                 <td class="text-end">{{displayWon evlu_pfls_amt}}</td>
                 <td class="text-center">
-                    <button class="btn btn-danger btnShowBuyCanvas" data-stk-code="{{pdno}}" data-stk-name="{{prdt_name}}">매수</button>
-                    <button class="btn btn-primary btnShowSellCanvas"  data-stk-code="{{pdno}}" data-stk-name="{{prdt_name}}" data-qty="{{hldg_qty}}">매도</button>
+                    <button class="btn btn-sm btn-danger btnShowBuyCanvas" data-stk-code="{{pdno}}" data-stk-name="{{prdt_name}}">매수</button>
+                    <button class="btn btn-sm btn-primary btnShowSellCanvas"  data-stk-code="{{pdno}}" data-stk-name="{{prdt_name}}" data-qty="{{hldg_qty}}">매도</button>
                 </td>
             </tr>
+            {{/test}}
             {{/each}}
         </tbody>
     </table>

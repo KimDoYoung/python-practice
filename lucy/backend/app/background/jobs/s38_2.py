@@ -7,8 +7,8 @@
 부가설명
     - 스크래핑기법으로는 selenium을 사용함
     - 단독으로 main 함수를 실행할 수 있음
-    - 단독실행시 export PYTHONPATH=/c/Users/deHong/Documents/kdy/python-practice/lucy 
-    - 단독실행시 python -m backend.app.background.jobs.s38_2
+    - 단독실행시> export PYTHONPATH=/c/Users/deHong/Documents/kdy/python-practice/lucy 
+    - 단독실행시> python -m backend.app.background.jobs.s38_2
 작성자: 김도영
 작성일: 2024-05-29
 버전: 1.0

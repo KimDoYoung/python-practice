@@ -55,7 +55,7 @@ class OrderRvsecnclDto(KisBaseModel):
     rt_cd: str # 성공 실패 여부 0 : 성공 0 이외의 값 : 실패
     msg_cd: str # 응답코드 응답코드
     msg1: str # 응답메세지 응답메세지
-    output: List[OrderRvsecnclItem]
+    output: OrderRvsecnclItem
 
 class OrderCancelRequest(BaseModel):
     ord_gno_brno:str # 주문지점번호 주문시 한국투자증권 시스템에서 지정된 영업점코드

@@ -149,15 +149,15 @@
             $form.find('input').val('');
         });
         function order_cash(data){
-        postData('/api/v1/kis/order_cash', data)
-            .then(data => {
-                console.log(data);
-                alert(data.msg1)
-                window.location.href = '/page?id=mytest_kis';
-            }).catch(error => {
-                console.error(error);
-                $('#buy-sell-message-area').html(error)
-            });
+            postData('/api/v1/kis/order-cash', data)
+                .then(data => {
+                    console.log(data);
+                    alert(data.msg1)
+                    window.location.href = '/page?id=mytest_kis';
+                }).catch(error => {
+                    console.error(error);
+                    $('#buy-sell-message-area').html(error)
+                });
         }
 
         //매수 처리
@@ -180,7 +180,7 @@
                 stk_code: stk_code,
                 qty: Number(qty),
                 cost: Number(cost)
-                }
+            }
             order_cash(data);
         });
         //매도

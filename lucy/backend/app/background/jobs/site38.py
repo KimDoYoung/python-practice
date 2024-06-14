@@ -1,3 +1,4 @@
+import asyncio
 from backend.app.background.jobs.f38_2 import  work1
 from backend.app.background.jobs.s38_2 import scrapping_38_fill_ipo_38
 from backend.app.core.mongodb import MongoDb
@@ -61,3 +62,11 @@ async def site38_work():
     logger.info('*******************************************')
     logger.info('site38_work() end')
     logger.info('*******************************************')
+
+async def main():
+    url = config.DB_URL
+    await MongoDb.initialize(url)
+    await site38_work()
+
+if __name__ == "__main__":
+    asyncio.run(main())

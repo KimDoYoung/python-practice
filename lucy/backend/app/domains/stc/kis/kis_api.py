@@ -388,7 +388,7 @@ class KoreaInvestmentApi:
             "tr_id": "TTTC0803U" #[실전투자] TTTC0803U : 주식 정정 취소 주문 [모의투자] VTTC0803U : 주식 정정 취소 주문",                        
         }        
 
-        response = requests.get(url, headers=headers, data=json.dumps(body))
+        response = requests.post(url, headers=headers, data=json.dumps(body))
         logger.debug(f"response : {response.text}")
         if response.status_code != 200:
             raise HTTPException(status_code=response.status_code, detail=f"Error 주식일별주문체결조회 : {response.text}")

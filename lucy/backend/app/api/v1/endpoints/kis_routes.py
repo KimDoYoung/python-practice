@@ -77,7 +77,7 @@ async def info(request:Request, user_service :UserService=Depends(get_user_servi
     return kis_inquire_balance
 
 
-@router.post("/order_cash", response_class=JSONResponse)
+@router.post("/order-cash", response_class=JSONResponse)
 async def order_cash(request:Request, order_cash: OrderCashDto, user_service :UserService=Depends(get_user_service)):
     '''주식매수, 주식매도 주문'''
     current_user = await get_current_user(request)
@@ -109,10 +109,7 @@ async def order_cancel(request:Request, order_cancel: OrderCancelRequest, user_s
     
     kis_api = KoreaInvestmentApi(user)
     cancel_response =   kis_api.order_cancel(order_cancel)
-    if order_cash.buy_sell_gb == "매수":
-        logger.debug(f"주식매수 : {cancel_response}")
-    else:
-        logger.debug(f"주식매도 : {cancel_response}")
+    logger.debug(f"주식매수,매도 취소 : {cancel_response.to_str()}")
     return cancel_response
 
 @router.get("/stock-info/{stk_code}", response_class=JSONResponse)
