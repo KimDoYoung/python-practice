@@ -1,4 +1,18 @@
-# APIRouter 인스턴스 생성
+# config_routes.py
+"""
+모듈 설명: 
+    - Config 관련 API를 정의한다.
+주요 기능:
+    - Config 모두 조회
+    - Config 1개 조회
+    - Config 추가
+    - Config 수정
+    - Config 삭제
+
+작성자: 김도영
+작성일: 14
+버전: 1.0
+"""
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -15,12 +29,14 @@ router = APIRouter()
 @router.get("/", response_model=List[DbConfig])
 async def get_config_list(config_service :DbConfigService=Depends(get_config_service)) -> List[DbConfig]:
     ''' Config 모두 조회'''
+    logger.debug("Config 모두 조회")
     list = await config_service.get_all()
     return list
 
 @router.get("/{key}", response_model=DbConfig)
 async def get_1(key:str, config_service :DbConfigService=Depends(get_config_service)) -> DbConfig:
     ''' Config 1개 조회'''
+    logger.debug("Config 1개 조회 : %s", key)
     dbconfig = await config_service.get_1(key)
     return dbconfig
 
@@ -35,7 +51,7 @@ async def create_1(dbconfig : DbConfigRequest, config_service :DbConfigService=D
 
 @router.put("/{key}",  response_model=DbConfig)
 async def update_1(key:str, dbconfig : DbConfigRequest, config_service :DbConfigService=Depends(get_config_service)) -> DbConfig:
-    ''' Config document 수정'''
+    ''' Config 수정'''
     dbconfig = await config_service.update_1(key, dbconfig.model_dump())
     return dbconfig
 
@@ -44,5 +60,5 @@ async def delete_1(key:str, config_service :DbConfigService=Depends(get_config_s
     ''' Config 삭제'''
     dbconfig = await config_service.delete_1(key)
     if not dbconfig:
-        raise HTTPException(status_code=404, detail="Config not found")
+        raise HTTPException(status_code=404, detail=f"Config key {key} not found")
     return dbconfig
