@@ -14,7 +14,7 @@
     <div id="message-area"></div> 
     <div id="inquire-balance-area"></div>
 </section>
-<section id="buy-sell-cash-section" class="container">
+<!-- <section id="buy-sell-cash-section" class="container">
     <h1>현금 매수-매도</h1>
     <div class="row">
         <div class="col bg-buy p-3 me-3">
@@ -75,7 +75,7 @@
     <div id="buy-sell-message-area"></div>
     <br><br><br><br><br><br><br><br><br><br><br><br>
     
-</section>
+</section> -->
 
 {% raw %} 
 <script id="inquire-balance-table-template" type="text/x-handlebars-template">
@@ -91,6 +91,7 @@
                 <th class="text-end">매입금액</th>
                 <th class="text-end">평가금액</th>
                 <th class="text-end">평가손익율</th>
+                <th class="text-center">동작</th>
             </tr>
         </thead>
         <tbody>
@@ -104,6 +105,10 @@
                 <td class="text-end">{{displayWon pchs_amt}}</td>
                 <td class="text-end">{{displayWon evlu_amt}}</td>
                 <td class="text-end">{{displayWon evlu_pfls_amt}}</td>
+                <td class="text-center">
+                    <button class="btn btn-danger btnShowBuyCanvas" data-stk-code="{{pdno}}" data-stk-name="{{prdt_name}}">매수</button>
+                    <button class="btn btn-primary btnShowSellCanvas"  data-stk-code="{{pdno}}" data-stk-name="{{prdt_name}}" data-qty="{{hldg_qty}}">매도</button>
+                </td>
             </tr>
             {{/each}}
         </tbody>
@@ -117,7 +122,7 @@
 <script>
     function initalize() {
         fetchData('/api/v1/kis')
-          .then(data => { 
+        .then(data => { 
             if(data.rt_cd == "1"){
                 console.log(data); 
                 $('#message-area').html(data.msg1)
@@ -129,20 +134,11 @@
             let html = template({list : output1, output2: output2});
             $('#inquire-balance-area').html(html)
             console.log(data); 
-          })
-          .catch(error=> { console.error(error); });
-    }
-    function order_cash(data){
-        postData('/api/v1/kis/order_cash', data)
-        .then(data => {
-            console.log(data);
-            alert(data.msg1)
-            window.location.href = '/page?id=mytest_kis';
-        }).catch(error => {
-            console.error(error);
-            $('#buy-sell-message-area').html(error)
+        })
+        .catch(error=> { 
+            console.error(error); 
+            $('#message-area').html(error)
         });
-
     }
     $( document ).ready(function() {
         console.log('ready.... ');
@@ -150,7 +146,7 @@
         $('#btnPsearchTitle').on('click', function() {
             window.location.href = '/page?id=mytest_kis-psearch';            
         });
-
+        //계좌정보 조회
         $('#inquire-balance-area').on("click", ".btnStockInfo", function(e) {
             e.preventDefault();
             const stk_code = $(this).data('stk-code');
@@ -158,30 +154,16 @@
             window.location.href = '/page?id=mytest_kis-stock-info';
             
         });
-        
-        //매수 매도 폼 초기화
-        $('#buy-form').on("click", ".btnClearBuy", function(e) {
+
+        $('#inquire-balance-area').on('click', '.btnShowSellCanvas', function(e) {
             e.preventDefault();
-            $('#buy-form input').val('');
-        });
-        $('#sell-form').on("click", ".btnClearSell", function(e) {
-            e.preventDefault();
-            $('#sell-form input').val('');
-        });
-        //매수, 매도 상품번호 설정
-        $('#inquire-balance-area').on("click", ".btnSetSellBuy", function(e) {
-            e.preventDefault();
+            console.log('btnShowSellCanvas click.... ');
             const stk_code = $(this).data('stk-code');
             const stk_name = $(this).data('stk-name');
-            $('#buy-form input[name=pdno]').val(stk_code);
-            $('#sell-form input[name=pdno]').val(stk_code);
-            $('#buy-form input[name=pdnm]').val(stk_name);
-            $('#sell-form input[name=pdnm]').val(stk_name);
-            $('#buy-form input[name=qty]').val(1)
-            $('#sell-form input[name=qty]').val(1)
-            $('#buy-form input[name=cost]').val(0)
-            $('#sell-form input[name=cost]').val(0)
+            const qty = $(this).data('qty');
+            showBuySellCanvas(stk_code, stk_name, "매도", qty, 0);
         });
+        
         //
         $('#btnTesTToken').on('click', function() {
             console.log('btnTesTToken click.... ');
@@ -195,53 +177,7 @@
                 $('#message-area').html(error)
             });
         });
-        //매수
-        $('#buy-form').on('submit', function(e){
-            e.preventDefault();
-            console.log('click 매수.... ');
-            const stk_code = $('#buy-form input[name=pdno]').val();
-            const qty = $('#buy-form input[name=qty]').val();
-            const cost = $('#buy-form input[name=cost]').val();
-            let msg = '';
-            if( cost == 0){
-                msg = '시장가로 매수하시겠습니까?';
-            }else{
-                msg = `지정가 ${cost}로 매수하시겠습니까?`;
-            }
-            if(!confirm(msg)) return;
-            
-            const data = {
-                buy_sell_gb : '매수',
-                stk_code: stk_code,
-                qty: Number(qty),
-                cost: Number(cost)
-                }
-            order_cash(data);
 
-        });
-        //매도
-        $('#sell-form').on('submit', function(e){
-            e.preventDefault();
-            console.log('click 매도.... ');
-            
-            const stk_code = $('#sell-form input[name=pdno]').val();
-            const qty = $('#sell-form input[name=qty]').val();
-            const cost = $('#sell-form input[name=cost]').val();
-            let msg = '';
-            if( cost == 0){
-                msg = '시장가로 매도하시겠습니까?';
-            }else{
-                msg = `지정가 ${cost}로 매도하시겠습니까?`;
-            }        
-            if(!confirm(msg)) return;    
-            const data = {
-                buy_sell_gb : '매도',
-                stk_code: stk_code,
-                qty: Number(qty),
-                cost: Number(cost)
-            }
-            order_cash(data);
-        })
         //주식일별주문체결조회
         $('#btnInquireDailyCcld').on('click', function() {
             console.log('주식일별주문체결조회 click.... ');

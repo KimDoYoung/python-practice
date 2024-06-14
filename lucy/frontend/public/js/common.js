@@ -447,12 +447,13 @@ async function fetchData(url) {
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            let errorData = await response.json();
+            throw new Error(`status : ${response.status},  ${errorData.detail}`);
         }
         const responseData = await response.json();
         return responseData;
     } catch (error) {
-        console.error('에러 발생:', error);
+        // console.error('에러 발생:', error);
         throw error;
     }
 }
@@ -476,7 +477,7 @@ async function postData(url, data) {
         const responseData = await response.json();
         return responseData;
     } catch (error) {
-        console.error('에러 발생:', error);
+        // console.error('에러 발생:', error);
         throw error;
     }
 }
@@ -501,7 +502,7 @@ async function putData(url, data) {
         const responseData = await response.json();
         return responseData;
     } catch (error) {
-        console.error('에러 발생:', error);
+        // console.error('에러 발생:', error);
         throw error;
     }
 }
@@ -525,7 +526,7 @@ async function deleteData(url, data) {
         const responseData = await response.json();
         return responseData;
     } catch (error) {
-        console.error('에러 발생:', error);
+        // console.error('에러 발생:', error);
         throw error;
     }
 }

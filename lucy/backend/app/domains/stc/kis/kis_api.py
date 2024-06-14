@@ -27,7 +27,7 @@ from backend.app.domains.stc.kis.model.kis_psearch_title_model import PsearchTit
 from backend.app.domains.user.user_model import KeyValueData, User
 from backend.app.core.dependency import get_user_service
 from backend.app.domains.user.user_service import UserService
-from backend.app.core.exception.kis_exception import KisAccessTokenExpireException, KisAccessTokenInvalidException
+from backend.app.core.exception.lucy_exception import KisAccessTokenExpireException, KisAccessTokenInvalidException
 logger = get_logger(__name__)
 
 class KoreaInvestmentApi:
@@ -109,9 +109,9 @@ class KoreaInvestmentApi:
     def check_access_token(self, json:dict) -> None:
         ''' 토큰 만료 여부 확인 '''
         if json['rt_cd'] == '1' and json['msg_cd'] == 'EGW00123':
-            raise KisAccessTokenExpireException("KIS Access Token Expired")
+            raise KisAccessTokenExpireException("KIS Access Token Expired(접속토큰이 만료됨)")
         if json['rt_cd'] == '1' and json['msg_cd'] == 'EGW00121':
-            raise KisAccessTokenInvalidException("KIS Access Token Invalid")
+            raise KisAccessTokenInvalidException("KIS Access Token Invalid(접속토큰이 유효하지 않음)")
 
         return None
 
@@ -166,6 +166,7 @@ class KoreaInvestmentApi:
         response = requests.get(url, headers=headers, params=params)
 
         if response.status_code != 200:
+            self.check_access_token(response.json())  
             raise HTTPException(status_code=response.status_code, detail=f"Error fetching balance: {response.text}")
 
         try:

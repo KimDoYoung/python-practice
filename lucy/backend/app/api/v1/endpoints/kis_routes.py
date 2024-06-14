@@ -11,7 +11,7 @@ from backend.app.domains.user.user_service import UserService
 
 from backend.app.core.logger import get_logger
 from backend.app.core.security import get_current_user
-from backend.app.core.exception.kis_exception import KisAccessTokenExpireException, KisAccessTokenInvalidException
+from backend.app.core.exception.lucy_exception import KisAccessTokenExpireException, KisAccessTokenInvalidException
 
 logger = get_logger(__name__)
 
