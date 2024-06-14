@@ -7,7 +7,7 @@
 {% block content %}
 <section id="ipo-list" class="container">
     <h1>IPO List</h1>
-    <p><a href="" target="_blank">커뮤니케이션38</a> Scrapping time  : {{}}</p>
+    <p><a href="" target="_blank">커뮤니케이션38</a> Scrapping time  : <span class="badge bg-primary" id="38-scrapping-time"></span></p>
     <div id="button-area">
         <a href="/page?id=ipo_calendar">Calendar</a>
     </div>
@@ -61,6 +61,7 @@
     $( document ).ready(function() {
         console.log('ipo list.... ');
         async function initialize() {
+
             await fetchData('/api/v1/ipo').then(data => {
                 console.log(data);
                 var source = $('#ipo-table').html();
@@ -85,6 +86,10 @@
                 var html = template({list: newList});
 
                 $('#table-area').html(html);
+            });
+            await fetchData('/api/v1/config/38-scrapping-time').then(data => {
+                console.log(data);
+                $('#38-scrapping-time').text(data);
             });
         }
         initialize();
