@@ -31,6 +31,12 @@ class IpoDays(BaseModel):
     ymd: str
     title: str
 
+class EvalData(BaseModel):
+    확정공모가 : Optional[int] = None
+    매출액 : Optional[float] = None
+    기관경쟁률: Optional[float] = None
+    의무보유확약 : Optional[float] = None
+
 class Ipo(Document):
     stk_name: str
     days: Days
@@ -40,6 +46,8 @@ class Ipo(Document):
     scrap_id: PydanticObjectId
     title: str
     scrap_url : Optional[str] = None
-
+    hp_url : Optional[str] = None #홈페이지 url
+    eval_data: EvalData
+    expect_cost: Optional[int] = None # 예상 공모가
     class Settings:
         collection = "Ipo"

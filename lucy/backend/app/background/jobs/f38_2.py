@@ -4,10 +4,9 @@
 collection ipo_scrap_38 에 쌓여 있는 데이터를 1. 가공하고  2. 필요한 데이터만 Ipo 컬렉션으로 옮긴다.
 
 주요 기능:
-- 컬렉션 Config의 last-fetch-time을 조회하여 마지막 스크랩 시간을 확인
-- last-fetch-time 이후에 스크랩된 데이터를 조회 하여 가공 선별하여 Ipo Collection에 넣는다.
-- 넣는 방법은 upsert 방식으로 처리한다.
-- last-fetch-time을 업데이트 한다.
+- Ipo 컬렉션에 필요한 데이터만 옮기는 작업
+- 시간과 상관없게 함. Ipo 컬렉션은 항상 최신 데이터를 가지고 있어야 한다.
+- Ipo 컬렉션은 과거 데이터를 가지고 있지 않는다.
 
 작성자: 김도영
 작성일: 2024-05-29
@@ -18,7 +17,7 @@ import asyncio
 from pymongo import   UpdateOne
 from datetime import datetime
 from backend.app.core.mongodb import MongoDb
-from backend.app.utils.scrap_util import extract_competition_rates, extract_dates, extract_numbers, to_num, to_won, to_ymd
+from backend.app.utils.scrap_util import extract_competition_rates, extract_dates, extract_gigan_compition_rate, extract_numbers, extract_percentage, to_maechul_oek, to_num, to_won, to_ymd
 from backend.app.core.logger import get_logger 
 from backend.app.core.config import config
 
@@ -67,6 +66,19 @@ def get_offering(offering_info, expected_participation):
     return offering
 
 #TODO 판정정보를 넣어야하지 않을까?
+def calculate_expected_cost(eval_data):
+    # 매출액, 기관경쟁률, 의무보유확약 계산가능하게 해서 공식을 만들자
+    # 공식은 계산식을 config에 설정해서 사용하자
+    return None
+
+def get_eval_data(company_info, offering_info, schedule_info):
+    eval_data = {}
+    eval_data['확정공모가'] = to_won(offering_info['확정공모가'])
+    eval_data['매출액'] =   to_maechul_oek(company_info['매출액'])
+    eval_data['기관경쟁률'] = extract_gigan_compition_rate(schedule_info['기관경쟁률'])
+    eval_data['의무보유확약'] = extract_percentage(schedule_info['의무보유확약'])
+    return eval_data
+
 async def work1(db, all_data=False):
     
     ''' 38사이트에서 스크랩한 원본 collection ipo_scrap에서 ipo 컬렉션으로 옮긴다. 1.필요한것만, 2.format변환 '''
@@ -124,8 +136,13 @@ async def work1(db, all_data=False):
             'offering' : get_offering(offering_info, expected_participation),
             'processed_time': datetime.now(),
             'scrap_id': doc['_id'],  # 원본 문서의 ObjectId 추가
-            'scrap_url' : doc['detail_url']
+            'scrap_url' : doc['detail_url'],
+            'hp_url' : company_info['홈페이지'],
+            'eval_data' : None,
+            'expect_cost' : None
         }
+        processed_entry['eval_data'] = get_eval_data(company_info, offering_info, schedule_info)
+        processed_entry['expect_cost'] = calculate_expected_cost(processed_entry['eval_data'])
         ipo_list.append(processed_entry)
 
     # upsert 작업을 위한 요청 목록 생성

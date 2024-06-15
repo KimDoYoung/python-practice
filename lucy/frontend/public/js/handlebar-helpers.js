@@ -127,6 +127,20 @@
         return year + '-' + month + '-' + day;
     });
 
+    /**
+     * displayYmdAd : 20200101 -> 2020-01-01
+     * 년도가 올해라면 년도를 표시하지 않음
+     */
+    Handlebars.registerHelper('displayYmdAd', function(dateStr) {
+        var year = dateStr.slice(0, 4);
+        var month = dateStr.slice(4, 6);
+        var day = dateStr.slice(6, 8);
+        if(year == new Date().getFullYear()) {
+            return month + '-' + day;
+        } else {
+            return year + '-' + month + '-' + day;
+        }
+    });    
         /**
      * displayYmd : 20200101 -> 2020-01-01
      */

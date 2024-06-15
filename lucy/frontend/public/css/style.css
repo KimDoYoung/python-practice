@@ -5,3 +5,17 @@
 .bg-sell {
     background-color: rgb(83, 146, 241);
 }
+.small-font1{
+    font-size: 0.6em;
+    color :rgb(47, 47, 225)
+}
+.small-font2{
+    font-size: 0.8em;
+    color :black
+}
+
+.card-ipo h6 {
+    font-size: 0.9em;
+    color: #15055c;
+    font-weight: bold;
+}

@@ -183,3 +183,47 @@ def extract_stock_and_limit(s):
         limit = None    
     return stock, limit
 
+def extract_gigan_compition_rate(input_string : str):
+    # 문자열에 .과 :이 모두 있는지 확인
+    if '.' in input_string and ':' in input_string:
+        # 콜론(:)을 기준으로 문자열 분리
+        parts = input_string.split(':')
+        
+        # 첫 번째 부분에서 점(.)이 있는 부분을 찾음
+        number_part = parts[0]
+        number_part = re.sub(r'[^0-9.]', '', number_part)
+        # 숫자 부분을 실수로 변환하여 반환
+        return float(number_part)
+    else:
+        # .과 :이 없으면 None을 반환
+        return None
+
+def extract_percentage(input_string):
+    # 입력 문자열이 비어 있는지 확인
+    if not input_string:
+        return None
+
+    # 문자열에 % 기호가 있는지 확인
+    if '%' in input_string:
+        # % 기호를 제거하고 숫자 부분을 추출
+        number_part = input_string.replace('%', '')
+        
+        try:
+            # 숫자 부분을 실수로 변환하여 반환
+            return float(number_part)
+        except ValueError:
+            # 변환이 실패하면 None 반환
+            return None
+    else:
+        # % 기호가 없으면 None을 반환
+        return None
+
+def to_maechul_oek(s : str):
+    won = to_won(s)
+    if won is None:
+        return None
+    else: 
+        try:
+            return round(won / 100000000 ,2)
+        except:
+            return None

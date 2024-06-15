@@ -88,6 +88,7 @@
     $( document ).ready(function() {
         console.log('config list.... ');
         async function initialize() {
+            //모든 config 정보를 가져와서 테이블에 표시
             await fetchData('/api/v1/config').then(data => {
                 console.log(data);
                 var source = $('#table1-template').html();
@@ -100,6 +101,7 @@
                 console.error('upsertConfig 중 에러 발생:', error);
                 showToastError(error);
             });
+            
         }
         async function getConfigFromDb(key) {
             try{

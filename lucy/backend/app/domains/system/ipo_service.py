@@ -71,8 +71,28 @@ class IpoService:
             
             ipos = await Ipo.find(query).to_list()
             
+
+            def get_nearest_future_date(ipo):
+                date_strings = [
+                    ipo.days.청약일,
+                    ipo.days.납입일,
+                    ipo.days.환불일,
+                    ipo.days.상장일
+                ]
+                
+                dates = []
+                for date_str in date_strings:
+                    # 날짜 문자열에서 숫자만 추출
+                    cleaned_date_str = ''.join(filter(str.isdigit, date_str))
+                    if len(cleaned_date_str) == 8:
+                        date = datetime.strptime(cleaned_date_str, '%Y%m%d')
+                        if date >= datetime.now():
+                            dates.append(date)
+                
+                return min(dates) if dates else datetime.max
+                        
             if sorting:
-                ipos = sorted(ipos, key=lambda x: x.processed_time, reverse=True)
+                ipos = sorted(ipos, key=get_nearest_future_date)
             else:
                 ipos = sorted(ipos, key=lambda x: x.processed_time)
 
