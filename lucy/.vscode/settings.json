@@ -34,5 +34,11 @@
     "css.validate": false ,
     "editor.inlineSuggest.enabled": true,
     "todo-tree.tree.scanMode": "workspace only",
+    "[python]": {
+        "editor.codeActionsOnSave": {
+          "source.organizeImports": "explicit",
+          "source.unusedImports": "explicit",
+        }
+    }
 
 }

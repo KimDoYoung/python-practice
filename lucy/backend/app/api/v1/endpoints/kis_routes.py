@@ -1,12 +1,28 @@
-from datetime import datetime
-from fastapi import APIRouter, Depends, HTTPException, Body, Path, Request
+# kis_routes.py
+"""
+모듈 설명: 
+    -  KIS 한국투자증권 API를 사용하는 API를 정의한다.
+주요 기능:
+    - token : KIS_ACCESS_TOKEN_EXPIRE_EXCECPTION이 발생하면 새로 token을 발급받아서 User DB에 저장한다.
+    - / : 주식잔고조회, 보유주식을 mystock에 등록
+    - /order-cash : 주식매수, 주식매도 주문
+    - /order-cancel : 주식매수, 주식매도 취소
+    - /stock-info/{stk_code} : 주식정보 조회
+    - /psearch/title : 조건식 타이틀 조회
+    - /psearch/result/{seq} : 조건식 결과 조회
+    - /inquire-daily-ccld : 주식일별주문체결조회
+
+작성자: 김도영
+작성일: 2024-06-16
+버전: 1.0
+"""
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
 from backend.app.core.dependency import get_mystock_service, get_user_service
 from backend.app.domains.stc.kis.kis_api import KoreaInvestmentApi
 from backend.app.domains.stc.kis.model.kis_inquire_daily_ccld_model import InquireDailyCcldRequest
 from backend.app.domains.stc.kis.model.kis_order_cash_model import OrderCancelRequest, OrderCashDto
 from backend.app.domains.system.mystock_model import MyStockDto
-from backend.app.domains.user.user_model import User
 from backend.app.domains.user.user_service import UserService
 
 from backend.app.core.logger import get_logger
@@ -18,13 +34,7 @@ logger = get_logger(__name__)
 # APIRouter 인스턴스 생성
 router = APIRouter()
 
-@router.get("/token", response_class=JSONResponse)
-async def get_token_from_kis(request:Request, user_service :UserService=Depends(get_user_service)):
-    '''
-        1. 현재 사용자 DB에 있는 ACCESS_TOKEN으로 현재가를 조회하고  
-        2. KIS_ACCESS_TOKEN_EXPIRE_EXCECPTION이 발생하면 
-        3. 새로 token을 발급받아서 User DB에 저장한다.
-    '''
+async def get_and_validate_user(request: Request, user_service: UserService):
     current_user = await get_current_user(request)
     logger.debug(f"current_user : {current_user}")
     user_id = current_user.get('user_id')
@@ -33,6 +43,17 @@ async def get_token_from_kis(request:Request, user_service :UserService=Depends(
     if not user:
         raise HTTPException(status_code=401, detail="Invalid token-사용자 정보가 없습니다")
     
+    return user
+
+@router.get("/token", response_class=JSONResponse)
+async def get_token_from_kis(request:Request, user_service :UserService=Depends(get_user_service)):
+    '''
+        1. 현재 사용자 DB에 있는 ACCESS_TOKEN으로 현재가를 조회하고  
+        2. KIS_ACCESS_TOKEN_EXPIRE_EXCECPTION이 발생하면 
+        3. 새로 token을 발급받아서 User DB에 저장한다.
+    '''
+    
+    user = await get_and_validate_user(request, user_service)
     kis_api = KoreaInvestmentApi(user)
     
     try:
@@ -53,14 +74,9 @@ async def get_token_from_kis(request:Request, user_service :UserService=Depends(
 @router.get("/", response_class=JSONResponse)
 async def info(request:Request, user_service :UserService=Depends(get_user_service)):
     '''1.주식잔고조회, 2. 보유주식을 mystock에 등록'''
-    current_user = await get_current_user(request)
-    logger.debug(f"current_user : {current_user}")
-    user_id = current_user.get('user_id')
-    user = await user_service.get_1(user_id)
-    
-    if not user:
-        raise HTTPException(status_code=401, detail="Invalid token-사용자 정보가 없습니다")
-    
+
+    user = await get_and_validate_user(request, user_service)
+
     # mystock에 보유로 넣는다.     
     kis_api = KoreaInvestmentApi(user)
     kis_inquire_balance =  kis_api.get_inquire_balance()
@@ -80,14 +96,9 @@ async def info(request:Request, user_service :UserService=Depends(get_user_servi
 @router.post("/order-cash", response_class=JSONResponse)
 async def order_cash(request:Request, order_cash: OrderCashDto, user_service :UserService=Depends(get_user_service)):
     '''주식매수, 주식매도 주문'''
-    current_user = await get_current_user(request)
-    logger.debug(f"current_user : {current_user}")
-    user_id = current_user.get('user_id')
-    user = await user_service.get_1(user_id)
     
-    if not user:
-        raise HTTPException(status_code=401, detail="Invalid token-사용자 정보가 없습니다")
-    
+    user = await get_and_validate_user(request, user_service)
+
     kis_api = KoreaInvestmentApi(user)
     kis_order_cash =   kis_api.order_cash(order_cash)
     if order_cash.buy_sell_gb == "매수":
@@ -99,14 +110,9 @@ async def order_cash(request:Request, order_cash: OrderCashDto, user_service :Us
 @router.post("/order-cancel", response_class=JSONResponse)
 async def order_cancel(request:Request, order_cancel: OrderCancelRequest, user_service :UserService=Depends(get_user_service)):
     '''주식매수, 주식매도 취소'''
-    current_user = await get_current_user(request)
-    logger.debug(f"current_user : {current_user}")
-    user_id = current_user.get('user_id')
-    user = await user_service.get_1(user_id)
     
-    if not user:
-        raise HTTPException(status_code=401, detail="Invalid token-사용자 정보가 없습니다")
-    
+    user = await get_and_validate_user(request, user_service)
+
     kis_api = KoreaInvestmentApi(user)
     cancel_response =   kis_api.order_cancel(order_cancel)
     logger.debug(f"주식매수,매도 취소 : {cancel_response.to_str()}")
@@ -114,28 +120,20 @@ async def order_cancel(request:Request, order_cancel: OrderCancelRequest, user_s
 
 @router.get("/stock-info/{stk_code}", response_class=JSONResponse)
 async def stock_info(request:Request, stk_code:str,  user_service :UserService=Depends(get_user_service)):
-    current_user = await get_current_user(request)
-    logger.debug(f"current_user : {current_user}")
-    user_id = current_user.get('user_id')
-    user = await user_service.get_1(user_id)
-    
-    if not user:
-        raise HTTPException(status_code=401, detail="Invalid token-사용자 정보가 없습니다")
-    
+    '''주식정보 조회'''
+
+    user = await get_and_validate_user(request, user_service)
+
     kis_api = KoreaInvestmentApi(user)
     kis_stock_info = kis_api.search_stock_info(stk_code)
     return kis_stock_info
 
 @router.get("/psearch/title", response_class=JSONResponse)
 async def psearch_title(request:Request, user_service :UserService=Depends(get_user_service)):
-    current_user = await get_current_user(request)
-    logger.debug(f"current_user : {current_user}")
-    user_id = current_user.get('user_id')
-    user = await user_service.get_1(user_id)
+    '''조건식 타이틀 조회'''    
     
-    if not user:
-        raise HTTPException(status_code=401, detail="Invalid token-사용자 정보가 없습니다")
-    
+    user = await get_and_validate_user(request, user_service)
+
     kis_api = KoreaInvestmentApi(user)
     kis_psearch_title = kis_api.psearch_title()
     return kis_psearch_title
@@ -143,14 +141,9 @@ async def psearch_title(request:Request, user_service :UserService=Depends(get_u
 @router.get("/psearch/result/{seq}", response_class=JSONResponse)
 async def psearch_result(request:Request,  seq:str, user_service :UserService=Depends(get_user_service)):
     '''조건식 '''
-    current_user = await get_current_user(request)
-    logger.debug(f"current_user : {current_user}")
-    user_id = current_user.get('user_id')
-    user = await user_service.get_1(user_id)
-    
-    if not user:
-        raise HTTPException(status_code=401, detail="Invalid token-사용자 정보가 없습니다")
-    
+
+    user = await get_and_validate_user(request, user_service)
+
     kis_api = KoreaInvestmentApi(user)
     kis_psearch_result = kis_api.psearch_result(seq)
     return kis_psearch_result
@@ -159,14 +152,9 @@ async def psearch_result(request:Request,  seq:str, user_service :UserService=De
 @router.post("/inquire-daily-ccld", response_class=JSONResponse)
 async def inquire_daily_ccld(request:Request, ccld: InquireDailyCcldRequest, user_service :UserService=Depends(get_user_service)):
     '''조건식 '''
-    current_user = await get_current_user(request)
-    logger.debug(f"current_user : {current_user}")
-    user_id = current_user.get('user_id')
-    user = await user_service.get_1(user_id)
     
-    if not user:
-        raise HTTPException(status_code=401, detail="Invalid token-사용자 정보가 없습니다")
-    
+    user = await get_and_validate_user(request, user_service)
+
     kis_api = KoreaInvestmentApi(user)
     # todayYmd = datetime.today().strftime("%Y%m%d")
     # ccld = InquireDailyCcldRequest(inqr_strt_dt=todayYmd, inqr_end_dt=todayYmd)
