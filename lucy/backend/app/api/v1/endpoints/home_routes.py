@@ -1,5 +1,5 @@
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 
@@ -50,8 +50,10 @@ async def page(request: Request, id: str = Query(..., description="The ID of the
     if not current_user:
         raise HTTPException(status_code=401, detail="Invalid token-현재 사용자 정보가 없습니다")
     stk_code = request.cookies.get("stk_code")
+    today = datetime.now().strftime("%Y-%m-%d %A")
     context = {
         "request": request, 
+        "today" : today,
         "page-id": id, 
         "user_id": current_user["user_id"], 
         "user_name": current_user["user_name"],

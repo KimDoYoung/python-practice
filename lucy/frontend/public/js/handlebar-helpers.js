@@ -141,7 +141,7 @@
             return year + '-' + month + '-' + day;
         }
     });    
-        /**
+    /**
      * displayYmd : 20200101 -> 2020-01-01
      */
     Handlebars.registerHelper('naverUrl', function(stockCode) {

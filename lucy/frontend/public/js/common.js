@@ -1,28 +1,28 @@
 ﻿if (!String.format) {
 	String.prototype.format = function() {
-	    var formatted = this, i = 0;
-	    while (/%s/.test(formatted))
-	    	formatted = formatted.replace("%s", arguments[i++]);
-	    return formatted;
+        var formatted = this, i = 0;
+        while (/%s/.test(formatted))
+            formatted = formatted.replace("%s", arguments[i++]);
+        return formatted;
 	}
 }
 //console.log("%s + %s = %s".format(4, 5, 9));
 if (!String.hashCode) {
 	String.prototype.hashCode = function() {
-	  var hash = 0,
-	    i, chr;
-	  if (this.length === 0) return hash;
-	  for (i = 0; i < this.length; i++) {
-	    chr = this.charCodeAt(i);
-	    hash = ((hash << 5) - hash) + chr;
-	    hash |= 0; // Convert to 32bit integer
-	  }
-	  return hash;
+        var hash = 0,
+        i, chr;
+        if (this.length === 0) return hash;
+            for (i = 0; i < this.length; i++) {
+            chr = this.charCodeAt(i);
+            hash = ((hash << 5) - hash) + chr;
+            hash |= 0; // Convert to 32bit integer
+        }
+        return hash;
 	}
 }
 if (typeof String.prototype.replaceAll != 'function') {
     String.prototype.replaceAll = function(search,replace){
-      return this.replace(new RegExp(search, "g"), replace);
+        return this.replace(new RegExp(search, "g"), replace);
     };
 }
 
@@ -131,9 +131,9 @@ var JuliaUtil = (function(){
         var reChars = [];
 
         for (var i = 0; chars.length > i; i++){
-             if( i != 0 &&( ( i+1 ) % 3) == 1){
+            if( i != 0 &&( ( i+1 ) % 3) == 1){
                 reChars[reChars.length] = ",";
-             }
+            }
             reChars[reChars.length] = chars[i];
         }
 
@@ -145,7 +145,7 @@ var JuliaUtil = (function(){
             settings = {};
         for(var opt in options){
             if(options.hasOwnProperty(opt)){
-             settings[opt] = options[opt];
+                settings[opt] = options[opt];
             }
         }
         for(var opt in defaults){
@@ -167,7 +167,7 @@ var JuliaUtil = (function(){
 					console.log(`status:${status}, response: ${response}, xhr:${xhr}`);
 				},
                 error : (xhr, status, error) => {
-					 console.error('Error fetching template:', error);
+					console.error('Error fetching template:', error);
 				},
                 complete: (xhr, status)=>{
 					console.log(`xhr:${xhr}, status:${status}`);
@@ -233,31 +233,30 @@ var JuliaUtil = (function(){
     }
     var addRemoveStickyAtTable = function(){
 		$('.dropdown').on('show.bs.dropdown',function(){
-	        console.log('drop down show')
-	        $('table thead').removeClass('sticky-top').removeClass('top-0');
-	    });
-	    $('.dropdown').on('hide.bs.dropdown',function(){
-	      console.log('drop down hide')
-	      $('table thead').addClass('sticky-top').addClass('top-0');
-	    });
+            console.log('drop down show')
+            $('table thead').removeClass('sticky-top').removeClass('top-0');
+        });
+        $('.dropdown').on('hide.bs.dropdown',function(){
+            console.log('drop down hide')
+            $('table thead').addClass('sticky-top').addClass('top-0');
+        });
 		$('#frYmd, #toYmd').on('show',function(){
-	        console.log('drop down show')
-	        $('table thead').removeClass('sticky-top').removeClass('top-0');
-	    });
+            console.log('drop down show')
+            $('table thead').removeClass('sticky-top').removeClass('top-0');
+        });
 		$('#frYmd, #toYmd').on('hide',function(){
-	        console.log('drop down show')
-	        $('table thead').addClass('sticky-top').addClass('top-0');
-	    });
-
+            console.log('drop down show')
+            $('table thead').addClass('sticky-top').addClass('top-0');
+        });
 	}  
 	/*
     var copyToClipboard = function(text) {
         try {
             navigator.clipboard.writeText(text);
             //console.log('Content copied to clipboard');
-          } catch (err) {
+        } catch (err) {
             console.error('Failed to copy: ', err);
-          }
+        }
     } 
     */
     var tableToString= (tableId) => {
@@ -265,63 +264,64 @@ var JuliaUtil = (function(){
         if($table == false) return "";
         var s = '';
         var headers = $table.find('thead tr th').each( (idx,th)=>{
-          console.log(th);
-          s += $(th).text() + "\t";
+            console.log(th);
+            s += $(th).text() + "\t";
         });
         if(s) s+= "\n";
         var rows = $table.find('tbody tr').each( (idx,tr) => {
-          $(tr).find('td').each( (idx,td) => {
-			  var $td = $(td);
-			  var colspan = $td.attr('colspan');
-			  if(colspan){
-				for(var i=0; i<colspan;i++){
-					s += "" + "\t";
-				}  
-			  }else{
-              	s += $(td).text().trim() + "\t";
-              }	
-          });
-          s += "\n";
+            $(tr).find('td').each( (idx,td) => {
+                var $td = $(td);
+                var colspan = $td.attr('colspan');
+                if(colspan){
+                    for(var i=0; i<colspan;i++){
+                        s += "" + "\t";
+                    }  
+                }else{
+                    s += $(td).text().trim() + "\t";
+                }	
+            });
+            s += "\n";
         });
         //copyToClipboard(s);
         return s;
-   }  
-   var isValidYmd = (dateStr) => {
-	   var d = (dateStr+"").replace(/\D/g,'');
-	   d = JuliaUtil.displayYmd(d);
-	   return !isNaN(new Date(d));
-   }
-   var navigateTo = function navigateToURL(url) {
-    	window.location.href = url;
-   }
+    }  
+    var isValidYmd = (dateStr) => {
+        var d = (dateStr+"").replace(/\D/g,'');
+        d = JuliaUtil.displayYmd(d);
+        return !isNaN(new Date(d));
+    }
+
+    var navigateTo = function navigateToURL(url) {
+        window.location.href = url;
+    }
     /**
      * javascript object객체에서 key에 해당하는 속성을 제거한다.
      */
-   var removeElement = function (obj,key) {
-    if (obj.hasOwnProperty(key)) {
-        delete obj[key];
-    }
-    return obj;
-   }
-   
-   var objectFromFrom = function($form){
-    const formArray = $form.serializeArray();
-    const formObject = {};
-
-    $.map(formArray, function(item) {
-        if (formObject[item.name]) {
-            if (!Array.isArray(formObject[item.name])) {
-                formObject[item.name] = [formObject[item.name]];
-            }
-            formObject[item.name].push(item.value);
-        } else {
-            formObject[item.name] = item.value;
+    var removeElement = function (obj,key) {
+        if (obj.hasOwnProperty(key)) {
+            delete obj[key];
         }
-    });
+        return obj;
+    }
+    
+    var objectFromFrom = function($form){
+        const formArray = $form.serializeArray();
+        const formObject = {};
 
-    //console.log(formObject);
-    return formObject;
-   }
+        $.map(formArray, function(item) {
+            if (formObject[item.name]) {
+                if (!Array.isArray(formObject[item.name])) {
+                    formObject[item.name] = [formObject[item.name]];
+                }
+                formObject[item.name].push(item.value);
+            } else {
+                formObject[item.name] = item.value;
+            }
+        });
+
+        //console.log(formObject);
+        return formObject;
+    }
 
     return {
         isString : isString,
@@ -368,25 +368,25 @@ const unsecuredCopyToClipboard = (text) => { const textArea = document.createEle
  * Then uses standard clipboard API, otherwise uses fallback
 */
 const copyToClipboard = (content) => {
-  var isShowAlert = true;
-  if (window.isSecureContext && navigator.clipboard) {
+    var isShowAlert = true;
+    if (window.isSecureContext && navigator.clipboard) {
     navigator.clipboard.writeText(content)
-	        .then(() => {
-		                    if(isShowAlert){
-				            	if(bootbox){
-				            		bootbox.alert("Table data has been copied to the clipboard.<br/>You can paste it in Excel");
-				            	}else{
-				            		alert("Table data has been copied to the clipboard.\nYou can paste it in Excel");
-				            	}
-				            }
-		    })
-		    .catch((err) => {
+        .then(() => {
+            if(isShowAlert){
+                if(bootbox){
+                    bootbox.alert("Table data has been copied to the clipboard.<br/>You can paste it in Excel");
+                }else{
+                    alert("Table data has been copied to the clipboard.\nYou can paste it in Excel");
+                }
+            }
+		})
+		.catch((err) => {
 		        //alert("something went wrong");
-		        console.error('Failed to copy: ', err);
-		    });	    
-  } else {
-    unsecuredCopyToClipboard(content);
-  }
+            console.error('Failed to copy: ', err);
+        });	    
+    } else {
+        unsecuredCopyToClipboard(content);
+    }
 };
 function triggerExportTable(){
 	//excel client
@@ -399,11 +399,11 @@ function triggerExportTable(){
 	XLSX.writeFile(workbook, excelName +'.xlsx'); 			
 	});
 	$('#btnTableExportToClipboard').on('click', ()=>{
-		  var isShowAlert = true;
-		  var tableName = $('#btnTableExportToClipboard').data('table-id');
-		  var s = JuliaUtil.tableToString(tableName);
-		  copyToClipboard(s);
-		  //unsecuredCopyToClipboard(s);
+        var isShowAlert = true;
+        var tableName = $('#btnTableExportToClipboard').data('table-id');
+        var s = JuliaUtil.tableToString(tableName);
+        copyToClipboard(s);
+       //unsecuredCopyToClipboard(s);
 	});	
 }
 //----------------------------------------
@@ -466,7 +466,7 @@ async function fetchData(url) {
         const responseData = await response.json();
         return responseData;
     } catch (error) {
-        // console.error('에러 발생:', error);
+        console.error('에러 발생:', error);
         throw error;
     }
 }
@@ -485,12 +485,13 @@ async function postData(url, data) {
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            let errorData = await response.json();
+            throw new LucyError(response.status, errorData.detail);
         }
         const responseData = await response.json();
         return responseData;
     } catch (error) {
-        // console.error('에러 발생:', error);
+        console.error('에러 발생:', error);
         throw error;
     }
 }
@@ -510,12 +511,13 @@ async function putData(url, data) {
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            let errorData = await response.json();
+            throw new LucyError(response.status, errorData.detail);
         }
         const responseData = await response.json();
         return responseData;
     } catch (error) {
-        // console.error('에러 발생:', error);
+        console.error('에러 발생:', error);
         throw error;
     }
 }
@@ -534,12 +536,13 @@ async function deleteData(url, data) {
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            let errorData = await response.json();
+            throw new LucyError(response.status, errorData.detail);
         }
         const responseData = await response.json();
         return responseData;
     } catch (error) {
-        // console.error('에러 발생:', error);
+        console.error('에러 발생:', error);
         throw error;
     }
 }
