@@ -25,7 +25,10 @@
             </ul>
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="/page?id=user_form" data-user-id="{{user_id}}" id="username">{{today}} {{user_name}}</a>
+                    <span class="nav-link text-primary">{{today}} </span>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/page?id=user_form" data-user-id="{{user_id}}" id="username">{{user_name}}</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#" id="logout"  data-user-id="{{user_id}}">

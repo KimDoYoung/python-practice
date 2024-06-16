@@ -441,28 +441,42 @@ function removeCookie(name) {
  */
 class LucyError extends Error {
     constructor(status, detail) {
-        super(`status: ${status}, detail: ${detail}`);
+        super(detail);
         this.status = status;
-        this.detail = detail;
     }
 }
 
-async function fetchData(url) {
+/**
+ * 공통 fetch 함수
+ * 
+ * @param {string} url - 요청할 URL
+ * @param {string} method - HTTP 메서드 ('GET', 'POST', 'PUT', 'DELETE')
+ * @param {Object} [data] - 요청에 포함할 데이터 (옵션)
+ * @returns {Promise<Object>} - 응답 데이터
+ */
+async function callLucyApi(url, method, data = null) {
     const token = localStorage.getItem('lucy_token');
 
     try {
-        const response = await fetch(url, {
-            method: 'GET',
+        const options = {
+            method,
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + token
             }
-        });
+        };
+
+        if (data) {
+            options.body = JSON.stringify(data);
+        }
+
+        const response = await fetch(url, options);
 
         if (!response.ok) {
-            let errorData = await response.json();
+            const errorData = await response.json();
             throw new LucyError(response.status, errorData.detail);
         }
+
         const responseData = await response.json();
         return responseData;
     } catch (error) {
@@ -471,78 +485,45 @@ async function fetchData(url) {
     }
 }
 
+/**
+ * GET 요청 함수
+ * 
+ * @param {string} url - 요청할 URL
+ * @returns {Promise<Object>} - 응답 데이터
+ */
+async function fetchData(url) {
+    return callLucyApi(url, 'GET');
+}
+
+/**
+ * POST 요청 함수
+ * 
+ * @param {string} url - 요청할 URL
+ * @param {Object} data - 요청에 포함할 데이터
+ * @returns {Promise<Object>} - 응답 데이터
+ */
 async function postData(url, data) {
-    const token = localStorage.getItem('lucy_token');
-
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            },
-            body: JSON.stringify(data)
-        });
-
-        if (!response.ok) {
-            let errorData = await response.json();
-            throw new LucyError(response.status, errorData.detail);
-        }
-        const responseData = await response.json();
-        return responseData;
-    } catch (error) {
-        console.error('에러 발생:', error);
-        throw error;
-    }
+    return callLucyApi(url, 'POST', data);
 }
 
-
+/**
+ * PUT 요청 함수
+ * 
+ * @param {string} url - 요청할 URL
+ * @param {Object} data - 요청에 포함할 데이터
+ * @returns {Promise<Object>} - 응답 데이터
+ */
 async function putData(url, data) {
-    const token = localStorage.getItem('lucy_token');
-
-    try {
-        const response = await fetch(url, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            },
-            body: JSON.stringify(data)
-        });
-
-        if (!response.ok) {
-            let errorData = await response.json();
-            throw new LucyError(response.status, errorData.detail);
-        }
-        const responseData = await response.json();
-        return responseData;
-    } catch (error) {
-        console.error('에러 발생:', error);
-        throw error;
-    }
+    return callLucyApi(url, 'PUT', data);
 }
 
+/**
+ * DELETE 요청 함수
+ * 
+ * @param {string} url - 요청할 URL
+ * @param {Object} data - 요청에 포함할 데이터
+ * @returns {Promise<Object>} - 응답 데이터
+ */
 async function deleteData(url, data) {
-    const token = localStorage.getItem('lucy_token');
-
-    try {
-        const response = await fetch(url, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            },
-            body: JSON.stringify(data)
-        });
-
-        if (!response.ok) {
-            let errorData = await response.json();
-            throw new LucyError(response.status, errorData.detail);
-        }
-        const responseData = await response.json();
-        return responseData;
-    } catch (error) {
-        console.error('에러 발생:', error);
-        throw error;
-    }
+    return callLucyApi(url, 'DELETE', data);
 }
