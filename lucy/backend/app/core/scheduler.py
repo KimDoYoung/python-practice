@@ -1,13 +1,11 @@
 # scheduler.py
-import asyncio
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.date import DateTrigger
 from typing import Any, Callable, Dict, List
-from beanie.odm.operators.update.general import Set
-from backend.app.core.mongodb import MongoDb
-from backend.app.domains.system.scheduler_job_model import JobRequest, SchedulerJob
+
+import pytz
 from backend.app.core.logger import get_logger
 
 logger = get_logger(__name__)
@@ -19,7 +17,7 @@ class Scheduler:
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super(Scheduler, cls).__new__(cls)
-            cls._instance.scheduler = BackgroundScheduler()
+            cls._instance.scheduler = BackgroundScheduler(timezone=pytz.timezone("Asia/Seoul"))
             
         return cls._instance
 
@@ -39,10 +37,10 @@ class Scheduler:
         except Exception as e:
             return {"error": str(e)}
 
-    def add_cron_job(self, func: Callable, cron: str, job_id: str, job_type:str, args: tuple = ()) -> None:
+    def add_cron_job(self, func: Callable, cron: str, job_id: str, job_type:str, args: tuple = (),  max_instances: int = 1) -> None:
         try:
             logger.debug('add_cron_job 함수 실행:' + job_id)
-            job = self.scheduler.add_job(func, CronTrigger.from_crontab(cron), id=job_id, args=args)
+            job = self.scheduler.add_job(func, CronTrigger.from_crontab(cron), id=job_id, args=args, max_instances=max_instances)
             logger.debug('add_cron_job 함수 실행 완료:' + job_id)
         except Exception as e:
             logger.error(f'Error adding job {job_id}: {e}', exc_info=True)

@@ -65,7 +65,7 @@ async def startup_event():
     scheduler = Scheduler.get_instance()   
     scheduler.start()
     scheduler_service = SchedulerJobService(scheduler=scheduler)
-    # await scheduler_service.register_system_jobs()
+    await scheduler_service.register_system_jobs()
     # asyncio
     
     

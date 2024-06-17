@@ -65,12 +65,25 @@ class SchedulerJobService:
         else:
             return False
     
-    def run_async_job(self, async_func, *args):
-        loop = asyncio.get_event_loop()
-        if loop.is_running():
-            loop.create_task(async_func(*args))
-        else:
-            loop.run_until_complete(async_func(*args))
+    # def run_async_job(self, async_func, *args):
+    #     loop = asyncio.get_event_loop()
+    #     if loop.is_running():
+    #         loop.create_task(async_func(*args))
+    #     else:
+    #         loop.run_until_complete(async_func(*args))
+    async def run_async_task(self, coro):
+        return await coro
+    
+    def run_async_job(self, job_func, *args, **kwargs):
+        try:
+            loop = asyncio.get_event_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            loop = asyncio.get_event_loop()
+
+        task = loop.create_task(self.run_async_task(job_func(*args, **kwargs)))
+        loop.run_until_complete(task)
 
     async def register_system_jobs(self):
         ''' 
@@ -86,14 +99,15 @@ class SchedulerJobService:
             await test_Job.insert()
         #2. db에서 모두 읽어서 그것들을  스케줄러에 등록
         logger.info("2. DB에서 모두 읽어서 등록")
-        test1 = job_mapping['test_task']
-        self.scheduler.add_cron_job(func=test1, cron="* * * * *", job_id="test_job", job_type="cron", args=["Hello, World!"])
-        site38_work = job_mapping['site38_work']
-        self.scheduler.add_cron_job(func=self.run_async_job, cron="53 16 * * 1-5", job_id="site38_work_job", job_type="cron", args=(site38_work,))
-        simple_async_test = job_mapping['simple_async_test']
-        self.add_cron_job(func=self.run_async_job, cron="*/1 * * * *", job_id="simple_test_job", job_type="cron", args=(simple_async_test, "Test Argument"))
+        # test1 = job_mapping['test_task']
+        # self.scheduler.add_cron_job(func=test1, cron="*/1 * * * *", job_id="test_job", job_type="cron", args=["Hello, World!"], max_instances=2)
+        
+        # simple_async_test = job_mapping['simple_async_test']
+        # self.scheduler.add_cron_job(func=self.run_async_job, cron="46 22 * * * ", job_id="simple_test_job", job_type="cron", args=(simple_async_test, "Async 테스트...."), max_instances=2)
 
-        #self.scheduler.add_cron_job(run_async_job, 'cron', day_of_week='mon-fri', hour=16, minute=25, args=[site38_work])
-        #self.scheduler.add_job(run_async_job, 'cron', day_of_week='mon-fri', hour=16, minute=30, args=[site38_work], id="site38_work_job")
+        site38_work = job_mapping['site38_work']
+        await site38_work("We are the world")
+        self.scheduler.get_instance().add_cron_job(func=self.run_async_job, cron="28 23 * * *", job_id="site38_work_job", job_type="cron", args=(site38_work,"왜 안되는겨?"), max_instances=2)
+        
 
         return {"message": "System jobs registered successfully"}

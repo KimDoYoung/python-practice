@@ -7,7 +7,13 @@ from backend.app.core.logger import get_logger
 
 logger = get_logger(__name__)
 
-async def site38_work():
+async def site38_work1(arg):
+    logger.info(f"site38_work 대신임: {arg}")
+    print(f"simple_async_test pring...: {arg}")
+    await asyncio.sleep(1)
+    logger.info("site38_work 대신 completed")
+
+async def site38_work(title):
     '''
     1. delete collection 'ipo_scrap_38' in mongodb
     2. call scrapping_38_fill_ipo_38 in s38_2 function
@@ -16,7 +22,7 @@ async def site38_work():
     '''
     # 1. delete collection 'ipo_scrap_38' in mongodb
     logger.info('*******************************************')
-    logger.info('site38_work() start')
+    logger.info('site38_work() start' +title)
     logger.info('*******************************************')
 
     client = MongoDb.get_client()
@@ -63,10 +69,15 @@ async def site38_work():
     logger.info('site38_work() end')
     logger.info('*******************************************')
 
-async def main():
-    url = config.DB_URL
-    await MongoDb.initialize(url)
-    await site38_work()
+async def site38_work_main(arg):
+    try:
+        # url = config.DB_URL
+        # await MongoDb.initialize(url)
+        # await site38_work()
+        logger.info(f"site38_work_main: {arg}")
+        await asyncio.sleep(1)
+    except Exception as e:
+        logger.error(f"site38_work failed: {e}")
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(site38_work_main())

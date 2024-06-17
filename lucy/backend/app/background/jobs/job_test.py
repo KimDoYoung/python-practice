@@ -9,6 +9,6 @@ def test1(msg: str):
 
 # 간단한 비동기 테스트 함수 등록
 async def simple_async_test(arg):
-    logger.info(f"simple_async_test is running with argument: {arg}")
+    logger.info(f"테스트 simple_async_test is running with argument: {arg}")
     await asyncio.sleep(1)
     logger.info("simple_async_test completed")
