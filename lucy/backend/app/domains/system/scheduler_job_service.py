@@ -1,11 +1,11 @@
+import asyncio
 from backend.app.core.logger import get_logger
-from motor.motor_asyncio import AsyncIOMotorClient
 
 from backend.app.domains.system.scheduler_job_model import SchedulerJob
-from backend.app.background.jobs.job_test import test1
+#from backend.app.background.jobs.job_test import test1
+from backend.app.background.schedule_mapping import job_mapping
 
 logger = get_logger(__name__)
-
 
 class SchedulerJobService:
     # _instance = None
@@ -65,6 +65,13 @@ class SchedulerJobService:
         else:
             return False
     
+    def run_async_job(self, async_func, *args):
+        loop = asyncio.get_event_loop()
+        if loop.is_running():
+            loop.create_task(async_func(*args))
+        else:
+            loop.run_until_complete(async_func(*args))
+
     async def register_system_jobs(self):
         ''' 
             1. DB에 system jobs 등록 
@@ -79,6 +86,14 @@ class SchedulerJobService:
             await test_Job.insert()
         #2. db에서 모두 읽어서 그것들을  스케줄러에 등록
         logger.info("2. DB에서 모두 읽어서 등록")
+        test1 = job_mapping['test_task']
         self.scheduler.add_cron_job(func=test1, cron="* * * * *", job_id="test_job", job_type="cron", args=["Hello, World!"])
-        
+        site38_work = job_mapping['site38_work']
+        self.scheduler.add_cron_job(func=self.run_async_job, cron="53 16 * * 1-5", job_id="site38_work_job", job_type="cron", args=(site38_work,))
+        simple_async_test = job_mapping['simple_async_test']
+        self.add_cron_job(func=self.run_async_job, cron="*/1 * * * *", job_id="simple_test_job", job_type="cron", args=(simple_async_test, "Test Argument"))
+
+        #self.scheduler.add_cron_job(run_async_job, 'cron', day_of_week='mon-fri', hour=16, minute=25, args=[site38_work])
+        #self.scheduler.add_job(run_async_job, 'cron', day_of_week='mon-fri', hour=16, minute=30, args=[site38_work], id="site38_work_job")
+
         return {"message": "System jobs registered successfully"}

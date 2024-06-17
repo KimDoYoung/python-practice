@@ -6,7 +6,7 @@
 
             <form id="form-mystock-add" action="">
                 <input type="text" name="stk_code" placeholder="종목코드" required>
-                <button type="submit" class="btn btn-primary">Add</button>
+                <button type="submit" id="addStkCode" class="btn btn-primary"><i class="bi bi-plus"></i> 추가</button>
             </form>
             <div id="list-area">
             </div>        
@@ -29,6 +29,7 @@
                 <th>종류</th>
                 <th>종목코드</th>
                 <th>종목명</th>
+                <th>현재가</th>
                 <th>동작</th>
             </tr>
         </thead>
@@ -36,9 +37,13 @@
             {{#each list}}
             <tr>
                 <td>{{this.stk_types}}</td>
-                <td>{{this.stk_code}}</td>
+                <td>{{goNaver this.stk_code}}</td>
                 <td>{{this.stk_name}}</td>
-                <td><button class="btnDelete btn btn-danger" data-id="{{this._id}}">삭제</button></td>
+                <td id="cost-{{this.stk_code}}">-</td>
+                <td>
+                    <button class="btnDelete btn btn-danger" data-id="{{this._id}}" title="관심..삭제"><i class="bi bi-dash"></i></button>
+                    <button class="btnCurrentCost btn btn-success" data-stk-code="{{this.stk_code}}"><img src="public/images/korean-won.svg" alt="아이콘" width="20" height="20"></button></td>
+                </td>
             </tr>
             {{/each}}
         </tbody>
@@ -48,78 +53,90 @@
 {% endblock %}
 {% block script %}
 {% raw %}
-    <script>
-            var ws = new WebSocket("ws://localhost:8000/ws");
-            ws.onmessage = function(event) {
-                var messages = document.getElementById('messages')
-                var message = document.createElement('li')
-                var content = document.createTextNode(event.data)
-                message.appendChild(content)
-                messages.appendChild(message)
-            };
+<script>
+    var ws = new WebSocket("ws://localhost:8000/ws");
+    ws.onmessage = function(event) {
+        var messages = document.getElementById('messages')
+        var message = document.createElement('li')
+        var content = document.createTextNode(event.data)
+        message.appendChild(content)
+        messages.appendChild(message)
+    };
 
-            function sendMessage(event) {
-                var input = document.getElementById("messageText")
-                ws.send(input.value)
-                input.value = ''
-                event.preventDefault()
-            }
+    function sendMessage(event) {
+        var input = document.getElementById("messageText")
+        ws.send(input.value)
+        input.value = ''
+        event.preventDefault()
+    }
 
-        function display_mystocks() {
-            fetch("/api/v1/mystock")
-            .then(response => response.json())
+    function display_mystocks() {
+        fetch("/api/v1/mystock")
+        .then(response => response.json())
+        .then(data => {
+            $("#list-area").empty();
+            var template = Handlebars.compile($("#mystock_list_template").html());
+            $("#list-area").html(template({list: data}));
+        })
+        .catch(error => {
+            console.log(error);
+        });
+    }
+    $(document).ready(function() {
+        //현재가 조회
+        $('#list-area').on('click', '.btnCurrentCost', function(e){
+            e.preventDefault();
+            debugger;
+            const stk_code = $(this).data('stk-code');
+            fetchData("/api/v1/kis/current-cost/" + stk_code)
             .then(data => {
-                $("#list-area").empty();
-                var template = Handlebars.compile($("#mystock_list_template").html());
-                $("#list-area").html(template({list: data}));
-                // data.forEach(function(item) {
-                //     $("#list-area").append("<div>" + item.stk_code + " " + item.stk_name +"</div>");
-                // });
+                console.log(data);
+                const cost = JuliaUtil.displayMoney(data.cost)
+                $('#cost-' + stk_code).text(cost);
             })
             .catch(error => {
+                showToastError(error);
                 console.log(error);
-            });
-        }
-        $(document).ready(function() {
-            $("#form-mystock-add").submit(function() {
-                stk_code = $(this).find("input[name='stk_code']").val();
-                data = {
+            });            
+        });
+        //추가 버튼 클릭
+        $("#form-mystock-add").submit(function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const stk_code = $(this).find("input[name='stk_code']").val();
+                if(stk_code.length < 6) {
+                    alert("종목코드를 정확히 입력해주세요.");
+                    return false;
+                }
+                const data = {
                     "stk_code": stk_code,
                     "stk_types": ["관심"]
                 }
-                fetch("/api/v1/mystock/add", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(data) // Add any data you want to send in the body
-                })
-                .then(response => response.json())
-                .then(data => {
-                    display_mystocks()
-                })
-                .catch(error => {
-                    console.log(error);
-                });
-                return false;
-            });
-            $('#list-area').on('click', '.btnDelete', function(e){
-                e.stopPropagation();
-                var id = $(this).data('id');
-                fetch("/api/v1/mystock/delete/" + id, {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                }).then(response => response.json())
+                postData("/api/v1/mystock/add", data)
                 .then(data => {
                     display_mystocks();
-                }).catch(error => {
-                    console.log(error);
-                });
-            })
-            display_mystocks();
+                })
+
+            return false;
         });
-    </script>
+        // 삭제 버튼 클릭
+        $('#list-area').on('click', '.btnDelete', function(e){
+            e.stopPropagation();
+            var id = $(this).data('id');
+            fetch("/api/v1/mystock/delete/" + id, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }).then(response => response.json())
+            .then(data => {
+                display_mystocks();
+            }).catch(error => {
+                console.log(error);
+            });
+        })
+        display_mystocks();
+    });
+</script>
 {% endraw %}
 {% endblock %}

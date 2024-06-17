@@ -30,6 +30,7 @@ class IpoDays(BaseModel):
     name: str
     ymd: str
     title: str
+    scrap_url: Optional[str] = None
 
 class EvalData(BaseModel):
     확정공모가 : Optional[int] = None

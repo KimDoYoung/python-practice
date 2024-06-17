@@ -4,7 +4,7 @@ from backend.app.core.scheduler import Scheduler
 from backend.app.domains.system.config_service import DbConfigService
 from backend.app.domains.system.scheduler_job_model import JobRequest
 from backend.app.domains.system.scheduler_job_service import SchedulerJobService
-from backend.app.background.schedule_mapping import task_mapping
+from backend.app.background.schedule_mapping import job_mapping
 from backend.app.core.logger import get_logger
 from backend.app.core.dependency import get_config_service, get_scheduler_job_service
 
@@ -40,13 +40,13 @@ async def add_job(job_request: JobRequest, scheduler_job_servce: SchedulerJobSer
 
         scheduler = Scheduler.get_instance()
         if job_request.run_type == "date":
-            func = task_mapping.get(job_request.func_name)
+            func = job_mapping.get(job_request.func_name)
             if func is None:
                 raise HTTPException(status_code=400, detail="Task not found")
             args = tuple(job_request.args)
             scheduler.add_date_job(func=func, cron=job_request.cron, job_id=job_request.job_id, job_type=job_request.job_type, args=args)   
         else:
-            func = task_mapping.get(job_request.func_name)
+            func = job_mapping.get(job_request.func_name)
             if job_request.run_date is None:
                 raise HTTPException(status_code=400, detail="run_date must be provided for date jobs")
             args = tuple(job_request.args)
@@ -72,7 +72,7 @@ async def run(program_id: str, background_tasks: BackgroundTasks, config_service
         테스트로 프로그램을 돌려본다.
         /api/v1/scheduler/run/scrap_judal
     '''
-    process = task_mapping[program_id]
+    process = job_mapping[program_id]
     if process is None:
         raise HTTPException(status_code=400, detail="Task not found")
 

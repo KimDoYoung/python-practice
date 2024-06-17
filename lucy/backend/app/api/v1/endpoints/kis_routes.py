@@ -45,6 +45,31 @@ async def get_and_validate_user(request: Request, user_service: UserService):
     
     return user
 
+@router.get("/current-cost/{stk_cost}", response_class=JSONResponse)
+async def current_cost(request:Request, stk_cost:str, user_service :UserService=Depends(get_user_service)):
+    '''
+        1. 현재 사용자 DB에 있는 ACCESS_TOKEN으로 현재가를 조회하고  
+        2. KIS_ACCESS_TOKEN_EXPIRE_EXCECPTION이 발생하면 
+        3. 새로 token을 발급받아서 User DB에 저장한다.
+    '''
+    
+    user = await get_and_validate_user(request, user_service)
+    kis_api = KoreaInvestmentApi(user)
+    
+    try:
+        cost = kis_api.get_current_price(stk_cost) # 삼성전자
+        logger.debug(f"{stk_cost} 현재가 : {cost}")
+        return {"cost": cost}
+    except KisAccessTokenExpireException as e:
+        logger.warning(f"현재 ACCESS_TOKEN은  만료되었습니다.")
+        new_access_token=await kis_api.set_access_token_from_kis()
+        logger.debug(f"새로운 ACCESS_TOKEN을 발급받음: [{new_access_token}]")
+    except KisAccessTokenInvalidException as e:
+        logger.error(f"현재 ACCESS_TOKEN이 유효하지 않습니다.")
+        new_access_token=await kis_api.set_access_token_from_kis()
+        return {"detail": "기존 Access Token이 유효하지 않아 재발급받음. 이제 Access Token 은 유효함"}        
+
+
 @router.get("/token", response_class=JSONResponse)
 async def get_token_from_kis(request:Request, user_service :UserService=Depends(get_user_service)):
     '''

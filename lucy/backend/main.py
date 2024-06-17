@@ -31,7 +31,7 @@ from backend.app.core.exception_handler import add_exception_handlers
 
 logger = get_logger(__name__)
 
-app = FastAPI(title="Lucy Project - 공모주청약(개인용)")
+app = FastAPI(title="Lucy Project - 단타머신-한입만(개인용)")
 # JWT 인증 미들웨어 등록
 app.add_middleware(JWTAuthMiddleware)
 
@@ -65,7 +65,8 @@ async def startup_event():
     scheduler = Scheduler.get_instance()   
     scheduler.start()
     scheduler_service = SchedulerJobService(scheduler=scheduler)
-    await scheduler_service.register_system_jobs()
+    # await scheduler_service.register_system_jobs()
+    # asyncio
     
     
 async def shutdown_event():

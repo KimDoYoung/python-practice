@@ -334,7 +334,7 @@ var JuliaUtil = (function(){
         //두날짜사이의 일수
         diffDays : diffDays,        
         //금액표시
-        displayComma : displayComma,
+        displayMoney : displayComma,
         //option 확장
         extendsOptions : extendsOptions,
         // 로딩이미지를 보여준다 
