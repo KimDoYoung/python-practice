@@ -165,6 +165,9 @@ async def work1(db, all_data=False):
     # Step 3: config 컬렉션에 last-fetch-time 업데이트
     current_time = datetime.now()
     current_time_str = current_time.isoformat()
+    # 기존 문서 삭제
+    await collection_config.delete_one({'key': '38-scrapping-time', 'mode': 'System'})
+
     await collection_config.update_one(
         {'key': '38-scrapping-time', 'mode': 'System'},
         {'$set': {'value': current_time_str}},

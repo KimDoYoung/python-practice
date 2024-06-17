@@ -69,10 +69,10 @@
                     <li><strong>액면가:</strong> {{displayWon offering.액면가 }}</li>
                     <li><strong>확정공모가:</strong>{{#if offering.확정공모가}} {{displayWon offering.확정공모가 }} {{else}} - {{/if}}</li>
                 </ul>
-                <h6 class="mb-1">주간사</h6>
+                <h6 class="mb-1">주간사-청약한도</h6>
                 <ul>
                     {{#each offering.주간사_리스트 }}
-                    <li>{{ 주간사 }} - {{ displayWon 청약한도 }}<span class="small-font1">(청약한도)</span></li>
+                    <li>{{ 주간사 }} - {{ displayWon 청약한도 }}</li>
                     {{/each}}
                 </ul>
                 <h6 class="mb-1">일정</h6>

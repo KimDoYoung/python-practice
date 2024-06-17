@@ -3,7 +3,6 @@ from beanie import init_beanie
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from apscheduler.schedulers.background import BackgroundScheduler
 
 from backend.app.core.logger import get_logger
 from backend.app.domains.system.config_model import DbConfig
@@ -27,8 +26,7 @@ from backend.app.api.v1.endpoints.mystock_routes import router as mystock_router
 from backend.app.api.v1.endpoints.client_websocket_routes import router as client_websocket_router
 
 from backend.app.core.scheduler import Scheduler
-from backend.app.background.jobs.job_test import test1
-from backend.app.core.exception_handler import add_exception_handlers
+from backend.app.core.exception_handler import add_exception_handlers 
 
 
 logger = get_logger(__name__)

@@ -2,11 +2,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 from beanie import PydanticObjectId
 from motor.motor_asyncio import AsyncIOMotorClient
-from pydantic import ValidationError
-from backend.app.domains.system.config_model import DbConfig
-import logging
 
-from backend.app.domains.system.eventdays_model import EventDays
 from backend.app.domains.system.ipo_model import Ipo
 
 from backend.app.core.logger import get_logger
@@ -56,50 +52,47 @@ class IpoService:
 
     async def get_all(self, onlyFuture:bool=False, sorting:bool= True) -> List[Ipo]:
         ''' onlyFuture가 True이면 현재 날짜 이후의 데이터만 가져온다. sorting이 True이면 processed_time을 기준으로 내림차순으로 정렬한다.'''
-        try:
-            current_date = datetime.now().strftime('%Y%m%d')
-            query = {}
-            if onlyFuture:
-                query = {
-                    "$or": [
-                        {"days.청약일": {"$gte": current_date}},
-                        {"days.납입일": {"$gte": current_date}},
-                        {"days.환불일": {"$gte": current_date}},
-                        {"days.상장일": {"$gte": current_date}}
-                    ]
-                }
-            
-            ipos = await Ipo.find(query).to_list()
-            
-
-            def get_nearest_future_date(ipo):
-                date_strings = [
-                    ipo.days.청약일,
-                    ipo.days.납입일,
-                    ipo.days.환불일,
-                    ipo.days.상장일
+        current_date = datetime.now().strftime('%Y%m%d')
+        query = {}
+        if onlyFuture:
+            query = {
+                "$or": [
+                    {"days.청약일": {"$gte": current_date}},
+                    {"days.납입일": {"$gte": current_date}},
+                    {"days.환불일": {"$gte": current_date}},
+                    {"days.상장일": {"$gte": current_date}}
                 ]
-                
-                dates = []
-                for date_str in date_strings:
-                    # 날짜 문자열에서 숫자만 추출
-                    cleaned_date_str = ''.join(filter(str.isdigit, date_str))
-                    if len(cleaned_date_str) == 8:
-                        date = datetime.strptime(cleaned_date_str, '%Y%m%d')
-                        if date >= datetime.now():
-                            dates.append(date)
-                
-                return min(dates) if dates else datetime.max
-                        
-            if sorting:
-                ipos = sorted(ipos, key=get_nearest_future_date)
-            else:
-                ipos = sorted(ipos, key=lambda x: x.processed_time)
+            }
+        
+        ipos = await Ipo.find(query).to_list()
+        
 
-            return ipos
-        except Exception as e:
-            print(f"An error occurred: {e}")
-            return []
+        def get_nearest_future_date(ipo):
+            date_strings = [
+                ipo.days.청약일,
+                ipo.days.납입일,
+                ipo.days.환불일,
+                ipo.days.상장일
+            ]
+            
+            dates = []
+            for date_str in date_strings:
+                # 날짜 문자열에서 숫자만 추출
+                cleaned_date_str = ''.join(filter(str.isdigit, date_str))
+                if len(cleaned_date_str) == 8:
+                    date = datetime.strptime(cleaned_date_str, '%Y%m%d')
+                    if date >= datetime.now():
+                        dates.append(date)
+            
+            return min(dates) if dates else datetime.max
+                    
+        if sorting:
+            ipos = sorted(ipos, key=get_nearest_future_date)
+        else:
+            ipos = sorted(ipos, key=lambda x: x.processed_time)
+
+        return ipos
+
     
     async def update_by_id(self, id: PydanticObjectId, data: Dict[str, Any]) -> Optional[Ipo]:
         ipo = await Ipo.get(id)

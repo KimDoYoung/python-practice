@@ -71,15 +71,14 @@
             <tr>
                 <th>상품</th>
                 <th>주문일시</th>
-                <th>매수/매도</th>
                 <th>주문번호</th>
                 <th>주문구분</th>
                 <th>구분</th>
-                <th>주문수량</th>
-                <th>주문단가</th>
-                <th>체결수량</th>
-                <th>잔여수량</th>
-                <th>체결금액</th>
+                <th class="text-end">주문수량</th>
+                <th class="text-end">주문단가</th>
+                <th class="text-end">체결수량</th>
+                <th class="text-end">잔여수량</th>
+                <th class="text-end">체결금액</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -88,22 +87,18 @@
             <tr>
                 <td>{{this.prdt_name}}({{this.pdno}})</td>
                 <td>{{this.ord_dt}} {{this.ord_tmd}}</td>
-                <td>
-                    {{#test "sll_buy_dvsn_cd == '01'"}}
-                        매도
-                    {{/test}}
-                    {{#test "sll_buy_dvsn_cd == '02'"}}
-                        매수
-                    {{/test}}
-                </td>
                 <td>{{this.odno}}</td>
                 <td>{{this.ord_dvsn_name}}</td>
-                <td>{{this.sll_buy_dvsn_cd_name}}</td>
-                <td>{{this.ord_qty}}</td>
-                <td>{{this.ord_unpr}}</td>
-                <td>{{this.tot_ccld_qty}}</td>
-                <td>{{this.rmn_qty}}</td>
-                <td>{{this.tot_ccld_amt}}</td>
+                {{#test "sll_buy_dvsn_cd == '01'"}} <!--매도 -->
+                    <td class="text-primary">{{this.sll_buy_dvsn_cd_name}}</td>
+                {{else}} <!--매수 -->
+                    <td class="text-danger">{{this.sll_buy_dvsn_cd_name}}</td>
+                {{/test}}
+                <td class="text-end">{{displayWon this.ord_qty}}</td>
+                <td class="text-end">{{displayWon this.ord_unpr}}</td>
+                <td class="text-end">{{displayWon this.tot_ccld_qty}}</td>
+                <td class="text-end">{{displayWon this.rmn_qty}}</td>
+                <td class="text-end">{{displayWon this.tot_ccld_amt}}</td>
                 <td>
                     {{#test "rmn_qty > 0"}}
                     <a href="#" 
