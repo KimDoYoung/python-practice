@@ -20,7 +20,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     input_string = update.message.text
     if bool(re.match(pattern, input_string)):
         code = input_string
-        dividend = get_dividend(code)
+        dividend = 0.00# get_dividend(code)
         await update.message.reply_text(f'{code}의 배당율은 {dividend} 입니다.')
     else:
         await update.message.reply_text(update.message.text)
