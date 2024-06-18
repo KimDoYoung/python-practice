@@ -39,6 +39,13 @@
           "source.organizeImports": "explicit",
           "source.unusedImports": "explicit",
         }
-    }
+    },
+    "search.exclude": {
+        "**/.git": true,
+        "**/env": true,
+        "**/data": true,
+        "**/tmp": true,
+        "**/*.md": true,
+    },
 
 }

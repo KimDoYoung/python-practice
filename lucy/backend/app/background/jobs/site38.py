@@ -33,26 +33,26 @@ async def site38_work(title):
     
     # 2. call scrapping_38_fill_ipo_38 in s38_2 function
     logger.info('-----------------------------------------------')
-    logger.info('Calling scrapping_38_fill_ipo_38()')
+    logger.info('커뮤니케이션38 스크래핑작업 시작 Calling scrapping_38_fill_ipo_38()')
     logger.info('-----------------------------------------------')
     result =  scrapping_38_fill_ipo_38()
     logger.info('-----------------------------------------------')
-    logger.info('scrapping_38_fill_ipo_38() returned %s', result)
+    logger.info('커뮤니케이션38 스크래핑작업 종료 scrapping_38_fill_ipo_38() returned %s', result)
     logger.info('-----------------------------------------------')
     if not result:
         collection = db['Config']
         collection.delete_one({'key':'site38_work'})        
         logger.error('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
-        logger.error('scrapping_38_fill_ipo_38 failed')
+        logger.error('scrapping_38_fill_ipo_38 스크래핑작업 실패')
         logger.error('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
         return False
     
     # 3. 성공시 delete 'Ipo' collection in mongodb
-    logger.info('-----------------------------------------------')
-    logger.info('Deleting collection Ipo')
-    logger.info('-----------------------------------------------')
-    collection = db['Ipo']
-    collection.delete_many({})
+    # logger.info('-----------------------------------------------')
+    # logger.info('Deleting collection Ipo')
+    # logger.info('-----------------------------------------------')
+    # collection = db['Ipo']
+    # collection.delete_many({})
 
     # 4. call scrap38_2_ipo in f38_2  (Ipo collection으로 옮기기)
     logger.info('-----------------------------------------------')
@@ -69,15 +69,13 @@ async def site38_work(title):
     logger.info('site38_work() end')
     logger.info('*******************************************')
 
-async def site38_work_main(arg):
+async def main(arg):
     try:
-        # url = config.DB_URL
-        # await MongoDb.initialize(url)
-        # await site38_work()
-        logger.info(f"site38_work_main: {arg}")
-        await asyncio.sleep(1)
+        url = config.DB_URL
+        await MongoDb.initialize(url)
+        await site38_work(arg)
     except Exception as e:
         logger.error(f"site38_work failed: {e}")
 
 if __name__ == "__main__":
-    asyncio.run(site38_work_main())
+    asyncio.run(main('scrapping38'))

@@ -60,6 +60,12 @@ async def startup_event():
     await init_beanie(database=db, document_models=[SchedulerJob])
     await init_beanie(database=db, document_models=[MyStock])
     
+    # 메인 이벤트 루프 실행
+    # try:
+    #     asyncio.get_event_loop().run_forever()
+    # except (KeyboardInterrupt, SystemExit):
+    #     pass
+
     # 스케줄러 시작
     logger.info("스케줄러 시작")
     scheduler = Scheduler.get_instance()   

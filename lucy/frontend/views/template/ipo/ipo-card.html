@@ -1,15 +1,47 @@
 {% extends 'common/base.html' %}
 {% block style %}
 <style>
+            .search-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .clear-button {
+            position: absolute;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #e9ecef;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.2em;
+            cursor: pointer;
+        }   
 </style>
 {% endblock %}
 
 {% block content %}
 <section id="ipo-list" class="container">
     <h1>공모주 목록</h1>
-    <div class="my-2">
-        <a href="https://www.38.co.kr/html/fund/index.htm?o=k" target="_blank">커뮤니케이션38</a> Scrapping time  : <span class="badge bg-success" id="38-scrapping-time"></span>
-        <a href="/page?id=ipo_calendar" title="달력으로 보기" class="mx-2"><i class="bi bi-calendar-week"></i></a>
+    <div class="my-2 row">
+        <div class="row align-items-center">
+            <div class="col-auto">
+                <a href="https://www.38.co.kr/html/fund/index.htm?o=k" target="_blank">커뮤니케이션38</a>
+            </div>
+            <div class="col-auto">
+                Scrapping time: <span class="badge bg-success" id="38-scrapping-time"></span>
+            </div>
+            <div class="col-auto">
+                <a href="/page?id=ipo_calendar" title="달력으로 보기" class="mx-2"><i class="bi bi-calendar-week"></i></a>
+            </div>
+            <div class="col-auto search-container">
+                <input type="text" id="searchInput" class="form-control rounded-pill" placeholder="Search...">
+                <button id="clearButton" class="clear-button" title="DEL - 지우기">&times;</button>
+            </div>
+        </div>
     </div>
     <div id="table-area"></div>
 </section>
@@ -112,6 +144,7 @@
 {% raw %}
 <script src="/public/js/ipo_helper.js"></script>
 <script>
+    let gList = [];
     // ISO문자열을 보기좋게 '2024-06-11T22:47:35.376869' -> '2024-06-11 22:47:35'
     function formatDateString(isoString) {
         // 문자열을 Date 객체로 변환
@@ -128,14 +161,26 @@
         // 원하는 형식으로 문자열을 구성
         return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     }
+    function drawCards(filterKey){
+        let list = gList;
+        if (filterKey) {
+            list = gList.filter(item => {
+                return item.company.includes(filterKey);
+            });
+        }
+        var source = $('#ipo-card').html();
+        var template = Handlebars.compile(source);
+
+        var html = template({list: list});
+
+        $('#table-area').html(html);
+    }
     $( document ).ready(function() {
         console.log('ipo list.... ');
         async function initialize() {
 
             await fetchData('/api/v1/ipo').then(data => {
                 console.log(data);
-                var source = $('#ipo-card').html();
-                var template = Handlebars.compile(source);
 
                 let newList = data.map(item => {
                     const regex = /(.+)-(.+)-(.+)\((.+)\)/;
@@ -152,10 +197,17 @@
                         return item;
                     }
                 });
-                console.log(newList);
-                var html = template({list: newList});
 
-                $('#table-area').html(html);
+                console.log(newList);
+                gList = newList;
+                drawCards();
+                $('#searchInput').focus();
+                // var source = $('#ipo-card').html();
+                // var template = Handlebars.compile(source);
+
+                // var html = template({list: newList});
+
+                // $('#table-area').html(html);
             });
             await fetchData('/api/v1/config/38-scrapping-time').then(data => {
                 console.log(data);
@@ -163,6 +215,21 @@
                 $('#38-scrapping-time').text(scrappingTime);
             });
         }
+        $('#searchInput').on('input', function() {
+            const query = $(this).val().toLowerCase();
+            drawCards(query);
+        });
+        // DEL 키를 캡처하여 입력 필드 내용 삭제
+        $('#searchInput').on('keydown', function(e) {
+            if (e.keyCode === 46) {  // DEL 키
+                $(this).val('');
+                drawCards();
+            }
+        });        
+        $('#clearButton').on('click', function() {
+            $('#searchInput').val('');
+            drawCards();
+        });        
         initialize();
     });
     </script>	

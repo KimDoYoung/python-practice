@@ -27,7 +27,8 @@
             "jinja": true,
             // "justMyCode": false,
             // "console": "integratedTerminal"
-            "console": "externalTerminal"
+            "console": "externalTerminal",
+            //"python": "c:\\Users\\deHong\\Python312\\python"
         }
     ]
 }

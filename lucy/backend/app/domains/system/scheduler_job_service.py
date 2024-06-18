@@ -1,4 +1,5 @@
 import asyncio
+from typing import List
 from backend.app.core.logger import get_logger
 
 from backend.app.domains.system.scheduler_job_model import SchedulerJob
@@ -11,13 +12,14 @@ class SchedulerJobService:
     # _instance = None
     def __init__(self, scheduler):
         self.scheduler = scheduler
+        self.loop = asyncio.get_event_loop()
 
     async def create(self, keyvalue: dict):
         scheduler_job = SchedulerJob(**keyvalue)
         await scheduler_job.create()
         return scheduler_job
 
-    async def get_schedule_list(self) -> list[dict]:
+    async def get_schedule_list(self) -> List[dict]:
         ''' 
             SchedulerJob Collection에서 모든 document를 가져오고 
             sheduler에 등록된 job_id와 running여부와 next_run_time을 추가하여 반환한다.
@@ -35,7 +37,7 @@ class SchedulerJobService:
 
         return job_list    
     
-    async def get_all(self) -> list[SchedulerJob]:
+    async def get_all(self) -> List[SchedulerJob]:
         ''' SchedulerJob Collection에서 모든 document를 가져온다.'''
         try:
             scheduler_jobs = await SchedulerJob.find().to_list()
@@ -71,19 +73,25 @@ class SchedulerJobService:
     #         loop.create_task(async_func(*args))
     #     else:
     #         loop.run_until_complete(async_func(*args))
+    # async def run_async_task(self, coro):
+    #     return await coro
+    
+    # def run_async_job(self, job_func, *args, **kwargs):
+    #     try:
+    #         loop = asyncio.get_event_loop()
+    #     except RuntimeError:
+    #         loop = asyncio.new_event_loop()
+    #         asyncio.set_event_loop(loop)
+    #         loop = asyncio.get_event_loop()
+
+    #     task = loop.create_task(self.run_async_task(job_func(*args, **kwargs)))
+    #     loop.run_until_complete(task)
+
     async def run_async_task(self, coro):
         return await coro
-    
-    def run_async_job(self, job_func, *args, **kwargs):
-        try:
-            loop = asyncio.get_event_loop()
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            loop = asyncio.get_event_loop()
 
-        task = loop.create_task(self.run_async_task(job_func(*args, **kwargs)))
-        loop.run_until_complete(task)
+    def run_async_job(self, coro, *args, **kwargs):
+        asyncio.run_coroutine_threadsafe(self.run_async_task(coro(*args, **kwargs)), self.loop)        
 
     async def register_system_jobs(self):
         ''' 
@@ -106,8 +114,7 @@ class SchedulerJobService:
         # self.scheduler.add_cron_job(func=self.run_async_job, cron="46 22 * * * ", job_id="simple_test_job", job_type="cron", args=(simple_async_test, "Async 테스트...."), max_instances=2)
 
         site38_work = job_mapping['site38_work']
-        await site38_work("We are the world")
-        self.scheduler.get_instance().add_cron_job(func=self.run_async_job, cron="28 23 * * *", job_id="site38_work_job", job_type="cron", args=(site38_work,"왜 안되는겨?"), max_instances=2)
+        self.scheduler.get_instance().add_cron_job(func=self.run_async_job, cron="47 12 * * 1-5", job_id="site38_work_job", job_type="cron", args=(site38_work,"왜 안되는겨?"), max_instances=2)
         
 
         return {"message": "System jobs registered successfully"}

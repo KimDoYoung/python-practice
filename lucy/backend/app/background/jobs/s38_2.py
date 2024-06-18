@@ -569,6 +569,7 @@ async def main():
     await MongoDb.initialize(config.DB_URL)
     delete_ipo_38()   
     scrapping_38_fill_ipo_38(is_test=False)
+    
 if __name__ == "__main__":
     try:
         asyncio.run(main())
