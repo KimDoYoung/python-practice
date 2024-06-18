@@ -40,7 +40,7 @@
           "source.unusedImports": "explicit",
         }
     },
-    "search.exclude": {
+    "search.exclude": { //찾기에서 배제할 폴더들
         "**/.git": true,
         "**/env": true,
         "**/data": true,

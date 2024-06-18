@@ -31,6 +31,13 @@
     "css.validate": false ,
     "editor.inlineSuggest.enabled": true,
     "python.terminal.activateEnvironment": false,
+    "search.exclude": { //찾기에서 배제할 폴더들
+        "**/.git": true,
+        "**/env": true,
+        "**/data": true,
+        "**/tmp": true,
+        "**/*.md": true,
+    },
 
 
 }
