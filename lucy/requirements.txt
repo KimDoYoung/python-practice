@@ -19,3 +19,4 @@ chromedriver-autoinstaller
 selenium
 pandas
 lxml
+python-telegram-bot

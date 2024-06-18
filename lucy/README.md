@@ -109,7 +109,7 @@ class DbConfig(Document):
 
 * 서비스 객체를 router 함수에서 주입시키기 위해서 사용
 
-```
+```text
 functools.lru_cache 데코레이터를 사용할 수 있습니다. 이 데코레이터는 한 번 생성된 객체를 캐시하여 이후 호출 시 캐시된 객체를 반환합니다.
 ```
 
