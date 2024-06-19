@@ -14,13 +14,14 @@
 
 # 전역 변수 설정
 import time
-
+from backend.app.core.logger import get_logger
+logger = get_logger(__name__)
 
 auto_trading_running = False
 auto_trading_thread = None
 
-def job1():
+def auto_trading_job():
     global auto_trading_running
     while auto_trading_running:
-        print("작업 수행 중...")
+        logger.debug("단타 머신 수행 중..." + str(time.time()))
         time.sleep(1)  # 실제 작업을 대체하는 지연

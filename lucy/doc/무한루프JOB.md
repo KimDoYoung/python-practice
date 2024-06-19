@@ -145,3 +145,79 @@ if __name__ == "__main__":
 </html>
 
 ```
+
+## 단타머신
+
+```python
+from fastapi import FastAPI
+import asyncio
+import config
+from backend.app.core.mongodb import MongoDb
+from beanie import init_beanie
+from backend.app.core.logger import get_logger
+from backend.app.models import User, EventDays, Ipo, DbConfig, SchedulerJob, MyStock
+from backend.app.services.scheduler import Scheduler, SchedulerJobService
+from auto_trading_job import auto_trading_job
+
+logger = get_logger(__name__)
+
+app = FastAPI()
+
+auto_trading_task = None
+
+@app.on_event("startup")
+async def startup_event():
+    ''' Lucy application  시작 '''
+    mongodb_url = config.DB_URL 
+    db_name = config.DB_NAME
+    logger.info(f"MongoDB 연결: {mongodb_url} / {db_name}")
+    await MongoDb.initialize(mongodb_url)
+    
+    db = MongoDb.get_client()[db_name]
+    await init_beanie(database=db, document_models=[User, EventDays, Ipo, DbConfig, SchedulerJob, MyStock])
+
+    # 스케줄러 시작
+    logger.info("스케줄러 시작")
+    scheduler = Scheduler.get_instance()   
+    scheduler.start()
+    scheduler_service = SchedulerJobService(scheduler=scheduler)
+    await scheduler_service.register_system_jobs()
+
+    # auto_trading_job 시작 & telegram_bot 시작
+    global auto_trading_task
+    auto_trading_task = asyncio.create_task(auto_trading_job())
+    logger.info("자동매매 시작")
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    ''' Lucy application 종료 '''
+    await MongoDb.close()
+    logger.info("MongoDB 연결 해제")
+    
+    scheduler = Scheduler.get_instance()
+    scheduler.shutdown()
+    logger.info("스케줄러 종료")
+
+    global auto_trading_task
+    if auto_trading_task:
+        auto_trading_task.cancel()
+        try:
+            await auto_trading_task
+        except asyncio.CancelledError:
+            logger.info("자동매매 작업이 취소되었습니다.")
+        logger.info("자동매매 종료")
+```
+
+```python
+import time
+import asyncio
+from backend.app.core.logger import get_logger
+
+logger = get_logger(__name__)
+
+async def auto_trading_job():
+    while True:
+        logger.debug("단타 머신 수행 중..." + str(time.time()))
+        await asyncio.sleep(1)  # 실제 작업을 대체하는 지연
+
+```
