@@ -125,24 +125,44 @@ def to_num(s: str) -> int:
     s1 = s.strip()
     return int(remove_non_numeric_chars(s1))
 
-def to_won(amount_str):
-    ''' 금액 문자열을 정수(금액 원)로 변환 '''
-    # 백만원 단위 처리
-    if '백만원' in amount_str:
-        clean_str = re.sub(r'[^0-9.]', '', amount_str)
-        if clean_str:  # clean_str이 비어있지 않은 경우에만 변환
-            return int(float(clean_str) * 1000000)
-        else:
-            return None  # 유효하지 않은 문자열인 경우 None 반환
+# def to_won(amount_str):
+#     ''' 금액 문자열을 정수(금액 원)로 변환 '''
+#     # 백만원 단위 처리
+#     if '백만원' in amount_str:
+#         clean_str = re.sub(r'[^0-9.-]', '', amount_str)
+#         if clean_str:  # clean_str이 비어있지 않은 경우에만 변환
+#             return int(float(clean_str) * 1000000)
+#         else:
+#             return None  # 유효하지 않은 문자열인 경우 None 반환
     
-    # 숫자와 점(.)을 제외한 모든 문자 제거
-    clean_str = re.sub(r'[^0-9.]', '', amount_str)
-    if clean_str:  # clean_str이 비어있지 않은 경우에만 변환
-        return int(float(clean_str))
+#     # 숫자와 점(.)을 제외한 모든 문자 제거
+#     clean_str = re.sub(r'[^0-9.]', '', amount_str)
+#     if clean_str:  # clean_str이 비어있지 않은 경우에만 변환
+#         return int(float(clean_str))
+#     else:
+#         return None  # 유효하지 않은 문자열인 경우 None 반환
+
+def to_won(value):
+    # '백만원' 단위를 포함하는 경우 처리
+    if '백만원' in value:
+        try:
+            # 숫자만 추출하여 ',' 제거 후 정수로 변환
+            num = int(value.replace('(백만원)', '').replace(',', '').strip())
+            return num * 1000000
+        except ValueError:
+            return None
+    # '원' 단위를 포함하는 경우 처리
+    elif '원' in value:
+        try:
+            return int(value.replace('원', '').replace(',', '').strip())
+        except ValueError:
+            return None
+    # 숫자만 있는 경우 처리
     else:
-        return None  # 유효하지 않은 문자열인 경우 None 반환
-
-
+        try:
+            return int(value.replace(',', '').strip())
+        except ValueError:
+            return None
 
 def extract_competition_rates(s: str):
     '''경쟁률 문자열에서 경쟁률과 비례 경쟁률을 추출'''

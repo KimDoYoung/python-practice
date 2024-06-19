@@ -14,9 +14,11 @@ collection ipo_scrap_38 에 쌓여 있는 데이터를 1. 가공하고  2. 필�
 """
 
 import asyncio
+from typing import Optional
 from pymongo import   UpdateOne
 from datetime import datetime
 from backend.app.core.mongodb import MongoDb
+from backend.app.utils.calc_util import calc
 from backend.app.utils.scrap_util import extract_competition_rates, extract_dates, extract_gigan_compition_rate, extract_numbers, extract_percentage, to_maechul_oek, to_num, to_won, to_ymd
 from backend.app.core.logger import get_logger 
 from backend.app.core.config import config
@@ -66,10 +68,24 @@ def get_offering(offering_info, expected_participation):
     return offering
 
 #TODO 판정정보를 넣어야하지 않을까?
-def calculate_expected_cost(eval_data):
-    # 매출액, 기관경쟁률, 의무보유확약 계산가능하게 해서 공식을 만들자
-    # 공식은 계산식을 config에 설정해서 사용하자
-    return None
+def calculate_expected_cost(eval_data=None, calc_expression=None) -> Optional[int]:
+
+    if all(key in eval_data for key in ['매출액', '확정공모가', '액면가','기관경쟁률','의무보유확약']):
+        pass
+    else:
+        expect_cost = None
+    mae_chul = eval_data['매출액']
+    if mae_chul < 30:
+        mulple_value = 2
+    else:
+        mulple_value =  calc(calc_expression, eval_data)
+    # 구한 배수 * 확정공모가 
+    result_float = mulple_value * eval_data['확정공모가']
+    unit_price = eval_data['액면가']
+    # 예상 공모가는 액면가의 배수로 반올림한다.
+    expect_cost  =round( result_float / unit_price) * unit_price
+    return expect_cost
+
 
 def get_eval_data(company_info, offering_info, schedule_info):
     eval_data = {}
@@ -77,6 +93,8 @@ def get_eval_data(company_info, offering_info, schedule_info):
     eval_data['매출액'] =   to_maechul_oek(company_info['매출액'])
     eval_data['기관경쟁률'] = extract_gigan_compition_rate(schedule_info['기관경쟁률'])
     eval_data['의무보유확약'] = extract_percentage(schedule_info['의무보유확약'])
+    eval_data['순이익'] = to_maechul_oek(company_info['순이익'])
+    eval_data['액면가'] = to_won(offering_info['액면가'])
     return eval_data
 
 async def work1(db, all_data=False):
@@ -90,7 +108,11 @@ async def work1(db, all_data=False):
     collection_scrap = db['ipo_scrap_38']
     collection_ipo = db['Ipo']
     collection_config = db['Config']
-
+    ipo_document = collection_config.find_one({'key': 'ipo_expected_cost_express', 'mode': 'System'})
+    if ipo_document:
+        calc_express = ipo_document['value']
+    else:
+        calc_express = "2"
     # last_fetch_config = collection_config.find_one({'key': 'scap_to_ipo_time'})
     # if last_fetch_config:
     #     last_fetch_time = last_fetch_config['value']
@@ -101,10 +123,10 @@ async def work1(db, all_data=False):
     #     last_fetch_time = datetime(1970, 1, 1)  # 기본값으로 먼 과거의 시간을 설정    
     #     logging.info('all data will be processed.')
 
-    last_fetch_time = datetime(1970, 1, 1)
-    logging.info(f"Last fetch time: {last_fetch_time}") 
+    # last_fetch_time = datetime(1970, 1, 1)
+    # logging.info(f"Last fetch time: {last_fetch_time}") 
 
-    query = {'scrap_time': {'$gt': last_fetch_time}}
+    # query = {'scrap_time': {'$gt': last_fetch_time}}
     documents = collection_scrap.find({})
     document_count = await collection_scrap.count_documents({})
     logging.info("-------------------------------------") 
@@ -115,7 +137,7 @@ async def work1(db, all_data=False):
 
     async for doc in documents:
         name = doc['stk_name']
-        logging.info(f"-------->Processing document for {name}")
+        logging.info(f"--------> Scrapping한 ipo_scrap_38의 회사명 : {name}")
         details = doc['details']
         # 필수 키가 있는지 확인
         required_keys = ['company_info', 'schedule_info', 'offering_info', 'expected_participation']
@@ -142,7 +164,7 @@ async def work1(db, all_data=False):
             'expect_cost' : None
         }
         processed_entry['eval_data'] = get_eval_data(company_info, offering_info, schedule_info)
-        processed_entry['expect_cost'] = calculate_expected_cost(processed_entry['eval_data'])
+        processed_entry['expect_cost'] = calculate_expected_cost(eval_data=processed_entry['eval_data'], calc_expression=calc_express)
         ipo_list.append(processed_entry)
 
     # upsert 작업을 위한 요청 목록 생성

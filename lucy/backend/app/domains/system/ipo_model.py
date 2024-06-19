@@ -37,6 +37,8 @@ class EvalData(BaseModel):
     매출액 : Optional[float] = None
     기관경쟁률: Optional[float] = None
     의무보유확약 : Optional[float] = None
+    순이익 : Optional[float] = None
+    액면가 : Optional[float] = None
 
 class Ipo(Document):
     stk_name: str

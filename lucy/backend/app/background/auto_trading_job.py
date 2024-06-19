@@ -13,6 +13,9 @@
 """
 
 # 전역 변수 설정
+import time
+
+
 auto_trading_running = False
 auto_trading_thread = None
 

@@ -8,6 +8,7 @@ from backend.app.background.schedule_mapping import job_mapping
 
 logger = get_logger(__name__)
 
+#TODO 다듬을 것 DB를 쓸 것인지? 만약 쓰지 않는다면 ... Scheduler instance를 삭제
 class SchedulerJobService:
     # _instance = None
     def __init__(self, scheduler):
@@ -114,7 +115,7 @@ class SchedulerJobService:
         # self.scheduler.add_cron_job(func=self.run_async_job, cron="46 22 * * * ", job_id="simple_test_job", job_type="cron", args=(simple_async_test, "Async 테스트...."), max_instances=2)
 
         site38_work = job_mapping['site38_work']
-        self.scheduler.get_instance().add_cron_job(func=self.run_async_job, cron="47 12 * * 1-5", job_id="site38_work_job", job_type="cron", args=(site38_work,"왜 안되는겨?"), max_instances=2)
+        self.scheduler.get_instance().add_cron_job(func=self.run_async_job, cron="31 09 * * 1-5", job_id="site38_work_job", job_type="cron", args=(site38_work,"왜 안되는겨?"), max_instances=2)
         
 
         return {"message": "System jobs registered successfully"}

@@ -1,5 +1,4 @@
-import pytest
-from backend.app.utils.scrap_util import extract_competition_rates, extract_stock_and_limit, fmt_number_kor, to_num
+from backend.app.utils.scrap_util import extract_competition_rates, extract_stock_and_limit, fmt_number_kor, to_maechul_oek, to_num
 from backend.app.utils.scrap_util import fmt_number_kor, extract_dates
 from backend.app.utils.scrap_util import extract_numbers
 from backend.app.utils.scrap_util import to_won
@@ -46,7 +45,9 @@ def test_to_num():
 
 def test_to_won():
     assert to_won('2,567 (백만원)') == 2567000000
+    assert to_won('-2,567 (백만원)') == -2567000000
     assert to_won('2,000원') == 2000
+    assert to_won('-2,000원') == -2000
     assert to_won('1,162,640,000') == 1162640000
     assert None == to_won('- (백만원)') 
     assert None == to_won('-')
@@ -89,6 +90,9 @@ def test_extract_stock_and_limit():
     assert start == '1,000,000~1,200,000'
     assert end == None
 
+def test_to_maechul_oek():
+    f= to_maechul_oek("-24,342 (백만원)")
+    assert f == -243.42 
     
 
 def test_1():
