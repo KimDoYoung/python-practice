@@ -1,7 +1,7 @@
 {% extends 'common/base.html' %}
 {% block style %}
 <style>
-            .search-container {
+        .search-container {
             position: relative;
             display: flex;
             align-items: center;
@@ -19,6 +19,9 @@
             border-radius: 50%;
             font-size: 1.2em;
             cursor: pointer;
+        }
+        .not-spec-header {
+            background-color: #f4ebc7; /* 원하는 색상으로 변경 */
         }   
 </style>
 {% endblock %}
@@ -88,7 +91,11 @@
     {{#each list}}
     <div class="card-ipo col-lg-3 col-md-4 col-sm-6 mb-4">
         <div class="card mb-4">
+            {{#test "/스팩\d{1,3}/.test(name) == false"}}
+            <div class="card-header not-spec-header">
+            {{else}}
             <div class="card-header">
+            {{/test}}
                 <h5 class="card-title">
                     <strong><a href="{{scrap_url}}" target="_blank">{{name}}</a> </strong> {{anchorHome hp_url}}<br> 
                     <span class="small-font1">{{stock_type}}/{{market_type}} ({{stock_code}})</span> 
@@ -122,13 +129,18 @@
                     <span class="badge bg-danger" title="상장일">{{displayYmdAd days.상장일}}</span>
                     {{/ifFuture}}            
                 <!-- </div> -->
+                {{#test "/스팩\d{1,3}/.test(name) == false"}}
                 <h6 class="mb-1 mt-1">예측</h6>
                 <ul>
                     <li><strong>매출액:</strong> {{eval_data.매출액}}억</li>
                     <li><strong>순이익:</strong> {{eval_data.순이익}}억</li>
                     <li><strong>기관경쟁률:</strong> {{eval_data.기관경쟁률}}</li>
                     <li><strong>의무보유확약:</strong> {{eval_data.의무보유확약}}%</li>
+                    {{#if expect_cost}}
+                    <li><strong>예상체결가:</strong><span style="color:red;font-weight: bolder;"> {{displayWon expect_cost}}</span></li>
+                    {{/if}}
                 </ul>
+                {{/test}}
             </div>
         </div>
     </div>

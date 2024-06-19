@@ -22,6 +22,7 @@ from backend.app.utils.calc_util import calc
 from backend.app.utils.scrap_util import extract_competition_rates, extract_dates, extract_gigan_compition_rate, extract_numbers, extract_percentage, to_maechul_oek, to_num, to_won, to_ymd
 from backend.app.core.logger import get_logger 
 from backend.app.core.config import config
+import sympy as sp
 
 logging = get_logger(__name__)
 
@@ -70,15 +71,20 @@ def get_offering(offering_info, expected_participation):
 #TODO 판정정보를 넣어야하지 않을까?
 def calculate_expected_cost(eval_data=None, calc_expression=None) -> Optional[int]:
 
-    if all(key in eval_data for key in ['매출액', '확정공모가', '액면가','기관경쟁률','의무보유확약']):
-        pass
-    else:
-        expect_cost = None
+    required_keys = ['매출액', '확정공모가', '액면가', '기관경쟁률', '의무보유확약']
+    # eval_data에 필요한 모든 키가 존재하고, 그 값이 None이 아닌지 확인
+    if not eval_data or not all(key in eval_data and eval_data[key] is not None for key in required_keys):
+        return None  # 필요한 모든 키가 존재하지 않거나 값이 None인 경우 None 반환
+
     mae_chul = eval_data['매출액']
     if mae_chul < 30:
         mulple_value = 2
     else:
         mulple_value =  calc(calc_expression, eval_data)
+
+    # sympy 결과를 float로 변환
+    if isinstance(mulple_value, sp.Basic):
+        mulple_value = float(mulple_value)        
     # 구한 배수 * 확정공모가 
     result_float = mulple_value * eval_data['확정공모가']
     unit_price = eval_data['액면가']
@@ -101,14 +107,11 @@ async def work1(db, all_data=False):
     
     ''' 38사이트에서 스크랩한 원본 collection ipo_scrap에서 ipo 컬렉션으로 옮긴다. 1.필요한것만, 2.format변환 '''
     # client = MongoClient('mongodb://root:root@test.kfs.co.kr:27017/')
-    logging.info("-------------------------------------") 
-    logging.info('scrap38_2_ipo() started')
-    logging.info("-------------------------------------") 
 
     collection_scrap = db['ipo_scrap_38']
     collection_ipo = db['Ipo']
     collection_config = db['Config']
-    ipo_document = collection_config.find_one({'key': 'ipo_expected_cost_express', 'mode': 'System'})
+    ipo_document = await collection_config.find_one({'key': 'ipo_expected_cost_express', 'mode': 'System'})
     if ipo_document:
         calc_express = ipo_document['value']
     else:
@@ -204,9 +207,12 @@ async def main():
     await MongoDb.initialize(url)
     client = MongoDb.get_client()
     db = client[dbname]
+    logging.info("-------------------------------------") 
+    logging.info('ipo_scrap_38->Ipo로 데이터 옮기기 시작')
+    logging.info("-------------------------------------")     
     await work1(db, all_data=True)
     logging.info('-------------------------------------')   
-    logging.info('scrap38_2_ipo() finished')
+    logging.info('ipo_scrap_38->Ipo로 데이터 옮기기 종료')
     logging.info('-------------------------------------')   
 
 
