@@ -50,6 +50,9 @@ app.add_middleware(
 
 async def startup_event():
     ''' Lucy application  시작 '''
+    logger.info('---------------------------------')
+    logger.info('Startup 프로세스 시작')
+    logger.info('---------------------------------')
 
     mongodb_url = config.DB_URL 
     db_name = config.DB_NAME
@@ -85,8 +88,16 @@ async def startup_event():
     # Telegram Bot 시작
     asyncio.create_task(run_telegram_bot())
 
+    logger.info('---------------------------------')
+    logger.info('Startup 프로세스 종료')
+    logger.info('---------------------------------')
+
+
 async def shutdown_event():
     ''' Lucy application 종료 '''
+    logger.info('---------------------------------')
+    logger.info('Shutdown 프로세스 시작')
+    logger.info('---------------------------------')
     await MongoDb.close()
     logger.info("MongoDB 연결 해제")
     
@@ -99,6 +110,10 @@ async def shutdown_event():
 
     # Telegram Bot 종료
     await stop_telegram_bot()
+
+    logger.info('---------------------------------')
+    logger.info('Shutdown 프로세스 종료')
+    logger.info('---------------------------------')
     
 
 # Adding event handlers to the application lifecycle
