@@ -101,6 +101,8 @@ async def info(request:Request, user_service :UserService=Depends(get_user_servi
     '''1.주식잔고조회, 2. 보유주식을 mystock에 등록'''
 
     user = await get_and_validate_user(request, user_service)
+    
+    # TODO : ACCESS_TOKEN 이 만료되었을 경우 새로 발급받아서 User DB에 저장한다.
 
     # mystock에 보유로 넣는다.     
     kis_api = KoreaInvestmentApi(user)

@@ -6,7 +6,7 @@
 
 {% block content %}
 <section id="list" class="container">
-    <h2>주식일별주문체결</h2>
+    <h2>주식日별주문체결</h2>
     <div id="ccld-search-area">
         <form id="form_ccld">
             <div class="row g-3">
@@ -100,7 +100,7 @@
         function initalize(){
             $('#inqr_strt_dt').val(JuliaUtil.today());
             $('#inqr_end_dt').val(JuliaUtil.today());
-            //$('#form_ccld').trigger('submit');
+            $('#form_ccld').trigger('submit');
         }
         //주문취소 버튼 
         $("#ccld-result-area").on("click", ".btnOrderCancel", function(e) {

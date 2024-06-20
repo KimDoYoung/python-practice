@@ -43,8 +43,12 @@
         {{#each list}}
         <div class="col-md-4 mb-4">
             <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title text-primary">{{this.name}}</h5>
+                    <!--TODO 코딩할 것-->
+                    <button class="btnBuy btn btn-danger" data-stk-code="{{this.code}}">買</button>
+                </div>
                 <div class="card-body">
-                <h5 class="card-title text-primary">{{this.name}}</h5>
                 <p class="card-text"><strong>종목코드:</strong> {{goNaver this.code}} ({{displayDaebi this.daebi}})</p>
                 <p class="card-text"><strong>현재가:</strong> {{displayWon this.price}}({{displayPercent this.chgrate}}%) </p>
                 <!-- <p class="card-text"><strong>등락율:</strong> {{displayPercent this.chgrate}}%</p> -->
