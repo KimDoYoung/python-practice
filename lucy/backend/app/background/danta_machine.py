@@ -17,26 +17,28 @@ from backend.app.core.logger import get_logger
 
 logger = get_logger(__name__)
 # 단타 머신 Task
-danta_machine_task = None
+Danta_Machine_Task = None
 
 async def start_danta_machine():
-    global danta_machine_task
-    if danta_machine_task is None or danta_machine_task.cancelled():
-        danta_machine_task = asyncio.create_task(danta_machine_main())
+    global Danta_Machine_Task
+    if Danta_Machine_Task is None or Danta_Machine_Task.cancelled():
+        Danta_Machine_Task = asyncio.create_task(danta_machine_main())
         logger.info("단타머신 시작")
+        #await send_danta_message("단타머신 시작합니다.")
 
 
 async def stop_danta_machine():
-    global danta_machine_task
-    if danta_machine_task:
-        danta_machine_task.cancel()
+    global Danta_Machine_Task
+    if Danta_Machine_Task:
+        Danta_Machine_Task.cancel()
         try:
-            await danta_machine_task
+            await Danta_Machine_Task
         except asyncio.CancelledError:
             pass
         logger.info("단타머신 종료")
+        #await send_danta_message("단타머신 종료합니다.")
 
 async def danta_machine_main():
     while True:
         logger.debug("단타 머신 수행 중..." + str(time.time()))
-        await asyncio.sleep(1)  # 실제 작업을 대체하는 지연
+        await asyncio.sleep(10)  # 실제 작업을 대체하는 지연

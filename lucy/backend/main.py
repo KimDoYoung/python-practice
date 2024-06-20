@@ -1,3 +1,4 @@
+import asyncio
 import os
 from beanie import init_beanie
 from fastapi import FastAPI
@@ -5,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from backend.app.background.danta_machine import start_danta_machine, stop_danta_machine
+from backend.app.background.telegram_bot import initialize_telegram_bot, run_telegram_bot, stop_telegram_bot
 from backend.app.core.logger import get_logger
 from backend.app.domains.system.config_model import DbConfig
 from backend.app.domains.system.eventdays_model import EventDays
@@ -77,8 +79,11 @@ async def startup_event():
     # TODO 기본적으로 넣어야할 DB항목들 즉 1.사용자 key-value 2. config의 수식을 넣어둬야하지 않을까?
     # TODO 아주 처음 생성시에 사용자 id를 어떻게 넣어야할까?
 
+    await initialize_telegram_bot()
     # 자동매매 시작
     await start_danta_machine()
+    # Telegram Bot 시작
+    asyncio.create_task(run_telegram_bot())
 
 async def shutdown_event():
     ''' Lucy application 종료 '''
@@ -91,6 +96,10 @@ async def shutdown_event():
 
     # 자동매매 종료
     await stop_danta_machine()
+
+    # Telegram Bot 종료
+    await stop_telegram_bot()
+    
 
 # Adding event handlers to the application lifecycle
 app.add_event_handler("startup", startup_event)
