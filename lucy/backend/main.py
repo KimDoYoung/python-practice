@@ -76,6 +76,7 @@ async def startup_event():
     await scheduler_service.register_system_jobs()
     # TODO 기본적으로 넣어야할 DB항목들 즉 1.사용자 key-value 2. config의 수식을 넣어둬야하지 않을까?
     # TODO 아주 처음 생성시에 사용자 id를 어떻게 넣어야할까?
+    # TODO 다듬기 가능?
 
     await initialize_telegram_bot()
     # 자동매매 시작
