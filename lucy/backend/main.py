@@ -35,7 +35,7 @@ from backend.app.core.exception_handler import add_exception_handlers
 logger = get_logger(__name__)
 
 
-app = FastAPI(title="Lucy Project - 단타머신-한입만(개인용)")
+app = FastAPI(title="Lucy - 단타머신(개인용)")
 # JWT 인증 미들웨어 등록
 app.add_middleware(JWTAuthMiddleware)
 
@@ -67,11 +67,6 @@ async def startup_event():
     await init_beanie(database=db, document_models=[SchedulerJob])
     await init_beanie(database=db, document_models=[MyStock])
     
-    # 메인 이벤트 루프 실행
-    # try:
-    #     asyncio.get_event_loop().run_forever()
-    # except (KeyboardInterrupt, SystemExit):
-    #     pass
 
     # 스케줄러 시작
     logger.info("스케줄러 시작")
