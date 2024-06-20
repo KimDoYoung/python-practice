@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from backend.app.background.danta_machine import start_danta_machine, stop_danta_machine
-from backend.app.background.telegram_bot import initialize_telegram_bot, run_telegram_bot, stop_telegram_bot
+from backend.app.background.telegram_bot import TELEGRAM_BOT_TOKEN, initialize_telegram_bot, start_telegram_bot, stop_telegram_bot
 from backend.app.core.logger import get_logger
 from backend.app.domains.system.config_model import DbConfig
 from backend.app.domains.system.eventdays_model import EventDays
@@ -82,7 +82,10 @@ async def startup_event():
     # 자동매매 시작
     await start_danta_machine()
     # Telegram Bot 시작
-    asyncio.create_task(run_telegram_bot())
+    if TELEGRAM_BOT_TOKEN is not None:
+        asyncio.create_task(start_telegram_bot())
+    else:
+        logger.warning("TELEGRAM_BOT_TOKEN 이 존재하지 않음.")
 
     logger.info('---------------------------------')
     logger.info('Startup 프로세스 종료')

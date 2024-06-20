@@ -83,7 +83,7 @@ async def main():
     polling_task = asyncio.create_task(polling())
 
 # 텔레그램 봇 실행 작업
-async def run_telegram_bot():
+async def start_telegram_bot():
     await main()
 
 # 텔레그램 봇 정지 작업
@@ -105,4 +105,4 @@ async def stop_telegram_bot():
         logger.info("텔레그램 봇 종료")
 
 if __name__ == "__main__":
-    run_telegram_bot()
+    start_telegram_bot()
