@@ -10,19 +10,23 @@
         "**/__pycache__": true,
         "**/.pytest_cache": true,
     },
-    "python.testing.pytestPath": "C:/Users/deHong/Documents/kdy/python-practice/lucy",
+    "python.testing.pytestPath": "C:/Users/KOREA/python-practice/lucy",
     
     "python.analysis.extraPaths": [
         "./backend/app/core",
         "./backend/app/utils/scrap_"
     ],
+    //-------------------------------------------------//
+    //pytest
+    //-------------------------------------------------//
     "python.testing.pytestArgs": [
-        "backend"
+        "-s",
+        "backend/tests"
     ],
     "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true,
-    "python.envFile":   "${workspaceFolder}/.env.local",
+    "python.testing.pytestEnabled": true,    
 
+    "python.envFile":   "${workspaceFolder}/.env.local",
     "tailwindCSS.includeLanguages": {
         "html": "html",
         "javascript": "javascript",

@@ -28,9 +28,9 @@ def install_chrome_driver():
     # Chrome 옵션 설정
     chrome_options = Options()
     chrome_options.add_argument("--headless")  # Headless 모드 활성화
-    # chrome_options.add_argument("--disable-gpu")  # GPU 가속 비활성화
-    # chrome_options.add_argument('--no-sandbox')  # Bypass OS security model, 크롬의 일반적인 문제 해결 옵션
-    # chrome_options.add_argument('--disable-dev-shm-usage')  # 컨테이너 환경에서 메모리 문제를 해결
+    chrome_options.add_argument("--disable-gpu")  # GPU 가속 비활성화
+    chrome_options.add_argument('--no-sandbox')  # Bypass OS security model, 크롬의 일반적인 문제 해결 옵션
+    chrome_options.add_argument('--disable-dev-shm-usage')  # 컨테이너 환경에서 메모리 문제를 해결
     #chrome_options.add_argument(f'--proxy-server={proxy}')
 
     global driver 
@@ -115,6 +115,7 @@ def main():
     df_all['href'] = baseUrl +  df_all['href']
 
     df_all.to_csv('torrent.csv', index=False)
+    print("torrent.csv saved")
     print("Done!")    
 
 if __name__ == "__main__":
