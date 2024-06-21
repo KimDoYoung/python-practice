@@ -94,6 +94,7 @@ class SchedulerJobService:
     def run_async_job(self, coro, *args, **kwargs):
         asyncio.run_coroutine_threadsafe(self.run_async_task(coro(*args, **kwargs)), self.loop)        
 
+    #TODO DB에서 모두 가져오게끔 수정
     async def register_system_jobs(self):
         ''' 
             1. DB에 system jobs 등록 
@@ -115,7 +116,7 @@ class SchedulerJobService:
         # self.scheduler.add_cron_job(func=self.run_async_job, cron="46 22 * * * ", job_id="simple_test_job", job_type="cron", args=(simple_async_test, "Async 테스트...."), max_instances=2)
 
         site38_work = job_mapping['site38_work']
-        self.scheduler.get_instance().add_cron_job(func=self.run_async_job, cron="12 20 * * 1-5", job_id="site38_work_job", job_type="cron", args=(site38_work,"왜 안되는겨?"), max_instances=2)
+        self.scheduler.get_instance().add_cron_job(func=self.run_async_job, cron="20 09 * * 1-5", job_id="site38_work_job", job_type="cron", args=(site38_work,"커뮤니케이션38 스크랩"), max_instances=2)
         
 
         return {"message": "System jobs registered successfully"}

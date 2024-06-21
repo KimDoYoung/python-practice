@@ -12,22 +12,22 @@
             <div class="col-md-6">
                 <h4>기본정보</h4>
                 <div class="mb-3">
-                    <label for="user_id" class="form-label">User ID</label>
+                    <label for="user_id" class="form-label fw-bold">User ID</label>
                     <input type="text" class="form-control" id="user_id" name="user_id" required readonly>
                 </div>
         
                 <div class="mb-3">
-                    <label for="user_name" class="form-label">User Name</label>
+                    <label for="user_name" class="form-label  fw-bold">User Name</label>
                     <input type="text" class="form-control" id="user_name" name="user_name" required>
                 </div>
         
                 <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
+                    <label for="email" class="form-label fw-bold">Email</label>
                     <input type="email" class="form-control" id="email" name="email" required>
                 </div>
         
                 <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
+                    <label for="password" class="form-label fw-bold">Password</label>
                     <input type="password" class="form-control" id="password" name="password">
                 </div>                        
             </div>
@@ -44,8 +44,8 @@
     <h4>키-값</h4>
     {{#each list}}
     <div class="mb-3">
-        <label for="{{key}}" class="form-label">{{key}}<label>
-        <input type="text" class="form-control" data-key="{{key}}" id="{{key}}" name="{{key}}" value="{{value}}" required>
+        <label for="{{key}}" class="form-label fw-bold">{{key}}<label>
+        <input type="text" class="form-control ms-2" data-key="{{key}}" id="{{key}}" name="{{key}}" value="{{value}}" required>
     </div>
     {{/each}}
 </script>

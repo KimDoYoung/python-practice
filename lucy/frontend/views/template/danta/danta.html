@@ -1,0 +1,25 @@
+{% extends 'common/base.html' %}
+{% block style %}
+<style>
+</style>
+{% endblock %}
+
+{% block content %}
+<section id="list" class="container">
+    <h2>단타머신</h2>
+</section>
+{% raw %} 
+<script id="table1-area" type="text/x-handlebars-template">
+</script>
+{% endraw %}
+{% endblock %}
+
+{% block script %}
+{% raw %}
+<script>
+    $( document ).ready(function() {
+        console.log('단타머신 ready.... ');
+    });
+    </script>	    
+{% endraw %}
+{% endblock %}

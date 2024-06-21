@@ -42,7 +42,7 @@
             {{#each list}}
             {{#test "hldg_qty > 0"}}
             <tr class="align-middle">
-                <td><a href="#" class="btnSetSellBuy" data-stk-code="{{pdno}}" data-stk-name="{{prdt_name}}">{{pdno}}</a></td>
+                <td>{{goNaver pdno}}</td>
                 <td><a href="#" class="btnStockInfo" data-stk-code="{{pdno}}">{{prdt_name}}</a></td>
                 <td class="text-end">{{displayWon pchs_avg_pric}}</td>
                 <td class="text-end">{{displayWon prpr}}</td>

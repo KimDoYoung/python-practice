@@ -9,7 +9,8 @@
     <div id="button-area">
         <a href="#"  class="btnDisplayForm btn btn-success" data-mode="insert">추가</a>
     </div>
-    <div id="table-area"></div>
+    <div id="config-table-area"></div>
+    <div id="scheduler-table-area"></div>
 </section>
 <section id="form-area" class="container d-none" >
     <h2 id="title">Config Add </h2>
@@ -50,6 +51,7 @@
 
 {% raw %} 
 <script id="table1-template" type="text/x-handlebars-template">
+    <h2>Config</h2>
     <table id="table1" class="table">
         <thead>
             <tr>
@@ -58,6 +60,7 @@
                 <th scope="col">Key</th>
                 <th scope="col">Value</th>
                 <th scope="col">Note</th>
+                <th scope="col">Action</th>
             </tr>
         </thead>
         <tbody>    
@@ -69,11 +72,50 @@
         <td>{{value}}</td>
         <td>{{note}}</td>
         <td>
-            {{#test "mode == 'User'"}}
-                <button type="button" class="btn btn-sm btn-primary btnDisplayForm" data-key="{{key}}" data-mode="update">Edit</button>
-                <button type="button" class="btn btn-sm btn-danger btnDelete" data-key="{{key}}">Delete</button>
+            {{#test "editable == true"}}
+            <button type="button" class="btn btn-sm btn-primary btnDisplayForm" data-key="{{key}}" data-mode="update">Edit</button>
             {{/test}}
         </td>
+    </tr>
+    {{/each}}
+        </tbody>
+    </table>
+</script>
+<script id="scheduler-table" type="text/x-handlebars-template">
+    <h2>Scheduler</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Job Id</th>
+                <th scope="col">Job Name</th>
+                <th scope="col">Type</th>
+                <th scope="col">Run Time Or Cron</th>
+                <th scope="col">Func Name</th>
+                <th scope="col">Arguments</th>
+                <th scope="col">Running</th>
+                <th scope="col">Next Run Time</th>
+            </tr>
+        </thead>
+        <tbody>    
+    {{#each list}}
+    <tr>
+        <td>{{inc @index}}</td>
+        <td>{{job_id}}</td>
+        <td>{{job_name}}</td>
+        <td>{{job_type}}/{{run_type}}</td>
+        <td>
+            {{#test "run_type == 'cron'" }}
+                {{cron}}
+            {{else}}
+                {{run_date}}
+            {{/test}}
+        </td>
+        <td>{{func_name}}</td>
+        <td>{{args}}</td>
+        <td>{{is_running}}</td>
+        <td>{{next_run_time}}</td>
+        <td>삭제</td>
     </tr>
     {{/each}}
         </tbody>
@@ -96,12 +138,21 @@
 
                 var html = template({list: data});
 
-                $('#table-area').html(html);
+                $('#config-table-area').html(html);
             }).catch(error => {
                 console.error('upsertConfig 중 에러 발생:', error);
                 showToastError(error);
             });
-            
+            //스케줄러 정보를 가져와서 테이블에 표시
+            await fetchData('/api/v1/scheduler').then(data => {
+                console.log(data);
+                var source = $('#scheduler-table').html();
+                var template = Handlebars.compile(source);
+
+                var html = template({list: data});
+
+                $('#scheduler-table-area').html(html);
+            });
         }
         async function getConfigFromDb(key) {
             try{

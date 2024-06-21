@@ -6,14 +6,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from backend.app.background.danta_machine import start_danta_machine, stop_danta_machine
-from backend.app.background.telegram_bot import TELEGRAM_BOT_TOKEN, initialize_telegram_bot, start_telegram_bot, stop_telegram_bot
+from backend.app.background.telegram_bot import  initialize_telegram_bot, start_telegram_bot, stop_telegram_bot
 from backend.app.core.logger import get_logger
 from backend.app.domains.system.config_model import DbConfig
 from backend.app.domains.system.eventdays_model import EventDays
 from backend.app.domains.system.ipo_model import Ipo
 from backend.app.domains.system.mystock_model import MyStock
 from backend.app.domains.system.scheduler_job_model import SchedulerJob
-from backend.app.domains.system.scheduler_job_service import SchedulerJobService
 from backend.app.domains.user.user_model import User
 from backend.app.core.mongodb import MongoDb
 from backend.app.core.config import config
@@ -27,9 +26,11 @@ from backend.app.api.v1.endpoints.config_routes import router as config_router
 from backend.app.api.v1.endpoints.kis_routes import router as kis_router
 from backend.app.api.v1.endpoints.mystock_routes import router as mystock_router
 from backend.app.api.v1.endpoints.client_websocket_routes import router as client_websocket_router
+from backend.app.api.v1.endpoints.danta_machine_routes import router as danta_router
 
 from backend.app.core.scheduler import Scheduler
-from backend.app.core.exception_handler import add_exception_handlers 
+from backend.app.core.exception_handler import add_exception_handlers
+from backend.app.core.dependency import get_scheduler_job_service 
 
 
 logger = get_logger(__name__)
@@ -72,17 +73,18 @@ async def startup_event():
     logger.info("스케줄러 시작")
     scheduler = Scheduler.get_instance()   
     scheduler.start()
-    scheduler_service = SchedulerJobService(scheduler=scheduler)
+    # scheduler_service =  SchedulerJobService(scheduler=scheduler)
+    scheduler_service =  get_scheduler_job_service()
     await scheduler_service.register_system_jobs()
     # TODO 기본적으로 넣어야할 DB항목들 즉 1.사용자 key-value 2. config의 수식을 넣어둬야하지 않을까?
     # TODO 아주 처음 생성시에 사용자 id를 어떻게 넣어야할까?
     # TODO 다듬기 가능?
 
-    await initialize_telegram_bot()
     # 자동매매 시작
     await start_danta_machine()
     # Telegram Bot 시작
-    if TELEGRAM_BOT_TOKEN is not None:
+    telegram_token, telegram_userid = await initialize_telegram_bot()
+    if telegram_token is not None:
         asyncio.create_task(start_telegram_bot())
     else:
         logger.warning("TELEGRAM_BOT_TOKEN 이 존재하지 않음.")
@@ -133,6 +135,8 @@ app.include_router(scheduler_router,prefix="/api/v1/scheduler", tags=["scheduler
 app.include_router(config_router,prefix="/api/v1/config", tags=["config"])
 app.include_router(kis_router,prefix="/api/v1/kis", tags=["kis"])
 app.include_router(mystock_router,prefix="/api/v1/mystock", tags=["mystock"])
+app.include_router(danta_router,prefix="/api/v1/danta", tags=["danta"])
+
 app.include_router(client_websocket_router)
 
 # Exception Handler 추가

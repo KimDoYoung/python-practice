@@ -21,6 +21,7 @@ async def initialize_telegram_bot():
     TELEGRAM_BOT_TOKEN = user.get_value_by_key("TELEGRAM_BOT_TOKEN")
     TELEGRAM_USER_ID = user.get_value_by_key("TELEGRAM_USER_ID")    
     logger.debug(f"TELEGRAM_BOT_TOKEN: {TELEGRAM_BOT_TOKEN}, TELEGRAM_USER_ID: {TELEGRAM_USER_ID}")
+    return TELEGRAM_BOT_TOKEN, TELEGRAM_USER_ID
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     from backend.app.background.danta_machine import start_danta_machine
