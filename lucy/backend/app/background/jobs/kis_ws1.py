@@ -7,9 +7,11 @@ from beanie import init_beanie
 import requests
 from backend.app.core.config import config
 from backend.app.core.mongodb import MongoDb
+from backend.app.domains.stc.kis.model.websocket_model import KisWsResponse
 from backend.app.domains.user.user_model import User
 from backend.app.core.dependency import get_user_service
 from backend.app.core.logger import get_logger
+from backend.app.utils.kis_ws_util import is_real_data, real_data_trid
 
 logger = get_logger(__name__)
 
@@ -66,26 +68,47 @@ async def kis_ws_connect():
             senddata = '{{"header": {{"approval_key": "{}", "personalseckey": "{}", "custtype": "P", "tr_type": "{}", "content-type": "utf-8"}}, "body": {{"input": {{"tr_id": "{}", "tr_key": "{}"}}}}}}'.format(
                 ws_approval_key, KIS_APP_SECRET, tr_type, tr_id, stk_code
             )
-            logger.info("senddata : " + senddata)
+            logger.info(f"보낸데이터 : [{senddata}]")
         #TODO https://github.com/koreainvestment/open-trading-api/blob/main/websocket/python/ops_ws_sample.py#L29 소스 좀더 참고해보기
         await websocket.send(senddata)
         while True:
-            response = await websocket.recv()
-            logger.info("웹소켓(KIS로부터 받은데이터) : [" + response + "]")
-            if response[0] == '0' or response[0] == '1': #실시간데이터
-                json_data = json.loads(response)
-                tr_id = json_data['header']['tr_id']
+            received_text = await websocket.recv()
+            logger.info("웹소켓(KIS로부터 받은데이터) : [" + received_text + "]")
+            if is_real_data(received_text):
+                trid0 = real_data_trid(received_text)
                 
+                # json_data = json.loads(response)
+                # tr_id = json_data['header']['tr_id']
+                # if response[0] == '0':
+                #     recvstr = data.split('|')  # 수신데이터가 실데이터 이전은 '|'로 나뉘어져있어 split
+                #     trid0 = recvstr[1]
+                #     if trid0 == "H0STASP0":  # 주식호가tr 일경우의 처리 단계
+                #         print("#### 주식호가 ####")
+                #         stockhoka(recvstr[3])
+                #         await asyncio.sleep(1)
+
+                #     elif trid0 == "H0STCNT0":  # 주식체결 데이터 처리
+                #         print("#### 주식체결 ####")
+                #         data_cnt = int(recvstr[2])	# 체결데이터 개수
+                #         stockspurchase(data_cnt, recvstr[3])
+
+                # elif data[0] == '1':
+                #     recvstr = data.split('|')  # 수신데이터가 실데이터 이전은 '|'로 나뉘어져있어 split
+                #     trid0 = recvstr[1]
+                #     if trid0 == "H0STCNI0" or trid0 == "H0STCNI9":  # 주실체결 통보 처리
+                #         stocksigningnotice(recvstr[3], aes_key, aes_iv)                
             else:
-                json_data = json.loads(response)
-                tr_id = json_data['header']['tr_id']
-                if tr_id != 'PINGPONG':
-                    logger.debug("tr_id : " + tr_id)
-                elif tr_id == 'PINGPONG':
-                    logger.debug("PINGPONG데이터 받음: [" + response + "]")
-                    await websocket.pong(response)
-                    logger.debug("PINGPONG데이터 전송: [" + response + "]")
-                
+                try:
+                    kis_ws_model = KisWsResponse.from_json_str(received_text)
+
+                    if kis_ws_model.isPingPong():
+                        await websocket.pong(received_text)  # 웹소켓 클라이언트에서 pong을 보냄
+                        logger.debug(f"PINGPONG 데이터 전송: [{received_text}]")
+                    else:
+                        logger.info(f"PINGPONG 아닌 것: [{received_text}]")
+                        logger.debug(f"kis_ws_model: {json.dumps(kis_ws_model.model_dump(), ensure_ascii=False)}")
+                except ValueError as e:
+                    logger.error(f"Error parsing response: {e}")
 
 
 def run():
