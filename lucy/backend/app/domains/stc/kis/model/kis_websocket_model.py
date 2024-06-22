@@ -40,7 +40,38 @@ class KisWsResponse(KisWsResponseBase):
 
     def isPingPong(self) -> bool:
         return self.header.tr_id == 'PINGPONG'
+
+class KisWsRealHeader(BaseModel):
+    ''' KIS의 실시간 데이터 헤더 모델'''
+    encrypt: str # 1) 암호화 유무 (0 : 암호화 되지 않은 데이터, 1: 암호화된 데이터)
+    tr_id: str   # 2) TR_ID (등록한 tr_id)
+    data_count: int # 3) 데이터 건수 (ex. 001)
+
+    @classmethod
+    def from_text(cls, text: str) -> "KisWsRealHeader":
+        fields = text.split('|')
+        return cls(
+            encrypt=fields[0],
+            tr_id=fields[1],
+            data_count=int(fields[2])
+        )
+
+    def is_encrypted(self) -> bool:
+        return self.encrypt == '1'
     
+class KisWsRealModelBase(BaseModel):
+    ''' KIS의 실시간 데이터 모델 슈퍼 클래스'''
+    def to_str(self) -> str:
+        """객체를 문자열로 변환"""
+        return str(self.model_dump())
+
+    def to_json(self) -> str:
+        """객체를 JSON 문자열로 변환"""
+        return json.dumps(self.model_dump(), ensure_ascii=False)
+    
+    def to_dict(self) -> dict:
+        """객체를 dict로 변환"""
+        return self.model_dump()
 #
 # 호가 실시간데이터
 # https://apiportal.koreainvestment.com/apiservice/apiservice-domestic-stock-real2#L_9cda726b-6f0b-48b5-8369-6d66bea05a2a
@@ -50,7 +81,7 @@ class CostQty(BaseModel):
     가격: int
     잔량: int
 
-class H0STASP0(BaseModel):
+class H0STASP0(KisWsRealModelBase):
     단축종목코드: str
     영업시간: str
     시간구분코드: str
@@ -110,7 +141,7 @@ class H0STASP0(BaseModel):
 # https://apiportal.koreainvestment.com/apiservice/apiservice-domestic-stock-real2#L_714d1437-8f62-43db-a73c-cf509d3f6aa7
 #
 
-class H0STCNT0(BaseModel):
+class H0STCNT0(KisWsRealModelBase):
     유가증권_단축_종목코드: str # MKSC_SHRN_ISCD
     주식_체결_시간: str # STCK_CNTG_HOUR
     주식_현재가: int # STCK_PRPR, 체결가격
@@ -215,7 +246,7 @@ class H0STCNT0(BaseModel):
 # https://apiportal.koreainvestment.com/apiservice/apiservice-domestic-stock-real2#L_1e3c056d-1b42-461c-b8fb-631bb48e1ee2
 #
 
-class H0STCNI0(BaseModel):
+class H0STCNI0(KisWsRealModelBase):
     고객_ID: str  # CUST_ID, 고객 ID
     계좌번호: str  # ACNT_NO, 계좌번호
     주문번호: str  # ODER_NO, 주문번호

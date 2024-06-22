@@ -1,5 +1,5 @@
 import pytest
-from backend.app.domains.stc.kis.model.websocket_model import H0STASP0, H0STCNI0, H0STCNT0, KisWsResponse
+from backend.app.domains.stc.kis.model.kis_websocket_model import H0STASP0, H0STCNI0, H0STCNT0, KisWsResponse
 
 
 def test_create():
@@ -80,3 +80,5 @@ def test_purchase_notice():
     assert isinstance(h0, H0STCNI0)
     assert h0.고객_ID == "ID123456"
     assert h0.주문가격 == "1500"
+
+    print(h0.to_str())

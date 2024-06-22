@@ -7,7 +7,7 @@ from beanie import init_beanie
 import requests
 from backend.app.core.config import config
 from backend.app.core.mongodb import MongoDb
-from backend.app.domains.stc.kis.model.websocket_model import KisWsResponse
+from backend.app.domains.stc.kis.model.kis_websocket_model import KisWsResponse
 from backend.app.domains.user.user_model import User
 from backend.app.core.dependency import get_user_service
 from backend.app.core.logger import get_logger
@@ -74,7 +74,7 @@ async def kis_ws_connect():
         while True:
             received_text = await websocket.recv()
             logger.info("웹소켓(KIS로부터 받은데이터) : [" + received_text + "]")
-            if is_real_data(received_text):
+            if is_real_data(received_text): # 실시간 데이터인 경우
                 trid0 = real_data_trid(received_text)
                 
                 # json_data = json.loads(response)
@@ -97,7 +97,7 @@ async def kis_ws_connect():
                 #     trid0 = recvstr[1]
                 #     if trid0 == "H0STCNI0" or trid0 == "H0STCNI9":  # 주실체결 통보 처리
                 #         stocksigningnotice(recvstr[3], aes_key, aes_iv)                
-            else:
+            else: # 실시간 데이터가 아닌 경우
                 try:
                     kis_ws_model = KisWsResponse.from_json_str(received_text)
 
