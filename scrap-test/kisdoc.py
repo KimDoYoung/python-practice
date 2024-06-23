@@ -200,7 +200,7 @@ def item_script(df, class_name, ele_name):
         if start:
             if element_name.startswith('-'):
                 s += f'    {element_name[1:]}: str # {han_name} {desc}\n'
-            elif element_name.startswith('output'):
+            elif  element_name.lower().startswith('output'):
                 start = False
     return s
 def make_pydantic_model(class_name, df):
@@ -216,7 +216,7 @@ def make_pydantic_model(class_name, df):
         if required == 'Y':
             if element_name.startswith('-'):
                 continue
-            if element_name.startswith('output'):
+            if element_name.lower().startswith('output'):
                 item_str = item_script(df,class_name, element_name)
                 if  df.loc[i, 'Type'] == 'Object' :
                     s += f'    {element_name}: {class_name}\n'
@@ -294,7 +294,12 @@ if __name__ == "__main__":
     
     # main_menu  = "[국내주식] 종목정보"
     # sub_menu = "주식일별주문체결조회"
-    main_menu  = "[국내주식] 주문계좌"
-    sub_menu = "매수가능조회"
+
+    # main_menu  = "[국내주식] 주문계좌"
+    # sub_menu = "매수가능조회"
+    
+    main_menu  = "[국내주식] 업종/기타"
+    sub_menu = "국내휴장일조회"
+
     main(main_menu, sub_menu)
     print("Done!")

@@ -73,7 +73,6 @@ async def startup_event():
     logger.info("스케줄러 시작")
     scheduler = Scheduler.get_instance()   
     scheduler.start()
-    # scheduler_service =  SchedulerJobService(scheduler=scheduler)
     scheduler_service =  get_scheduler_job_service()
     await scheduler_service.register_system_jobs()
     # TODO 기본적으로 넣어야할 DB항목들 즉 1.사용자 key-value 2. config의 수식을 넣어둬야하지 않을까?

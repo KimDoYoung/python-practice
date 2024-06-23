@@ -18,6 +18,7 @@ from pydantic import ValidationError
 import requests
 
 from backend.app.core.logger import get_logger
+from backend.app.domains.stc.kis.model.kis_chk_holiday_model import ChkHolidayDto
 from backend.app.domains.stc.kis.model.kis_inquire_balance_model import KisInquireBalance
 from backend.app.domains.stc.kis.model.kis_inquire_daily_ccld_model import InquireDailyCcldDto, InquireDailyCcldRequest
 from backend.app.domains.stc.kis.model.kis_inquire_psbl_rvsecncl_model import InquirePsblRvsecnclDto
@@ -479,4 +480,45 @@ def inquire_psbl_order(self, ipo_req :InquirePsblOrderRequest ) -> InquirePsblOr
         raise HTTPException(status_code=500, detail="Invalid JSON response")
     except ValidationError as e:
         raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
-    return psbl_order        
+    return psbl_order
+
+##############################################################################################
+# [국내주식] 업종/기타 > 국내휴장일조회
+# 국내휴장일조회 API입니다.
+# 영업일, 거래일, 개장일, 결제일 여부를 조회할 수 있습니다.
+# 주문을 넣을 수 있는지 확인하고자 하실 경우 개장일여부(opnd_yn)을 사용하시면 됩니다.
+##############################################################################################
+#TODO Test필요
+def chk_holiday(self, base_dt:str) -> ChkHolidayDto:
+    '''국내휴장일조회 '''
+    logger.info(f"국내휴장일조회")
+
+    url = self._BASE_URL + "/uapi/domestic-stock/v1/quotations/chk-holiday"
+    params = {
+        "BASS_DT": base_dt, #"기준일자 기준일자(YYYYMMDD)",
+        "CTX_AREA_NK": "",  # 연속조회키 공백으로 입력",
+        "CTX_AREA_FK": "",  # 연속조회검색조건 공백으로 입력",
+    }    
+    headers ={
+        "content-type": "application/json; charset=utf-8",
+        "authorization": f"Bearer {self.ACCESS_TOKEN}",
+        "appkey": self.APP_KEY,
+        "appsecret": self.APP_SECRET,
+        "tr_id": "CTCA0903R",
+        "custtype": "P"
+    }    
+
+    response = requests.get(url, headers=headers, params=params)
+    logger.debug(f"response : {response.text}")
+    if response.status_code != 200:
+        raise HTTPException(status_code=response.status_code, detail=f"Error fetching balance: {response.text}")
+    try:
+        json_data = response.json()
+        chk_holiday = InquirePsblOrderDto(**json_data)
+        logger.info(f"조건식 목록 조회 : {chk_holiday}")
+    except requests.exceptions.JSONDecodeError:
+        logger.error(f"Error decoding JSON: {response.text}")
+        raise HTTPException(status_code=500, detail="Invalid JSON response")
+    except ValidationError as e:
+        raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
+    return chk_holiday

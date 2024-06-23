@@ -7,15 +7,10 @@ Created on Wed Feb 15 16:57:19 2023
 """
 import kis_auth as kis
 
-import time, copy
-import requests
-import json
 
 import pandas as pd
 
-from collections import namedtuple
 from datetime import datetime
-from pandas import DataFrame
 
 #====|  [국내주식] 주문/계좌  |===========================================================================================================================
 
@@ -1318,8 +1313,6 @@ def get_quotations_nav_comparison_trend(output_dv="1", div_code="J", itm_no="", 
     dataframe = current_data
 
     return dataframe
-
-
 
 ##############################################################################################
 # [국내주식] 업종/기타 > 국내휴장일조회

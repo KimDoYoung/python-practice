@@ -114,9 +114,9 @@ class SchedulerJobService:
         
         # simple_async_test = job_mapping['simple_async_test']
         # self.scheduler.add_cron_job(func=self.run_async_job, cron="46 22 * * * ", job_id="simple_test_job", job_type="cron", args=(simple_async_test, "Async 테스트...."), max_instances=2)
-
+        # TODO 휴일 가져오는 것도 매달 첫째날 1시에 돌리자
         site38_work = job_mapping['site38_work']
-        self.scheduler.get_instance().add_cron_job(func=self.run_async_job, cron="20 09 * * 1-5", job_id="site38_work_job", job_type="cron", args=(site38_work,"커뮤니케이션38 스크랩"), max_instances=2)
+        self.scheduler.get_instance().add_cron_job(func=self.run_async_job, cron="40 14 * * 1-5", job_id="site38_work_job", job_type="cron", args=(site38_work,"커뮤니케이션38 스크랩"), max_instances=2)
         
 
         return {"message": "System jobs registered successfully"}
