@@ -118,5 +118,8 @@ class SchedulerJobService:
         site38_work = job_mapping['site38_work']
         self.scheduler.get_instance().add_cron_job(func=self.run_async_job, cron="40 14 * * 1-5", job_id="site38_work_job", job_type="cron", args=(site38_work,"커뮤니케이션38 스크랩"), max_instances=2)
         
+        holiday_godata = job_mapping['holiday_godata']
+        self.scheduler.get_instance().add_cron_job(func=self.run_async_job, cron="00 17 * * *", job_id="holiday_godata", job_type="cron", args=(holiday_godata,"휴일정보"), max_instances=2)
+        
 
         return {"message": "System jobs registered successfully"}

@@ -20,7 +20,7 @@ import xml.etree.ElementTree as ET
 from backend.app.core.logger import get_logger
 from backend.app.core.mongodb import MongoDb
 from backend.app.core.config import config
-from backend.app.core.dependency import get_eventdays_service, get_user_service
+# from backend.app.core.dependency import get_eventdays_service, get_user_service
 from backend.app.core.exception import lucy_exception
 from backend.app.domains.system.eventdays_model import EventDays
 from backend.app.domains.user.user_model import User
@@ -28,6 +28,7 @@ from backend.app.domains.user.user_model import User
 logging = get_logger(__name__)
 
 async def fetch_holidays(year, month):
+    from backend.app.core.dependency import  get_user_service
     sYear = str(year)
     sMonth = str(month).zfill(2)
 
@@ -54,7 +55,7 @@ async def fetch_holidays(year, month):
         return None
 
 def parse_xml_and_update_days(xml_data):
-    print(xml_data)
+    logging.debug(f"가져온 휴일 데이터 : {xml_data}")
     days = []
     root = ET.fromstring(xml_data)
     
@@ -84,7 +85,7 @@ def parse_xml_and_update_days(xml_data):
     return days
 
 async def upsert_holidays(days):
-    
+    from backend.app.core.dependency import get_eventdays_service
     service = get_eventdays_service()
 
     for item in days:
@@ -99,32 +100,32 @@ def future_12_months(year, month):
         result.append((future_date.year, future_date.month))
     return result
 
-def db_init():
+async def db_init():
     mongodb_url = config.DB_URL
     db_name = config.DB_NAME
     logging.info(f"MongoDB 연결: {mongodb_url} / {db_name}")
-    MongoDb.initialize(mongodb_url)
+    await MongoDb.initialize(mongodb_url)
 
     db = MongoDb.get_client()[db_name]
-    init_beanie(database=db, document_models=[User])
-    init_beanie(database=db, document_models=[EventDays])
+    await init_beanie(database=db, document_models=[User])
+    await init_beanie(database=db, document_models=[EventDays])
 
-async def fetch_and_upsert_holiday():
+async def fetch_and_upsert_holiday(arg):
     year = datetime.now().year
     month = datetime.now().month
-
+    logging.debug(f"{arg} 현재 연도: {year}, 현재 월: {month}")
     for year, month in future_12_months(year, month):
         xml_data = await fetch_holidays(year, month)
         if xml_data:
             days = parse_xml_and_update_days(xml_data)
             await upsert_holidays(days)
-        print(f"{year}년 {month}월 데이터 처리 완료")
+        logging.info(f"{year}년 {month}월 데이터 처리 완료")
         time.sleep(2)
 
 
 async def main():
-    db_init()
-    await fetch_and_upsert_holiday()
+    await db_init()
+    await fetch_and_upsert_holiday("휴일정보")
 
 
 #TODO main 함수를 호출하는 코드 추가
