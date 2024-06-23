@@ -21,6 +21,7 @@ from backend.app.core.logger import get_logger
 from backend.app.domains.stc.kis.model.kis_inquire_balance_model import KisInquireBalance
 from backend.app.domains.stc.kis.model.kis_inquire_daily_ccld_model import InquireDailyCcldDto, InquireDailyCcldRequest
 from backend.app.domains.stc.kis.model.kis_inquire_psbl_rvsecncl_model import InquirePsblRvsecnclDto
+from backend.app.domains.stc.kis.model.kis_inquire_psble_order import InquirePsblOrderDto, InquirePsblOrderRequest
 from backend.app.domains.stc.kis.model.kis_order_cash_model import KisOrderCash, OrderCancelRequest, OrderCashDto, OrderRvsecnclDto
 from backend.app.domains.stc.kis.model.kis_psearch_result_model import PsearchResultDto
 from backend.app.domains.stc.kis.model.kis_search_stock_info_model import SearchStockInfoDto
@@ -441,3 +442,41 @@ def inquire_psbl_rvsecncl(self) -> OrderRvsecnclDto:
     except ValidationError as e:
         raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
     return possible_cancel_result    
+
+##############################################################################################
+# [국내주식] 주문/계좌 > 매수가능조회
+#############################################################################################
+#TODO Test필요
+def inquire_psbl_order(self, ipo_req :InquirePsblOrderRequest ) -> InquirePsblOrderDto:
+    '''매수가능조회 '''
+    logger.info(f"매수가능조회")
+    url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/inquire-psbl-order"
+    params = {
+        "CANO": self.ACCTNO[0:8],
+        "ACNT_PRDT_CD": self.ACCTNO[8:10],
+        "PDNO": ipo_req.pdno, # 종목번호(6자리) * PDNO, ORD_UNPR 공란 입력 시, 매수수량 없이 매수금액만 조회됨
+        "ORD_UNPR": ipo_req.ord_unpr, # 1주당 가격 * 시장가(ORD_DVSN:01)로 조회 시, 공란으로 입력 * PDNO, ORD_UNPR 공란 입력 시, 매수수량 없이 매수금액만 조회됨
+        "ORD_DVSN": ipo_req.ord_dvsn,  #특정 종목 전량매수 시 가능수량을 확인할 경우  00:지정가는 증거금율이 반영되지 않으므로  증거금율이 반영되는 01: 시장가로 조회 * 다만, 조건부지정가 등 특정 주문구분(ex.IOC)으로 주문 시 가능수량을 확인할 경우 주문 시와 동일한 주문구분(ex.IOC) 입력하여 가능수량 확인 * 종목별 매수가능수량 조회 없이 매수금액만 조회하고자 할 경우 임의값(00) 입력 00 : 지정가 01 : 시장가 02 : 조건부지정가 03 : 최유리지정가 04 : 최우선지정가 05 : 장전 시간외 06 : 장후 시간외 07 : 시간외 단일가 08 : 자기주식 09 : 자기주식S-Option 10 : 자기주식금전신탁 11 : IOC지정가 (즉시체결,잔량취소) 12 : FOK지정가 (즉시체결,전량취소) 13 : IOC시장가 (즉시체결,잔량취소) 14 : FOK시장가 (즉시체결,전량취소) 15 : IOC최유리 (즉시체결,잔량취소) 16 : FOK최유리 (즉시체결,전량취소) 51 : 장중대량 52 : 장중바스켓 62 : 장개시전 시간외대량 63 : 장개시전 시간외바스켓 67 : 장개시전 금전신탁자사주 69 : 장개시전 자기주식 72 : 시간외대량 77 : 시간외자사주신탁 79 : 시간외대량자기주식 80 : 바스켓
+        "CMA_EVLU_AMT_ICLD_YN": ipo_req.cma_evlu_amt_icld_yn, #Y : 포함 N : 포함하지 않음
+        "OVRS_ICLD_YN": ipo_req.ovrs_icld_yn #Y : 포함 N : 포함하지 않음
+    }    
+    headers ={
+        "authorization": f"Bearer {self.ACCESS_TOKEN}",
+        "appkey": self.APP_KEY,
+        "appsecret": self.APP_SECRET,
+        "tr_id":  "TTTC8908R" #매수가능조회
+    }       
+    response = requests.get(url, headers=headers, params=params)
+    logger.debug(f"response : {response.text}")
+    if response.status_code != 200:
+        raise HTTPException(status_code=response.status_code, detail=f"Error fetching balance: {response.text}")
+    try:
+        json_data = response.json()
+        psbl_order = InquirePsblOrderDto(**json_data)
+        logger.info(f"조건식 목록 조회 : {psbl_order}")
+    except requests.exceptions.JSONDecodeError:
+        logger.error(f"Error decoding JSON: {response.text}")
+        raise HTTPException(status_code=500, detail="Invalid JSON response")
+    except ValidationError as e:
+        raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
+    return psbl_order        

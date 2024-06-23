@@ -177,11 +177,12 @@ def maker_params_code(df):
     s = "{\n"
 
     for i in range(len(df)):
-        element_name = df.loc[i, 'Element'].lower()
+        element_name = df.loc[i, 'Element']
         required = df.loc[i, 'Required']
+        han = df.loc[i, '한글명']
         desc = df.loc[i, 'Description']
         if required == 'Y':
-            s += f'"{element_name}": "{desc}",\n'
+            s += f'"{element_name}": "{han} {desc}",\n'
     s += "}\n"
     return s
 def item_script(df, class_name, ele_name):
@@ -294,6 +295,6 @@ if __name__ == "__main__":
     # main_menu  = "[국내주식] 종목정보"
     # sub_menu = "주식일별주문체결조회"
     main_menu  = "[국내주식] 주문계좌"
-    sub_menu = "주식정정취소가능주문조회"
+    sub_menu = "매수가능조회"
     main(main_menu, sub_menu)
     print("Done!")
