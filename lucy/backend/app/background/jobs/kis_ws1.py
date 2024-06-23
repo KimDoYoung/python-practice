@@ -7,11 +7,15 @@ from beanie import init_beanie
 import requests
 from backend.app.core.config import config
 from backend.app.core.mongodb import MongoDb
-from backend.app.domains.stc.kis.model.kis_websocket_model import KisWsResponse
+from backend.app.domains.stc.kis.model.kis_websocket_model import H0STASP0, H0STCNI0, H0STCNT0, KisWsRealHeader, KisWsResponse
 from backend.app.domains.user.user_model import User
 from backend.app.core.dependency import get_user_service
 from backend.app.core.logger import get_logger
-from backend.app.utils.kis_ws_util import is_real_data, real_data_trid
+from backend.app.utils.kis_ws_util import is_real_data
+
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import unpad
+from base64 import b64decode
 
 logger = get_logger(__name__)
 
@@ -37,6 +41,41 @@ def get_ws_approval_key(key, secret):
     logger.debug("웹소켓 접속키 발급 결과 : " + res.text)    
     approval_key = res.json()["approval_key"]
     return approval_key
+
+def aes_cbc_base64_dec(key, iv, cipher_text):
+    """
+    :param key:  str type AES256 secret key value
+    :param iv: str type AES256 Initialize Vector
+    :param cipher_text: Base64 encoded AES256 str
+    :return: Base64-AES256 decodec str
+    """
+    cipher = AES.new(key.encode('utf-8'), AES.MODE_CBC, iv.encode('utf-8'))
+    return bytes.decode(unpad(cipher.decrypt(b64decode(cipher_text)), AES.block_size))
+
+def kis_ws_real_data_parsing(recv_text, aes_key, aes_iv):
+    ''' KisWsRealHeader, KisWsRealModelBase 객체로 변환해서 리턴'''
+    class_map = {
+        'H0STASP0': H0STASP0,
+        'H0STCNI0': H0STCNI0,
+        'H0STCNT0': H0STCNT0
+    }
+    header = KisWsRealHeader.from_text(recv_text)
+    body_text = recv_text.split('|', 3)[-1]
+    if  header.is_encrypted(): # 암호화된 데이터인 경우
+        plain_text = aes_cbc_base64_dec(aes_key, aes_iv, body_text)
+    else:
+        plain_text = body_text
+    
+    tr_id = header.tr_id
+    instance = None
+    if tr_id in class_map:
+        cls = class_map[tr_id]
+        instance = cls.from_string(plain_text)
+        logger.debug(instance)
+    else:
+        logger.debug(f"{tr_id} 이름의 모델이 존재하지 않습니다.")
+
+    return header, instance
 
 async def kis_ws_connect():
     await init_db()
@@ -71,32 +110,18 @@ async def kis_ws_connect():
             logger.info(f"보낸데이터 : [{senddata}]")
         #TODO https://github.com/koreainvestment/open-trading-api/blob/main/websocket/python/ops_ws_sample.py#L29 소스 좀더 참고해보기
         await websocket.send(senddata)
+        
+        aes_key = None
+        aes_iv = None
+
         while True:
             received_text = await websocket.recv()
             logger.info("웹소켓(KIS로부터 받은데이터) : [" + received_text + "]")
             if is_real_data(received_text): # 실시간 데이터인 경우
-                trid0 = real_data_trid(received_text)
-                
-                # json_data = json.loads(response)
-                # tr_id = json_data['header']['tr_id']
-                # if response[0] == '0':
-                #     recvstr = data.split('|')  # 수신데이터가 실데이터 이전은 '|'로 나뉘어져있어 split
-                #     trid0 = recvstr[1]
-                #     if trid0 == "H0STASP0":  # 주식호가tr 일경우의 처리 단계
-                #         print("#### 주식호가 ####")
-                #         stockhoka(recvstr[3])
-                #         await asyncio.sleep(1)
-
-                #     elif trid0 == "H0STCNT0":  # 주식체결 데이터 처리
-                #         print("#### 주식체결 ####")
-                #         data_cnt = int(recvstr[2])	# 체결데이터 개수
-                #         stockspurchase(data_cnt, recvstr[3])
-
-                # elif data[0] == '1':
-                #     recvstr = data.split('|')  # 수신데이터가 실데이터 이전은 '|'로 나뉘어져있어 split
-                #     trid0 = recvstr[1]
-                #     if trid0 == "H0STCNI0" or trid0 == "H0STCNI9":  # 주실체결 통보 처리
-                #         stocksigningnotice(recvstr[3], aes_key, aes_iv)                
+                header, real_model = kis_ws_real_data_parsing(received_text, aes_key, aes_iv)
+                logger.info(f"header: {header}")
+                logger.info(f"real_model: {real_model}")
+                await asyncio.sleep(1)
             else: # 실시간 데이터가 아닌 경우
                 try:
                     kis_ws_model = KisWsResponse.from_json_str(received_text)
@@ -105,6 +130,8 @@ async def kis_ws_connect():
                         await websocket.pong(received_text)  # 웹소켓 클라이언트에서 pong을 보냄
                         logger.debug(f"PINGPONG 데이터 전송: [{received_text}]")
                     else:
+                        aes_iv = kis_ws_model.body.output.iv if kis_ws_model.body.output.iv is not None else aes_iv
+                        aes_key =  kis_ws_model.body.output.key if kis_ws_model.body.output.key is not None else aes_key
                         logger.info(f"PINGPONG 아닌 것: [{received_text}]")
                         logger.debug(f"kis_ws_model: {json.dumps(kis_ws_model.model_dump(), ensure_ascii=False)}")
                 except ValueError as e:

@@ -21,3 +21,4 @@ pandas
 lxml
 python-telegram-bot
 sympy
+pycryptodome
