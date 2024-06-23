@@ -20,13 +20,13 @@ import requests
 from backend.app.core.logger import get_logger
 from backend.app.domains.stc.kis.model.kis_inquire_balance_model import KisInquireBalance
 from backend.app.domains.stc.kis.model.kis_inquire_daily_ccld_model import InquireDailyCcldDto, InquireDailyCcldRequest
+from backend.app.domains.stc.kis.model.kis_inquire_psbl_rvsecncl_model import InquirePsblRvsecnclDto
 from backend.app.domains.stc.kis.model.kis_order_cash_model import KisOrderCash, OrderCancelRequest, OrderCashDto, OrderRvsecnclDto
 from backend.app.domains.stc.kis.model.kis_psearch_result_model import PsearchResultDto
 from backend.app.domains.stc.kis.model.kis_search_stock_info_model import SearchStockInfoDto
 from backend.app.domains.stc.kis.model.kis_psearch_title_model import PsearchTitleDto
 from backend.app.domains.user.user_model import KeyValueData, User
 from backend.app.core.dependency import get_user_service
-from backend.app.domains.user.user_service import UserService
 from backend.app.core.exception.lucy_exception import KisAccessTokenExpireException, KisAccessTokenInvalidException
 logger = get_logger(__name__)
 
@@ -401,4 +401,43 @@ class KoreaInvestmentApi:
             raise HTTPException(status_code=500, detail="Invalid JSON response")
         except ValidationError as e:
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
-        return order_cancel  
+        return order_cancel
+    
+##############################################################################################
+# [국내주식] 주문/계좌 > 주식정정취소가능주문조회[v1_국내주식-004]
+##############################################################################################
+#주식주문(정정취소) 호출 전에 반드시 주식정정취소가능주문조회 호출을 통해 
+#정정취소가능수량(output > psbl_qty)을 확인하신 후 정정취소주문 내시기 바랍니다.
+#TODO 테스트 필요
+def inquire_psbl_rvsecncl(self) -> OrderRvsecnclDto:
+    '''정정취소 가능수량 조회 '''
+    logger.info(f"정정취소 가능수량 조회")
+    url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/inquire-psbl-rvsecncl"
+    params = {
+        "CANO": self.ACCTNO[0:8],
+        "ACNT_PRDT_CD": self.ACCTNO[8:10],
+        "CTX_AREA_FK100": "",  #공란 : 최초 조회시 이전 조회 Output CTX_AREA_FK100 값 : 다음페이지 조회시(2번째부터)",
+        "CTX_AREA_NK100": "",  #공란 : 최초 조회시 이전 조회 Output CTX_AREA_NK100 값 : 다음페이지 조회시(2번째부터)",
+        "INQR_DVSN_1": "1",  #0 : 조회순서 1 : 주문순 2 : 종목순",
+        "INQR_DVSN_2": "1"  #0 : 전체 1 : 매도 2 : 매수",
+    }    
+    headers ={
+        "authorization": f"Bearer {self.ACCESS_TOKEN}",
+        "appkey": self.APP_KEY,
+        "appsecret": self.APP_SECRET,
+        "tr_id":  "TTTC8036R" #모의투자 사용 불가", 
+    }       
+    response = requests.get(url, headers=headers, params=params)
+    logger.debug(f"response : {response.text}")
+    if response.status_code != 200:
+        raise HTTPException(status_code=response.status_code, detail=f"Error fetching balance: {response.text}")
+    try:
+        json_data = response.json()
+        possible_cancel_result = InquirePsblRvsecnclDto(**json_data)
+        logger.info(f"조건식 목록 조회 : {possible_cancel_result}")
+    except requests.exceptions.JSONDecodeError:
+        logger.error(f"Error decoding JSON: {response.text}")
+        raise HTTPException(status_code=500, detail="Invalid JSON response")
+    except ValidationError as e:
+        raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
+    return possible_cancel_result    

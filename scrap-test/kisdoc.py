@@ -294,6 +294,6 @@ if __name__ == "__main__":
     # main_menu  = "[국내주식] 종목정보"
     # sub_menu = "주식일별주문체결조회"
     main_menu  = "[국내주식] 주문계좌"
-    sub_menu = "주식주문(정정취소)"
+    sub_menu = "주식정정취소가능주문조회"
     main(main_menu, sub_menu)
     print("Done!")

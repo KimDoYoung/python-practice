@@ -124,12 +124,12 @@ async def kis_ws_connect():
                 await asyncio.sleep(1)
             else: # 실시간 데이터가 아닌 경우
                 try:
-                    kis_ws_model = KisWsResponse.from_json_str(received_text)
-
-                    if kis_ws_model.isPingPong():
+                    resp_json = json.loads(received_text)
+                    if resp_json['header']['tr_id'] == 'PINGPONG': # PINGPONG 데이터인 경우
                         await websocket.pong(received_text)  # 웹소켓 클라이언트에서 pong을 보냄
                         logger.debug(f"PINGPONG 데이터 전송: [{received_text}]")
                     else:
+                        kis_ws_model = KisWsResponse.from_json_str(received_text)
                         aes_iv = kis_ws_model.body.output.iv if kis_ws_model.body.output.iv is not None else aes_iv
                         aes_key =  kis_ws_model.body.output.key if kis_ws_model.body.output.key is not None else aes_key
                         logger.info(f"PINGPONG 아닌 것: [{received_text}]")
