@@ -148,7 +148,29 @@
         const anchor = "<a href='https://finance.naver.com/item/main.nhn?code=" + stockCode + "' target='_blank'>" + stockCode + "</a>";
         return new Handlebars.SafeString(anchor);
     });
-    //TODO displayHanWon을 12345 -> 1조 2345억으로 변경
+    //displayJoEok을 12345 -> 1조 2345억으로 변경
+    Handlebars.registerHelper('displayJoEok', function(number) {
+        // 소수점 아래를 잘라내고 정수 부분만 사용
+        number = Math.floor(number);
+
+        if (typeof number !== 'number') {
+            return number;
+        }
+
+        let trillion = Math.floor(number / 10000);
+        let remainder = number % 10000;
+
+        let formattedNumber = '';
+        if (trillion > 0) {
+            formattedNumber += `${trillion}조 `;
+        }
+        if (remainder > 0 || formattedNumber !== '') {
+            formattedNumber += `${remainder.toLocaleString()}억`;
+        }
+
+        return formattedNumber.trim();
+    });
+
     Handlebars.registerHelper('displayWon', function(number) {
         // 숫자를 int형으로 변환
         var intNumber = parseInt(number, 10);
