@@ -47,7 +47,7 @@ class SchedulerJobService:
             logger.error(f"Failed to retrieve all SchedulerJobs: {e}")
             raise e
     
-    async def get_job(self, job_id: str) -> SchedulerJob:
+    async def get_1(self, job_id: str) -> SchedulerJob:
         scheduler_job = await SchedulerJob.find_one(SchedulerJob.job_id == job_id)
         return scheduler_job
     
@@ -67,26 +67,6 @@ class SchedulerJobService:
             return True
         else:
             return False
-    
-    # def run_async_job(self, async_func, *args):
-    #     loop = asyncio.get_event_loop()
-    #     if loop.is_running():
-    #         loop.create_task(async_func(*args))
-    #     else:
-    #         loop.run_until_complete(async_func(*args))
-    # async def run_async_task(self, coro):
-    #     return await coro
-    
-    # def run_async_job(self, job_func, *args, **kwargs):
-    #     try:
-    #         loop = asyncio.get_event_loop()
-    #     except RuntimeError:
-    #         loop = asyncio.new_event_loop()
-    #         asyncio.set_event_loop(loop)
-    #         loop = asyncio.get_event_loop()
-
-    #     task = loop.create_task(self.run_async_task(job_func(*args, **kwargs)))
-    #     loop.run_until_complete(task)
 
     async def run_async_task(self, coro):
         return await coro
@@ -97,29 +77,27 @@ class SchedulerJobService:
     #TODO DB에서 모두 가져오게끔 수정
     async def register_system_jobs(self):
         ''' 
-            1. DB에 system jobs 등록 
-            2. db에서 모두 읽어서 그것들을  스케줄러에 등록 
+            1. db에서 모두 읽어서 그것들을  스케줄러에 등록 
+            2. 기존 등록된 job은 삭제하고 다시 등록한다.
         '''
-        # 1. DB에 system jobs 등록
-        logger.info("1. DB에 system jobs 등록: 없으면 추가 있으면 pass")
-        test_job = SchedulerJob.find_one({"job_id": "test_job"})
-        count = await test_job.count()
-        if count == 0:
-            test_Job = SchedulerJob(job_id="test_job", job_name="test1", job_type="system", run_type="cron", func_name="test1", cron="*/5 * * * *", args=["Hello, World!"])
-            await test_Job.insert()
-        #2. db에서 모두 읽어서 그것들을  스케줄러에 등록
-        logger.info("2. DB에서 모두 읽어서 등록")
-        # test1 = job_mapping['test_task']
-        # self.scheduler.add_cron_job(func=test1, cron="*/1 * * * *", job_id="test_job", job_type="cron", args=["Hello, World!"], max_instances=2)
+        logger.info("1. DB에서 모두 읽어서 등록")
+        db_jobs = await self.get_all()
+        scheduler = self.scheduler.get_instance()
         
-        # simple_async_test = job_mapping['simple_async_test']
-        # self.scheduler.add_cron_job(func=self.run_async_job, cron="46 22 * * * ", job_id="simple_test_job", job_type="cron", args=(simple_async_test, "Async 테스트...."), max_instances=2)
+        for job in db_jobs:
+            job_id = job.job_id
+            # 기존 job이 있다면 삭제
+            scheduler.remove_job(job_id)
+            job_process = job_mapping[job_id]
+            # scheduler에 등록 
+            scheduler.add_cron_job(func=self.run_async_job, cron=job.cron_str, job_id=job_id, args=(job_process, job.args), max_instances=2)
+
         # TODO 휴일 가져오는 것도 매달 첫째날 1시에 돌리자
-        site38_work = job_mapping['site38_work']
-        self.scheduler.get_instance().add_cron_job(func=self.run_async_job, cron="40 14 * * 1-5", job_id="site38_work_job", job_type="cron", args=(site38_work,"커뮤니케이션38 스크랩"), max_instances=2)
+        # site38_work = job_mapping['site38_work']
+        # self.scheduler.get_instance().add_cron_job(func=self.run_async_job, cron="40 14 * * 1-5", job_id="site38_work",  args=(site38_work,"커뮤니케이션38 스크랩"), max_instances=2)
         
-        holiday_godata = job_mapping['holiday_godata']
-        self.scheduler.get_instance().add_cron_job(func=self.run_async_job, cron="00 17 * * *", job_id="holiday_godata", job_type="cron", args=(holiday_godata,"휴일정보"), max_instances=2)
+        # holiday_godata = job_mapping['holiday_godata']
+        # self.scheduler.get_instance().add_cron_job(func=self.run_async_job, cron="00 17 * * *", job_id="holiday_godata", args=(holiday_godata,"휴일정보"), max_instances=2)
         
 
         return {"message": "System jobs registered successfully"}

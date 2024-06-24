@@ -2,7 +2,7 @@
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from backend.app.core.scheduler import Scheduler
 from backend.app.domains.system.config_service import DbConfigService
-from backend.app.domains.system.scheduler_job_model import JobRequest
+from backend.app.domains.system.scheduler_job_model import JobRequest, SchedulerJob
 from backend.app.domains.system.scheduler_job_service import SchedulerJobService
 from backend.app.background.schedule_mapping import job_mapping
 from backend.app.core.logger import get_logger
@@ -31,26 +31,21 @@ async def get_jobs(scheduler_job_servce: SchedulerJobService = Depends(get_sched
     logger.debug(f"job_list: {job_list}")
     return job_list    
 
-@router.post("/add")
-async def add_job(job_request: JobRequest, scheduler_job_servce: SchedulerJobService = Depends(get_scheduler_job_service)):
+@router.get("/{job_id}")
+async def get_1(job_id : str, scheduler_job_servce: SchedulerJobService = Depends(get_scheduler_job_service))-> SchedulerJob:
+    ''' 스케줄러 job1개 조회  '''
+    job = await scheduler_job_servce.get_1(job_id)
+    return job
+
+@router.post("/edit/{job_id}")
+async def update_job(job_request: JobRequest, scheduler_job_servce: SchedulerJobService = Depends(get_scheduler_job_service)):
     
     try:
-        # Save job to db
-        await scheduler_job_servce.create(job_request.model_dump())
-
-        scheduler = Scheduler.get_instance()
-        if job_request.run_type == "date":
-            func = job_mapping.get(job_request.func_name)
-            if func is None:
-                raise HTTPException(status_code=400, detail="Task not found")
-            args = tuple(job_request.args)
-            scheduler.add_date_job(func=func, cron=job_request.cron, job_id=job_request.job_id, job_type=job_request.job_type, args=args)   
-        else:
-            func = job_mapping.get(job_request.func_name)
-            if job_request.run_date is None:
-                raise HTTPException(status_code=400, detail="run_date must be provided for date jobs")
-            args = tuple(job_request.args)
-            scheduler.add_date_job(func=func, run_date=job_request.run_date, job_id=job_request.job_id, job_type=job_request.job_type, args=args)
+        # DB에 변경사항을 저장하고
+        await scheduler_job_servce.update(job_request)
+        # 스케줄러에 변경사항을 반영한다.
+        await scheduler_job_servce.register_system_jobs()
+        
         return {"message": "Job added successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))    

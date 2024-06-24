@@ -6,13 +6,44 @@
 
 {% block content %}
 <section id="list-area" class="container">
-    <div id="button-area">
+    <!-- <div id="button-area">
         <a href="#"  class="btnDisplayForm btn btn-success" data-mode="insert">추가</a>
-    </div>
+    </div> -->
     <div id="config-table-area"></div>
     <div id="scheduler-table-area"></div>
 </section>
-<section id="form-area" class="container d-none" >
+<!-- Scheduler 수정 폼 -->
+<section id="scheduler-form-area" class="container d-none" >
+    <h2 id="title">Scheduler Edit </h2>
+    <form id="scheduler-form" action="/api/v1/scheduler" method="post">
+        <input type="hidden" name="db_action" id="db_action" value="insert">
+
+        <div class="mb-3">
+            <label for="job_id" class="form-label">Job Id</label>
+            <input type="text" class="form-control" id="job_id" name="job_id"  required readonly>
+        </div>
+
+        <div class="mb-3">
+            <label for="run_type" class="form-label">Run Type</label>
+            <input type="text" class="form-control" id="run_type" name="run_type" required  readonly>
+        </div>
+
+        <div class="mb-3">
+            <label for="args" class="form-label">Arguments</label>
+            <input type="text" class="form-control" id="args" name="args" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="cron_str" class="form-label">Cron</label>
+            <input type="text" class="form-control" id="cron_str" name="cron_str" required >
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-secondary btnHideForm">Cancel</button>
+    </form>
+
+</section>
+<section id="config-form-area" class="container d-none" >
     <h2 id="title">Config Add </h2>
     <form id="dbconfig-form" action="/api/v1/config" method="post">
         <input type="hidden" name="db_action" id="db_action" value="insert">
@@ -20,7 +51,7 @@
         <div class="mb-3">
             <label for="mode" class="form-label">Mode</label><br>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="mode" id="modeSystem" value="System" checked readonly>
+                <input class="form-check-input" type="radio" name="mode" id="modeSystem" value="System" readonly>
                 <label class="form-check-label" for="modeSystem">System</label>
             </div>
             <div class="form-check form-check-inline">
@@ -43,6 +74,7 @@
             <label for="note" class="form-label">Note</label>
             <textarea class="form-control" id="note" name="note" rows="3"></textarea>
         </div>
+        <input type="hidden"  name="editable" id="editable" value="" required>
 
         <button type="submit" class="btn btn-primary">Submit</button>
         <button type="submit" class="btn btn-secondary btnHideForm">Cancel</button>
@@ -88,13 +120,9 @@
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">Job Id</th>
-                <th scope="col">Job Name</th>
-                <th scope="col">Type</th>
-                <th scope="col">Run Time Or Cron</th>
-                <th scope="col">Func Name</th>
+                <th scope="col">Run Type</th>
                 <th scope="col">Arguments</th>
-                <th scope="col">Running</th>
-                <th scope="col">Next Run Time</th>
+                <th scope="col">Cron</th>
             </tr>
         </thead>
         <tbody>    
@@ -102,20 +130,12 @@
     <tr>
         <td>{{inc @index}}</td>
         <td>{{job_id}}</td>
-        <td>{{job_name}}</td>
-        <td>{{job_type}}/{{run_type}}</td>
-        <td>
-            {{#test "run_type == 'cron'" }}
-                {{cron}}
-            {{else}}
-                {{run_date}}
-            {{/test}}
-        </td>
-        <td>{{func_name}}</td>
+        <td>{{run_type}}</td>
         <td>{{args}}</td>
-        <td>{{is_running}}</td>
-        <td>{{next_run_time}}</td>
-        <td>삭제</td>
+        <td>{{cron_str}}</td>
+        <td>
+            <button type="button" class="btn btn-sm btn-primary btnDisplaySchedulerForm" data-key="{{job_id}}" data-mode="update">Edit</button>
+        </td>
     </tr>
     {{/each}}
         </tbody>
@@ -154,19 +174,41 @@
                 $('#scheduler-table-area').html(html);
             });
         }
+        // config key로 조회
         async function getConfigFromDb(key) {
             try{
                 const data = await fetchData('/api/v1/config/'+key);
                 $('#db_action').val('update');
-                $('#mode').val(data.mode);
+                if (data.mode == 'System') $('#modeSystem').prop('checked', true);
+                else $('#modeUser').prop('checked', true);
+
+                // $('input[name=mode]').prop('checked', true);
+                // $('#mode').val(data.mode);
                 $('#key').val(data.key);
                 $('#value').val(data.value);
                 $('#note').val(data.note);
+                $('#editable').val(data.editable);
             }catch (error) {
                 console.error('upsertConfig 중 에러 발생:', error);
                 showToastError(error);
             }
         }
+        // scheduler job_id로  조회
+        async function getSchedulerFromDb(job_id) {
+            try{
+                const data = await fetchData('/api/v1/scheduler/'+job_id);
+                $('#job_id').val(data.job_id);
+                $('#run_type').val(data.run_type);
+                $('#args').val(data.args);
+                $('#cron_str').val(data.cron_str);
+
+
+            }catch (error) {
+                console.error('upsertConfig 중 에러 발생:', error);
+                showToastError(error);
+            }
+        }
+        // config 추가/수정 
         async function upsertConfig(configData) {
 
             try {
@@ -197,6 +239,17 @@
             }
         }
 
+        async function upsertScheduler(data) {
+
+            try {
+                response = await postData('/api/v1/scheduler/edit/'+data.key, data);
+                console.log('응답 데이터:', response);
+                window.location.reload();
+            } catch (error) {
+                console.error('upsertScheduler  중 에러 발생:', error);
+                showToastError(error);
+            }
+        }
         initialize();
         
         //-------------------------------
@@ -207,20 +260,42 @@
                 e.preventDefault();
                 e.stopPropagation();
 
-                $('#form-area').addClass('d-none');
+                $('#config-form-area').addClass('d-none');
                 $('#list-area').removeClass('d-none');
             });
-
+            //scheduler form submit클릭
+            $('#scheduler-form').on('submit', function(event) {
+                event.preventDefault();
+                const dataObject = JuliaUtil.objectFromForm($(this));
+                console.log(dataObject);
+                upsertScheduler(dataObject);
+            });
+            //config form submit클릭
             $('#dbconfig-form').on('submit', function(event) {
                 event.preventDefault();
+                $('#modeSystem').prop('disabled', false);
+                $('#modeUser').prop('disabled', false);                
                 const dataObject = JuliaUtil.objectFromForm($(this));
                 console.log(dataObject);
                 upsertConfig(dataObject);
             });
+            //Scheduler 수정 버튼 클릭시
+            $('.container').on('click', '.btnDisplaySchedulerForm', function(e){
+                e.preventDefault();
+                e.stopPropagation();
+                $('#scheduler-form-area').removeClass('d-none');
+                $('#list-area').addClass('d-none');
+                var key = $(this).data('key');
+                console.log('key:', key);
+                debugger;
+                getSchedulerFromDb(key);
+
+            });
+            //Config 수정버튼 클릭시
             $('.container').on('click', '.btnDisplayForm', function(e){
                 e.preventDefault();
                 e.stopPropagation();
-                $('#form-area').removeClass('d-none');
+                $('#config-form-area').removeClass('d-none');
                 $('#list-area').addClass('d-none');
 
                 let mode = $(this).data('mode');
@@ -230,11 +305,15 @@
                     $('#key').val('');
                     $('#value').val('');
                     $('#note').val('');
+                    $('#editable').val('false');
                     $('#modeSystem').prop('disabled', true);
-                    $('#modeUser').prop('checked', true);
+                    $('#modeSystem').prop('checked', true);
                 } else {
                     $('#db_action').val('update');
-                    $('#title').text('Config Update');
+                    $('#title').text('Config 수정');
+                    $('#modeSystem').prop('disabled', true);
+                    $('#modeUser').prop('disabled', true);
+                    $('#key').prop('readonly', true);
                     debugger;
                     var key = $(this).data('key');
                     getConfigFromDb(key);

@@ -37,7 +37,7 @@ class Scheduler:
         except Exception as e:
             return {"error": str(e)}
 
-    def add_cron_job(self, func: Callable, cron: str, job_id: str, job_type:str, args: tuple = (),  max_instances: int = 1) -> None:
+    def add_cron_job(self, func: Callable, cron: str, job_id: str,  args: tuple = (),  max_instances: int = 1) -> None:
         try:
             logger.debug('add_cron_job 함수 실행:' + job_id)
             job = self.scheduler.add_job(func, CronTrigger.from_crontab(cron), id=job_id, args=args, max_instances=max_instances)
