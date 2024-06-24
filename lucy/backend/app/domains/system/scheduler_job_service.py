@@ -1,14 +1,26 @@
+# scheduler_job_service.py
+"""
+모듈 설명: 
+    - SchedulerJob Collection에 대한 비즈니스 로직을 처리하는 서비스 클래스
+    - Scheduler (BackgroundScheduler)를 이용하여 스케줄러에 등록된 job을 관리한다.
+주요 기능:
+    - Lucy 시작할 때 DB에서 읽어서 스케줄러에 등록
+    - Scheduler class와 Db 를 조합하여  정보를 가져오기
+    - SchedulerJob Collection을 변경해서 실행시간을 변경시키기
+
+작성자: 김도영
+작성일: 24
+버전: 1.0
+"""
 import asyncio
 from typing import List
 from backend.app.core.logger import get_logger
 
 from backend.app.domains.system.scheduler_job_model import SchedulerJob
-#from backend.app.background.jobs.job_test import test1
 from backend.app.background.schedule_mapping import job_mapping
 
 logger = get_logger(__name__)
 
-#TODO 다듬을 것 DB를 쓸 것인지? 만약 쓰지 않는다면 ... Scheduler instance를 삭제
 class SchedulerJobService:
     # _instance = None
     def __init__(self, scheduler):
@@ -74,7 +86,6 @@ class SchedulerJobService:
     def run_async_job(self, coro, *args, **kwargs):
         asyncio.run_coroutine_threadsafe(self.run_async_task(coro(*args, **kwargs)), self.loop)        
 
-    #TODO DB에서 모두 가져오게끔 수정
     async def register_system_jobs(self):
         ''' 
             1. db에서 모두 읽어서 그것들을  스케줄러에 등록 
@@ -91,13 +102,5 @@ class SchedulerJobService:
             job_process = job_mapping[job_id]
             # scheduler에 등록 
             scheduler.add_cron_job(func=self.run_async_job, cron=job.cron_str, job_id=job_id, args=(job_process, job.args), max_instances=2)
-
-        # TODO 휴일 가져오는 것도 매달 첫째날 1시에 돌리자
-        # site38_work = job_mapping['site38_work']
-        # self.scheduler.get_instance().add_cron_job(func=self.run_async_job, cron="40 14 * * 1-5", job_id="site38_work",  args=(site38_work,"커뮤니케이션38 스크랩"), max_instances=2)
-        
-        # holiday_godata = job_mapping['holiday_godata']
-        # self.scheduler.get_instance().add_cron_job(func=self.run_async_job, cron="00 17 * * *", job_id="holiday_godata", args=(holiday_godata,"휴일정보"), max_instances=2)
-        
 
         return {"message": "System jobs registered successfully"}
