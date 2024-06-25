@@ -1,3 +1,15 @@
+# danta_machine_routes.py
+"""
+모듈 설명: 
+    - danta_machine 관련 API 라우터
+주요 기능:
+    - /start: 단타머신 시작
+    - /stop: 단타머신 종료
+
+작성자: 김도영
+작성일: 25
+버전: 1.0
+"""
 import asyncio
 from fastapi import APIRouter
 from backend.app.background.danta_machine import start_danta_machine

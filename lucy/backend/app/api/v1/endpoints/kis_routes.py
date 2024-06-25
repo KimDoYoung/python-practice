@@ -44,7 +44,7 @@ async def validate_user(request: Request, user_service: UserService):
         raise HTTPException(status_code=401, detail="Invalid token-사용자 정보가 없습니다")
     
     return user
-#TODO : get_kis_api 함수를 데코레이터로 만들어서 사용하는 것이 좋을 것 같다.
+
 async def get_kis_api(request: Request, user_service: UserService) -> KoreaInvestmentApi:
     ''' 
         토큰이 유효한지 체크해서 유효하지 않으면 새로 발급받아서 User DB에 저장한다. 
@@ -67,30 +67,55 @@ async def get_kis_api(request: Request, user_service: UserService) -> KoreaInves
         new_access_token=await kis_api.set_access_token_from_kis()
         return kis_api
 
+# def get_kis_api(func):
+#     @wraps(func)
+#     async def wrapper(request: Request, user_service: UserService, *args, **kwargs):
+#         user = await validate_user(request, user_service)
+#         kis_api = KoreaInvestmentApi(user)
+        
+#         try:
+#             cost = kis_api.get_current_price("005930") # 삼성전자
+#             logger.debug(f"현재 ACCESS_TOKEN OK, 삼성전자 현재가 : {cost}")
+#         except KisAccessTokenExpireException as e:
+#             logger.warning(f"현재 ACCESS_TOKEN은 만료되었습니다.")
+#             new_access_token = await kis_api.set_access_token_from_kis()
+#             logger.debug(f"새로운 ACCESS_TOKEN을 발급받음: [{new_access_token}]")
+#         except KisAccessTokenInvalidException as e:
+#             logger.error(f"현재 ACCESS_TOKEN이 유효하지 않습니다.")
+#             new_access_token = await kis_api.set_access_token_from_kis()
+        
+#         return await func(request, user_service, kis_api, *args, **kwargs)
+#     return wrapper
+
+@router.get("/", response_class=JSONResponse, response_model=None)
+async def info(request:Request, user_service :UserService=Depends(get_user_service)):
+    '''1.주식잔고조회, 2. 보유주식을 mystock에 등록'''
+    
+    kis_api = await get_kis_api(request, user_service)
+
+    kis_inquire_balance =  kis_api.get_inquire_balance()
+    mystock_service = get_mystock_service()
+    output1 = kis_inquire_balance.output1
+    for item in output1:
+        stk_code = item.pdno
+        stk_name = item.prdt_name
+        stk_types = ['보유']
+        mystock_dto = MyStockDto(stk_code=stk_code, stk_name=stk_name, stk_types=stk_types)
+        await mystock_service.upsert(mystock_dto)
+
+    logger.debug(f"주식잔고 조회 : {kis_inquire_balance}")
+    return kis_inquire_balance
+
+
 @router.get("/current-cost/{stk_cost}", response_class=JSONResponse)
 async def current_cost(request:Request, stk_cost:str, user_service :UserService=Depends(get_user_service)):
     '''
-        1. 현재 사용자 DB에 있는 ACCESS_TOKEN으로 현재가를 조회하고  
-        2. KIS_ACCESS_TOKEN_EXPIRE_EXCECPTION이 발생하면 
-        3. 새로 token을 발급받아서 User DB에 저장한다.
+        현재가 조회
     '''
-    
-    user = await validate_user(request, user_service)
-    kis_api = KoreaInvestmentApi(user)
-    
-    try:
-        cost = kis_api.get_current_price(stk_cost) # 삼성전자
-        logger.debug(f"{stk_cost} 현재가 : {cost}")
-        return {"cost": cost}
-    except KisAccessTokenExpireException as e:
-        logger.warning(f"현재 ACCESS_TOKEN은  만료되었습니다.")
-        new_access_token=await kis_api.set_access_token_from_kis()
-        logger.debug(f"새로운 ACCESS_TOKEN을 발급받음: [{new_access_token}]")
-    except KisAccessTokenInvalidException as e:
-        logger.error(f"현재 ACCESS_TOKEN이 유효하지 않습니다.")
-        new_access_token=await kis_api.set_access_token_from_kis()
-        return {"detail": "기존 Access Token이 유효하지 않아 재발급받음. 이제 Access Token 은 유효함"}        
-
+    kis_api = await get_kis_api(request, user_service)
+    cost = kis_api.get_current_price(stk_cost) # 삼성전자
+    logger.debug(f"{stk_cost} 현재가 : {cost}")
+    return {"cost": cost}
 
 @router.get("/token", response_class=JSONResponse)
 async def get_token_from_kis(request:Request, user_service :UserService=Depends(get_user_service)):
@@ -115,35 +140,13 @@ async def get_token_from_kis(request:Request, user_service :UserService=Depends(
         logger.error(f"현재 ACCESS_TOKEN이 유효하지 않습니다.")
         new_access_token=await kis_api.set_access_token_from_kis()
         return {"detail": "기존 Access Token이 유효하지 않아 재발급받음. 이제 Access Token 은 유효함"}
-    
-
-@router.get("/", response_class=JSONResponse)
-async def info(request:Request, user_service :UserService=Depends(get_user_service)):
-    '''1.주식잔고조회, 2. 보유주식을 mystock에 등록'''
-    
-    kis_api = await get_kis_api(request, user_service)
-
-    kis_inquire_balance =  kis_api.get_inquire_balance()
-    mystock_service = get_mystock_service()
-    output1 = kis_inquire_balance.output1
-    for item in output1:
-        stk_code = item.pdno
-        stk_name = item.prdt_name
-        stk_types = ['보유']
-        mystock_dto = MyStockDto(stk_code=stk_code, stk_name=stk_name, stk_types=stk_types)
-        await mystock_service.upsert(mystock_dto)
-
-    logger.debug(f"주식잔고 조회 : {kis_inquire_balance}")
-    return kis_inquire_balance
 
 
 @router.post("/order-cash", response_class=JSONResponse)
 async def order_cash(request:Request, order_cash: OrderCashDto, user_service :UserService=Depends(get_user_service)):
     '''주식매수, 주식매도 주문'''
     
-    user = await validate_user(request, user_service)
-
-    kis_api = KoreaInvestmentApi(user)
+    kis_api = await get_kis_api(request, user_service)
     kis_order_cash =   kis_api.order_cash(order_cash)
     if order_cash.buy_sell_gb == "매수":
         logger.debug(f"주식매수 : {kis_order_cash}")
@@ -154,10 +157,7 @@ async def order_cash(request:Request, order_cash: OrderCashDto, user_service :Us
 @router.post("/order-cancel", response_class=JSONResponse)
 async def order_cancel(request:Request, order_cancel: OrderCancelRequest, user_service :UserService=Depends(get_user_service)):
     '''주식매수, 주식매도 취소'''
-    
-    user = await validate_user(request, user_service)
-
-    kis_api = KoreaInvestmentApi(user)
+    kis_api = await get_kis_api(request, user_service)
     cancel_response =   kis_api.order_cancel(order_cancel)
     logger.debug(f"주식매수,매도 취소 : {cancel_response.to_str()}")
     return cancel_response
@@ -165,43 +165,29 @@ async def order_cancel(request:Request, order_cancel: OrderCancelRequest, user_s
 @router.get("/stock-info/{stk_code}", response_class=JSONResponse)
 async def stock_info(request:Request, stk_code:str,  user_service :UserService=Depends(get_user_service)):
     '''주식정보 조회'''
-
-    user = await validate_user(request, user_service)
-
-    kis_api = KoreaInvestmentApi(user)
+    kis_api = await get_kis_api(request, user_service)
     kis_stock_info = kis_api.search_stock_info(stk_code)
     return kis_stock_info
 
 @router.get("/psearch/title", response_class=JSONResponse)
 async def psearch_title(request:Request, user_service :UserService=Depends(get_user_service)):
     '''조건식 타이틀 조회'''    
-    
-    user = await validate_user(request, user_service)
-
-    kis_api = KoreaInvestmentApi(user)
+    kis_api = await get_kis_api(request, user_service)    
     kis_psearch_title = kis_api.psearch_title()
     return kis_psearch_title
 
 @router.get("/psearch/result/{seq}", response_class=JSONResponse)
 async def psearch_result(request:Request,  seq:str, user_service :UserService=Depends(get_user_service)):
-    '''조건식 '''
-
-    user = await validate_user(request, user_service)
-
-    kis_api = KoreaInvestmentApi(user)
+    '''seq에 해당하는 조건식 조회 '''
+    kis_api = await get_kis_api(request, user_service)
     kis_psearch_result = kis_api.psearch_result(seq)
     return kis_psearch_result
 
 
 @router.post("/inquire-daily-ccld", response_class=JSONResponse)
 async def inquire_daily_ccld(request:Request, ccld: InquireDailyCcldRequest, user_service :UserService=Depends(get_user_service)):
-    '''조건식 '''
-    
-    user = await validate_user(request, user_service)
-
-    kis_api = KoreaInvestmentApi(user)
-    # todayYmd = datetime.today().strftime("%Y%m%d")
-    # ccld = InquireDailyCcldRequest(inqr_strt_dt=todayYmd, inqr_end_dt=todayYmd)
+    '''주식일별주문체결조회 '''
+    kis_api = await get_kis_api(request, user_service)
     ccld_result = kis_api.inquire_daily_ccld(inquire_daily_ccld=ccld)
     logger.debug("주식일별주문체결조회:["+ccld_result.to_str()+"]")
     return ccld_result

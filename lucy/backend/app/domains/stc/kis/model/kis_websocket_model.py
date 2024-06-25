@@ -1,5 +1,5 @@
 import json
-from typing import List, Type, TypeVar
+from typing import List, Optional, Type, TypeVar
 from pydantic import BaseModel, ValidationError
 
 T = TypeVar('T', bound='KisWsResponseBase')
@@ -27,7 +27,7 @@ class Body(BaseModel):
     rt_cd: str
     msg_cd: str
     msg1: str
-    output: Output
+    output: Optional[Output] = None
 
 class Header(BaseModel):
     tr_id: str

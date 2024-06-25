@@ -86,6 +86,7 @@
         </thead>
         <tbody>
             {{#each data.output1}}
+            {{#test "rmn_qty != '0'" }}
             <tr>
                 <td>{{this.prdt_name}}({{this.pdno}})</td>
                 <td>{{this.ord_dt}} {{this.ord_tmd}}</td>
@@ -111,6 +112,7 @@
                     class="btnOrderCancel">잔량전부취소</a></td>
                     {{/test}}
             </tr>
+            {{/test}}
             {{/each}}
         </tbody>
     </table>
@@ -159,6 +161,7 @@
                 let html = template({data : response});
                 $('#ccld-result-area').html(html)
             }else{
+            debugger;
                 let template = Handlebars.compile(document.getElementById('ccld-table-template').innerHTML); 
                 let html = template({data : response});
                 $('#ccld-result-area').html(html)

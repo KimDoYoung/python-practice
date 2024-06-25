@@ -7,6 +7,9 @@
 {% block content %}
 <section id="list" class="container">
     <h2>단타머신</h2>
+    <div id="button-area">
+        <button id="btnDantaStartStop" class="btn btn-primary">Danta Start</button>
+    </div>
 </section>
 {% raw %} 
 <script id="table1-area" type="text/x-handlebars-template">
@@ -19,6 +22,10 @@
 <script>
     $( document ).ready(function() {
         console.log('단타머신 ready.... ');
+        $('#btnDantaStartStop').on('click', function(){
+
+        })
+        
     });
     </script>	    
 {% endraw %}

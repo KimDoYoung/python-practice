@@ -106,17 +106,30 @@ async def kis_ws_connect():
 
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         choice = input(timestamp + ": Enter 'exit' to exit: ")
-        stk_code = '005930'
+        # stk_code = '005930'
+        stk_code = '108380'
         if choice == '1': #주식호가 등록
             tr_id = 'H0STASP0'
             tr_type = '1'
         elif choice == '2':  # 주식체결 등록
+            tr_id = 'H0STASP0'
+            tr_type = '2'
+        elif choice == '3':  # 주식체결 등록
             tr_id = 'H0STCNT0'
-            tr_type = '1'            
+            tr_type = '1'
+        elif choice == '4':  # 주식체결 등록해제
+            tr_id = 'H0STCNT0'
+            tr_type = '2'
+        elif choice == '5':  # 주식체결통보 등록(고객용)
+            tr_id = 'H0STCNI0' # 고객체결통보
+            tr_type = '1'
+        elif choice == '6':  # 주식체결통보 등록해제(고객용)
+            tr_id = 'H0STCNI0' # 고객체결통보
+            tr_type = '2'
         else:
             senddata = 'wrong inert data'
         
-        if choice == '1' or choice == '2':
+        if choice == '1' or choice == '2' or choice == '3' or choice == '4':
             req = new_kis_ws_request()
             req.header.approval_key = ws_approval_key
             req.header.personalseckey = KIS_APP_SECRET
@@ -124,6 +137,15 @@ async def kis_ws_connect():
             req.body.input.tr_id = tr_id
             req.body.input.tr_key = stk_code
             senddata = req.model_dump_json()
+        elif choice == '5' or choice == '6':
+            req = new_kis_ws_request()
+            req.header.approval_key = ws_approval_key
+            req.header.personalseckey = KIS_APP_SECRET
+            req.header.tr_type = tr_type
+            req.body.input.tr_id = tr_id
+            req.body.input.tr_key = KIS_HTS_USER_ID
+            senddata = req.model_dump_json()
+            
             # senddata = '{{"header": {{"approval_key": "{}", "personalseckey": "{}", "custtype": "P", "tr_type": "{}", "content-type": "utf-8"}}, "body": {{"input": {{"tr_id": "{}", "tr_key": "{}"}}}}}}'.format(
             #     ws_approval_key, KIS_APP_SECRET, tr_type, tr_id, stk_code
             # )
@@ -153,8 +175,9 @@ async def kis_ws_connect():
                         logger.debug(f"PINGPONG 데이터 전송: [{received_text}]")
                     else:
                         kis_ws_model = KisWsResponse.from_json_str(received_text)
-                        aes_iv = kis_ws_model.body.output.iv if kis_ws_model.body.output.iv is not None else aes_iv
-                        aes_key =  kis_ws_model.body.output.key if kis_ws_model.body.output.key is not None else aes_key
+                        if kis_ws_model.body.output is not None and kis_ws_model.body.output.iv is not None and kis_ws_model.body.output.key is not None:
+                            aes_iv = kis_ws_model.body.output.iv
+                            aes_key =  kis_ws_model.body.output.key
                         logger.info(f"PINGPONG 아닌 것: [{received_text}]")
                         logger.debug(f"kis_ws_model: {json.dumps(kis_ws_model.model_dump(), ensure_ascii=False)}")
                 except ValueError as e:

@@ -34,11 +34,13 @@ async def stop_danta_machine():
         try:
             await Danta_Machine_Task
         except asyncio.CancelledError:
+            logger.error("단타머신 종료 중 에러 발생")
             pass
         logger.info("단타머신 종료")
         #await send_danta_message("단타머신 종료합니다.")
 
 async def danta_machine_main():
+    '''' 단타 머신 메인 루프 '''
     while True:
         logger.debug("단타 머신 수행 중..." + str(time.time()))
         await asyncio.sleep(10)  # 실제 작업을 대체하는 지연
