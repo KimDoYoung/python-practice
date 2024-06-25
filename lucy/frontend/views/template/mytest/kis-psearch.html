@@ -45,8 +45,7 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="card-title text-primary">{{this.name}}</h5>
-                    <!--TODO 코딩할 것-->
-                    <button class="btnBuy btn btn-danger" data-stk-code="{{this.code}}">買</button>
+                    <button class="btnBuy btn btn-danger" data-stk-code="{{this.code}}" data-stk-name="{{this.name}}">買</button>
                 </div>
                 <div class="card-body">
                 <p class="card-text"><strong>종목코드:</strong> {{goNaver this.code}} ({{displayDaebi this.daebi}})</p>
@@ -66,7 +65,7 @@
                 <p class="card-text"><strong>기준가:</strong> {{this.recprice}}</p>
                 <p class="card-text"><strong>상한가:</strong> {{this.uplmtprice}}</p>
                 <p class="card-text"><strong>하한가:</strong> {{this.dnlmtprice}}</p> -->
-                <p class="card-text"><strong>시가총액:</strong> {{displayWon this.stotprice}}억</p>
+                <p class="card-text"><strong>시가총액:</strong> {{displayJoEok this.stotprice}}</p>
                 </div>
             </div>
         </div>
@@ -122,6 +121,12 @@
                 make_result_html(data)
             })
             .catch(error=> { console.error(error); });
+        });
+        //매수 버튼 클릭
+        $('#psearch-reuslt-area').on("click", ".btnBuy", function() {
+            const stk_code = $(this).data('stk-code');
+            const stk_name = $(this).data('stk-name');
+            showBuySellCanvas(stk_code, stk_name, "매수", 1, 0);
         });
     });
     </script>	    

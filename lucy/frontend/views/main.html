@@ -43,8 +43,8 @@
                 <td>
                     <button class="btnDelete btn btn-secondary" data-id="{{this._id}}" title="관심..삭제"><i class="bi bi-dash"></i></button>
                     <button class="btnCurrentCost btn btn-success" data-stk-code="{{this.stk_code}}"><img src="public/images/korean-won.svg" alt="아이콘" width="20" height="20"></button>
-                    <button class="btnBuy btn btn-danger" data-stk-code="{{this.stk_code}}">買</button>
-                    <button class="btnSell btn btn-primary" data-stk-code="{{this.stk_code}}">賣</button>
+                    <button class="btnBuy btn btn-danger" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}">買</button>
+                    <button class="btnSell btn btn-primary" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}">賣</button>
                 </td>
             </tr>
             {{/each}}
@@ -136,6 +136,20 @@
             }).catch(error => {
                 console.log(error);
             });
+        })
+        // btnBuy구매 버튼 클릭
+        $('#list-area').on('click', '.btnBuy', function(e){
+            e.stopPropagation();
+            const stk_code = $(this).data('stk-code');
+            const stk_name = $(this).data('stk-name');
+            showBuySellCanvas(stk_code, stk_name, "매수", 1, 0);
+        })
+        // btnSell판매 버튼 클릭
+        $('#list-area').on('click', '.btnSell', function(e){
+            e.stopPropagation();
+            const stk_code = $(this).data('stk-code');
+            const stk_name = $(this).data('stk-name');
+            showBuySellCanvas(stk_code, stk_name, "매도", 1, 0);
         })
         display_mystocks();
     });
