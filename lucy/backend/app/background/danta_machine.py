@@ -20,6 +20,7 @@ logger = get_logger(__name__)
 Danta_Machine_Task = None
 
 async def start_danta_machine():
+    ''' 단타 머신 시작 '''
     global Danta_Machine_Task
     if Danta_Machine_Task is None or Danta_Machine_Task.cancelled():
         Danta_Machine_Task = asyncio.create_task(danta_machine_main())
@@ -28,19 +29,27 @@ async def start_danta_machine():
 
 
 async def stop_danta_machine():
+    ''' 단타 머신 종료 '''
     global Danta_Machine_Task
     if Danta_Machine_Task:
         Danta_Machine_Task.cancel()
         try:
             await Danta_Machine_Task
-        except asyncio.CancelledError:
-            logger.error("단타머신 종료 중 에러 발생")
-            pass
+        except asyncio.CancelledError as e:
+            logger.error(f"단타머신 종료 중 에러 발생: {e}")
+        finally:
+            Danta_Machine_Task = None
         logger.info("단타머신 종료")
-        #await send_danta_message("단타머신 종료합니다.")
+
+def danta_machine_status() -> str:
+    global Danta_Machine_Task
+    if Danta_Machine_Task is None or Danta_Machine_Task.cancelled():
+        return "stopped"
+    else:
+        return "running"
 
 async def danta_machine_main():
     '''' 단타 머신 메인 루프 '''
     while True:
         logger.debug("단타 머신 수행 중..." + str(time.time()))
-        await asyncio.sleep(10)  # 실제 작업을 대체하는 지연
+        await asyncio.sleep(5)  # 실제 작업을 대체하는 지연

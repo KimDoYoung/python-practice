@@ -10,6 +10,9 @@
     <div id="button-area">
         <button id="btnDantaStartStop" class="btn btn-primary">Danta Start</button>
     </div>
+    <div id="status-area">
+        <div id="status-danta"></div>
+    </div>
 </section>
 {% raw %} 
 <script id="table1-area" type="text/x-handlebars-template">
@@ -20,12 +23,55 @@
 {% block script %}
 {% raw %}
 <script>
+    const DANTA_START = 'Danta Start';
+    const DANTA_STOP = 'Danta Stop';
+    function initialize() {
+        fetchData('/api/v1/danta/status')
+        .then(data => {
+            const status = data.status;
+            const message = data.message;
+            $('#status-danta').text(message);
+            if(status === 'running') {
+                $('#btnDantaStartStop').text(DANTA_STOP);
+                $('#btnDantaStartStop').removeClass('btn-primary').addClass('btn-secondary');
+            } else {
+                $('#btnDantaStartStop').text(DANTA_START);
+                $('#btnDantaStartStop').removeClass('btn-secondary').addClass('btn-primary');
+            }
+        })
+        .catch(error=> {
+            console.error(error); 
+        });
+    }
     $( document ).ready(function() {
         console.log('단타머신 ready.... ');
         $('#btnDantaStartStop').on('click', function(){
-
+            const text = $('#btnDantaStartStop').text();
+            debugger;
+            if(text == DANTA_STOP){
+                fetchData('/api/v1/danta/stop')
+                .then(data => {
+                    $('#status-danta').text(data.message);
+                    $('#btnDantaStartStop').text(DANTA_START);
+                    $('#btnDantaStartStop').removeClass('btn-secondary').addClass('btn-primary');
+                })
+                .catch(error=> {
+                    console.error(error); 
+                });
+            } else {
+                fetchData('/api/v1/danta/start')
+                .then(data => {
+                    $('#status-danta').text(data.message);
+                    $('#btnDantaStartStop').text(DANTA_STOP);
+                    $('#btnDantaStartStop').removeClass('btn-primary').addClass('btn-secondary');
+                })
+                .catch(error=> {
+                    console.error(error); 
+                });
+            }
+            
         })
-        
+        initialize();
     });
     </script>	    
 {% endraw %}
