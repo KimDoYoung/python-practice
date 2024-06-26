@@ -1,6 +1,14 @@
 {% extends 'common/base.html' %}
 {% block style %}
 <style>
+    #logs {
+        height: 400px;
+        overflow-y: scroll;
+        border: 1px solid #ccc;
+        padding: 10px;
+        background-color: rgb(104, 100, 100);
+        color: white;
+    }    
 </style>
 {% endblock %}
 
@@ -12,6 +20,8 @@
     </div>
     <div id="status-area">
         <div id="status-danta"></div>
+    </div>
+    <div id="logs">
     </div>
 </section>
 {% raw %} 
@@ -45,6 +55,24 @@
     }
     $( document ).ready(function() {
         console.log('단타머신 ready.... ');
+        var ws = new WebSocket("ws://localhost:8000/ws");
+
+        ws.onmessage = function(event) {
+            var logsDiv = $('#logs');
+            var newLog = $('<div>').text(event.data);
+            logsDiv.append(newLog);
+            // 자동 스크롤
+            logsDiv.scrollTop(logsDiv[0].scrollHeight);
+        };
+
+        ws.onerror = function(event) {
+            console.error("WebSocket error observed:", event);
+        };
+
+        ws.onclose = function(event) {
+            console.log("WebSocket connection closed:", event);
+        };
+
         $('#btnDantaStartStop').on('click', function(){
             const text = $('#btnDantaStartStop').text();
             debugger;

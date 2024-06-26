@@ -62,6 +62,13 @@ class User(Document):
             if kv.key == key:
                 return kv.value
         return None
+    
+    def set_value_by_key(self, key: str, value: str):
+        for kv in self.key_values:
+            if kv.key == key:
+                kv.value = value
+                return
+        self.key_values.append(KeyValueData(key=key, value=value))
 
     class Settings:
         name = "Users"

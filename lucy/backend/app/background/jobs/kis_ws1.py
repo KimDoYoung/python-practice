@@ -109,7 +109,7 @@ async def kis_ws_connect():
         # stk_code = '005930'
         stk_code = '108380'
         if choice == '1': #주식호가 등록
-            tr_id = 'H0STASP0'
+            tr_id = 'H0STASP0' 
             tr_type = '1'
         elif choice == '2':  # 주식체결 등록
             tr_id = 'H0STASP0'
@@ -149,7 +149,7 @@ async def kis_ws_connect():
             # senddata = '{{"header": {{"approval_key": "{}", "personalseckey": "{}", "custtype": "P", "tr_type": "{}", "content-type": "utf-8"}}, "body": {{"input": {{"tr_id": "{}", "tr_key": "{}"}}}}}}'.format(
             #     ws_approval_key, KIS_APP_SECRET, tr_type, tr_id, stk_code
             # )
-            logger.info(f"보낸데이터 : [{senddata}]")
+        logger.info(f"보낸데이터 : [{senddata}]")
     
             
 
@@ -162,11 +162,12 @@ async def kis_ws_connect():
         while True:
             received_text = await websocket.recv()
             logger.info("웹소켓(KIS로부터 받은데이터) : [" + received_text + "]")
+
             if is_real_data(received_text): # 실시간 데이터인 경우
                 header, real_model = kis_ws_real_data_parsing(received_text, aes_key, aes_iv)
                 logger.info(f"header: {header}")
                 logger.info(f"real_model: {real_model}")
-                await asyncio.sleep(1)
+                await asyncio.sleep(0.1)
             else: # 실시간 데이터가 아닌 경우
                 try:
                     resp_json = json.loads(received_text)

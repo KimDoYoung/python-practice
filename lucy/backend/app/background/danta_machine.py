@@ -13,6 +13,7 @@
 """
 import time
 import asyncio
+from backend.app.api.v1.endpoints.client_websocket_routes import broadcast_message
 from backend.app.core.logger import get_logger
 
 logger = get_logger(__name__)
@@ -53,3 +54,4 @@ async def danta_machine_main():
     while True:
         logger.debug("단타 머신 수행 중..." + str(time.time()))
         await asyncio.sleep(5)  # 실제 작업을 대체하는 지연
+        await broadcast_message("단타 머신 수행 중..." + str(time.time()))

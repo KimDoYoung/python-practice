@@ -534,3 +534,5 @@ def chk_holiday(self, base_dt:str) -> ChkHolidayDto:
     except ValidationError as e:
         raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
     return chk_holiday
+
+#TODO 더 넣을 것.
