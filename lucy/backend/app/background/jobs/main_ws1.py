@@ -6,7 +6,6 @@ import websockets
 from fastapi import BackgroundTasks, FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 from backend.app.core.logger import get_logger
-from backend.app.domains.stc.kis.model.kis_websocket_model import KisWsResponse
 from backend.app.domains.user.user_model import User
 from backend.app.utils.kis_ws_util import KIS_WSReq, get_ws_approval_key, is_real_data, kis_ws_real_data_parsing, new_kis_ws_request
 from backend.app.core.config import config
@@ -38,6 +37,15 @@ html = """
 </head>
 <body>
     <h1>Real-Time Logs</h1>
+    <div>
+        호가 : 종목코드 
+        <input type="text" id="stock_code" value="160190"> 
+        <button id="subscribe_bid_ask">호가 등록</button> 
+        <button id="un_subscribe_bid_ask">호가 취소</button> 
+        <button id="subscribe_contact">체결가 등록</button> 
+        <button id="un_subscribe_contact">체결가 취소</button> 
+
+    </div>
     <button id="start">Start</button>
     <button id="stop">Stop</button>
     <div id="logs"></div>
@@ -49,7 +57,41 @@ html = """
 
             ws.onmessage = function(event) {
                 var logsDiv = $('#logs');
-                var newLog = $('<div>').text(event.data);
+                var jsonData = JSON.parse(event.data);
+                var s = '';
+                if(jsonData.CODE == 'H0STASP0'){
+                    s += `호가: ${jsonData.MKSC_SHRN_ISCD} `;
+                    s += `영업시간: ${jsonData.BSOP_HOUR} `;
+                    s += `시간구분: ${jsonData.HOUR_CLS_CODE} `;
+                    s += `예상 체결가: ${jsonData.ANTC_CNPR} `;
+                    s += `예상 체결량: ${jsonData.ANTC_CNQN} `;
+                    s += `예상 거래량: ${jsonData.ANTC_VOL} `;
+                    s += `대비: ${jsonData.ANTC_CNTG_VRSS_SIGN} `;
+                }else if(jsonData.CODE == 'H0STCNT0'){
+                    s += `체결가: ${jsonData.MKSC_SHRN_ISCD} `;
+                    s += `주식_체결_시간: ${jsonData.STCK_CNTG_HOUR} `;
+                    s += `주식_현재가: ${jsonData.STCK_PRPR} `;
+                    s += `주식_시가: ${jsonData.STCK_OPRC} `;
+                    s += `주식_최고가: ${jsonData.STCK_HGPR} `;
+                    s += `주식_최저가: ${jsonData.STCK_LWPR} `;
+                }else if(jsonData.CODE == 'H0STCNI0'){
+                    s += `체결통보: `;
+                    s += `고객_ID: ${jsonData.CUST_ID} `;
+                    s += `계좌번호: ${jsonData.ACNT_NO} `;
+                    s += `주문번호: ${jsonData.ODER_NO} `;
+                    s += `원주문번호: ${jsonData.OODER_NO} `;
+                    s += `매도매수구분: ${jsonData.SELN_BYOV_CLS} `;
+                    s += `정정구분: ${jsonData.RCTF_CLS} `;
+                    s += `주문종류: ${jsonData.ODER_KIND} `;                
+                    s += `주문조건: ${jsonData.ODER_COND} `;                
+                    s += `주식_단축_종목코드: ${jsonData.STCK_SHRN_ISCD} `;
+                    s += `체결_수량: ${jsonData.CNTG_QTY} `;
+                    s += `체결단가: ${jsonData.CNTG_UNPR} `;                
+                    s += `주식_체결_시간: ${jsonData.STCK_CNTG_HOUR}`;
+                }else{
+                    s = jsonData.MSG; //event.data;
+                }
+                var newLog = $('<div>').text(s);
                 logsDiv.append(newLog);
 
                 // 자동 스크롤
@@ -82,6 +124,34 @@ html = """
                 $.post('/stop');
                 //stopWebSocket();
             });
+        //<input type="text" id="stock_code" value="160190"> 
+        //<button id="subscribe_bid_ask">호가 등록</button> 
+        //<button id="un_subscribe_bid_ask">호가 취소</button> 
+        //<button id="subscribe_contract">체결가 등록</button> 
+        //<button id="un_subscribe_contract">체결가 취소</button>
+
+            $('#subscribe_bid_ask').click(function() {
+                var stock_code = $('#stock_code').val();
+                var url = '/subscribe/bid-ask/' + stock_code;
+                fetch(url, { method: 'GET' });
+            });
+            $('#un_subscribe_bid_ask').click(function() {
+                var stock_code = $('#stock_code').val();
+                var url = '/un-subscribe/bid-ask/' + stock_code;
+                fetch(url, { method: 'GET' });
+            });
+
+            $('#subscribe_contract').click(function() {
+                var stock_code = $('#stock_code').val();
+                var url = '/subscribe/contract/' + stock_code;
+                fetch(url, { method: 'GET' });
+            });            
+            $('#un_subscribe_contract').click(function() {
+                var stock_code = $('#stock_code').val();
+                var url = '/un-subscribe/contract/' + stock_code;
+                fetch(url, { method: 'GET' });
+            });            
+
         });
     </script>
 </body>
@@ -103,6 +173,20 @@ async def websocket_endpoint(client_websocket: WebSocket):
             await client_websocket.send_text(f"Message text was: {data}")
     except WebSocketDisconnect:
         logger.info("WebSocket connection closed")
+
+async def broadcast_log(message: str):
+    disconnected_clients = []
+    for client in clients:
+        try:
+            msg = {"CODE": "SYS", "MSG": message}
+            await client.send_text(json.dumps(msg))
+            #await client.send_text(msg)
+            logger.debug("웹소켓으로 메세지 전송: " + message)
+        except WebSocketDisconnect:
+            disconnected_clients.append(client)
+    
+    for client in disconnected_clients:
+        clients.remove(client)
 
 
 async def broadcast_message(message: str):
@@ -155,29 +239,39 @@ async def on_open(user,websocket):
     # ws_approval_key = get_ws_approval_key(KIS_APP_KEY, KIS_APP_SECRET)    
     # user.set_value_by_key("KIS_WS_APPROVAL_KEY", ws_approval_key)
 
-    stocks = ('458870', '009520', '108380')
-    # stocks = ('458870')
-    for stock in stocks:
-        senddata = await subscribe(user, KIS_WSReq.BID_ASK, stock)
-        logger.debug(f"보낸데이터 : [{senddata}]")
-        await websocket.send(senddata)
-        await asyncio.sleep(0.5)
-    #    await subscribe(user, websocket, KIS_WSReq.CONTRACT, stock)
+    # stocks = ('160190', '009520', '108380')
+    # for stock in stocks:
+    #     # 호가 등록
+    #     senddata = await subscribe(user, KIS_WSReq.BID_ASK, stock)
+    #     logger.debug(f"보낸데이터 : [{senddata}]")
+    #     await websocket.send(senddata)
+    #     await asyncio.sleep(0.5)
+    #     # 체결가 등록
+    #     senddata = await subscribe(user, KIS_WSReq.CONTRACT, stock)
+    #     await websocket.send(senddata)
+    #     await asyncio.sleep(0.5)
+    # 고객체결발생통보 등록
+    senddata = await subscribe(user,  KIS_WSReq.NOTICE, None)
+    await websocket.send(senddata)
+    await asyncio.sleep(0.5)
     #await subscribe(user, websocket, KIS_WSReq.NOTICE, None)
 
 
-async def on_message(websocket, message):
-    logger.info(f"웹소켓으로부터 받은 데이터: {message}")
+# async def on_message(websocket, message):
+#     logger.info(f"웹소켓으로부터 받은 데이터: {message}")
 
 
 
 async def on_error(websocket, error):
+    await broadcast_log("Kis Websocket 통신 중 에러발생..." + error)
     logger.error(f"웹소켓 에러 발생: {error}")
 
 async def on_close(websocket):
+    await broadcast_log("Kis Websocket이 중지되었습니다.")
     logger.info("웹소켓 연결이 닫혔습니다.")
 
 async def connect_to_korea_investment():
+    global korea_investment_websocket
     uri = "ws://ops.koreainvestment.com:21000"
     try:
         user_service = get_user_service()
@@ -189,42 +283,55 @@ async def connect_to_korea_investment():
         user.set_value_by_key("KIS_WS_APPROVAL_KEY", ws_approval_key)
 
         async with websockets.connect(uri, ping_interval=60) as websocket:
-            korea_investment_websocket = websocket
             await on_open(user,websocket)
-
+            korea_investment_websocket = websocket
+            if korea_investment_websocket is None:
+                raise Exception("korea_investment_websocket 웹소켓 연결이 안됨")
             # aes_key = None
             # aes_iv = None
 
             while True:
                 received_text = await websocket.recv()  
                 logger.info("웹소켓(KIS로부터 받은데이터) : [" + received_text + "]")
-                await broadcast_message(received_text)
+                #await broadcast_message(received_text)
                 if is_real_data(received_text): # 실시간 데이터인 경우
                     aes_key = user.get_value_by_key("KIS_WS_AES_KEY")
                     aes_iv = user.get_value_by_key("KIS_WS_AES_IV")
                     header, real_model = kis_ws_real_data_parsing(received_text, aes_key, aes_iv)
                     logger.info(f"header: {header}")
                     logger.info(f"real_model: {real_model}")
-                    model_str = real_model.to_str()
-                    await broadcast_message(model_str)
+                    #model_str = real_model.to_str()
+                    real_data_dict = real_model.data_for_client_ws()
+                    message_str = json.dumps(real_data_dict)
+                    await broadcast_message(message_str)
                     await asyncio.sleep(1)
                 else: # 실시간 데이터가 아닌 경우
                     try:
                         resp_json = json.loads(received_text)
+                        #kis_ws_response = KisWsResponse.from_json_str(received_text)
                         if resp_json['header']['tr_id'] == 'PINGPONG': # PINGPONG 데이터인 경우
                             await websocket.pong(received_text)  # 웹소켓 클라이언트에서 pong을 보냄
                             logger.debug(f"PINGPONG 데이터 전송: [{received_text}]")
                         else:
-                            kis_ws_model = KisWsResponse.from_json_str(received_text)
-                            if kis_ws_model.body.output is not None and kis_ws_model.body.output.iv is not None and kis_ws_model.body.output.key is not None:
-                                user.set_value_by_key("KIS_WS_AES_IV", kis_ws_model.body.output.iv)
-                                user.set_value_by_key("KIS_WS_AES_KEY", kis_ws_model.body.output.key)
-                                # aes_iv = kis_ws_model.body.output.iv
-                                # aes_key =  kis_ws_model.body.output.key
+                            #kis_ws_response = KisWsResponse.from_json_str(received_text)
+                            if resp_json['body']['output'] is not None and resp_json['body']['output']['iv'] is not None and resp_json['body']['output']['key'] is not None:
+                                user.set_value_by_key("KIS_WS_AES_IV", resp_json['body']['output']['iv'])
+                                user.set_value_by_key("KIS_WS_AES_KEY", resp_json['body']['output']['key'])
+                                if(resp_json['header']['tr_id'] == 'H0STCNI0'):
+                                    tr_key = resp_json['header']['tr_key']
+                                    msg = f"체결통보 데이터: {tr_key} 체결통보 성공적으로 등록되었습니다"
+                                    await broadcast_log(msg)
+                                    logger.debug(f"{msg}")
+
                             logger.info(f"PINGPONG 아닌 것: [{received_text}]")
-                            logger.debug(f"kis_ws_model: {json.dumps(kis_ws_model.model_dump(), ensure_ascii=False)}")
-                    except ValueError as e:
-                        logger.error(f"Error parsing response: {e}")        
+                            #logger.debug(f"kis_ws_model: {json.dumps(resp_json.model_dump(), ensure_ascii=False)}")
+                    except json.JSONDecodeError as e:
+                            logger.error(f"JSON decoding error: {e}")
+                    except websockets.ConnectionClosed as e:
+                            logger.error(f"WebSocket connection closed: {e}")
+                            break
+                    except Exception as e:
+                            logger.error(f"Unexpected error: {e}")
     except websockets.exceptions.ConnectionClosed as e:
         await on_close(korea_investment_websocket)
         logger.error(f"웹소켓 연결이 닫혔습니다: {e}")
@@ -232,6 +339,7 @@ async def connect_to_korea_investment():
         await on_error(korea_investment_websocket, e)
         logger.error(f"웹소켓 연결 중 에러 발생: {e}")
     finally:
+        logger.debug(f"finally.....")
         korea_investment_websocket = None
 
 async def kis_ws_start():
@@ -250,15 +358,83 @@ async def kis_ws_stop():
 async def start(background_tasks: BackgroundTasks):
     logger.info("웹소켓 테스트 서버 시작")
     await kis_ws_start()
-    await broadcast_message("Kis Websocket이 시작되었습니다.")
+    await broadcast_log("Kis Websocket이 시작되었습니다.")
     return {"message": "WebSocket connection is started"}
 
 @app.post("/stop")
 async def stop():
     logger.info("웹소켓 테스트 서버 중지")
     await kis_ws_stop()
-    await broadcast_message("Kis Websocket이 중지되었습니다.")
+    await broadcast_log("Kis Websocket이 중지되었습니다.")
     return {"message": "WebSocket connection is not running"}
+
+@app.get("/subscribe/bid-ask/{stock_code}")
+async def subscribe_bid_ask(stock_code: str):
+    global korea_investment_websocket
+    if korea_investment_websocket is None:
+        return {"message": "WebSocket connection is not established"}
+    user_service = get_user_service()
+    user = await user_service.get_1("kdy987")
+    KIS_APP_KEY = user.get_value_by_key("KIS_APP_KEY")
+    KIS_APP_SECRET = user.get_value_by_key("KIS_APP_SECRET")
+
+    ws_approval_key = get_ws_approval_key(KIS_APP_KEY, KIS_APP_SECRET)    
+    user.set_value_by_key("KIS_WS_APPROVAL_KEY", ws_approval_key)
+    senddata = await subscribe(user, KIS_WSReq.BID_ASK, stock_code)
+    await korea_investment_websocket.send(senddata)
+    return {"message": "호가 등록"}
+
+@app.get("/un-subscribe/bid-ask/{stock_code}")
+async def un_subscribe_bid_ask(stock_code: str):
+    global korea_investment_websocket
+    if korea_investment_websocket is None:
+        return {"message": "WebSocket connection is not established"}
+    
+    user_service = get_user_service()
+    user = await user_service.get_1("kdy987")
+    KIS_APP_KEY = user.get_value_by_key("KIS_APP_KEY")
+    KIS_APP_SECRET = user.get_value_by_key("KIS_APP_SECRET")
+
+    ws_approval_key = get_ws_approval_key(KIS_APP_KEY, KIS_APP_SECRET)    
+    user.set_value_by_key("KIS_WS_APPROVAL_KEY", ws_approval_key)
+
+    senddata = await unsubscribe(user, KIS_WSReq.BID_ASK, stock_code)
+    await korea_investment_websocket.send(senddata)
+    return {"message": "호가 취소"}
+
+@app.get("/subscribe/contract/{stock_code}")
+async def subscribe_contract(stock_code: str):
+    global korea_investment_websocket
+    if korea_investment_websocket is None:
+        return {"message": "WebSocket connection is not established"}
+    user_service = get_user_service()
+    user = await user_service.get_1("kdy987")
+    KIS_APP_KEY = user.get_value_by_key("KIS_APP_KEY")
+    KIS_APP_SECRET = user.get_value_by_key("KIS_APP_SECRET")
+
+    ws_approval_key = get_ws_approval_key(KIS_APP_KEY, KIS_APP_SECRET)    
+    user.set_value_by_key("KIS_WS_APPROVAL_KEY", ws_approval_key)
+    
+    senddata = await subscribe(user, KIS_WSReq.CONTRACT, stock_code)
+    await korea_investment_websocket.send(senddata)
+    return {"message": "체결가 등록"}
+
+@app.get("/un-subscribe/contract/{stock_code}")
+async def un_subscribe_contract(stock_code: str):
+    global korea_investment_websocket
+    if korea_investment_websocket is None:
+        return {"message": "WebSocket connection is not established"}
+    user_service = get_user_service()
+    user = await user_service.get_1("kdy987")
+    KIS_APP_KEY = user.get_value_by_key("KIS_APP_KEY")
+    KIS_APP_SECRET = user.get_value_by_key("KIS_APP_SECRET")
+
+    ws_approval_key = get_ws_approval_key(KIS_APP_KEY, KIS_APP_SECRET)    
+    user.set_value_by_key("KIS_WS_APPROVAL_KEY", ws_approval_key)
+    senddata = await unsubscribe(user, KIS_WSReq.CONTRACT, stock_code)
+    await korea_investment_websocket.send(senddata)
+    return {"message": "체결가 취소"}
+
 
 @app.post("/send")
 async def send(request: Request):

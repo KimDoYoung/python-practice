@@ -1,6 +1,7 @@
 import json
 from typing import List, Optional, Type, TypeVar
 from pydantic import BaseModel, ValidationError
+from abc import ABC, abstractmethod
 
 T = TypeVar('T', bound='KisWsResponseBase')
 
@@ -59,7 +60,7 @@ class KisWsRealHeader(BaseModel):
     def is_encrypted(self) -> bool:
         return self.encrypt == '1'
     
-class KisWsRealModelBase(BaseModel):
+class KisWsRealModelBase(BaseModel, ABC):
     ''' KIS의 실시간 데이터 모델 슈퍼 클래스'''
     def to_str(self) -> str:
         """객체를 문자열로 변환"""
@@ -72,6 +73,27 @@ class KisWsRealModelBase(BaseModel):
     def to_dict(self) -> dict:
         """객체를 dict로 변환"""
         return self.model_dump()
+    
+    @abstractmethod
+    def data_for_client_ws(self) -> dict:
+        '''클라이언트에게 전달할 데이터를 반환한다. 추상메서드'''
+        pass
+
+대비부호_코드테이블 = {
+    '1': '상한',
+    '2': '상승',
+    '3': '보합',
+    '4': '하한',
+    '5': '하락'
+}
+시간구분_코드테이블 = {
+    '0' : '장중',
+    'A' : '장후예상',
+    'B' : '장전예상',
+    'C' : '9시이후의 예상가, VI발동',
+    'D' : '시간외 단일가 예상'
+}
+
 #
 # 호가 실시간데이터
 # https://apiportal.koreainvestment.com/apiservice/apiservice-domestic-stock-real2#L_9cda726b-6f0b-48b5-8369-6d66bea05a2a
@@ -134,8 +156,20 @@ class H0STASP0(KisWsRealModelBase):
             예상_체결_전일대비율=float(recvvalue[52]),
             누적_거래량=int(recvvalue[53]),
             주식매매_구분코드=recvvalue[58]
-        )    
-    
+        )
+    def data_for_client_ws(self) -> dict:
+        sigan_name = 시간구분_코드테이블[self.시간구분코드]
+        buho_name = 대비부호_코드테이블[self.예상_체결_대비부호]
+        return {
+            "CODE": "H0STASP0",
+            "MKSC_SHRN_ISCD": self.단축종목코드,
+            "BSOP_HOUR": self.영업시간,
+            "HOUR_CLS_CODE": sigan_name,
+            "ANTC_CNPR": self.예상_체결가,
+            "ANTC_CNQN": self.예상_체결량,
+            "ANTC_VOL": self.예상_거래량,
+            "ANTC_CNTG_VRSS_SIGN": buho_name
+        }
 #
 # 체결가 실시간데이터
 # https://apiportal.koreainvestment.com/apiservice/apiservice-domestic-stock-real2#L_714d1437-8f62-43db-a73c-cf509d3f6aa7
@@ -240,7 +274,16 @@ class H0STCNT0(KisWsRealModelBase):
             임의종료구분코드=fields[44] if fields[44] else "", # 빈값 처리
             정적VI발동기준가=int(fields[45])
         )
-
+    def data_for_client_ws(self) -> dict:
+        return {
+            "CODE": "H0STCNT0",
+            "MKSC_SHRN_ISCD": self.유가증권_단축_종목코드,
+            "STCK_CNTG_HOUR": self.주식_체결_시간,
+            "STCK_PRPR": self.주식_현재가,
+            "STCK_OPRC": self.주식_시가,
+            "STCK_HGPR": self.주식_최고가,
+            "STCK_LWPR": self.주식_최저가
+        }
 #
 # 실시간체결통보
 # https://apiportal.koreainvestment.com/apiservice/apiservice-domestic-stock-real2#L_1e3c056d-1b42-461c-b8fb-631bb48e1ee2
@@ -299,3 +342,20 @@ class H0STCNI0(KisWsRealModelBase):
             체결종목명40=fields[21],
             주문가격=fields[22],
         )
+    
+    def data_for_client_ws(self) -> dict:
+        return {
+            "CODE" : "H0STCNI0",
+            "CUST_ID": self.고객_ID,
+            "ACNT_NO": self.계좌번호,
+            "ODER_NO": self.주문번호,
+            "OODER_NO": self.원주문번호,
+            "SELN_BYOV_CLS": self.매도매수구분,
+            "RCTF_CLS": self.정정구분,
+            "ODER_KIND": self.주문종류,
+            "ODER_COND": self.주문조건,
+            "STCK_SHRN_ISCD": self.주식_단축_종목코드,
+            "CNTG_QTY": self.체결_수량,
+            "CNTG_UNPR": self.체결단가,
+            "STCK_CNTG_HOUR": self.주식_체결_시간
+        }
