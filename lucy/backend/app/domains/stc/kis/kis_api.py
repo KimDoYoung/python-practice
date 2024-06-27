@@ -542,7 +542,6 @@ def chk_holiday(self, base_dt:str) -> ChkHolidayDto:
 # [0971] 주식 매도 화면에서 종목코드 입력 후 "가능" 클릭 시 매도가능수량이 확인되는 기능을 API로 개발한 사항
 # output > ord_psbl_qty(주문가능수량) 확인하실 수 있습니다.
 ##############################################################################################
-
 def inquire_psbl_sell(self, stk_code:str) -> InquirePsblSellDto:
     '''매도가능수량 조회 '''
     logger.info(f"매도가능수량 조회")
@@ -553,7 +552,7 @@ def inquire_psbl_sell(self, stk_code:str) -> InquirePsblSellDto:
         "CANO": self.ACCTNO[0:8],
         "ACNT_PRDT_CD": self.ACCTNO[8:10],
         "PDNO": stk_code
-    }
+    }  
     headers ={
         "content-type": "application/json; charset=utf-8",
         "authorization": f"Bearer {self.ACCESS_TOKEN}",
