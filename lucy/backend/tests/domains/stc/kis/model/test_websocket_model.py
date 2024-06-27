@@ -2,7 +2,7 @@ import pytest
 from backend.app.domains.stc.kis.model.kis_websocket_model import H0STASP0, H0STCNI0, H0STCNT0, KisWsResponse
 
 
-def test_create():
+def test_create_KisWsResponse():
     # JSON 데이터 예시
     json_data = '{"header":{"tr_id":"H0STASP0","tr_key":"005930","encrypt":"N"},"body":{"rt_cd":"0","msg_cd":"OPSP0000","msg1":"SUBSCRIBE SUCCESS","output":{"iv":"d59d91fcf9fd0044","key":"iuheqrmvfxoceaxeyqgjwesozgizmmgx"}}}'
 
@@ -18,11 +18,26 @@ def test_create():
     assert kis_ws_response_model.body.output.iv == "d59d91fcf9fd0044"
     assert kis_ws_response_model.body.output.key == "iuheqrmvfxoceaxeyqgjwesozgizmmgx"
 
+    assert kis_ws_response_model.get_iv() == "d59d91fcf9fd0044"
+    assert kis_ws_response_model.get_key() == "iuheqrmvfxoceaxeyqgjwesozgizmmgx"
+
+    # 잘못된 데이터
     wrong_json_data = '{"header1":{"tr_id":"H0STASP0","tr_key":"005930","encrypt":"N"},"body":{"rt_cd":"0","msg_cd":"OPSP0000","msg1":"SUBSCRIBE SUCCESS","output":{"iv":"d59d91fcf9fd0044","key":"iuheqrmvfxoceaxeyqgjwesozgizmmgx"}}}'
 
     with pytest.raises(ValueError):
         kis_ws_response_model = KisWsResponse.from_json_str(wrong_json_data)
 
+def test_pingpong():
+    json_data = '{"header":{"tr_id":"PINGPONG","datetime":"20240627145359"}}'
+    kis_ws_response_model = KisWsResponse.from_json_str(json_data)
+    assert kis_ws_response_model.is_pingpong() == True
+
+def test_invalid_response():
+    json_data = '{"header":{"tr_id":"(null)","tr_key":"","encrypt":"N"},"body":{"rt_cd":"9","msg_cd":"OPSP9999","msg1":"JSON PARSING ERROR : invalid json format"}}'
+    kis_ws_response_model = KisWsResponse.from_json_str(json_data)
+    assert kis_ws_response_model.is_error() == True
+    assert kis_ws_response_model.get_error_code() == "OPSP9999"
+    assert kis_ws_response_model.get_error_message() == "JSON PARSING ERROR : invalid json format"
 # 실시간 호가 
 def test_hoga():
     # 데이터 예시
@@ -82,3 +97,5 @@ def test_purchase_notice():
     assert h0.주문가격 == "1500"
 
     print(h0.to_str())
+
+

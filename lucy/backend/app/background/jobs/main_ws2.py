@@ -6,6 +6,7 @@ import websockets
 from fastapi import BackgroundTasks, FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 from backend.app.core.logger import get_logger
+from backend.app.domains.stc.kis.model.kis_websocket_model import KisWsResponse
 from backend.app.domains.user.user_model import User
 from backend.app.utils.kis_ws_util import KIS_WSReq, get_ws_approval_key, is_real_data, kis_ws_real_data_parsing, new_kis_ws_request
 from backend.app.core.config import config
@@ -119,11 +120,11 @@ async def on_open(user,websocket):
     #     senddata = await subscribe(user, KIS_WSReq.CONTRACT, stock)
     #     await websocket.send(senddata)
     #     await asyncio.sleep(0.5)
+
     # 고객체결발생통보 등록
-    senddata = await subscribe(user,  KIS_WSReq.NOTICE, None)
-    await websocket.send(senddata)
-    await asyncio.sleep(0.5)
-    #await subscribe(user, websocket, KIS_WSReq.NOTICE, None)
+    # senddata = await subscribe(user,  KIS_WSReq.NOTICE, None)
+    # await websocket.send(senddata)
+    # await asyncio.sleep(0.5)
 
 
 # async def on_message(websocket, message):
@@ -162,7 +163,6 @@ async def connect_to_korea_investment():
             while True:
                 received_text = await websocket.recv()  
                 logger.info("웹소켓(KIS로부터 받은데이터) : [" + received_text + "]")
-                #await broadcast_message(received_text)
                 if is_real_data(received_text): # 실시간 데이터인 경우
                     aes_key = user.get_value_by_key("KIS_WS_AES_KEY")
                     aes_iv = user.get_value_by_key("KIS_WS_AES_IV")
@@ -173,27 +173,23 @@ async def connect_to_korea_investment():
                     real_data_dict = real_model.data_for_client_ws()
                     message_str = json.dumps(real_data_dict)
                     await broadcast_message(message_str)
-                    await asyncio.sleep(1)
+                    await asyncio.sleep(0.5)
                 else: # 실시간 데이터가 아닌 경우
                     try:
-                        resp_json = json.loads(received_text)
-                        #kis_ws_response = KisWsResponse.from_json_str(received_text)
-                        if resp_json['header']['tr_id'] == 'PINGPONG': # PINGPONG 데이터인 경우
+                        kis_response = KisWsResponse.from_json_str(received_text)
+                        if kis_response.is_pingpong(): # PINGPONG 데이터인 경우
                             await websocket.pong(received_text)  # 웹소켓 클라이언트에서 pong을 보냄
                             logger.debug(f"PINGPONG 데이터 전송: [{received_text}]")
-                        else:
-                            #kis_ws_response = KisWsResponse.from_json_str(received_text)
-                            if resp_json['body']['output'] is not None and resp_json['body']['output']['iv'] is not None and resp_json['body']['output']['key'] is not None:
-                                user.set_value_by_key("KIS_WS_AES_IV", resp_json['body']['output']['iv'])
-                                user.set_value_by_key("KIS_WS_AES_KEY", resp_json['body']['output']['key'])
-                                if(resp_json['header']['tr_id'] == 'H0STCNI0'):
-                                    tr_key = resp_json['header']['tr_key']
-                                    msg = f"체결통보 데이터: {tr_key} 체결통보 성공적으로 등록되었습니다"
-                                    await broadcast_log(msg)
-                                    logger.debug(f"{msg}")
-
-                            logger.info(f"PINGPONG 아닌 것: [{received_text}]")
-                            #logger.debug(f"kis_ws_model: {json.dumps(resp_json.model_dump(), ensure_ascii=False)}")
+                        elif kis_response.is_error():
+                            logger.warning(f"Kis Websocket Response 에러발생: {kis_response.get_error_message()}")
+                        else: 
+                            iv = kis_response.get_iv()
+                            key = kis_response.get_key()
+                            user.set_value_by_key("KIS_WS_AES_IV", iv)
+                            user.set_value_by_key("KIS_WS_AES_KEY", key)
+                            event_log = kis_response.get_event_log()
+                            logger.debug(f"event_log: {event_log}")
+                            await broadcast_log(event_log)
                     except json.JSONDecodeError as e:
                             logger.error(f"JSON decoding error: {e}")
                     except websockets.ConnectionClosed as e:

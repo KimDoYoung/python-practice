@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Real-Time Logs</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        #logs {
+            height: 400px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Real-Time Logs</h1>
+    <div>
+        호가 : 종목코드 
+        <input type="text" id="stock_code" value="160190"> 
+        <button id="subscribe_bid_ask">호가 등록</button> 
+        <button id="un_subscribe_bid_ask">호가 취소</button> 
+        <button id="subscribe_contact">체결가 등록</button> 
+        <button id="un_subscribe_contact">체결가 취소</button> 
+
+    </div>
+    <button id="start">Start</button>
+    <button id="stop">Stop</button>
+    <div id="logs"></div>
+    <script>
+        var ws;
+
+        function startWebSocket() {
+            ws = new WebSocket("ws://localhost:8000/ws");
+
+            ws.onmessage = function(event) {
+                var logsDiv = $('#logs');
+                var jsonData = JSON.parse(event.data);
+                var s = '';
+                if(jsonData.CODE == 'H0STASP0'){
+                    s += `호가: ${jsonData.MKSC_SHRN_ISCD} `;
+                    s += `영업시간: ${jsonData.BSOP_HOUR} `;
+                    s += `시간구분: ${jsonData.HOUR_CLS_CODE} `;
+                    s += `예상 체결가: ${jsonData.ANTC_CNPR} `;
+                    s += `예상 체결량: ${jsonData.ANTC_CNQN} `;
+                    s += `예상 거래량: ${jsonData.ANTC_VOL} `;
+                    s += `대비: ${jsonData.ANTC_CNTG_VRSS_SIGN} `;
+                }else if(jsonData.CODE == 'H0STCNT0'){
+                    s += `체결가: ${jsonData.MKSC_SHRN_ISCD} `;
+                    s += `주식_체결_시간: ${jsonData.STCK_CNTG_HOUR} `;
+                    s += `주식_현재가: ${jsonData.STCK_PRPR} `;
+                    s += `주식_시가: ${jsonData.STCK_OPRC} `;
+                    s += `주식_최고가: ${jsonData.STCK_HGPR} `;
+                    s += `주식_최저가: ${jsonData.STCK_LWPR} `;
+                }else if(jsonData.CODE == 'H0STCNI0'){
+                    s += `체결통보: `;
+                    s += `고객_ID: ${jsonData.CUST_ID} `;
+                    s += `계좌번호: ${jsonData.ACNT_NO} `;
+                    s += `주문번호: ${jsonData.ODER_NO} `;
+                    s += `원주문번호: ${jsonData.OODER_NO} `;
+                    s += `매도매수구분: ${jsonData.SELN_BYOV_CLS} `;
+                    s += `정정구분: ${jsonData.RCTF_CLS} `;
+                    s += `주문종류: ${jsonData.ODER_KIND} `;                
+                    s += `주문조건: ${jsonData.ODER_COND} `;                
+                    s += `주식_단축_종목코드: ${jsonData.STCK_SHRN_ISCD} `;
+                    s += `체결_수량: ${jsonData.CNTG_QTY} `;
+                    s += `체결단가: ${jsonData.CNTG_UNPR} `;                
+                    s += `주식_체결_시간: ${jsonData.STCK_CNTG_HOUR}`;
+                }else{
+                    s = jsonData.MSG; //event.data;
+                }
+                var newLog = $('<div>').text(s);
+                logsDiv.append(newLog);
+
+                // 자동 스크롤
+                logsDiv.scrollTop(logsDiv[0].scrollHeight);
+            };
+
+            ws.onerror = function(event) {
+                console.error("WebSocket error observed:", event);
+            };
+
+            ws.onclose = function(event) {
+                console.log("WebSocket connection closed:", event);
+            };
+        }
+
+        function stopWebSocket() {
+            if (ws) {
+                ws.close();
+            }
+        }
+
+        $(document).ready(function() {
+            startWebSocket();
+            $('#start').click(function() {
+                $.post('/start');
+                //startWebSocket();
+            });
+
+            $('#stop').click(function() {
+                $.post('/stop');
+                //stopWebSocket();
+            });
+        //<input type="text" id="stock_code" value="160190"> 
+        //<button id="subscribe_bid_ask">호가 등록</button> 
+        //<button id="un_subscribe_bid_ask">호가 취소</button> 
+        //<button id="subscribe_contract">체결가 등록</button> 
+        //<button id="un_subscribe_contract">체결가 취소</button>
+
+            $('#subscribe_bid_ask').click(function() {
+                var stock_code = $('#stock_code').val();
+                var url = '/subscribe/bid-ask/' + stock_code;
+                fetch(url, { method: 'GET' });
+            });
+            $('#un_subscribe_bid_ask').click(function() {
+                var stock_code = $('#stock_code').val();
+                var url = '/un-subscribe/bid-ask/' + stock_code;
+                fetch(url, { method: 'GET' });
+            });
+
+            $('#subscribe_contract').click(function() {
+                var stock_code = $('#stock_code').val();
+                var url = '/subscribe/contract/' + stock_code;
+                fetch(url, { method: 'GET' });
+            });            
+            $('#un_subscribe_contract').click(function() {
+                var stock_code = $('#stock_code').val();
+                var url = '/un-subscribe/contract/' + stock_code;
+                fetch(url, { method: 'GET' });
+            });            
+
+        });
+    </script>
+</body>
+</html>

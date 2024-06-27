@@ -19,6 +19,7 @@ class KisWsResponseBase(BaseModel):
             return cls.model_validate(json_dict)
         except ValidationError as e:
             raise ValueError(f"웹소켓 데이터 처리 오류 : Validation error: {e}")
+    
 
 class Output(BaseModel):
     iv: str
@@ -32,15 +33,56 @@ class Body(BaseModel):
 
 class Header(BaseModel):
     tr_id: str
-    tr_key: str
-    encrypt: str
+    tr_key: Optional[str] = None
+    encrypt: Optional[str] = None
+    datetime: Optional[str] = None
 
 class KisWsResponse(KisWsResponseBase):
     header: Header
-    body: Body
+    body: Optional[Body] = None
 
-    def isPingPong(self) -> bool:
+    def is_pingpong(self) -> bool:
         return self.header.tr_id == 'PINGPONG'
+
+    def is_error(self) -> bool:
+        if self.is_pingpong():
+            return False
+        if self.body is not None:
+            return self.body.rt_cd != '0'
+        return False
+    
+    def get_error_code(self) -> str:
+        if self.is_error():
+            return self.body.msg_cd
+        return None
+    
+    def get_error_message(self) -> str:
+        if self.is_error():
+            return self.body.msg1
+        return None
+
+    def get_iv(self) -> str:
+        if self.body is None or self.body.output is None:
+            return None
+        return self.body.output.iv
+    def get_key(self) -> str:
+        if self.body is None or self.body.output is None:
+            return None
+        return self.body.output.key
+    def get_event_log(self) -> str:
+        if self.is_pingpong() or self.is_error():
+            return None
+
+        rt_cd = self.body.rt_cd
+        tr_id = self.header.tr_id
+        
+        if rt_cd == '0':
+            tr_key = self.header.tr_key
+            msg_cd = self.body.msg_cd
+            msg1 = self.body.msg1
+            return f"{tr_id}-{tr_key}-{msg_cd}-{msg1}"
+        
+        return None
 
 class KisWsRealHeader(BaseModel):
     ''' KIS의 실시간 데이터 헤더 모델'''
