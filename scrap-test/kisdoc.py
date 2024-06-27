@@ -295,11 +295,11 @@ if __name__ == "__main__":
     # main_menu  = "[국내주식] 종목정보"
     # sub_menu = "주식일별주문체결조회"
 
-    # main_menu  = "[국내주식] 주문계좌"
-    # sub_menu = "매수가능조회"
+    main_menu  = "[국내주식] 주문계좌"
+    sub_menu = "매도가능수량조회 "
     
-    main_menu  = "[국내주식] 업종/기타"
-    sub_menu = "국내휴장일조회"
+    # main_menu  = "[국내주식] 업종/기타"
+    # sub_menu = "국내휴장일조회"
 
     main(main_menu, sub_menu)
     print("Done!")

@@ -31,7 +31,7 @@ class MyStockService:
     async def get_all(self) -> List[MyStock]:
         ''' MyStock Collection에서 모든 document를 가져온다.'''
         try:
-            mystocks = await MyStock.find().to_list()
+            mystocks = await MyStock.find().sort(-MyStock.last_update_time).to_list()
             return mystocks
         except Exception as e:
             logger.error(f"Failed to retrieve all MyStocks: {e}")

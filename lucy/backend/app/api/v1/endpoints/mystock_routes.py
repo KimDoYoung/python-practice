@@ -16,6 +16,7 @@ router = APIRouter()
 async def get_list(mystock_service :MyStockService=Depends(get_mystock_service)) -> List[MyStock]:
     ''' 나의 주식 목록 조회'''
     list = await mystock_service.get_all()
+    # list.sort(key=lambda x: x.last_update_time)
     return list
 
 @router.delete("/delete/{id}")

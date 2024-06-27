@@ -99,6 +99,8 @@ async def info(request:Request, user_service :UserService=Depends(get_user_servi
     for item in output1:
         stk_code = item.pdno
         stk_name = item.prdt_name
+        if '스팩' in stk_name:
+            continue
         stk_types = ['보유']
         mystock_dto = MyStockDto(stk_code=stk_code, stk_name=stk_name, stk_types=stk_types)
         await mystock_service.upsert(mystock_dto)

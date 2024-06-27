@@ -7,6 +7,7 @@
             <form id="form-mystock-add" action="">
                 <input type="text" name="stk_code" placeholder="종목코드" required>
                 <button type="submit" id="addStkCode" class="btn btn-primary"><i class="bi bi-plus"></i> 추가</button>
+                <button type="button" id="allCost" class="btn btn-warning"><i class="bi bi-plus"></i> 현재가</button>
             </form>
             <div id="list-area">
             </div>        
@@ -39,12 +40,12 @@
                 <td>{{this.stk_types}}</td>
                 <td>{{goNaver this.stk_code}}</td>
                 <td>{{this.stk_name}}</td>
-                <td id="cost-{{this.stk_code}}">-</td>
-                <td>
-                    <button class="btnDelete btn btn-secondary" data-id="{{this._id}}" title="관심..삭제"><i class="bi bi-dash"></i></button>
-                    <button class="btnCurrentCost btn btn-success" data-stk-code="{{this.stk_code}}"><img src="public/images/korean-won.svg" alt="아이콘" width="20" height="20"></button>
-                    <button class="btnBuy btn btn-danger" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}">買</button>
-                    <button class="btnSell btn btn-primary" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}">賣</button>
+                <td id="cost-{{this.stk_code}}" class="mx-2 p-2 text-end">-</td>
+                <td class="ms-2">
+                    <button class="btnDelete btn btn-secondary btn-sm" data-id="{{this._id}}" title="관심..삭제"><i class="bi bi-dash"></i></button>
+                    <button class="btnCurrentCost btn btn-success btn-sm" data-stk-code="{{this.stk_code}}"><img src="public/images/korean-won.svg" alt="아이콘" width="20" height="20"></button>
+                    <button class="btnBuy btn btn-danger btn-sm" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}">買</button>
+                    <button class="btnSell btn btn-primary btn-sm" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}">賣</button>
                 </td>
             </tr>
             {{/each}}
@@ -85,6 +86,11 @@
         });
     }
     $(document).ready(function() {
+        $('#allCost').on('click', function(){
+            $('#list-area').find('.btnCurrentCost').each(function(){
+                $(this).trigger('click');
+            });
+        });
         //현재가 조회
         $('#list-area').on('click', '.btnCurrentCost', function(e){
             e.preventDefault();

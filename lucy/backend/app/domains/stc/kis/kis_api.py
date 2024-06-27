@@ -14,7 +14,8 @@
 /uapi/domestic-stock/v1/trading/inquire-daily-ccld
 /uapi/domestic-stock/v1/trading/order-rvsecncl
 /uapi/domestic-stock/v1/trading/inquire-psbl-rvsecncl
-/uapi/domestic-stock/v1/trading/inquire-psbl-order
+/uapi/domestic-stock/v1/trading/inquire-psbl-order #매수가능조회
+/uapi/domestic-stock/v1/trading/inquire-psbl-sell  #매도가능조회
 /uapi/domestic-stock/v1/quotations/chk-holiday
 에러 :
     -  Access Token은 하루 단위로 만료되므로, 만료되면 다시 발급해야 한다.
@@ -34,6 +35,7 @@ from backend.app.domains.stc.kis.model.kis_chk_holiday_model import ChkHolidayDt
 from backend.app.domains.stc.kis.model.kis_inquire_balance_model import KisInquireBalance
 from backend.app.domains.stc.kis.model.kis_inquire_daily_ccld_model import InquireDailyCcldDto, InquireDailyCcldRequest
 from backend.app.domains.stc.kis.model.kis_inquire_psbl_rvsecncl_model import InquirePsblRvsecnclDto
+from backend.app.domains.stc.kis.model.kis_inquire_psbl_sell_model import InquirePsblSellDto
 from backend.app.domains.stc.kis.model.kis_inquire_psble_order import InquirePsblOrderDto, InquirePsblOrderRequest
 from backend.app.domains.stc.kis.model.kis_order_cash_model import KisOrderCash, OrderCancelRequest, OrderCashDto, OrderRvsecnclDto
 from backend.app.domains.stc.kis.model.kis_psearch_result_model import PsearchResultDto
@@ -448,7 +450,7 @@ def inquire_psbl_rvsecncl(self) -> OrderRvsecnclDto:
     try:
         json_data = response.json()
         possible_cancel_result = InquirePsblRvsecnclDto(**json_data)
-        logger.info(f"조건식 목록 조회 : {possible_cancel_result}")
+        logger.info(f"정정취소 가능수량 조회 : {possible_cancel_result}")
     except requests.exceptions.JSONDecodeError:
         logger.error(f"Error decoding JSON: {response.text}")
         raise HTTPException(status_code=500, detail="Invalid JSON response")
@@ -486,7 +488,7 @@ def inquire_psbl_order(self, ipo_req :InquirePsblOrderRequest ) -> InquirePsblOr
     try:
         json_data = response.json()
         psbl_order = InquirePsblOrderDto(**json_data)
-        logger.info(f"조건식 목록 조회 : {psbl_order}")
+        logger.info(f"매수가능조회 목록 조회 : {psbl_order}")
     except requests.exceptions.JSONDecodeError:
         logger.error(f"Error decoding JSON: {response.text}")
         raise HTTPException(status_code=500, detail="Invalid JSON response")
@@ -527,7 +529,7 @@ def chk_holiday(self, base_dt:str) -> ChkHolidayDto:
     try:
         json_data = response.json()
         chk_holiday = InquirePsblOrderDto(**json_data)
-        logger.info(f"조건식 목록 조회 : {chk_holiday}")
+        logger.info(f"국내휴장일조회 목록 조회 : {chk_holiday}")
     except requests.exceptions.JSONDecodeError:
         logger.error(f"Error decoding JSON: {response.text}")
         raise HTTPException(status_code=500, detail="Invalid JSON response")
@@ -535,4 +537,42 @@ def chk_holiday(self, base_dt:str) -> ChkHolidayDto:
         raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
     return chk_holiday
 
-#TODO 더 넣을 것.
+##############################################################################################
+# [국내주식] 주문계좌 > 매도가능수량
+# [0971] 주식 매도 화면에서 종목코드 입력 후 "가능" 클릭 시 매도가능수량이 확인되는 기능을 API로 개발한 사항
+# output > ord_psbl_qty(주문가능수량) 확인하실 수 있습니다.
+##############################################################################################
+
+def inquire_psbl_sell(self, stk_code:str) -> InquirePsblSellDto:
+    '''매도가능수량 조회 '''
+    logger.info(f"매도가능수량 조회")
+
+    url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/inquire-psbl-sell"
+
+    params = {
+        "CANO": self.ACCTNO[0:8],
+        "ACNT_PRDT_CD": self.ACCTNO[8:10],
+        "PDNO": stk_code
+    }
+    headers ={
+        "content-type": "application/json; charset=utf-8",
+        "authorization": f"Bearer {self.ACCESS_TOKEN}",
+        "appkey": self.APP_KEY,
+        "appsecret": self.APP_SECRET,
+        "tr_id": "TTTC8408R",
+        "custtype": "p",
+    }
+    response = requests.get(url, headers=headers, params=params)
+    logger.debug(f"response : {response.text}")
+    if response.status_code != 200:
+        raise HTTPException(status_code=response.status_code, detail=f"Error fetching balance: {response.text}")
+    try:
+        json_data = response.json()
+        inquire_psbl_sell = InquirePsblSellDto(**json_data)
+        logger.info(f"매도가능수량조회 : {inquire_psbl_sell}")
+    except requests.exceptions.JSONDecodeError:
+        logger.error(f"Error decoding JSON: {response.text}")
+        raise HTTPException(status_code=500, detail="Invalid JSON response")
+    except ValidationError as e:
+        raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
+    return chk_holiday

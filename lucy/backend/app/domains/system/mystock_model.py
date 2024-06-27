@@ -9,13 +9,17 @@
 작성일: 07
 버전: 1.0
 """
+import datetime
 from typing import List, Optional
-from beanie import Document, PydanticObjectId
-from pydantic import BaseModel, field_validator
+from beanie import Document
+from pydantic import BaseModel, Field, field_validator
 class MyStockBase(BaseModel):
     stk_code: str
     stk_name: Optional[str] = None
     stk_types: Optional[List[str]] = None
+    last_update_time: Optional[datetime.datetime] = Field(default_factory=datetime.datetime.now)
+
+
 
     @field_validator('stk_code')
     def validate_stk_code(cls, v):
