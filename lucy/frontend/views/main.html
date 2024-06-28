@@ -112,18 +112,20 @@
             e.preventDefault();
             e.stopPropagation();
             const stk_code = $(this).find("input[name='stk_code']").val();
-                if(stk_code.length < 6) {
-                    alert("종목코드를 정확히 입력해주세요.");
-                    return false;
-                }
-                const data = {
-                    "stk_code": stk_code,
-                    "stk_types": ["관심"]
-                }
-                postData("/api/v1/mystock/add", data)
-                .then(data => {
-                    display_mystocks();
-                })
+            const $input = $(this).find("input[name='stk_code']")
+            if(stk_code.length < 6) {
+                alert("종목코드를 정확히 입력해주세요.");
+                return false;
+            }
+            const data = {
+                "stk_code": stk_code,
+                "stk_types": ["관심"]
+            }
+            postData("/api/v1/mystock/add", data)
+            .then(data => {
+                display_mystocks();
+                $input.val('');
+            })
 
             return false;
         });
