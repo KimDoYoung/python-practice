@@ -2,8 +2,9 @@ import asyncio
 import json
 from typing import List
 from beanie import init_beanie
+from fastapi.websockets import WebSocketState
 import websockets
-from fastapi import BackgroundTasks, FastAPI, Request, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 from backend.app.core.logger import get_logger
 from backend.app.domains.stc.kis.model.kis_websocket_model import KisWsResponse
@@ -34,6 +35,8 @@ async def get():
 
 @app.websocket("/ws")
 async def websocket_endpoint(client_websocket: WebSocket):
+    user_id = client_websocket.query_params.get("user_id")
+    logger.info("client로부터 연결시 받은 param user_id " + user_id)
     clients.append(client_websocket)
     logger.debug("client로부터 웹소켓 연결되었습니다.")
     await client_websocket.accept()
@@ -44,28 +47,34 @@ async def websocket_endpoint(client_websocket: WebSocket):
     except WebSocketDisconnect:
         logger.info("WebSocket connection closed")
 
-async def broadcast_log(message: str):
-    disconnected_clients = []
-    for client in clients:
-        try:
-            msg = {"CODE": "SYS", "MSG": message}
-            await client.send_text(json.dumps(msg))
-            #await client.send_text(msg)
-            logger.debug("웹소켓으로 메세지 전송: " + message)
-        except WebSocketDisconnect:
-            disconnected_clients.append(client)
-    
-    for client in disconnected_clients:
-        clients.remove(client)
 
-
-async def broadcast_message(message: str):
-    disconnected_clients = []
-    for client in clients:
-        try:
+async def send_message_to_client(client: WebSocket, message: str):
+    try:
+        if client.application_state == WebSocketState.CONNECTED:
             await client.send_text(message)
             logger.debug("웹소켓으로 메세지 전송: " + message)
-        except WebSocketDisconnect:
+        else:
+            raise WebSocketDisconnect
+    except WebSocketDisconnect:
+        logger.error(f"Client WS Connection 끊어짐")
+        return False
+    except Exception as e:
+        logger.error(f"Client WS으로 메세진 전송중 에러 : {e}")
+        return False
+
+    return True
+
+async def broadcast_log(message: str):
+    msg = json.dumps({"CODE": "SYS", "MSG": message})
+    await broadcast_message_to_clients(msg)
+
+async def broadcast_message(message: str):
+    await broadcast_message_to_clients(message)
+
+async def broadcast_message_to_clients(message: str):
+    disconnected_clients = []
+    for client in clients:
+        if not await send_message_to_client(client, message):
             disconnected_clients.append(client)
     
     for client in disconnected_clients:
@@ -85,6 +94,16 @@ async def create_kis_ws_request(user: User, tr_id, tr_type, tr_key):
     return senddata
 
 async def subscribe(user: User, tr_id, stock_code):
+
+    approval_key = user.get_value_by_key("KIS_WS_APPROVAL_KEY")
+    if not approval_key:
+        KIS_APP_KEY = user.get_value_by_key("KIS_APP_KEY")
+        KIS_APP_SECRET = user.get_value_by_key("KIS_APP_SECRET")
+
+        approval_key = get_ws_approval_key(KIS_APP_KEY, KIS_APP_SECRET)    
+        user.set_value_by_key("KIS_WS_APPROVAL_KEY", approval_key)
+        user.save()
+
     if tr_id in [KIS_WSReq.BID_ASK, KIS_WSReq.CONTRACT]:
         return await create_kis_ws_request(user, tr_id, '1', stock_code)
     elif tr_id == KIS_WSReq.NOTICE:
@@ -92,6 +111,16 @@ async def subscribe(user: User, tr_id, stock_code):
         return await create_kis_ws_request(user, tr_id, '1', KIS_HTS_USER_ID)
 
 async def unsubscribe(user: User, tr_id, stock_code):
+
+    approval_key = user.get_value_by_key("KIS_WS_APPROVAL_KEY")
+    if not approval_key:
+        KIS_APP_KEY = user.get_value_by_key("KIS_APP_KEY")
+        KIS_APP_SECRET = user.get_value_by_key("KIS_APP_SECRET")
+
+        approval_key = get_ws_approval_key(KIS_APP_KEY, KIS_APP_SECRET)    
+        user.set_value_by_key("KIS_WS_APPROVAL_KEY", approval_key)
+        user.save()
+
     if tr_id in [KIS_WSReq.BID_ASK, KIS_WSReq.CONTRACT]:
         return await create_kis_ws_request(user, tr_id, '2', stock_code)
     elif tr_id == KIS_WSReq.NOTICE:
@@ -99,7 +128,7 @@ async def unsubscribe(user: User, tr_id, stock_code):
         return await create_kis_ws_request(user, tr_id, '2', KIS_HTS_USER_ID)
 
 async def on_open(user,websocket):
-    logger.info("웹소켓 연결이 열렸습니다.")
+    logger.info("KIS와의 웹소켓이  연결되었습니다.")
     # user_service = get_user_service()
     # user = await user_service.get_1("kdy987")
     
@@ -146,13 +175,13 @@ async def connect_to_korea_investment():
     try:
         user_service = get_user_service()
         user = await user_service.get_1("kdy987")
-        KIS_APP_KEY = user.get_value_by_key("KIS_APP_KEY")
-        KIS_APP_SECRET = user.get_value_by_key("KIS_APP_SECRET")
+        # KIS_APP_KEY = user.get_value_by_key("KIS_APP_KEY")
+        # KIS_APP_SECRET = user.get_value_by_key("KIS_APP_SECRET")
 
-        ws_approval_key = get_ws_approval_key(KIS_APP_KEY, KIS_APP_SECRET)    
-        user.set_value_by_key("KIS_WS_APPROVAL_KEY", ws_approval_key)
+        # ws_approval_key = get_ws_approval_key(KIS_APP_KEY, KIS_APP_SECRET)    
+        # user.set_value_by_key("KIS_WS_APPROVAL_KEY", ws_approval_key)
 
-        async with websockets.connect(uri, ping_interval=60) as websocket:
+        async with websockets.connect(uri, ping_interval=None) as websocket:
             await on_open(user,websocket)
             korea_investment_websocket = websocket
             if korea_investment_websocket is None:
@@ -220,7 +249,7 @@ async def kis_ws_stop():
         is_websocket_running = False
 
 @app.post("/start")
-async def start(background_tasks: BackgroundTasks):
+async def start():
     logger.info("웹소켓 테스트 서버 시작")
     await kis_ws_start()
     await broadcast_log("Kis Websocket이 시작되었습니다.")
@@ -228,77 +257,90 @@ async def start(background_tasks: BackgroundTasks):
 
 @app.post("/stop")
 async def stop():
-    logger.info("웹소켓 테스트 서버 중지")
+    logger.info("kis 웹소켓 테스트 서버 중지")
     await kis_ws_stop()
     await broadcast_log("Kis Websocket이 중지되었습니다.")
     return {"message": "WebSocket connection is not running"}
 
-@app.get("/subscribe/bid-ask/{stock_code}")
-async def subscribe_bid_ask(stock_code: str):
+@app.get("/subscribe/bid-ask/{user_id}/{stock_code}")
+async def subscribe_bid_ask(user_id:str, stock_code: str):
     global korea_investment_websocket
     if korea_investment_websocket is None:
         return {"message": "WebSocket connection is not established"}
     user_service = get_user_service()
-    user = await user_service.get_1("kdy987")
-    KIS_APP_KEY = user.get_value_by_key("KIS_APP_KEY")
-    KIS_APP_SECRET = user.get_value_by_key("KIS_APP_SECRET")
-
-    ws_approval_key = get_ws_approval_key(KIS_APP_KEY, KIS_APP_SECRET)    
-    user.set_value_by_key("KIS_WS_APPROVAL_KEY", ws_approval_key)
+    user = await user_service.get_1(user_id)
+    if user is None:
+        return {"message": "User not found"}
+    
     senddata = await subscribe(user, KIS_WSReq.BID_ASK, stock_code)
     await korea_investment_websocket.send(senddata)
     return {"message": "호가 등록"}
 
-@app.get("/un-subscribe/bid-ask/{stock_code}")
-async def un_subscribe_bid_ask(stock_code: str):
+@app.get("/un-subscribe/bid-ask/{user_id}/{stock_code}")
+async def un_subscribe_bid_ask(user_id:str, stock_code: str):
     global korea_investment_websocket
     if korea_investment_websocket is None:
-        return {"message": "WebSocket connection is not established"}
+        return {"result": "NK", "message": "WebSocket connection is not established"}
     
     user_service = get_user_service()
-    user = await user_service.get_1("kdy987")
-    KIS_APP_KEY = user.get_value_by_key("KIS_APP_KEY")
-    KIS_APP_SECRET = user.get_value_by_key("KIS_APP_SECRET")
-
-    ws_approval_key = get_ws_approval_key(KIS_APP_KEY, KIS_APP_SECRET)    
-    user.set_value_by_key("KIS_WS_APPROVAL_KEY", ws_approval_key)
+    user = await user_service.get_1(user_id)
+    if user is None:
+        return {"message": "User not found"}
 
     senddata = await unsubscribe(user, KIS_WSReq.BID_ASK, stock_code)
     await korea_investment_websocket.send(senddata)
     return {"message": "호가 취소"}
 
-@app.get("/subscribe/contract/{stock_code}")
-async def subscribe_contract(stock_code: str):
+@app.get("/subscribe/contract/{user_id}/{stock_code}")
+async def subscribe_contract(user_id:str, stock_code: str):
     global korea_investment_websocket
     if korea_investment_websocket is None:
         return {"message": "WebSocket connection is not established"}
+    
     user_service = get_user_service()
-    user = await user_service.get_1("kdy987")
-    KIS_APP_KEY = user.get_value_by_key("KIS_APP_KEY")
-    KIS_APP_SECRET = user.get_value_by_key("KIS_APP_SECRET")
-
-    ws_approval_key = get_ws_approval_key(KIS_APP_KEY, KIS_APP_SECRET)    
-    user.set_value_by_key("KIS_WS_APPROVAL_KEY", ws_approval_key)
+    user = await user_service.get_1(user_id)
+    if user is None:
+        return {"message": "User not found"}
     
     senddata = await subscribe(user, KIS_WSReq.CONTRACT, stock_code)
     await korea_investment_websocket.send(senddata)
     return {"message": "체결가 등록"}
 
-@app.get("/un-subscribe/contract/{stock_code}")
-async def un_subscribe_contract(stock_code: str):
+@app.get("/un-subscribe/contract/{user_id}/{stock_code}")
+async def un_subscribe_contract(user_id:str, stock_code: str):
     global korea_investment_websocket
     if korea_investment_websocket is None:
         return {"message": "WebSocket connection is not established"}
+    
     user_service = get_user_service()
-    user = await user_service.get_1("kdy987")
-    KIS_APP_KEY = user.get_value_by_key("KIS_APP_KEY")
-    KIS_APP_SECRET = user.get_value_by_key("KIS_APP_SECRET")
-
-    ws_approval_key = get_ws_approval_key(KIS_APP_KEY, KIS_APP_SECRET)    
-    user.set_value_by_key("KIS_WS_APPROVAL_KEY", ws_approval_key)
+    user = await user_service.get_1(user_id)
+    if user is None:
+        return {"message": "User not found"}
+    
     senddata = await unsubscribe(user, KIS_WSReq.CONTRACT, stock_code)
     await korea_investment_websocket.send(senddata)
     return {"message": "체결가 취소"}
+
+@app.get("/subscribe/notice/{user_id}")
+async def subscribe_notice(user_id: str):
+    user_service = get_user_service()
+    user = await user_service.get_1(user_id)
+    if user is None:
+        return {"message": "User not found"}
+    senddata = await subscribe(user, KIS_WSReq.NOTICE, None)
+    await korea_investment_websocket.send(senddata)
+    return {"message": "고객체결발생통보 등록"}
+
+@app.get("/un-subscribe/notice/{user_id}")
+async def un_subscribe_notice(user_id: str):
+    user_service = get_user_service()
+    user = await user_service.get_1(user_id)
+    if user is None:
+        return {"message": "User not found"}
+    senddata = await unsubscribe(user, KIS_WSReq.NOTICE, None)
+    await korea_investment_websocket.send(senddata)
+    return {"message": "고객체결발생통보 해제"}
+
 
 
 @app.post("/send")

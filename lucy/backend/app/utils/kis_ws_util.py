@@ -64,7 +64,7 @@ def aes_cbc_base64_dec(key, iv, cipher_text):
 
 
 def kis_ws_real_data_parsing(recv_text, aes_key, aes_iv):
-    ''' KisWsRealHeader, KisWsRealModelBase 객체로 변환해서 리턴'''
+    '''KIS로 부터 받은 문자열을 해석해서 KisWsRealHeader, KisWsRealModelBase 객체로 변환해서 리턴'''
     class_map = {
         'H0STASP0': H0STASP0,
         'H0STCNT0': H0STCNT0,

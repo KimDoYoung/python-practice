@@ -19,18 +19,27 @@
         <input type="text" id="stock_code" value="160190"> 
         <button id="subscribe_bid_ask">호가 등록</button> 
         <button id="un_subscribe_bid_ask">호가 취소</button> 
-        <button id="subscribe_contact">체결가 등록</button> 
-        <button id="un_subscribe_contact">체결가 취소</button> 
+        <button id="subscribe_contract">체결가 등록</button> 
+        <button id="un_subscribe_contract">체결가 취소</button> 
+        <input type="text" id="user_id" value="kdy987"> 
+        <button id="subscribe_notice">체결알림등록</button> 
+        <button id="un_subscribe_notice">체결알림해제</button> 
 
     </div>
     <button id="start">Start</button>
     <button id="stop">Stop</button>
     <div id="logs"></div>
+    <div id="errors"></div>
     <script>
         var ws;
 
         function startWebSocket() {
-            ws = new WebSocket("ws://localhost:8000/ws");
+            if (ws) {
+                debugger;
+                ws.close();
+                ws = null;
+            }
+            ws = new WebSocket("ws://localhost:8000/ws?user_id=kdy987");
 
             ws.onmessage = function(event) {
                 var logsDiv = $('#logs');
@@ -77,10 +86,13 @@
 
             ws.onerror = function(event) {
                 console.error("WebSocket error observed:", event);
+                ws.close();
+                ws = null;
             };
 
             ws.onclose = function(event) {
                 console.log("WebSocket connection closed:", event);
+                ws = null;
             };
         }
 
@@ -88,18 +100,21 @@
             if (ws) {
                 ws.close();
             }
+            ws = null;
         }
-
+        function dispError(errormsg){
+            const nowtime = new Date().toLocaleTimeString();
+            $('#errors').text(nowtime + ":" + errormsg);
+        }
         $(document).ready(function() {
-            startWebSocket();
             $('#start').click(function() {
+                startWebSocket();
                 $.post('/start');
-                //startWebSocket();
             });
 
             $('#stop').click(function() {
                 $.post('/stop');
-                //stopWebSocket();
+                stopWebSocket();
             });
         //<input type="text" id="stock_code" value="160190"> 
         //<button id="subscribe_bid_ask">호가 등록</button> 
@@ -109,25 +124,39 @@
 
             $('#subscribe_bid_ask').click(function() {
                 var stock_code = $('#stock_code').val();
-                var url = '/subscribe/bid-ask/' + stock_code;
-                fetch(url, { method: 'GET' });
+                var user_id = $('#user_id').val();
+                var url = '/subscribe/bid-ask/' + user_id + "/" + stock_code;
+                fetch(url, { method: 'GET' }).then(response => response.json()).then(data => dispError(data.message));
             });
             $('#un_subscribe_bid_ask').click(function() {
                 var stock_code = $('#stock_code').val();
-                var url = '/un-subscribe/bid-ask/' + stock_code;
-                fetch(url, { method: 'GET' });
+                var user_id = $('#user_id').val();
+                var url = '/un-subscribe/bid-ask/' + user_id + "/"+ stock_code;
+                fetch(url, { method: 'GET' }).then(response => response.json()).then(data => dispError(data.message));
             });
 
             $('#subscribe_contract').click(function() {
                 var stock_code = $('#stock_code').val();
-                var url = '/subscribe/contract/' + stock_code;
-                fetch(url, { method: 'GET' });
+                var user_id = $('#user_id').val();
+                var url = '/subscribe/contract/' + user_id + "/" + stock_code;
+                fetch(url, { method: 'GET' }).then(response => response.json()).then(data => dispError(data.message));
             });            
             $('#un_subscribe_contract').click(function() {
                 var stock_code = $('#stock_code').val();
-                var url = '/un-subscribe/contract/' + stock_code;
-                fetch(url, { method: 'GET' });
-            });            
+                var user_id = $('#user_id').val();
+                var url = '/un-subscribe/contract/'+ user_id + "/" + stock_code;
+                fetch(url, { method: 'GET' }).then(response => response.json()).then(data => dispError(data.message));
+            });
+            $('#subscribe_notice').click(function() {
+                var user_id = $('#user_id').val();
+                var url = '/subscribe/notice/' + user_id;
+                fetch(url, { method: 'GET' }).then(response => response.json()).then(data => dispError(data.message));
+            });
+            $('#un_subscribe_notice').click(function() {
+                var user_id = $('#user_id').val();
+                var url = '/un-subscribe/notice/' + user_id;
+                fetch(url, { method: 'GET' }).then(response => response.json()).then(data => dispError(data.message));
+            });
 
         });
     </script>
