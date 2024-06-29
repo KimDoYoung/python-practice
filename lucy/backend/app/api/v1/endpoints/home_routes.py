@@ -39,7 +39,15 @@ async def display_main(request: Request):
     if not current_user:
         raise HTTPException(status_code=401, detail="Invalid token-현재 사용자 정보가 없습니다")
     
-    context = {"request": request,  "user_id":  current_user["user_id"], "user_name": current_user["user_name"]}    
+    logger.debug("***************Calling get_today() function for /main endpoint")
+    today_str = get_today()
+    logger.debug(f"****************today_str in /main: {today_str}")
+    stk_code = request.cookies.get("stk_code")
+    context = { "request": request,  
+                "user_id":  current_user["user_id"], 
+                "user_name": current_user["user_name"], 
+                "today": today_str,
+                "stk_code": stk_code}    
     return render_template("main.html", context)
 
 @router.get("/page", response_class=HTMLResponse, include_in_schema=False)

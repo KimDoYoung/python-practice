@@ -20,8 +20,8 @@
     //pytest
     //-------------------------------------------------//
     "python.testing.pytestArgs": [
-        "-s",
-        "backend/tests"
+        "backend/tests",
+        "-s"
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,    
