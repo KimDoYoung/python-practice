@@ -1,4 +1,4 @@
-{% extends 'common/base.html' %}
+{% extends 'common/base_kis.html' %}
 {% block style %}
 <style>
 
@@ -8,10 +8,10 @@
 {% block content %}
 <section id="list-section" class="container">
     <h3>KIS(한국투자증권) 계좌조회</h3>
-    <button id="btnTesTToken">Test-AccessToken</button>
+    <!-- <button id="btnTesTToken">Test-AccessToken</button>
     <button id="btnPsearchTitle">조건식리스트</button>
     <button id="btnInquireDailyCcld">주식일별주문체결조회</button>
-    <button id="btnRefresh" class="btn btn-primary"><i class="bi bi-arrow-clockwise"></i>Refresh</button>
+    <button id="btnRefresh" class="btn btn-primary"><i class="bi bi-arrow-clockwise"></i>Refresh</button> -->
 
     <div id="message-area"></div> 
     <div id="inquire-balance-area"></div>
@@ -24,7 +24,7 @@
 {% raw %} 
 <script id="inquire-balance-table-template" type="text/x-handlebars-template">
     <h4>예수금총액 : {{displayWon output2.dnca_tot_amt}}</h4>
-    <table class="table">
+    <table class="table table-sm">
         <thead>
             <tr>
                 <th>상품번호</th>
@@ -178,14 +178,14 @@
         });
         //조건식 목록 조회
         $('#btnPsearchTitle').on('click', function() {
-            window.location.href = '/page?id=mytest_kis-psearch';            
+            window.location.href = '/page?id=kis_kis-psearch';            
         });
         //계좌정보 조회
         $('#inquire-balance-area').on("click", ".btnStockInfo", function(e) {
             e.preventDefault();
             const stk_code = $(this).data('stk-code');
             setCookie('stk_code', stk_code, 5);
-            window.location.href = '/page?id=mytest_kis-stock-info';
+            window.location.href = '/page?id=kis_kis-stock-info';
             
         });
 
@@ -225,7 +225,7 @@
         //주식일별주문체결조회
         $('#btnInquireDailyCcld').on('click', function() {
             console.log('주식일별주문체결조회 click.... ');
-            window.location.href = '/page?id=mytest_kis-inquire-daily-ccld';
+            window.location.href = '/page?id=kis_kis-inquire-daily-ccld';
 
         });
 

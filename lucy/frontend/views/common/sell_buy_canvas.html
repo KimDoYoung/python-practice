@@ -1,0 +1,64 @@
+<!-- 매수/매도용 Offcanvas component -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasBuySell" aria-labelledby="offcanvasExampleLabel" >
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasExampleLabel">매수/매도</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div id="offcanvaBuy" class="bg-buy mb-3 p-2">
+            <h2>매수</h2>
+            <form action="" id="buy-form">
+                <div class="row mb-3">
+                    <div class="col-4">
+                        <label for="pdno" class="form-label">상품번호</label>
+                        <input type="text" class="form-control" name="pdno" required>
+                    </div>
+                    <div class="col-8">
+                        <label for="pdno" class="form-label">상품명칭</label>
+                        <input type="text" class="form-control" name="pdnm" readonly required>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <label for="qty" class="form-label">수량</label>
+                        <input type="number" class="form-control" name="qty" required min="1">
+                    </div>
+                    <div class="col">
+                        <label for="cost" class="form-label">지정가<small>(0:시장가)</small></label>
+                        <input type="number" class="form-control" name="cost" required min="0">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-danger  btnBuyCash">매수</button>
+                <button type="button" class="btn btn-secondary btnClearBuySell">초기화</button>
+            </form>
+        </div> 
+        <div id="offcanvasBuySell" class="bg-sell p-2">
+            <h2>매도</h2>
+            <form action="" id="sell-form">
+                <div class="row mb-3 p-2">
+                    <div class="col">
+                        <label for="pdno" class="form-label">상품번호</label>
+                        <input type="text" class="form-control" name="pdno" required>
+                    </div>
+                    <div class="col">
+                        <label for="pdno" class="form-label">상품명칭</label>
+                        <input type="text" class="form-control" name="pdnm" readonly required>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <label for="qty" class="form-label">수량</label>
+                        <input type="number" class="form-control" name="qty"  min="1" required>
+                    </div>
+                    <div class="col">
+                        <label for="cost" class="form-label">지정가<small>(0:시장가)</small></label>
+                        <input type="number" class="form-control" name="cost" min="0" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btnSellCash">매도</button>
+                <button type="button" class="btn btn-secondary btnClearBuySell">초기화</button>
+            </form>        
+        </div>
+        <div id="buy-sell-message-area"></div>
+    </div>
+</div>

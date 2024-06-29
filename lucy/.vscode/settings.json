@@ -50,6 +50,7 @@
         "**/data": true,
         "**/tmp": true,
         "**/*.md": true,
+        "**/doc"  : true
     },
 
 }

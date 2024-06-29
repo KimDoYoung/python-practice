@@ -1,4 +1,4 @@
-{% extends 'common/base.html' %}
+{% extends 'common/base_kis.html' %}
 {% block style %}
 <style>
 </style>
@@ -13,16 +13,16 @@
     {% raw %} 
     <script id="stock-info-template" type="text/x-handlebars-template">
         <div class="container">
-           <h2 class="text-primary">{{stk_name}}-{{stk_code}}</h2>
-          {{#each rows}}
-          <div class="row mb-3">
-            {{#each this}}
-            <div class="col-md-4">
-              <strong>{{title}}:</strong> {{value}}
+            <h2 class="text-primary">{{stk_name}}-{{stk_code}}</h2>
+            {{#each rows}}
+                <div class="row mb-3">
+                {{#each this}}
+                <div class="col-md-4">
+                    <strong>{{title}}:</strong> {{value}}
+                </div>
+                {{/each}}
             </div>
             {{/each}}
-          </div>
-          {{/each}}
         </div>
 </script>
 {% endraw %}
