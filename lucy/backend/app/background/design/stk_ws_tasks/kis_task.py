@@ -32,8 +32,9 @@ class KISTask:
     #         # KIS 회사의 WebSocket 통신 로직
     #         await asyncio.sleep(1)
     #         await self.to_client_msg("실시간 WS 동작중...")
-
+    #TODO : accounts collection을 만들 것
     async def create_kis_ws_request(self, tr_id, tr_type, tr_key):
+        
         approval_key = self.user.get_value_by_key("KIS_WS_APPROVAL_KEY")
         if not approval_key:
             KIS_APP_KEY = self.user.get_value_by_key("KIS_APP_KEY")
@@ -84,24 +85,18 @@ class KISTask:
         await websocket.send(senddata)
         await asyncio.sleep(0.5)
 
+    # TODO 여기서 오류가 나면 task가 종료되어야함 그것을 어떻게 처리할지 생각해보자
     async def run(self):
         try:
             user_service = get_user_service()
             user = await user_service.get_1(self.user_id)        
             self.user = user            
-            # KIS_APP_KEY = user.get_value_by_key("KIS_APP_KEY")
-            # KIS_APP_SECRET = user.get_value_by_key("KIS_APP_SECRET")
-
-            # ws_approval_key = get_ws_approval_key(KIS_APP_KEY, KIS_APP_SECRET)    
-            # user.set_value_by_key("KIS_WS_APPROVAL_KEY", ws_approval_key)
 
             async with websockets.connect(self.url, ping_interval=None) as websocket:
                 self.stk_websocket = websocket
                 await self.on_open()
                 if self.stk_websocket is None:
                     raise Exception("korea_investment_websocket 웹소켓 연결이 안됨")
-                # aes_key = None
-                # aes_iv = None
 
                 while True:
                     received_text = await websocket.recv()  
@@ -124,7 +119,7 @@ class KISTask:
                                 await websocket.pong(received_text)  # 웹소켓 클라이언트에서 pong을 보냄
                                 logger.debug(f"PINGPONG 데이터 전송: [{received_text}]")
                             elif kis_response.is_error():
-                                logger.warning(f"Kis Websocket Response 에러발생: {kis_response.get_error_message()}")
+                                logger.warning(f"{self.user_id} {self.abbr} Websocket Response 에러발생: {kis_response.get_error_message()}")
                             else: 
                                 iv = kis_response.get_iv()
                                 key = kis_response.get_key()
@@ -134,16 +129,16 @@ class KISTask:
                                 logger.debug(f"event_log: {event_log}")
                                 await self.broadcast(event_log)
                         except json.JSONDecodeError as e:
-                                logger.error(f"JSON decoding error: {e}")
+                                logger.error(f"{self.user_id} {self.abbr} JSON decoding error: {e}")
                         except websockets.ConnectionClosed as e:
-                                logger.error(f"WebSocket connection closed: {e}")
+                                logger.error(f"{self.user_id} {self.abbr}  WebSocket connection closed: {e}")
                                 break
                         except Exception as e:
                                 logger.error(f"Unexpected error: {e}")
         except websockets.exceptions.ConnectionClosed as e:
-            logger.error(f"웹소켓 연결이 닫혔습니다: {e}")
+            logger.error(f"{self.user_id} {self.abbr} 웹소켓 연결이 닫혔습니다: {e}")
         except Exception as e:
-            logger.error(f"웹소켓 연결 중 에러 발생: {e}")
+            logger.error(f"{self.user_id} {self.abbr} 웹소켓 연결 중 에러 발생: {e}")
         finally:
             logger.debug(f"finally.....")
             self.stk_websocket = None
