@@ -20,22 +20,13 @@ class KeyValueData(BaseModel):
     note: Optional[str] = None
     created_at: datetime =  Field(default_factory=lambda: datetime.now(timezone.utc))
 
-# class UserRequest(BaseModel):
-#     user_id: str
-#     user_name: str
-#     email: EmailStr
-#     password: str
-#     kind: str = 'P'
-#     additional_attributes: List[KeyValueData] = []
-
-# class KeyValueData(BaseModel):
-#     GODATA_DECODE : str
-#     GODATA_ENCODE : str
-#     DART_OPENAPI : str
-#     KIS_ACCTNO : str
-#     KIS_ACCTPW : str
-#     KIS_APP_KEY : str
-
+class StkAccount(BaseModel):
+    abbr: str
+    account_no: str
+    account_pw: str
+    hts_id: Optional[str] = None
+    key_values: List[KeyValueData] = []
+    created_at: datetime =  Field(default_factory=lambda: datetime.now(timezone.utc))
 
 #TODO upsert addtion을 빼는 것이 좋지 않을까?
 class User(Document):
@@ -46,6 +37,7 @@ class User(Document):
     kind: str = 'P'
     created_at: datetime =  Field(default_factory=lambda: datetime.now(timezone.utc))
     key_values: List[KeyValueData] = []
+    accounts: List[StkAccount] = []
 
     def to_dict(self):
         kv = [kv.model_dump() for kv in self.key_values]
