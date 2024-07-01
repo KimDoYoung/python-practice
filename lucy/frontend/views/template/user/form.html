@@ -9,7 +9,7 @@
     <h2>사용자정보</h2>
     <form id="user-form">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <h4>기본정보</h4>
                 <div class="mb-3">
                     <label for="user_id" class="form-label fw-bold">User ID</label>
@@ -31,7 +31,9 @@
                     <input type="password" class="form-control" id="password" name="password">
                 </div>                        
             </div>
-            <div class="col-md-6" id="additional-attributes">
+            <div class="col-md-4" id="additional-attributes">
+            </div>
+            <div class="col-md-4" id="accounts">
             </div>
         </div> 
         <div id="error-area" class="text-danger p-3 mt-3"></div>       
@@ -43,7 +45,26 @@
 <script id="keyvalue-list-template" type="text/x-handlebars-template">
     <h4>키-값</h4>
     {{#each list}}
-    <div class="mb-3">
+    <div class="mb-1">
+        <label for="{{key}}" class="form-label fw-bold">{{key}}<label>
+        <input type="text" class="form-control ms-2" data-key="{{key}}" id="{{key}}" name="{{key}}" value="{{value}}" required>
+    </div>
+    {{/each}}
+</script>
+<script id="keyvalue-list-template" type="text/x-handlebars-template">
+    <h4>키-값</h4>
+    {{#each list}}
+    <div class="mb-1">
+        <label for="{{key}}" class="form-label fw-bold">{{key}}<label>
+        <input type="text" class="form-control ms-2" data-key="{{key}}" id="{{key}}" name="{{key}}" value="{{value}}" required>
+    </div>
+    {{/each}}
+</script>
+<script id="accounts-template" type="text/x-handlebars-template">
+    <h4>키-값</h4>
+    {{#each list}}
+    
+    <div class="mb-1">
         <label for="{{key}}" class="form-label fw-bold">{{key}}<label>
         <input type="text" class="form-control ms-2" data-key="{{key}}" id="{{key}}" name="{{key}}" value="{{value}}" required>
     </div>
