@@ -23,7 +23,7 @@ class StockWsManager:
         if user is None:
             return ERROR_USER_NOT_FOUND
         
-        account = await user.find_account(acctno)
+        account = user.find_account(acctno)
         if account is None:
             return ERROR_ACCOUNT_NOT_FOUND
         
@@ -47,8 +47,16 @@ class StockWsManager:
             logger.debug(f"새 사용자 연결 생성: {user_id}")
 
         if acctno not in self.stock_connections[user_id]:
-            task = asyncio.create_task(self.stock_ws_task(user_id, acctno, abbr))
-            self.stock_connections[user_id][acctno] = task
+            try:
+                task = asyncio.create_task(self.stock_ws_task(user_id, acctno, abbr))
+                self.stock_connections[user_id][acctno] = task
+            except Exception as e:
+                logger.error(f"에러 발생: {e}")
+                if acctno in self.stock_connections.get(user_id, {}):
+                    del self.stock_connections[user_id][acctno]
+                    if not self.stock_connections[user_id]:
+                        del self.stock_connections[user_id]                
+                return {"code": "06", "detail": f"{acctno} 계좌에 대한 WebSocket 작업 실패: {user_id}"}
         
         logger.debug(f"{acctno} 계좌에 대한 WebSocket 작업 시작: {user_id}")
         return {"code" : "00", "detail": f"{acctno} 계좌에 대한 WebSocket 작업 시작: {user_id}"}
@@ -77,12 +85,21 @@ class StockWsManager:
 
         if abbr == "KIS":
             kis_task = KISTask(user_id, acctno, self.client_ws_manager)
-            await kis_task.run()
-            logger.debug(f"KIS 작업 완료: {user_id}")
+            result = await kis_task.initialize()
+            if result["code"] != "00":
+                raise Exception(result["detail"])
+            try:
+                await kis_task.run()
+            except Exception as e:
+                logger.error(f"KIS WebSocket 작업 중 에러 발생: {e}")
+                raise Exception(f"KIS WebSocket 작업 중 에러 발생: {e}")
+            
+            logger.debug(f"KIS 작업 완료: {user_id}/{acctno}/{abbr} ")
         elif abbr == "LS":
             ls_task = LSTask()
+            await ls_task.initialize()
             await ls_task.run(user_id)
-            logger.debug(f"KB 작업 완료: {user_id}")
+            logger.debug(f"LS 작업 완료: {user_id}")
         else:
             logger.error(f"알 수 없는 증권사: {abbr}")        
 

@@ -17,17 +17,24 @@
 <body>
 <div class="container">
     <h1>사용자별 증권사별 Real Data</h1>
-    
-    user id: <input type="text" id="user_id" value="kdy987">
-    acct no: <input type="text" id="acct_no" value="6577792801">
-    <button id="connect_ws">connect client ws</button>
-    <button id="start_from_stock">Start Stk WS</button>
-    <button id="stop_from_stock">Stop Stk WS</button>
-    <button id="status_from_stock">status</button>
-
+    <div>
+        user id: <input type="text" id="user_id" value="kdy987">
+        acct no: <input type="text" id="acct_no" value="6577792801">
+        <button id="connect_ws">connect client ws</button>
+        <button id="start_from_stock">Start Stk WS</button>
+        <button id="stop_from_stock">Stop Stk WS</button>
+        <button id="status_from_stock">status</button>
+    </div>
+    <div>
+        종목코드:<input type="text" id="stk_code">
+        가격(0:시장가):<input type="text" id="cost" value="0">
+        <button id="buy">매수</button>
+        <button id="sell">매도</button>
+    </div>
     <div class="m-3">
-        <h3>client</h3>
+        <h3>ws client</h3>
         <div id="logs"></div>
+        <h3>Restful</h3>
         <div id="errors"></div>
     </div>
 
@@ -92,7 +99,8 @@
             });
             $('#start_from_stock').click(function(){
                 const user_id = $('#user_id').val();
-                fetch(`/start-realdata/${user_id}`, {
+                const acct_no = $('#acct_no').val();
+                fetch(`/start-realdata/${user_id}/${acct_no}`, {
                     method: 'GET'
                 }).then(response => {
                     if (!response.ok) {
@@ -103,7 +111,7 @@
                 .then(data => {
                     //debugger;
                     //$('#logs').append(data);
-                    $('.toast-body').text(data.message);
+                    $('.toast-body').text(data.detail);
                     $('.toast').toast('show');
                 })
                 .catch(error => {
@@ -112,7 +120,8 @@
             });
             $('#stop_from_stock').click(function(){
                 const user_id = $('#user_id').val();
-                fetch(`/stop-realdata/${user_id}`, {
+                const acct_no = $('#acct_no').val();
+                fetch(`/stop-realdata/${user_id}/${acct_no}`, {
                     method: 'GET'
                 }).then(response => {
                     if (!response.ok) {
@@ -121,7 +130,7 @@
                     return response.json();
                 })
                 .then(data => {
-                    $('.toast-body').text(data.message);
+                    $('.toast-body').text(data.detail);
                     $('.toast').toast('show');
                 })
                 .catch(error => {
@@ -144,7 +153,7 @@
                     $('#logs').append(status);
                 })
                 .catch(error => {
-                    dispError(error.message);
+                    dispError(error.detail);
                 });
             });
         });

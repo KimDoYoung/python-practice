@@ -11,8 +11,8 @@ from backend.app.core.mongodb import MongoDb
 
 app = FastAPI()
 
-client_ws_manager = ClientWsManager()
-stock_ws_manager = StockWsManager(client_ws_manager)
+client_ws_manager = None
+stock_ws_manager = None
 
 async def init_db():
     ''' Lucy가 사용하는 stockdb 초기화 '''
@@ -25,7 +25,11 @@ async def init_db():
 
 @app.on_event("startup")
 async def startup_event():
+    global client_ws_manager, stock_ws_manager
     await init_db()
+    client_ws_manager = ClientWsManager()
+    stock_ws_manager = StockWsManager(client_ws_manager)
+
 
 @app.get("/", response_class=HTMLResponse)
 async def get():
