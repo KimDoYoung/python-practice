@@ -27,7 +27,8 @@
     </div>
     <div>
         종목코드:<input type="text" id="stk_code">
-        가격(0:시장가):<input type="text" id="cost" value="0">
+        가격(0:시장가):<input type="number" id="cost" value="0">
+        수량:<input type="number" id="qty" value="1">
         <button id="buy">매수</button>
         <button id="sell">매도</button>
     </div>
@@ -35,6 +36,7 @@
         <h3>ws client</h3>
         <div id="logs"></div>
         <h3>Restful</h3>
+        <div id="restful"></div>
         <div id="errors"></div>
     </div>
 
@@ -153,6 +155,73 @@
                     $('#logs').append(status);
                 })
                 .catch(error => {
+                    dispError(error.detail);
+                });
+            });
+            //매수
+            $('#buy').click(function(){
+                const user_id = $('#user_id').val();
+                const acct_no = $('#acct_no').val();
+                const stk_code = $('#stk_code').val();
+                const cost = $('#cost').val();
+                const qty = $('#qty').val();
+                const data = {
+                    user_id: user_id,
+                    acct_no: acct_no,
+                    buy_sell_gb : '매수',
+                    stk_code: stk_code,
+                    cost: cost,
+                    qty: qty
+                }
+                const url = '/order-cash'
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                }).then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error occurred');
+                    }
+                    return response.json();
+                }).then(data => {
+                    var divMsg = $('<div>').text(data.detail);
+                    $('#restful').append(divMsg);
+                }).catch(error => {
+                    dispError(error.detail);
+                });
+            });
+            $('#sell').click(function(){
+                const user_id = $('#user_id').val();
+                const acct_no = $('#acct_no').val();
+                const stk_code = $('#stk_code').val();
+                const cost = $('#cost').val();
+                const qty = $('#qty').val();
+                const data = {
+                    user_id: user_id,
+                    acct_no: acct_no,
+                    buy_sell_gb : '매도',
+                    stk_code: stk_code,
+                    cost: cost,
+                    qty: qty
+                }
+                const url = '/order-cash'
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                }).then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error occurred');
+                    }
+                    return response.json();
+                }).then(data => {
+                    var divMsg = $('<div>').text(data.detail);
+                    $('#restful').append(divMsg);
+                }).catch(error => {
                     dispError(error.detail);
                 });
             });

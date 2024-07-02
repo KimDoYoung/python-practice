@@ -2,6 +2,7 @@ import os
 from beanie import init_beanie
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
+from backend.app.domains.stc.kis.model.kis_order_cash_model import OrderCashRequest
 from backend.app.domains.user.user_model import User
 from managers.client_ws_manager import ClientWsManager
 from managers.stock_ws_manager import StockWsManager
@@ -64,6 +65,18 @@ async def stop_stock_ws(user_id: str, acctno: str):
     if stock_ws_manager.is_connected(user_id, acctno):
         await stock_ws_manager.disconnect(user_id, acctno)
     return {"message": f"Stopped WebSocket for user {user_id}"}
+
+@app.post("/order-cash")
+async def order_cash(order_cash_request: OrderCashRequest):
+    ''' 매도/매수 주문'''
+    gb = order_cash_request.buy_sell_gb
+    if gb == "매수":
+        kis_api = await get_kis_api(request, user_service)
+        kis_order_cash =   kis_api.order_cash(order_cash)
+    else:
+        pass
+
+
 
 @app.get("/status-realdata")
 async def stop_stock_ws():

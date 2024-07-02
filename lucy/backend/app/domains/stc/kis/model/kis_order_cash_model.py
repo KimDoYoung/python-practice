@@ -1,11 +1,19 @@
-from typing import List, Literal
+from typing import Literal
 
-from pydantic import BaseModel, constr, field_validator, validator
+from pydantic import BaseModel, field_validator
 from backend.app.domains.stc.kis.model.kis_base_model import KisBaseModel
 
 '''
 주식 주문내역 조회
 '''
+
+class OrderCashRequest(BaseModel):
+    buy_sell_gb: Literal['매수', '매도']
+    user_id: str # 사용자 ID
+    acctno: str # 계좌번호
+    stk_code: str
+    qty: int
+    cost: int = 0 # cost가 0이면 시장가로 주문
 
 class OrderCashDto(BaseModel):
     buy_sell_gb: Literal['매수', '매도']
