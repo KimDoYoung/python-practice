@@ -15,7 +15,7 @@ class ClientWsManager:
             logger.debug(f"새 사용자 연결 생성: {user_id}")
         self.active_connections[user_id].append(websocket)
         msg =f"사용자 {user_id}의 WebSocket 연결 추가: 현재 연결 수 {len(self.active_connections[user_id])}"
-        await self.send_personal_message(msg, user_id)
+        await self.send_to_client(msg, user_id)
         return msg
 
     def disconnect(self, user_id: str, websocket: WebSocket):
@@ -26,7 +26,7 @@ class ClientWsManager:
                 del self.active_connections[user_id]
                 logger.debug(f"사용자 {user_id}의 모든 WebSocket 연결 제거")
 
-    async def send_personal_message(self, message: str, user_id: str):
+    async def send_to_client(self, message: str, user_id: str):
         if user_id in self.active_connections:
             for websocket in self.active_connections[user_id][:]:
                 try:

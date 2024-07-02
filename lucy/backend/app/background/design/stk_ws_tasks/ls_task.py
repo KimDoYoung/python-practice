@@ -1,6 +1,6 @@
 import asyncio
 
-class KBTask:
+class LSTask:
     async def run(self, user_id: str):
         while True:
             # KB 회사의 WebSocket 통신 로직

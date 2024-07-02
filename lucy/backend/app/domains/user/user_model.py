@@ -35,6 +35,7 @@ class User(Document):
     email: EmailStr = Field(json_schema_extra={"unique": True})
     password: str
     kind: str = 'P'
+    default_user: bool = False
     created_at: datetime =  Field(default_factory=lambda: datetime.now(timezone.utc))
     key_values: List[KeyValueData] = []
     accounts: List[StkAccount] = []
@@ -61,6 +62,26 @@ class User(Document):
                 kv.value = value
                 return
         self.key_values.append(KeyValueData(key=key, value=value))
+
+    def get_value_in_accounts(self, key:str)->Optional[str]:
+        for account in self.accounts:
+            for kv in account.key_values:
+                if kv.key == key:
+                    return kv.value
+        return None
+    def set_value_in_accounts(self, key:str, value:str):
+        for account in self.accounts:
+            for kv in account.key_values:
+                if kv.key == key:
+                    kv.value = value
+                    return
+        self.accounts.append(StkAccount(key_values=[KeyValueData(key=key, value=value)]))
+
+    def find_account(self, acctno: str):
+        for account in self.accounts:
+            if account.account_no == acctno:
+                return account
+        return None
 
     class Settings:
         name = "Users"

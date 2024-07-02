@@ -7,7 +7,6 @@ from managers.client_ws_manager import ClientWsManager
 from managers.stock_ws_manager import StockWsManager
 from backend.app.core.config import config
 from backend.app.core.mongodb import MongoDb
-from backend.app.core.dependency import get_user_service
 
 
 app = FastAPI()
@@ -42,32 +41,24 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
     try:
         while True:
             data = await websocket.receive_text()
-            await client_ws_manager.send_personal_message(f"Message text was: {data}", user_id)
+            await client_ws_manager.send_to_client(f"Message text was: {data}", user_id)
     except WebSocketDisconnect:
         client_ws_manager.disconnect(user_id)
 
-@app.get("/start-realdata/{user_id}")
-async def start_stock_ws(user_id: str):
-    user_service = get_user_service()# 1. 사용자별로 증권사 계정을 다 가져온다.
-    user = await user_service.get_1(user_id)
-    
+@app.get("/start-realdata/{user_id}/{acctno}")
+async def start_stock_ws(user_id: str, acctno: str):
+    ''' 사용자의 acctno에 대해서 연결을 시작한다'''
     #stock_accounts = user.stock_accounts
-    stock_accounts = ['kis']
-    for stk_company_abbr in stock_accounts:
-        if not stock_ws_manager.is_connected(user_id, stk_company_abbr):
-            await stock_ws_manager.connect(user_id, stk_company_abbr)
-    return {"message": f"Started WebSocket for user {user_id}"}
+    if stock_ws_manager.is_connected(user_id, acctno):
+        return {"code":"01", "detail": f"{user_id}, {acctno} 이미 연결되어 있습니다."}
+    result = await stock_ws_manager.connect(user_id, acctno)
+    return result
 
-@app.get("/stop-realdata/{user_id}")
-async def stop_stock_ws(user_id: str):
-    user_service = get_user_service()# 1. 사용자별로 증권사 계정을 다 가져온다.
-    user = await user_service.get_1(user_id)
-    
-    #stock_accounts = user.stock_accounts
-    stock_accounts = ['kis']
-    for stk_company_abbr in stock_accounts:
-        if stock_ws_manager.is_connected(user_id, stk_company_abbr):
-            await stock_ws_manager.disconnect(user_id, stk_company_abbr=stk_company_abbr)
+@app.get("/stop-realdata/{user_id}/{acctno}")
+async def stop_stock_ws(user_id: str, acctno: str):
+    ''' 사용자의 acctno에 대해서 실시간 연결을 중단한다 '''
+    if stock_ws_manager.is_connected(user_id, acctno):
+        await stock_ws_manager.disconnect(user_id, acctno)
     return {"message": f"Stopped WebSocket for user {user_id}"}
 
 @app.get("/status-realdata")

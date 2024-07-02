@@ -15,7 +15,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
     try:
         while True:
             data = await websocket.receive_text()
-            await client_ws_manager.send_personal_message(f"Message text was: {data}", user_id)
+            await client_ws_manager.send_to_client(f"Message text was: {data}", user_id)
     except WebSocketDisconnect:
         client_ws_manager.disconnect(user_id, websocket)
 
@@ -43,7 +43,7 @@ async def test_websocket_connection():
 async def test_send_personal_message():
     user_id = "test_user"
     with client.websocket_connect(f"/ws?user_id={user_id}") as websocket:
-        await client_ws_manager.send_personal_message("Test Message", user_id)
+        await client_ws_manager.send_to_client("Test Message", user_id)
         data = websocket.receive_text()
         assert data == "Test Message"
 

@@ -13,32 +13,32 @@ logger = get_logger(__name__)
 
 #TODO BASE가 있어야하지않을까?
 class KISTask:
-    def __init__(self, user_id:str, client_ws_manager: ClientWsManager):
+    def __init__(self, user_id:str, acctno:str, client_ws_manager: ClientWsManager):
         self.client_ws_manager = client_ws_manager
         self.user_id = user_id
         self.url = "ws://ops.koreainvestment.com:21000"
         self.abbr = 'KIS'
+        self.user_service = get_user_service()
         self.stk_websocket = None
+        self.user = self.user_service.get_1(self.user_id)
+        self.acctno = acctno
+        self.account = self.user.find_account(acctno)
 
-
-    async def broadcast(self, message: str):
-        logger.debug(message)
+    async def make_message(self, message:str):
         now_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        msg = f"{self.user_id}|{self.abbr}|{now_time}|{message}"
-        await self.client_ws_manager.send_personal_message(msg, self.user_id)
+        return  f"{now_time}|{self.user_id}|{self.acctno}|{self.abbr}|{message}"
+    
+    async def broadcast(self, message: str):
+        msg = await self.make_message(message)
+        logger.debug(msg)
+        await self.client_ws_manager.send_to_client(msg, self.user_id)
 
-    # async def run(self):
-    #     while True:
-    #         # KIS 회사의 WebSocket 통신 로직
-    #         await asyncio.sleep(1)
-    #         await self.to_client_msg("실시간 WS 동작중...")
-    #TODO : accounts collection을 만들 것
     async def create_kis_ws_request(self, tr_id, tr_type, tr_key):
-        
-        approval_key = self.user.get_value_by_key("KIS_WS_APPROVAL_KEY")
+        ''' KIS에 요청을 보내기 위한 데이터 생성'''
+        approval_key = self.user.get_value_in_accounts("KIS_WS_APPROVAL_KEY")
         if not approval_key:
-            KIS_APP_KEY = self.user.get_value_by_key("KIS_APP_KEY")
-            KIS_APP_SECRET = self.user.get_value_by_key("KIS_APP_SECRET")
+            KIS_APP_KEY = self.user.get_value_in_accounts("KIS_APP_KEY")
+            KIS_APP_SECRET = self.user.get_value_in_accounts("KIS_APP_SECRET")
 
             approval_key = get_ws_approval_key(KIS_APP_KEY, KIS_APP_SECRET)    
             self.user.set_value_by_key("KIS_WS_APPROVAL_KEY", approval_key)
@@ -46,7 +46,7 @@ class KISTask:
             self.user.save()
 
         # ws_approval_key = self.user.get_value_by_key("KIS_WS_APPROVAL_KEY")
-        KIS_APP_SECRET = self.user.get_value_by_key("KIS_APP_SECRET")
+        KIS_APP_SECRET = self.user.get_value_in_accounts("KIS_APP_SECRET")
         req = new_kis_ws_request()
         req.header.approval_key = approval_key
         req.header.personalseckey = KIS_APP_SECRET
@@ -55,7 +55,7 @@ class KISTask:
         req.body.input.tr_key = tr_key
         senddata = req.model_dump_json()
         
-        logger.debug(f"{self.abbr}, {self.user_id} : 증권사에 보낸 데이터[{senddata}]")
+        logger.debug(f"{self.user_id}/{self.acctno}/{self.abbr} : 증권사에 보낸 데이터[{senddata}]")
         
         return senddata
 
@@ -65,7 +65,7 @@ class KISTask:
         if tr_id in [KIS_WSReq.BID_ASK, KIS_WSReq.CONTRACT]:
             return await self.create_kis_ws_request(tr_id, '1', stock_code)
         elif tr_id == KIS_WSReq.NOTICE:
-            KIS_HTS_USER_ID = user.get_value_by_key("KIS_HTS_USER_ID")
+            KIS_HTS_USER_ID = user.get_value_in_accounts("KIS_HTS_USER_ID")
             return await self.create_kis_ws_request(tr_id, '1', KIS_HTS_USER_ID)
 
     async def unsubscribe(self, tr_id, stock_code):
@@ -74,7 +74,7 @@ class KISTask:
         if tr_id in [KIS_WSReq.BID_ASK, KIS_WSReq.CONTRACT]:
             return await self.create_kis_ws_request(tr_id, '2', stock_code)
         elif tr_id == KIS_WSReq.NOTICE:
-            KIS_HTS_USER_ID = user.get_value_by_key("KIS_HTS_USER_ID")
+            KIS_HTS_USER_ID = user.get_value_in_accounts("KIS_HTS_USER_ID")
             return await self.create_kis_ws_request(tr_id, '2', KIS_HTS_USER_ID)
         
     async def on_open(self):
@@ -88,10 +88,6 @@ class KISTask:
     # TODO 여기서 오류가 나면 task가 종료되어야함 그것을 어떻게 처리할지 생각해보자
     async def run(self):
         try:
-            user_service = get_user_service()
-            user = await user_service.get_1(self.user_id)        
-            self.user = user            
-
             async with websockets.connect(self.url, ping_interval=None) as websocket:
                 self.stk_websocket = websocket
                 await self.on_open()
@@ -102,8 +98,8 @@ class KISTask:
                     received_text = await websocket.recv()  
                     logger.info("웹소켓(KIS로부터 받은데이터) : [" + received_text + "]")
                     if is_real_data(received_text): # 실시간 데이터인 경우
-                        aes_key = user.get_value_by_key("KIS_WS_AES_KEY")
-                        aes_iv = user.get_value_by_key("KIS_WS_AES_IV")
+                        aes_key = self.user.get_value_in_accounts("KIS_WS_AES_KEY")
+                        aes_iv = self.user.get_value_in_accounts("KIS_WS_AES_IV")
                         header, real_model = kis_ws_real_data_parsing(received_text, aes_key, aes_iv)
                         logger.info(f"header: {header}")
                         logger.info(f"real_model: {real_model}")
@@ -123,22 +119,22 @@ class KISTask:
                             else: 
                                 iv = kis_response.get_iv()
                                 key = kis_response.get_key()
-                                user.set_value_by_key("KIS_WS_AES_IV", iv)
-                                user.set_value_by_key("KIS_WS_AES_KEY", key)
+                                self.user.set_value_in_accounts("KIS_WS_AES_IV", iv)
+                                self.user.set_value_in_accounts("KIS_WS_AES_KEY", key)
                                 event_log = kis_response.get_event_log()
                                 logger.debug(f"event_log: {event_log}")
                                 await self.broadcast(event_log)
                         except json.JSONDecodeError as e:
-                                logger.error(f"{self.user_id} {self.abbr} JSON decoding error: {e}")
+                                logger.error(f"{self.user_id}/{self.acctno}/{self.abbr} JSON decoding error: {e}")
                         except websockets.ConnectionClosed as e:
-                                logger.error(f"{self.user_id} {self.abbr}  WebSocket connection closed: {e}")
+                                logger.error(f"{self.user_id}/{self.acctno}/{self.abbr}  WebSocket connection closed: {e}")
                                 break
                         except Exception as e:
                                 logger.error(f"Unexpected error: {e}")
         except websockets.exceptions.ConnectionClosed as e:
-            logger.error(f"{self.user_id} {self.abbr} 웹소켓 연결이 닫혔습니다: {e}")
+            logger.error(f"{self.user_id}/{self.acctno}/{self.abbr} 웹소켓 연결이 닫혔습니다: {e}")
         except Exception as e:
-            logger.error(f"{self.user_id} {self.abbr} 웹소켓 연결 중 에러 발생: {e}")
+            logger.error(f"{self.user_id}/{self.acctno}/{self.abbr} 웹소켓 연결 중 에러 발생: {e}")
         finally:
-            logger.debug(f"finally.....")
+            logger.debug(f"{self.user_id}/{self.acctno}/{self.abbr} finally 증권사 웹소켓 close")
             self.stk_websocket = None

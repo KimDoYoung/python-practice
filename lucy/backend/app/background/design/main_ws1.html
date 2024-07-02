@@ -19,13 +19,17 @@
     <h1>사용자별 증권사별 Real Data</h1>
     
     user id: <input type="text" id="user_id" value="kdy987">
+    acct no: <input type="text" id="acct_no" value="6577792801">
     <button id="connect_ws">connect client ws</button>
     <button id="start_from_stock">Start Stk WS</button>
     <button id="stop_from_stock">Stop Stk WS</button>
     <button id="status_from_stock">status</button>
 
-    <div id="logs"></div>
-    <div id="errors"></div>
+    <div class="m-3">
+        <h3>client</h3>
+        <div id="logs"></div>
+        <div id="errors"></div>
+    </div>
 
     <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">

@@ -38,7 +38,7 @@ def new_kis_ws_request() -> KisWsRequest:
         )
     )
 
-def get_ws_approval_key(key, secret):
+def get_ws_approval_key(key:str, secret:str):
     # url = https://openapivts.koreainvestment.com:29443' # 모의투자계좌     
     url = 'https://openapi.koreainvestment.com:9443' # 실전투자계좌
     headers = {"content-type": "application/json"}
