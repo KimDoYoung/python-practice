@@ -1,0 +1,50 @@
+{
+    // "Print to console": {
+    //     "prefix": "log11",
+    //     "body": [
+    //         "console.log('$1');",
+    //         "$2"
+    //     ],
+    //     "description": "Log output to console"
+    // }
+    "logger" : {
+        "prefix": "my_logger",
+        "body":  [
+            "from backend.app.core.logger import get_logger",
+            "logger = get_logger(__name__)"
+        ],
+    },
+    "router file starter" : {
+        "prefix": "my_router",
+        "body":  [
+            "# $TM_FILENAME_BASE.py",
+            "from fastapi import APIRouter",
+            "from backend.app.core.$TM_FILENAME_BASE import Scheduler",
+            "router = APIRouter()",
+            "@router.get(\"${2}\")",
+        ],
+    },
+    "file comments" : {
+        "prefix": "my_filecomments",
+        "body":  [
+            "# $TM_FILENAME_BASE.py",
+            "\"\"\"",
+            "모듈 설명: ",
+            "\t- ${1:  설명을 넣으시오}",
+            "주요 기능:",
+            "\t- ${2:  기능을 넣으시오}",
+            "",
+            "작성자: 김도영",
+            "작성일: $CURRENT_DATE",
+            "버전: 1.0",
+            "\"\"\"",
+        ]
+    },
+    "import backend.config" :{
+        "prefix" : "my_config",
+        "body" :[
+            "from backend.app.core.config import config"
+        ]
+    }
+}
+

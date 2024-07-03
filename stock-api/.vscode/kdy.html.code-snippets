@@ -1,0 +1,28 @@
+{
+    "event on some element" : {
+        "prefix": "myEventOnInElevment",
+        "body":  [
+            "$(${1: container element}).on(\"click\", \"${2: element}\", function() {",
+                "alert(\"두 번째 버튼을 클릭했습니다.\");",
+            "});"
+            ],
+    },
+    "fetchData 전형적인것" : {
+        "prefix": "myfetchData",
+        "body" :[
+            "fetchData('${1: url}')",
+            "  .then(data => {\n console.log(data); \n})",
+            "  .catch(error=> {\n console.error(error); \n});"
+        ]
+    },
+    "postData 전형적인 것" : {
+        "prefix": "mypostData",
+        "body" :[
+            "const url = '${1: url}';",
+            "const data = { abc : 'abc', def : 'def'};",
+            "postData(url, data)",
+            "  .then(data => {\nconsole.log(data);\n})",
+            "  .catch(error=> {\n console.error(error);\n });"
+        ]
+    }
+}

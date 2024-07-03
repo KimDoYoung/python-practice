@@ -1,0 +1,9 @@
+fastapi 
+uvicorn 
+beanie 
+motor
+pytest
+python-dotenv
+concurrent-log-handler
+jinja2
+pytest-asyncio
