@@ -101,7 +101,7 @@ class KisStockApi(StockApi):
         logger.debug("----------------------------------------------")
 
         self.account.set_value('KIS_ACCESS_TOKEN', ACCESS_TOKEN)
-        self.user_service.update_user(self.user.user_id, self.user)
+        await self.user_service.update_user(self.user.user_id, self.user)
         #self.user.save()
         return ACCESS_TOKEN
     
