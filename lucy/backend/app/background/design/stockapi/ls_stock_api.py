@@ -1,7 +1,7 @@
-# kis_api.py
+# lsapi.py
 """
 모듈 설명: 
-    - KIS에서 제공하는 API를 사용하기 위한 클래스
+    - LS에서 제공하는 API를 사용하기 위한 클래스
 주요 기능:
 /oauth2/tokenP
 /uapi/hashkey
@@ -25,7 +25,6 @@
 버전: 1.0
 """
 import json
-from typing import List
 from fastapi import HTTPException
 from pydantic import ValidationError
 import requests
@@ -41,18 +40,18 @@ from backend.app.domains.stc.kis.model.kis_order_cash_model import KisOrderCash,
 from backend.app.domains.stc.kis.model.kis_psearch_result_model import PsearchResultDto
 from backend.app.domains.stc.kis.model.kis_search_stock_info_model import SearchStockInfoDto
 from backend.app.domains.stc.kis.model.kis_psearch_title_model import PsearchTitleDto
-from backend.app.domains.user.user_model import KeyValueData, User
+from backend.app.domains.user.user_model import StkAccount, User
 from backend.app.core.dependency import get_user_service
 from backend.app.core.exception.lucy_exception import KisAccessTokenExpireException, KisAccessTokenInvalidException
 logger = get_logger(__name__)
 
-class KisApi:
+class LsStockApi:
     # _instance = None
 
     _BASE_URL = 'https://openapi.koreainvestment.com:9443'
     
-    def __init__(self, user: User):
-        self.user = user
+    def __init__(self, user: User, account: StkAccount):
+        super().__init__(user.user_id, account.account_no)
         self.HTS_USER_ID = self.get_key_value(self.user.key_values,"KIS_HTS_USER_ID")
         self.APP_KEY = self.get_key_value(self.user.key_values,"KIS_APP_KEY")
         self.APP_SECRET = self.get_key_value(self.user.key_values,"KIS_APP_SECRET")
@@ -62,26 +61,16 @@ class KisApi:
             self.ACCESS_TOKEN = access_token
         else:
             self.set_access_token_from_kis()
-    #TODO : 모델 쪽으로 뻴 것을 고려해보자    
-    def get_key_value(self, key_values:List[KeyValueData], key_name:str) -> str:
-        for item in key_values:
-            if item.key == key_name:
-                return item.value
-        return ''
-    def upsert_key_value(self, key_values: List[KeyValueData], key_name: str, key_value: str):
-        for item in key_values:
-            if item.key == key_name:
-                item.value = key_value
-                return
-        # 키 값이 없으면 새로운 항목 추가
-        key_values.append(KeyValueData(key=key_name, value=key_value))
 
-    def test_access_token(self):
+
+    async def initialize(self) -> bool:
         ''' Access Token 만료 여부 확인 '''
         try:
             cost = self.get_current_price("005930") # 삼성전자
         except KisAccessTokenExpireException as e:
-            self.set_access_token_from_kis()
+            await self.set_access_token_from_kis()
+
+        return True    
 
     async def set_access_token_from_kis(self)->str:
         ''' Access Token 발급을 kis 서버로부터 받아서 self에 채우고 users db에 넣는다. '''

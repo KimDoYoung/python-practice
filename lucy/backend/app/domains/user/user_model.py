@@ -28,6 +28,18 @@ class StkAccount(BaseModel):
     key_values: List[KeyValueData] = []
     created_at: datetime =  Field(default_factory=lambda: datetime.now(timezone.utc))
 
+    def set_value(self, key:str, value:str):
+        for kv in self.key_values:
+            if kv.key == key:
+                kv.value = value
+                return
+        self.key_values.append(KeyValueData(key=key, value=value))
+    def get_value(self, key:str)->Optional[str]:
+        for kv in self.key_values:
+            if kv.key == key:
+                return kv.value
+        return None
+
 #TODO upsert addtion을 빼는 것이 좋지 않을까?
 class User(Document):
     user_id: str = Field(json_schema_extra={"unique": True})

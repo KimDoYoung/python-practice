@@ -1,7 +1,7 @@
-# lsapi.py
+# kis_api.py
 """
 모듈 설명: 
-    - LS에서 제공하는 API를 사용하기 위한 클래스
+    - KIS에서 제공하는 API를 사용하기 위한 클래스
 주요 기능:
 /oauth2/tokenP
 /uapi/hashkey
@@ -25,11 +25,11 @@
 버전: 1.0
 """
 import json
-from typing import List
 from fastapi import HTTPException
 from pydantic import ValidationError
 import requests
 
+from backend.app.background.design.stockapi.stock_api import StockApi
 from backend.app.core.logger import get_logger
 from backend.app.domains.stc.kis.model.kis_chk_holiday_model import ChkHolidayDto
 from backend.app.domains.stc.kis.model.kis_inquire_balance_model import KisInquireBalance
@@ -37,51 +37,48 @@ from backend.app.domains.stc.kis.model.kis_inquire_daily_ccld_model import Inqui
 from backend.app.domains.stc.kis.model.kis_inquire_psbl_rvsecncl_model import InquirePsblRvsecnclDto
 from backend.app.domains.stc.kis.model.kis_inquire_psbl_sell_model import InquirePsblSellDto
 from backend.app.domains.stc.kis.model.kis_inquire_psble_order import InquirePsblOrderDto, InquirePsblOrderRequest
-from backend.app.domains.stc.kis.model.kis_order_cash_model import KisOrderCash, OrderCancelRequest, OrderCashDto, OrderRvsecnclDto
+from backend.app.domains.stc.kis.model.kis_order_cash_model import KisOrderCash, OrderCancelRequest, OrderCashRequest, OrderCashResponse, OrderRvsecnclDto
 from backend.app.domains.stc.kis.model.kis_psearch_result_model import PsearchResultDto
 from backend.app.domains.stc.kis.model.kis_search_stock_info_model import SearchStockInfoDto
 from backend.app.domains.stc.kis.model.kis_psearch_title_model import PsearchTitleDto
-from backend.app.domains.user.user_model import KeyValueData, User
-from backend.app.core.dependency import get_user_service
+from backend.app.domains.user.user_model import StkAccount, User
 from backend.app.core.exception.lucy_exception import KisAccessTokenExpireException, KisAccessTokenInvalidException
 logger = get_logger(__name__)
 
-class LsApi:
+class KisStockApi(StockApi):
     # _instance = None
 
     _BASE_URL = 'https://openapi.koreainvestment.com:9443'
     
-    def __init__(self, user: User):
+    def __init__(self, user:User, account: StkAccount):
+        super().__init__(user.user_id, account.account_no)
         self.user = user
-        self.HTS_USER_ID = self.get_key_value(self.user.key_values,"KIS_HTS_USER_ID")
-        self.APP_KEY = self.get_key_value(self.user.key_values,"KIS_APP_KEY")
-        self.APP_SECRET = self.get_key_value(self.user.key_values,"KIS_APP_SECRET")
-        self.ACCTNO = self.get_key_value(self.user.key_values,"KIS_ACCTNO")
-        access_token = self.get_key_value(self.user.key_values,"KIS_ACCESS_TOKEN")
+        self.account = account
+        
+        self.HTS_USER_ID = account.get_value('KIS_HTS_USER_ID')
+        self.APP_KEY = account.get_value('KIS_APP_KEY')
+        self.APP_SECRET = account.get_value('KIS_APP_SECRET')
+        self.ACCTNO = account.account_no
+        self.ACCESS_TOKEN = None
+        access_token = account.get_value('KIS_ACCESS_TOKEN')
         if access_token:
             self.ACCESS_TOKEN = access_token
-        else:
-            self.set_access_token_from_kis()
-    #TODO : 모델 쪽으로 뻴 것을 고려해보자    
-    def get_key_value(self, key_values:List[KeyValueData], key_name:str) -> str:
-        for item in key_values:
-            if item.key == key_name:
-                return item.value
-        return ''
-    def upsert_key_value(self, key_values: List[KeyValueData], key_name: str, key_value: str):
-        for item in key_values:
-            if item.key == key_name:
-                item.value = key_value
-                return
-        # 키 값이 없으면 새로운 항목 추가
-        key_values.append(KeyValueData(key=key_name, value=key_value))
 
-    def test_access_token(self):
-        ''' Access Token 만료 여부 확인 '''
+
+    async def initialize(self) -> bool:
+        ''' Access Token 존재여부 및  만료 여부 확인 '''
+
+        # 존재여부 체크
+        if self.ACCESS_TOKEN is None:
+            await self.set_access_token_from_kis()
+
+        # 만료여부 체크
         try:
             cost = self.get_current_price("005930") # 삼성전자
         except KisAccessTokenExpireException as e:
-            self.set_access_token_from_kis()
+            await self.set_access_token_from_kis()
+
+        return True    
 
     async def set_access_token_from_kis(self)->str:
         ''' Access Token 발급을 kis 서버로부터 받아서 self에 채우고 users db에 넣는다. '''
@@ -102,12 +99,10 @@ class LsApi:
         logger.debug("----------------------------------------------")
         logger.debug(f"ACCESS_TOKEN : [{ACCESS_TOKEN}]")
         logger.debug("----------------------------------------------")
-        self.upsert_key_value(self.user.key_values, "KIS_ACCESS_TOKEN", ACCESS_TOKEN )
-        #self.user.key_values["KIS_ACCESS_TOKEN"] = ACCESS_TOKEN
-        # db에 저장
-        logger.debug(f"self.user : {self.user.to_dict()}")
-        user_service = get_user_service()
-        await user_service.update_user(self.user.user_id, self.user)
+
+        self.account.set_value('KIS_ACCESS_TOKEN', ACCESS_TOKEN)
+        self.user_service.update_user(self.user.user_id, self.user)
+        #self.user.save()
         return ACCESS_TOKEN
     
     def hashkey(self, datas):
@@ -197,9 +192,11 @@ class LsApi:
         return kis_inquire_balance
 
 
-    def order_cash(self,  order_cash : OrderCashDto ) -> KisOrderCash:
+    def order_cash(self,  order_cash_request : OrderCashRequest ) -> OrderCashResponse:
         ''' 현금 매수 or 매도 '''
-        logger.info(f"현금 매수 매도(order_cash) : {order_cash}")
+        logger.info(f"현금 매수 매도(order_cash) : {order_cash_request}")
+        order_cash = order_cash_request.kis_order_cash
+
         url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/order-cash"
         tr_id = "TTTC0802U" if order_cash.buy_sell_gb == "매수" else "TTTC0801U"
         headers = {

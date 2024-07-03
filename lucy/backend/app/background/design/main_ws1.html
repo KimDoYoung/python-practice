@@ -12,6 +12,12 @@
             border: 1px solid #ccc;
             padding: 10px;
         }
+        #restful {
+            height: 400px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
     </style>
 </head>
 <body>
@@ -19,6 +25,7 @@
     <h1>사용자별 증권사별 Real Data</h1>
     <div>
         user id: <input type="text" id="user_id" value="kdy987">
+        stock : <input type="text" id="stk_abbr" value="KIS">
         acct no: <input type="text" id="acct_no" value="6577792801">
         <button id="connect_ws">connect client ws</button>
         <button id="start_from_stock">Start Stk WS</button>
@@ -26,7 +33,7 @@
         <button id="status_from_stock">status</button>
     </div>
     <div>
-        종목코드:<input type="text" id="stk_code">
+        종목코드:<input type="text" id="stk_code" value="450330">
         가격(0:시장가):<input type="number" id="cost" value="0">
         수량:<input type="number" id="qty" value="1">
         <button id="buy">매수</button>
@@ -36,7 +43,9 @@
         <h3>ws client</h3>
         <div id="logs"></div>
         <h3>Restful</h3>
-        <div id="restful"></div>
+        <div id="restful">
+
+        </div>
         <div id="errors"></div>
     </div>
 
@@ -160,20 +169,25 @@
             });
             //매수
             $('#buy').click(function(){
+                debugger;
+                const stk_abbr = $('#stk_abbr').val();
                 const user_id = $('#user_id').val();
                 const acct_no = $('#acct_no').val();
                 const stk_code = $('#stk_code').val();
                 const cost = $('#cost').val();
                 const qty = $('#qty').val();
                 const data = {
-                    user_id: user_id,
-                    acct_no: acct_no,
-                    buy_sell_gb : '매수',
-                    stk_code: stk_code,
-                    cost: cost,
-                    qty: qty
+                    "stk_abbr": stk_abbr,
+                    "kis_order_cash": {
+                        "buy_sell_gb": "매수",
+                        "user_id": user_id,
+                        "acctno": acct_no,
+                        "stk_code": stk_code,
+                        "qty": qty,
+                        "cost": cost
+                    }   
                 }
-                const url = '/order-cash'
+                const url = `/order-cash/${user_id}/${acct_no}`
                 fetch(url, {
                     method: 'POST',
                     headers: {
@@ -206,7 +220,7 @@
                     cost: cost,
                     qty: qty
                 }
-                const url = '/order-cash'
+                const url = `/order-cash/${user_id}/${acct_no}`
                 fetch(url, {
                     method: 'POST',
                     headers: {
