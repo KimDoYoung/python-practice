@@ -1,0 +1,84 @@
+{% extends 'common/base.html' %}
+{% block style %}
+<style>
+.log {
+    height: 400px;
+    overflow-y: scroll;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+</style>
+
+{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col">
+        <h3>Websocket</h3>
+        <div class="log" id="ws-log"></div>
+    </div>
+    <div class="col">
+        <h3>Restful</h3>
+        <div class="log" id="restful-log"></div>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <div id="error-area"></div>
+    </div>
+</div>
+{% raw %} 
+<!--handlebar scripts-->
+{% endraw %}
+{% endblock %}
+{% block script %}
+{% raw %}
+<script>
+        var ws;
+
+function startWebSocket(user_id) {
+    if (ws) {
+        ws.close();
+        ws = null;
+    }
+    ws = new WebSocket("ws://localhost:8000/ws?user_id=" + user_id);
+
+    ws.onmessage = function(event) {
+        var logsDiv = $('#logs');
+        //debugger;
+        // var jsonData = JSON.parse(event.data);
+        s = event.data;
+        var newLog = $('<div>').text(s);
+        logsDiv.append(newLog);
+
+        // 자동 스크롤
+        logsDiv.scrollTop(logsDiv[0].scrollHeight);
+    };
+
+    ws.onerror = function(event) {
+        console.error("WebSocket error observed:", event);
+        ws.close();
+        ws = null;
+    };
+
+    ws.onclose = function(event) {
+        console.log("WebSocket connection closed:", event);
+        ws = null;
+    };
+}
+
+function stopWebSocket() {
+    if (ws) {
+        ws.close();
+    }
+    ws = null;
+}
+function dispError(errormsg){
+    const nowtime = new Date().toLocaleTimeString();
+    $('#error-area').text(nowtime + ":" + errormsg);
+}    
+$( document ).ready(function() {
+    console.log( "ready!")
+});
+</script>
+{% endraw %}
+{% endblock %}

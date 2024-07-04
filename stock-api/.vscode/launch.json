@@ -14,7 +14,7 @@
             "env": {"PYTHONPATH": "${workspaceFolder}"}            
         },
         {
-            "name": "Debug-Lucy",
+            "name": "웹-Stockapi",
             "type": "debugpy",
             "request": "launch",
             "module": "uvicorn",

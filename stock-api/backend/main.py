@@ -1,4 +1,3 @@
-import asyncio
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,9 +11,7 @@ from backend.app.core.config import config
 from backend.app.api.v1.endpoints import (
     user_routes, home_routes, stock_routes
 )
-from backend.app.core.scheduler import Scheduler
 from backend.app.core.exception_handler import add_exception_handlers
-from backend.app.core.dependency import get_scheduler_job_service
 from backend.app.core.logger import get_logger
 
 logger = get_logger(__name__)
@@ -64,22 +61,8 @@ async def startup_event():
     
     db = MongoDb.get_client()[db_name]
     await init_beanie(database=db, document_models=[
-        User, EventDays, Ipo, DbConfig, SchedulerJob, MyStock
+        User
     ])
-
-    logger.info("스케줄러 시작")
-    scheduler = Scheduler.get_instance()
-    scheduler.start()
-    scheduler_service = get_scheduler_job_service()
-    await scheduler_service.register_system_jobs()
-
-    await start_danta_machine()
-    
-    telegram_token, telegram_userid = await initialize_telegram_bot()
-    if telegram_token is not None:
-        asyncio.create_task(start_telegram_bot())
-    else:
-        logger.warning("TELEGRAM_BOT_TOKEN 이 존재하지 않음.")
 
     logger.info('---------------------------------')
     logger.info('Startup 프로세스 종료')
@@ -92,13 +75,6 @@ async def shutdown_event():
     await MongoDb.close()
     logger.info("MongoDB 연결 해제")
     
-    scheduler = Scheduler.get_instance()
-    scheduler.shutdown()
-    logger.info("스케줄러 종료")
-
-    await stop_danta_machine()
-    await stop_telegram_bot()
-
     logger.info('---------------------------------')
     logger.info('Shutdown 프로세스 종료')
     logger.info('---------------------------------')

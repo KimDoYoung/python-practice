@@ -7,5 +7,5 @@ def get_today():
     yoil = datetime.now().weekday()
     yoil_korean = yoils[yoil]
     today = datetime.now().strftime("%Y-%m-%d")
-    today = f"{today}({yoil_korean})"
+    today = f"{today} ({yoil_korean})"
     return today
