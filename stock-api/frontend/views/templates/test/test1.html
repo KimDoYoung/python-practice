@@ -110,24 +110,31 @@ $( document ).ready(function() {
             "cost": cost
         }
         const url = `/api/v1/${stk_abbr.toLowerCase()}/order-cash/${user_id}/${acct_no}`
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        }).then(response => {
-            if (!response.ok) {
-                throw new Error('Error occurred');
-            }
-            return response.json();
-        }).then(data => {
-            console.log(data);
-            var divMsg = $('<div>').text(JSON.stringify(data));
-            $('#restful').append(divMsg);
-        }).catch(error => {
+        response_json = getFetch(url, data).catch(error => {
+            console.error(error);
             dispError(error.detail);
         });
+
+        console.log(response_json)
+                        
+        // fetch(url, {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify(data)
+        // }).then(response => {
+        //     if (!response.ok) {
+        //         throw new Error('Error occurred');
+        //     }
+        //     return response.json();
+        // }).then(data => {
+        //     console.log(data);
+        //     var divMsg = $('<div>').text(JSON.stringify(data));
+        //     $('#restful').append(divMsg);
+        // }).catch(error => {
+        //     dispError(error.detail);
+        // });
     })
 });
 </script>

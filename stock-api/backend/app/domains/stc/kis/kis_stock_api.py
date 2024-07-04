@@ -42,7 +42,7 @@ from backend.app.domains.stc.kis.model.kis_search_stock_info_model import Search
 from backend.app.domains.stc.kis.model.kis_psearch_title_model import PsearchTitleDto
 from backend.app.domains.stc.stock_api import StockApi
 from backend.app.domains.user.user_model import StkAccount, User
-from backend.app.core.exception.custom_exception import KisAccessTokenExpireException, KisAccessTokenInvalidException
+from backend.app.core.exception.stock_api_exceptions import KisAccessTokenExpireException, KisAccessTokenInvalidException
 logger = get_logger(__name__)
 
 class KisStockApi(StockApi):

@@ -14,9 +14,11 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import HTMLResponse, JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from typing import Union
+import datetime
 
 from backend.app.core.logger import get_logger
 from backend.app.core.template_engine import render_template
+from backend.app.core.exception.stock_api_exceptions import StockApiException
 
 logger = get_logger(__name__)
 
@@ -26,6 +28,7 @@ def add_exception_handlers(app):
     app.add_exception_handler(HTTPException, http_exception_handler)
     app.add_exception_handler(Exception, general_exception_handler)
     app.add_exception_handler(StarletteHTTPException, custom_404_exception_handler)
+    app.add_exception_handler(StockApiException, stock_api_exception_handler)
 
 async def validation_exception_handler(request: Request, exc: RequestValidationError) -> Union[JSONResponse, HTMLResponse]:
     """입력 데이터 유효성 검사 예외 처리"""
@@ -41,6 +44,10 @@ async def general_exception_handler(request: Request, exc: Exception) -> Union[J
 
 async def custom_404_exception_handler(request: Request, exc: StarletteHTTPException) -> Union[JSONResponse, HTMLResponse]:
     """404 예외 처리"""
+    return await create_error_response(request, exc)
+
+async def stock_api_exception_handler(request: Request, exc: StockApiException) -> Union[JSONResponse, HTMLResponse]:
+    """StockApiException 처리"""
     return await create_error_response(request, exc)
 
 async def create_error_response(request: Request, exc: Exception, errors=None) -> Union[JSONResponse, HTMLResponse]:
@@ -59,5 +66,6 @@ async def create_error_response(request: Request, exc: Exception, errors=None) -
     else:
         return JSONResponse(
             status_code=context["status_code"],
-            content=context
+            content=context,
+            server_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         )

@@ -31,7 +31,7 @@ from backend.app.core.logger import get_logger
 from backend.app.domains.stc.stock_api import StockApi
 from backend.app.domains.user.user_model import StkAccount, User
 from backend.app.core.dependency import get_user_service
-from backend.app.core.exception.custom_exception import KisAccessTokenExpireException
+from backend.app.core.exception.stock_api_exceptions import KisAccessTokenExpireException
 logger = get_logger(__name__)
 
 class LsStockApi(StockApi):
