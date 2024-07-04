@@ -43,7 +43,7 @@ from backend.app.domains.stc.kis.model.kis_search_stock_info_model import Search
 from backend.app.domains.stc.kis.model.kis_psearch_title_model import PsearchTitleDto
 from backend.app.domains.user.user_model import KeyValueData, User
 from backend.app.core.dependency import get_user_service
-from backend.app.core.exception.lucy_exception import KisAccessTokenExpireException, KisAccessTokenInvalidException
+from exception.custom_exception import KisAccessTokenExpireException, KisAccessTokenInvalidException
 logger = get_logger(__name__)
 
 class KoreaInvestmentApi:
