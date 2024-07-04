@@ -1,6 +1,6 @@
-from backend.app.domains.stock_api_base_model import KisBaseModel
+from backend.app.domains.stock_api_base_model import StockApiBaseModel
 
-class SearchStockInfoItem(KisBaseModel):
+class SearchStockInfoItem(StockApiBaseModel):
     pdno: str # 상품번호 
     prdt_type_cd: str # 상품유형코드 
     mket_id_cd: str # 시장ID코드 AGR.농축산물파생 BON.채권파생 CMD.일반상품시장 CUR.통화파생 ENG.에너지파생 EQU.주식파생 ETF.ETF파생 IRT.금리파생 KNX.코넥스 KSQ.코스닥 MTL.금속파생 SPI.주가지수파생 STK.유가증권
@@ -67,7 +67,7 @@ class SearchStockInfoItem(KisBaseModel):
     lstg_rqsr_item_cd: str # 상장신청인종목코드 
     trst_istt_issu_istt_cd: str # 신탁기관발행기관코드 
 
-class SearchStockInfoDto(KisBaseModel):
+class SearchStockInfoDto(StockApiBaseModel):
     rt_cd: str # 성공 실패 여부 
     msg_cd: str # 응답코드 
     msg1: str # 응답메세지 

@@ -7,10 +7,25 @@
     border: 1px solid #ccc;
     padding: 10px;
 }
+.buysell input {
+    width:100px;
+}
 </style>
 
 {% endblock %}
 {% block content %}
+<div class="row">
+    <div class="col buysell">
+        user id: <input type="text" id="user_id" value="kdy987">
+        stock abbr: <input type="text" id="stk_abbr" value="KIS">
+        account no : <input type="text" id="acct_no" value="6577792801">
+        stock code : <input type="text" id="stk_code" value="005930">
+        qty : <input type="number" name="qty" id="qty" value="1">
+        cost(0:시장가): <input type="number" name="cost" id="cost" value="0">
+        <button id="btnBuy">매수</button>
+        <button id="btnSell">매도</button>
+    </div>
+</div>
 <div class="row">
     <div class="col">
         <h3>Websocket</h3>
@@ -33,7 +48,7 @@
 {% block script %}
 {% raw %}
 <script>
-        var ws;
+var ws;
 
 function startWebSocket(user_id) {
     if (ws) {
@@ -78,6 +93,42 @@ function dispError(errormsg){
 }    
 $( document ).ready(function() {
     console.log( "ready!")
+    $('#btnBuy').on('click', function(){
+        debugger;
+        const user_id = $('#user_id').val();
+        const stk_abbr = $('#stk_abbr').val();
+        const acct_no = $('#acct_no').val();
+        const stk_code = $('#stk_code').val();
+        const qty = $('#qty').val();
+        const cost = $('#cost').val();
+        const data = {
+            "buy_sell_gb": "매수",
+            "user_id": user_id,
+            "acctno": acct_no,
+            "stk_code": stk_code,
+            "qty": qty,
+            "cost": cost
+        }
+        const url = `/api/v1/${stk_abbr.toLowerCase()}/order-cash/${user_id}/${acct_no}`
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        }).then(response => {
+            if (!response.ok) {
+                throw new Error('Error occurred');
+            }
+            return response.json();
+        }).then(data => {
+            console.log(data);
+            var divMsg = $('<div>').text(JSON.stringify(data));
+            $('#restful').append(divMsg);
+        }).catch(error => {
+            dispError(error.detail);
+        });
+    })
 });
 </script>
 {% endraw %}

@@ -1,6 +1,6 @@
-from backend.app.domains.stock_api_base_model import KisBaseModel
+from backend.app.domains.stock_api_base_model import StockApiBaseModel
 # 매도 가능수량 조회
-class InquirePsblSellItem(KisBaseModel):
+class InquirePsblSellItem(StockApiBaseModel):
     pdno: str # 상품번호 
     prdt_name: str # 상품명 
     buy_qty: str # 매수수량 
@@ -15,7 +15,7 @@ class InquirePsblSellItem(KisBaseModel):
     evlu_pfls_amt: str # 평가손익금액 
     evlu_pfls_rt: str # 평가손익율 
 
-class InquirePsblSellDto(KisBaseModel):
+class InquirePsblSellDto(StockApiBaseModel):
     rt_cd: str # 성공 실패 여부 
     msg_cd: str # 응답코드 
     msg1: str # 응답메세지 

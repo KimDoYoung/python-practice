@@ -5,14 +5,26 @@ from backend.app.domains.stc.kis.kis_ws_task import KISTask
 from backend.app.domains.stc.ls.ls_ws_task import LSTask
 from backend.app.core.logger import get_logger
 from backend.app.core.dependency import get_user_service
+
 logger = get_logger(__name__)
 
 class StockWsManager:
+    _instance = None
+
+    def __new__(cls, client_ws_manager: ClientWsManager, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super(StockWsManager, cls).__new__(cls, *args, **kwargs)
+            cls._instance.__initialized = False
+        return cls._instance
+
     def __init__(self, client_ws_manager: ClientWsManager):
+        if self.__initialized:
+            return
         self.client_ws_manager = client_ws_manager    
         self.user_service = get_user_service()
         self.stock_connections: Dict[str, Dict[str, asyncio.Task]] = {}
         logger.debug("StockWsManager 초기화 완료")
+        self.__initialized = True
 
     async def validate_account(self, user_id: str, acctno: str):
         ERROR_USER_NOT_FOUND = {"code": "02", "detail": f"사용자 {user_id}를 찾을 수 없습니다."}
@@ -75,12 +87,12 @@ class StockWsManager:
             if not self.stock_connections[user_id]:
                 del self.stock_connections[user_id]
             
-            self.client_ws_manager.send_to_client(f"사용자 {user_id}의 모든 증권 계좌 WebSocket 작업 종료", user_id)
+            await self.client_ws_manager.send_to_client(f"사용자 {user_id}의 모든 증권 계좌 WebSocket 작업 종료", user_id)
             return {"code": "00", "detail": f"{user_id}/{acctno} 계좌에 대한 WebSocket 작업 종료"}
         else:
             return {"code": "05", "detail": f"{user_id}/{acctno} 계좌에 대한 WebSocket 작업이 이미 종료되었습니다."}
 
-    async def stock_ws_task(self, user_id: str, acctno:str, abbr: str):
+    async def stock_ws_task(self, user_id: str, acctno: str, abbr: str):
         logger.debug(f"WebSocket 작업 시작: {user_id}/{acctno}/{abbr}")
 
         if abbr == "KIS":

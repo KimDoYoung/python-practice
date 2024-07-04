@@ -40,8 +40,8 @@
     "todo-tree.tree.scanMode": "workspace only",
     "[python]": {
         "editor.codeActionsOnSave": {
-          "source.organizeImports": "explicit",
-          "source.unusedImports": "explicit",
+        "source.organizeImports": "explicit",
+        "source.unusedImports": "explicit",
         }
     },
     "search.exclude": { //찾기에서 배제할 폴더들

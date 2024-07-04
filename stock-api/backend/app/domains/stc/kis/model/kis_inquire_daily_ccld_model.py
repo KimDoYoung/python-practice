@@ -1,7 +1,7 @@
 from typing import List, Optional
-from pydantic import BaseModel, field_validator, validator
+from pydantic import BaseModel, field_validator
 
-from backend.app.domains.stock_api_base_model import KisBaseModel
+from backend.app.domains.stock_api_base_model import StockApiBaseModel
 from pydantic import BaseModel
 
 class InquireDailyCcldItem1(BaseModel):
@@ -40,7 +40,7 @@ class InquireDailyCcldItem2(BaseModel):
     tot_ccld_amt: str # 총체결금액 
     prsm_tlex_smtl: str # 추정제비용합계 제세 + 주문수수료 ※ 해당 값은 당일 데이터에 대해서만 제공됩니다.
 
-class InquireDailyCcldDto(KisBaseModel):
+class InquireDailyCcldDto(StockApiBaseModel):
     rt_cd: str # 성공 실패 여부 0 : 성공 0 이외의 값 : 실패
     msg_cd: str # 응답코드 응답코드
     msg1: str # 응답메세지 응답메세지

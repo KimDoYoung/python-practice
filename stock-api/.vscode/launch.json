@@ -25,7 +25,7 @@
                 "8000" // 원하는 포트 번호로 변경
             ],
             "jinja": true,
-            "justMyCode": false,
+            //"justMyCode": false,
             // "console": "integratedTerminal"
             "console": "externalTerminal",
             //"python": "c:\\Users\\deHong\\Python312\\python"

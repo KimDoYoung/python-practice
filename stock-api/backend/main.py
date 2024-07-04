@@ -9,14 +9,11 @@ from backend.app.domains.user.user_model import User
 from backend.app.core.mongodb import MongoDb
 from backend.app.core.config import config
 from backend.app.api.v1.endpoints import (
-    user_routes, home_routes, stock_routes
+    stock_kis_routes, user_routes, home_routes
 )
 from backend.app.core.exception_handler import add_exception_handlers
 from backend.app.core.logger import get_logger
-from backend.app.managers.client_ws_manager import ClientWsManager
-from backend.app.managers.stock_api_manager import StockApiManager
-from backend.app.managers.stock_ws_manager import StockWsManager
-from backend.app.core.dependency import get_user_service
+# from backend.app.core.globals import client_ws_manager, stock_ws_manager, api_manager
 
 logger = get_logger(__name__)
 
@@ -30,6 +27,7 @@ def create_app() -> FastAPI:
     return app
 
 def add_middlewares(app: FastAPI):
+    ''' 미들웨어 설정 '''
     #app.add_middleware(JWTAuthMiddleware)
     app.add_middleware(
         CORSMiddleware,
@@ -40,9 +38,10 @@ def add_middlewares(app: FastAPI):
     )
 
 def add_routes(app: FastAPI):
+    ''' 라우터 설정'''
     app.include_router(home_routes.router) # 화면
     app.include_router(user_routes.router, prefix="/api/v1/user", tags=["user"])
-    app.include_router(stock_routes.router, prefix="/api/v1/stock", tags=["stock"])
+    app.include_router(stock_kis_routes.router, prefix="/api/v1/kis", tags=["kis"])
 
 def add_static_files(app: FastAPI):
     '''정적 파일 경로 설정'''
@@ -71,10 +70,10 @@ async def startup_event():
         User
     ])
 
-    client_ws_manager = ClientWsManager()
-    stock_ws_manager = StockWsManager(client_ws_manager)
-    api_manager = StockApiManager()
-    api_manager.set_user_service(get_user_service())
+    # client_ws_manager = ClientWsManager()
+    # stock_ws_manager = StockWsManager(client_ws_manager)
+    # api_manager = StockApiManager()
+    # api_manager.set_user_service(get_user_service())
 
     logger.info('---------------------------------')
     logger.info('Startup 프로세스 종료')

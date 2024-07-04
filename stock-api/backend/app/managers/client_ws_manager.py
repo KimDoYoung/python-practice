@@ -4,9 +4,18 @@ from backend.app.core.logger import get_logger
 logger = get_logger(__name__)
 
 class ClientWsManager:
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super(ClientWsManager, cls).__new__(cls, *args, **kwargs)
+        return cls._instance
+
     def __init__(self):
-        self.active_connections: Dict[str, List[WebSocket]] = {}
-        logger.debug("ClientWsManager 초기화 완료")
+        if not hasattr(self, 'initialized'):  # 이미 초기화되었는지 확인
+            self.active_connections: Dict[str, List[WebSocket]] = {}
+            logger.debug("ClientWsManager 초기화 완료")
+            self.initialized = True  # 초기화 상태 설정
 
     async def connect(self, websocket: WebSocket, user_id: str):
         await websocket.accept()

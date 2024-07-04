@@ -1,14 +1,14 @@
 from typing import List
 
 
-from backend.app.domains.stock_api_base_model import KisBaseModel
+from backend.app.domains.stock_api_base_model import StockApiBaseModel
 
 
 ##############################################################################################
 # [국내주식] 주문/계좌 > 주식정정취소가능주문조회[v1_국내주식-004]
 ##############################################################################################
 
-class InquirePsblRvsecnclItem(KisBaseModel):
+class InquirePsblRvsecnclItem(StockApiBaseModel):
     ord_gno_brno: str # 주문채번지점번호 주문시 한국투자증권 시스템에서 지정된 영업점코드
     odno: str # 주문번호 주문시 한국투자증권 시스템에서 채번된 주문번호
     orgn_odno: str # 원주문번호 정정/취소주문 인경우 원주문번호
@@ -27,7 +27,7 @@ class InquirePsblRvsecnclItem(KisBaseModel):
     mgco_aptm_odno: str # 운용사지정주문번호 주문 번호 (운용사 통한 주문)
 
 
-class InquirePsblRvsecnclDto(KisBaseModel):
+class InquirePsblRvsecnclDto(StockApiBaseModel):
     rt_cd: str # 성공 실패 여부 0 : 성공 0 이외의 값 : 실패
     msg_cd: str # 응답코드 응답코드
     msg1: str # 응답메세지 응답메세지

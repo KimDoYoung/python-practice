@@ -8,3 +8,4 @@ concurrent-log-handler
 jinja2
 pytest-asyncio
 requests
+pycryptodome

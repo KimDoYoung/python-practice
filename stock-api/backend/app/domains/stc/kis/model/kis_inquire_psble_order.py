@@ -1,13 +1,13 @@
 
 from pydantic import BaseModel
-from backend.app.domains.stock_api_base_model import KisBaseModel
+from backend.app.domains.stock_api_base_model import StockApiBaseModel
 from typing import Optional
 
 ##############################################################################################
 # [국내주식] 주문/계좌 > 매수가능조회
 ##############################################################################################
 
-class InquirePsblOrderItem(KisBaseModel):
+class InquirePsblOrderItem(StockApiBaseModel):
     ord_psbl_cash: str # 주문가능현금 
     ord_psbl_sbst: str # 주문가능대용 
     ruse_psbl_amt: str # 재사용가능금액 
@@ -21,7 +21,7 @@ class InquirePsblOrderItem(KisBaseModel):
     ovrs_re_use_amt_wcrc: str # 해외재사용금액원화 
     ord_psbl_frcr_amt_wcrc: str # 주문가능외화금액원화 
 
-class InquirePsblOrderDto(KisBaseModel):
+class InquirePsblOrderDto(StockApiBaseModel):
     rt_cd: str # 성공 실패 여부 0 : 성공 0 이외의 값 : 실패
     msg_cd: str # 응답코드 응답코드
     msg1: str # 응답메세지 응답메세지
