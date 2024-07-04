@@ -7,3 +7,4 @@ python-dotenv
 concurrent-log-handler
 jinja2
 pytest-asyncio
+requests

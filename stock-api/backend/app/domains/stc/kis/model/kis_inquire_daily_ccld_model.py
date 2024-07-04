@@ -1,7 +1,7 @@
 from typing import List, Optional
 from pydantic import BaseModel, field_validator, validator
 
-from backend.app.domains.stc.kis.model.kis_base_model import KisBaseModel
+from backend.app.domains.stock_api_base_model import KisBaseModel
 from pydantic import BaseModel
 
 class InquireDailyCcldItem1(BaseModel):

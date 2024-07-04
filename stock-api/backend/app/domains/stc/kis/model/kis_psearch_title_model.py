@@ -1,6 +1,6 @@
 from typing import List
 from pydantic import BaseModel
-from backend.app.domains.stc.kis.model.kis_base_model import KisBaseModel
+from backend.app.domains.stock_api_base_model import KisBaseModel
 
 class PsearchTitleItem(BaseModel):
     user_id: str # HTS ID 

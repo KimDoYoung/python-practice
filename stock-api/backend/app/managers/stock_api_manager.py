@@ -1,5 +1,5 @@
-from backend.app.background.design.stockapi.kis_stock_api import KisStockApi
-from backend.app.background.design.stockapi.ls_stock_api import LsStockApi
+from backend.app.domains.stc.kis.kis_stock_api import KisStockApi
+from backend.app.domains.stc.ls.ls_stock_api import LsStockApi
 
 
 class StockApiManager:

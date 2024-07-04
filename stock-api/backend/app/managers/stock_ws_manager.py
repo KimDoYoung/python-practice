@@ -1,8 +1,8 @@
 from typing import Dict
 import asyncio
 from backend.app.managers.client_ws_manager import ClientWsManager
-from backend.app.stk_ws_tasks.kis_task import KISTask
-from backend.app..design.stk_ws_tasks.ls_task import LSTask
+from backend.app.domains.stc.kis.kis_ws_task import KISTask
+from backend.app.domains.stc.ls.ls_ws_task import LSTask
 from backend.app.core.logger import get_logger
 from backend.app.core.dependency import get_user_service
 logger = get_logger(__name__)

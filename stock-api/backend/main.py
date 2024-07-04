@@ -13,6 +13,10 @@ from backend.app.api.v1.endpoints import (
 )
 from backend.app.core.exception_handler import add_exception_handlers
 from backend.app.core.logger import get_logger
+from backend.app.managers.client_ws_manager import ClientWsManager
+from backend.app.managers.stock_api_manager import StockApiManager
+from backend.app.managers.stock_ws_manager import StockWsManager
+from backend.app.core.dependency import get_user_service
 
 logger = get_logger(__name__)
 
@@ -41,15 +45,18 @@ def add_routes(app: FastAPI):
     app.include_router(stock_routes.router, prefix="/api/v1/stock", tags=["stock"])
 
 def add_static_files(app: FastAPI):
+    '''정적 파일 경로 설정'''
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     static_files_path = os.path.join(BASE_DIR, 'frontend', 'public')
     app.mount("/public", StaticFiles(directory=static_files_path), name="public")
 
 def add_event_handlers(app: FastAPI):
+    ''' start/shutdown 이벤트 핸들러 등록'''
     app.add_event_handler("startup", startup_event)
     app.add_event_handler("shutdown", shutdown_event)
 
 async def startup_event():
+    global client_ws_manager, stock_ws_manager, api_manager
     logger.info('---------------------------------')
     logger.info('Startup 프로세스 시작')
     logger.info('---------------------------------')
@@ -63,6 +70,11 @@ async def startup_event():
     await init_beanie(database=db, document_models=[
         User
     ])
+
+    client_ws_manager = ClientWsManager()
+    stock_ws_manager = StockWsManager(client_ws_manager)
+    api_manager = StockApiManager()
+    api_manager.set_user_service(get_user_service())
 
     logger.info('---------------------------------')
     logger.info('Startup 프로세스 종료')

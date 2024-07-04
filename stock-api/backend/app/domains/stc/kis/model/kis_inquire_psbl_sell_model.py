@@ -1,4 +1,4 @@
-from backend.app.domains.stc.kis.model.kis_base_model import KisBaseModel
+from backend.app.domains.stock_api_base_model import KisBaseModel
 # 매도 가능수량 조회
 class InquirePsblSellItem(KisBaseModel):
     pdno: str # 상품번호 
