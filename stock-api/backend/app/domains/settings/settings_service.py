@@ -1,5 +1,4 @@
 from typing import List
-from motor.motor_asyncio import AsyncIOMotorClient
 from backend.app.core.logger import get_logger
 from backend.app.domains.settings.settings_model import Settings
 
@@ -7,9 +6,6 @@ from backend.app.domains.settings.settings_model import Settings
 logger = get_logger(__name__)
 
 class SettingsService:
-    # _instance = None
-    def __init__(self, db_client: AsyncIOMotorClient):
-        self.db_client = db_client
 
     async def create(self, keyvalue: dict):
         setting = Settings(**keyvalue)

@@ -8,9 +8,6 @@ from backend.app.core.logger import get_logger
 logger = get_logger(__name__)
 
 class UserService:
-    # _instance = None
-    def __init__(self, db_client: AsyncIOMotorClient):
-        self.db_client = db_client
 
     async def create_user(self, user_data: dict):
         user = User(**user_data)

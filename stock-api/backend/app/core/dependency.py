@@ -1,41 +1,29 @@
+# dependency.py
+"""
+모듈 설명: 
+    - DB CRUD를 제공하는 service를 캐싱하는 모듈
+주요 기능:
+    - 각 테이블(컬렉션)에 대한 CRUD service 객체를 캐싱
+
+작성자: 김도영
+작성일: 05
+버전: 1.0
+"""
 from functools import lru_cache
 
-
-from backend.app.core.mongodb import MongoDb
-from backend.app.core.config import config
+from backend.app.domains.logs.logs_service import LogsService
 from backend.app.domains.settings.settings_service import SettingsService
 from backend.app.domains.user.user_service import UserService
 
 
 @lru_cache()
 def get_user_service():
-    db_name = config.DB_NAME
-    return UserService(MongoDb.get_client()[db_name])
+    return UserService()
 
 @lru_cache()
 def get_logs_service():
-    db_name = config.DB_NAME
-    return LogsService(MongoDb.get_client()[db_name])
+    return LogsService()
 
 @lru_cache()
 def get_settings_service():
-    db_name = config.DB_NAME
-    return SettingsService(MongoDb.get_client()[db_name])
-
-# 각 증권사들의  주식 API를 통합적으로 관리하는 Manager
-# @lru_cache()
-# def get_api_manager(user_service: UserService = Depends(get_user_service)):
-#     from backend.app.managers.stock_api_manager import StockApiManager
-#     api_manager = StockApiManager()
-#     api_manager.set_user_service(user_service)
-#     return api_manager
-
-# client 즉 AssetErp와 통신하는 WebSocketManager
-# @lru_cache()
-# def get_client_ws_manager() -> ClientWsManager:
-#     return ClientWsManager()
-
-# # KIS,LS 등 증권사의 체결통보(실시간)를 받기위한 WebSocketManager
-# @lru_cache()
-# def get_stock_ws_manager(client_ws_manager: ClientWsManager = Depends(get_client_ws_manager)) -> StockWsManager:
-#     return StockWsManager(client_ws_manager)
+    return SettingsService()

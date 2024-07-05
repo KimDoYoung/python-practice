@@ -1,29 +1,36 @@
+# logs_service.py
+"""
+모듈 설명: 
+    - Logs 컬렉션에 대한 CRUD
+주요 기능:
+    - get_all
+    - create
+
+작성자: 김도영
+작성일: 05
+버전: 1.0
+"""
 from typing import List
-from motor.motor_asyncio import AsyncIOMotorClient
 from backend.app.core.logger import get_logger
-from backend.app.domains.logs.logs_model import Logs
+from backend.app.domains.logs.logs_model import LogQueryParams, Logs
 
 
 logger = get_logger(__name__)
 
 class LogsService:
-    # _instance = None
-    def __init__(self, db_client: AsyncIOMotorClient):
-        self.db_client = db_client
+    async def create(self, keyvalue: dict) -> Logs:
+        log_entry = Logs(**keyvalue)
+        await log_entry.create()
+        return log_entry
 
-    async def create(self, keyvalue: dict):
-        setting = Logs(**keyvalue)
-        await setting.create()
-        return setting
-
-    async def get_all(self) -> List[Logs]:
+    async def get_all(self, query_params: LogQueryParams) -> List[Logs]:
         try:
-            Logs = await Logs.find_all().to_list()
-            return Logs
+            query = query_params.to_query_dict()
+            logs = await Logs.find(query).sort("at_time").to_list()
+            return logs
         except Exception as e:
-            logger.error(f"Failed to retrieve all dbconfigs: {e}")
+            logger.error(f"Failed to retrieve logs: {e}")
             raise e
 
     async def count(self) -> int:
-        result = await Logs.count()
-        return result
+        return await Logs.count()

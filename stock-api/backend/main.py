@@ -58,7 +58,7 @@ def add_event_handlers(app: FastAPI):
     app.add_event_handler("shutdown", shutdown_event)
 
 async def startup_event():
-    global client_ws_manager, stock_ws_manager, api_manager
+
     logger.info('---------------------------------')
     logger.info('Startup 프로세스 시작')
     logger.info('---------------------------------')
