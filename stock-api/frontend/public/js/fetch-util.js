@@ -9,6 +9,9 @@ class StockApiError extends Error {
         this.status = status;
         this.server_time =server_time;
     }
+    toString() {
+        return `Error ${this.status}: ${this.message} (Server Time: ${this.server_time})`;
+    }    
 }
 
 /**
@@ -22,32 +25,34 @@ class StockApiError extends Error {
 async function callStockApi(url, method, data = null) {
     // const token = localStorage.getItem('lucy_token');
 
-    try {
-        const options = {
-            method,
-            headers: {
-                'Content-Type': 'application/json',
-                // 'Authorization': 'Bearer ' + token
-            }
-        };
+    // try {
 
-        if (data) {
-            options.body = JSON.stringify(data);
+    // } catch (error) {
+    //     console.error('에러 발생:', error.detail);
+    //     throw error;
+    // }
+    const options = {
+        method,
+        headers: {
+            'Content-Type': 'application/json',
+            // 'Authorization': 'Bearer ' + token
         }
+    };
 
-        const response = await fetch(url, options);
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new StockApiError(response.status, errorData.detail, errorData.server_time);
-        }
-
-        const responseData = await response.json();
-        return responseData;
-    } catch (error) {
-        console.error('에러 발생:', error);
-        throw error;
+    if (data) {
+        options.body = JSON.stringify(data);
     }
+
+    const response = await fetch(url, options);
+
+    if (!response.ok) {
+        debugger;
+        const errorData = await response.json();
+        throw new StockApiError(response.status, errorData.detail, errorData.server_time);
+    }
+
+    const responseData = await response.json();
+    return responseData;    
 }
 
 /**

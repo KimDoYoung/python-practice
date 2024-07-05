@@ -62,7 +62,6 @@ class KISTask:
         ''' KIS에 요청을 보내기 위한 데이터 생성'''
         approval_key = self.APPROVAL_KEY
         if not approval_key:
-
             approval_key = get_ws_approval_key(self.APP_KEY, self.APP_SECRET)    
             self.APPROVAL_KEY = approval_key
 

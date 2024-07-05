@@ -13,18 +13,43 @@ from fastapi import APIRouter, Depends
 
 from backend.app.domains.stc.kis.model.kis_order_cash_model import KisOrderCashRequest, KisOrderCashResponse
 from backend.app.domains.user.user_service import UserService
+from backend.app.managers.client_ws_manager import ClientWsManager
 from backend.app.managers.stock_api_manager import StockApiManager
 from backend.app.core.dependency import get_user_service
-from backend.app.core.exception.stock_api_exceptions import StockApiException
+from backend.app.managers.stock_ws_manager import StockWsManager
 #from backend.app.core.globals import api_manager
 
 # APIRouter 인스턴스 생성
 router = APIRouter()
 
+@router.get("/notice/start/{user_id}/{acctno}")
+async def notice_start(user_id:str, acctno:str, user_service:UserService = Depends(get_user_service) ):
+    ''' KIS 체결통보 연결 시작-실시간으로 체결결과를 Websockect으로 통보요청'''
+    client_ws_manager = ClientWsManager()
+
+    stock_ws_manager = StockWsManager(client_ws_manager)
+    if stock_ws_manager.is_connected(user_id, acctno):
+        return {"code":"01", "detail": f"{user_id}, {acctno} 이미 연결되어 있습니다."}
+    
+    result = await stock_ws_manager.connect(user_id, acctno)
+    return result
+
+@router.get("/notice/stop/{user_id}/{acctno}")
+async def notice_start(user_id:str, acctno:str, user_service:UserService = Depends(get_user_service) ):
+    ''' KIS 체결통보 연결 시작-실시간으로 체결결과를 Websockect으로 통보해제 '''
+    client_ws_manager = ClientWsManager()
+    stock_ws_manager = StockWsManager(client_ws_manager)
+
+    if stock_ws_manager.is_connected(user_id, acctno):
+        result = await stock_ws_manager.disconnect(user_id, acctno)
+    else:
+        result = {"code":"01", "detail": f"{user_id}, {acctno} 연결되어 있지 않습니다."}
+    return result
+
 @router.post("/order-cash/{user_id}/{acctno}",response_model=KisOrderCashResponse)
 async def order_cash(user_id:str, acctno:str, order_cash_request: KisOrderCashRequest, user_service:UserService = Depends(get_user_service) ):
     ''' 매도/매수 주문'''
-    raise StockApiException("이것은 잘못된 데이터입니다.")
+    # raise StockApiException("이것은 잘못된 데이터입니다.")
     api_manager = StockApiManager(user_service)
     kis_api = await api_manager.stock_api(user_id, acctno,'KIS')
     # kis_api = StockApiManager(user_service).stock_api(user_id, acctno,'KIS')

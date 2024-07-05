@@ -22,6 +22,11 @@
         stock code : <input type="text" id="stk_code" value="005930">
         qty : <input type="number" name="qty" id="qty" value="1">
         cost(0:시장가): <input type="number" name="cost" id="cost" value="0">
+        <br>
+        <button id="btnStartWs">WS시작</button>
+        <button id="btnStopWs">WS종료</button>
+        <button id="btnStartNotice">체결통보시작</button>
+        <button id="btnStopNotice">체결통보종료</button>
         <button id="btnBuy">매수</button>
         <button id="btnSell">매도</button>
     </div>
@@ -55,10 +60,10 @@ function startWebSocket(user_id) {
         ws.close();
         ws = null;
     }
-    ws = new WebSocket("ws://localhost:8000/ws?user_id=" + user_id);
+    ws = new WebSocket("ws://localhost:8000/api/v1/ws?user_id=" + user_id);
 
     ws.onmessage = function(event) {
-        var logsDiv = $('#logs');
+        var logsDiv = $('#ws-log');
         //debugger;
         // var jsonData = JSON.parse(event.data);
         s = event.data;
@@ -88,13 +93,58 @@ function stopWebSocket() {
     ws = null;
 }
 function dispError(errormsg){
-    const nowtime = new Date().toLocaleTimeString();
     $('#error-area').text(nowtime + ":" + errormsg);
-}    
+} 
+function addRestfulLog(log) {
+    var logsDiv = $('#restful-log');
+    var newLog = $('<div>').text(log);
+    logsDiv.append(newLog);
+    logsDiv.scrollTop(logsDiv[0].scrollHeight);
+}   
 $( document ).ready(function() {
     console.log( "ready!")
+    //웹소켓 시작 종료
+    $('#btnStartWs').on('click', function(){
+        const user_id = $('#user_id').val();
+        startWebSocket(user_id);
+    })
+    $('#btnStopWs').on('click', function(){
+        stopWebSocket();
+    });
+    //체결통보 시작 종료
+    $('#btnStartNotice').on('click', function(){
+        const user_id = $('#user_id').val();
+        const acct_no = $('#acct_no').val();
+        const stk_abbr = $('#stk_abbr').val();
+        const url = `/api/v1/${stk_abbr.toLowerCase()}/notice/start/${user_id}/${acct_no}`
+        console.log(url);
+        getFetch(url)
+        .then(response => {
+            console.log(response);
+            addRestfulLog(JSON.stringify(response));
+        })
+        .catch(error => {
+            console.error(error.message);
+            addRestfulLog(error.toString());
+        });
+    });
+    $('#btnStartNotice').on('click', function(){
+        const user_id = $('#user_id').val();
+        const acct_no = $('#acct_no').val();
+        const stk_abbr = $('#stk_abbr').val();
+        const url = `/api/v1/${stk_abbr.toLowerCase()}/notice/stop/${user_id}/${acct_no}`
+        console.log(url);
+        getFetch(url)
+        .then(response => {
+            console.log(response);
+            addRestfulLog(JSON.stringify(response));
+        })
+        .catch(error => {
+            console.error(error.message);
+            addRestfulLog(error.toString());
+        });
+    });
     $('#btnBuy').on('click', function(){
-        debugger;
         const user_id = $('#user_id').val();
         const stk_abbr = $('#stk_abbr').val();
         const acct_no = $('#acct_no').val();
@@ -110,32 +160,43 @@ $( document ).ready(function() {
             "cost": cost
         }
         const url = `/api/v1/${stk_abbr.toLowerCase()}/order-cash/${user_id}/${acct_no}`
-        response_json = getFetch(url, data).catch(error => {
-            console.error(error);
-            dispError(error.detail);
+        postFetch(url, data)
+        .then(response => {
+            console.log(response);
+            addRestfulLog(JSON.stringify(response));
+        })
+        .catch(error => {
+            console.error(error.message);
+            addRestfulLog(error.toString());
         });
-
-        console.log(response_json)
-                        
-        // fetch(url, {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify(data)
-        // }).then(response => {
-        //     if (!response.ok) {
-        //         throw new Error('Error occurred');
-        //     }
-        //     return response.json();
-        // }).then(data => {
-        //     console.log(data);
-        //     var divMsg = $('<div>').text(JSON.stringify(data));
-        //     $('#restful').append(divMsg);
-        // }).catch(error => {
-        //     dispError(error.detail);
-        // });
-    })
+    });
+    $('#btnSell').on('click', function(){
+        const user_id = $('#user_id').val();
+        const stk_abbr = $('#stk_abbr').val();
+        const acct_no = $('#acct_no').val();
+        const stk_code = $('#stk_code').val();
+        const qty = $('#qty').val();
+        const cost = $('#cost').val();
+        const data = {
+            "buy_sell_gb": "매도",
+            "user_id": user_id,
+            "acctno": acct_no,
+            "stk_code": stk_code,
+            "qty": qty,
+            "cost": cost
+        }
+        const url = `/api/v1/${stk_abbr.toLowerCase()}/order-cash/${user_id}/${acct_no}`
+        postFetch(url, data)
+        .then(response => {
+            console.log(response);
+            addRestfulLog(JSON.stringify(response));
+        })
+        .catch(error => {
+            console.error(error.message);
+            addRestfulLog(error.toString());
+        });
+    });
+    
 });
 </script>
 {% endraw %}

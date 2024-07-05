@@ -14,7 +14,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import HTMLResponse, JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from typing import Union
-import datetime
+from datetime import datetime 
 
 from backend.app.core.logger import get_logger
 from backend.app.core.template_engine import render_template
@@ -57,7 +57,8 @@ async def create_error_response(request: Request, exc: Exception, errors=None) -
         "request": request.url.path,
         "status_code": getattr(exc, "status_code", 500),
         "detail": getattr(exc, "detail", "Internal Server Error"),
-        "errors": errors or []
+        "errors": errors or [],
+        "server_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
 
     accept = request.headers.get("Accept", "")
@@ -67,5 +68,4 @@ async def create_error_response(request: Request, exc: Exception, errors=None) -
         return JSONResponse(
             status_code=context["status_code"],
             content=context,
-            server_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         )
