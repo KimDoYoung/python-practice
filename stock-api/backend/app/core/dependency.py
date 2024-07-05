@@ -3,6 +3,7 @@ from functools import lru_cache
 
 from backend.app.core.mongodb import MongoDb
 from backend.app.core.config import config
+from backend.app.domains.settings.settings_service import SettingsService
 from backend.app.domains.user.user_service import UserService
 
 
@@ -10,6 +11,16 @@ from backend.app.domains.user.user_service import UserService
 def get_user_service():
     db_name = config.DB_NAME
     return UserService(MongoDb.get_client()[db_name])
+
+@lru_cache()
+def get_logs_service():
+    db_name = config.DB_NAME
+    return LogsService(MongoDb.get_client()[db_name])
+
+@lru_cache()
+def get_settings_service():
+    db_name = config.DB_NAME
+    return SettingsService(MongoDb.get_client()[db_name])
 
 # 각 증권사들의  주식 API를 통합적으로 관리하는 Manager
 # @lru_cache()

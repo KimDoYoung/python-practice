@@ -5,6 +5,8 @@ from fastapi.staticfiles import StaticFiles
 from beanie import init_beanie
 
 
+from backend.app.domains.logs.logs_model import Logs
+from backend.app.domains.settings.settings_model import Settings
 from backend.app.domains.user.user_model import User
 from backend.app.core.mongodb import MongoDb
 from backend.app.core.config import config
@@ -68,7 +70,7 @@ async def startup_event():
     
     db = MongoDb.get_client()[db_name]
     await init_beanie(database=db, document_models=[
-        User
+        User, Settings, Logs
     ])
 
     logger.info('---------------------------------')

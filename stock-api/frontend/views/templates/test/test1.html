@@ -35,10 +35,12 @@
     <div class="col">
         <h3>Websocket</h3>
         <div class="log" id="ws-log"></div>
+        <button id="btnClearWs" onclick="javascript:$('#ws-log').empty()">Clear</button>
     </div>
     <div class="col">
         <h3>Restful</h3>
         <div class="log" id="restful-log"></div>
+        <button id="btnClearWs" onclick="javascript:$('#restful-log').empty()">Clear</button>
     </div>
 </div>
 <div class="row">
@@ -128,7 +130,7 @@ $( document ).ready(function() {
             addRestfulLog(error.toString());
         });
     });
-    $('#btnStartNotice').on('click', function(){
+    $('#btnStopNotice').on('click', function(){
         const user_id = $('#user_id').val();
         const acct_no = $('#acct_no').val();
         const stk_abbr = $('#stk_abbr').val();

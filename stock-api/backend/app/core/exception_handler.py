@@ -56,7 +56,7 @@ async def create_error_response(request: Request, exc: Exception, errors=None) -
     context = {
         "request": request.url.path,
         "status_code": getattr(exc, "status_code", 500),
-        "detail": getattr(exc, "detail", "Internal Server Error"),
+        "detail": getattr(exc, "detail", "Internal Server Error :" + str(exc)),
         "errors": errors or [],
         "server_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }

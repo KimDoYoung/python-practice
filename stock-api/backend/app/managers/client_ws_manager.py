@@ -1,3 +1,14 @@
+# client_ws_manager.py
+"""
+모듈 설명: 
+    - user_id별로 WebSocket 연결을 관리하는 클래스
+주요 기능:
+    - 
+
+작성자: 김도영
+작성일: 05
+버전: 1.0
+"""
 from typing import Dict, List
 from fastapi import WebSocket
 from backend.app.core.logger import get_logger

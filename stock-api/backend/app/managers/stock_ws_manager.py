@@ -1,3 +1,14 @@
+# stock_ws_manager.py
+"""
+모듈 설명: 
+    - 사용자별로 증권사 WebSocket 연결을 관리하는 클래스
+주요 기능:
+    - 사용자별로 증권사 WebSocket 연결을 생성 및 제거
+
+작성자: 김도영
+작성일: 05
+버전: 1.0
+"""
 from typing import Dict
 import asyncio
 from backend.app.managers.client_ws_manager import ClientWsManager
