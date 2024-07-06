@@ -3,23 +3,9 @@
 모듈 설명: 
     - LS에서 제공하는 API를 사용하기 위한 클래스
 주요 기능:
-/oauth2/tokenP
-/uapi/hashkey
-/uapi/domestic-stock/v1/quotations/inquire-price 
-/uapi/domestic-stock/v1/trading/inquire-balance
-/uapi/domestic-stock/v1/trading/order-cash - 
-/uapi/domestic-stock/v1/quotations/search-stock-info
-/uapi/domestic-stock/v1/quotations/psearch-title
-/uapi/domestic-stock/v1/quotations/psearch-result
-/uapi/domestic-stock/v1/trading/inquire-daily-ccld
-/uapi/domestic-stock/v1/trading/order-rvsecncl
-/uapi/domestic-stock/v1/trading/inquire-psbl-rvsecncl
-/uapi/domestic-stock/v1/trading/inquire-psbl-order #매수가능조회
-/uapi/domestic-stock/v1/trading/inquire-psbl-sell  #매도가능조회
-/uapi/domestic-stock/v1/quotations/chk-holiday
+
 에러 :
     -  Access Token은 하루 단위로 만료되므로, 만료되면 다시 발급해야 한다.
-    - {'rt_cd': '1', 'msg_cd': 'EGW00123', 'msg1': '기간이 만료된 token 입니다.'}
 작성자: 김도영
 작성일: 07
 버전: 1.0

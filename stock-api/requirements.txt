@@ -2,11 +2,12 @@ fastapi
 uvicorn 
 beanie 
 motor
-pytest
 python-dotenv
 concurrent-log-handler
 jinja2
 pytest-asyncio
 requests
 pycryptodome
+pytest
 httpx
+asgi_lifespan

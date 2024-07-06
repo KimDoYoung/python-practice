@@ -10,7 +10,7 @@
         "**/__pycache__": true,
         "**/.pytest_cache": true,
     },
-    "python.testing.pytestPath": "C:/Users/KOREA/python-practice/lucy",
+    //"python.testing.pytestPath": "C:/Users/KOREA/python-practice/lucy",
     
     "python.analysis.extraPaths": [
         "./backend/app/core",
@@ -20,7 +20,7 @@
     //pytest
     //-------------------------------------------------//
     "python.testing.pytestArgs": [
-        "backend/tests",
+        "backend",
         "-s"
     ],
     "python.testing.unittestEnabled": false,

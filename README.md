@@ -24,3 +24,6 @@
 6. joanna : RESTful방식의 주식매매 연습
 7. sofia : Web app - 이미지보기
 8. pytest-test : pytest로 mock 연습
+9. lucy : 자동단타머신
+10. stock-api : multi user, multi account 주식거래 
+
