@@ -69,7 +69,11 @@ def get_url_and_tables(url:str, menu:str, sub_menu:str):
 
         # ID가 '업종기간별추이'인 div 요소 찾기
         div_element = driver.find_element(By.ID, sub_menu)
-            
+        tr_cd_span = div_element.find_element(By.CSS_SELECTOR, 'span.apiCode')
+        tr_cd = None
+        if tr_cd_span: 
+            tr_cd = tr_cd_span.text
+            print(f"tr_cd: {tr_cd}")
         # 해당 div 하위의 클래스가 'btn btn-plus'인 버튼 요소 찾기
         button_element = div_element.find_element(By.CLASS_NAME, "btn-plus")
         button_element.click()
@@ -77,9 +81,7 @@ def get_url_and_tables(url:str, menu:str, sub_menu:str):
 
         time.sleep(3)
         # 페이지 소스를 가져와서 BeautifulSoup으로 파싱
-        # page_source = driver.page_source
-        # with open('page_source.html', 'w', encoding='utf-8') as file:
-        #     file.write(page_source)
+        page_source = driver.page_source
 
         dataframes = {}
         soup = BeautifulSoup(page_source, 'html.parser')
@@ -90,7 +92,8 @@ def get_url_and_tables(url:str, menu:str, sub_menu:str):
             # 해당 div 다음에 있는 형제 요소 중 div를 찾기
             next_div = title_div.find_next_sibling('div')
             if next_div:
-                dataframes['기본정보'] = pd.read_html(str(next_div))[0]
+                html_div = StringIO(str(next_div))
+                dataframes['기본정보'] = pd.read_html(html_div)[0]
             else:
                 print("기본정보찾기 faile : 다음에 있는 div를 찾을 수 없습니다.")
         else:
@@ -106,11 +109,10 @@ def get_url_and_tables(url:str, menu:str, sub_menu:str):
             if div_element:
                 table = div_element.find("table")
                 if table:
-                    df = pd.read_html(str(table))[0]
+                    html_table_io = StringIO(str(table))
+                    df = pd.read_html(html_table_io)[0]
                     dataframes[div_id] = df
                     print(f"{div_id} OK")
-                    # print(f"{div_id} 데이터프레임:")
-                    # print(df)
                 else:
                     print(f"{div_id} 안에 테이블이 없습니다.")
             else:
@@ -119,7 +121,7 @@ def get_url_and_tables(url:str, menu:str, sub_menu:str):
         print("페이지 parsing 시간 초과")
         driver.quit()
 
-    return dataframes
+    return tr_cd, dataframes
 
 def json_pretty(json_str):
     try:
@@ -129,25 +131,121 @@ def json_pretty(json_str):
     except json.JSONDecodeError as e:
         return json_str
 
+def write_basic_info(file, df):
+    file.write("#기본정보\n")
+    for i in range(len(df)):
+        key = df.iloc[i, 0]
+        value = df.iloc[i, 1]
+        if key == 'URL':
+            file.write(f'PATH = "{value}"\n')
+
+def write_reqHeader_info(file, df, tr_cd):
+    ''' reqHeader 정보를 파일에 쓰기'''
+    file.write("\nheaders = {\n")
+    for i in range(len(df)):
+        key = df.iloc[i, 0]
+        value = df.iloc[i, 1]
+        desc = df.iloc[i,5]
+        if key.lower() == 'authorization':
+            file.write(f'\t"Authorization" : "Bearer " + ACCESS_TOKEN, \n')
+        elif key.lower() == 'content-type':
+            file.write(f'\t"Content-Type": "application/json; charset=utf-8",\n')
+        elif key.lower() == 'tr_cd':
+            file.write(f'\t"tr_cd" : "{tr_cd}", #{desc}\n')
+        else:
+            file.write(f'\t"{key}" : "{value}", #{desc}\n')
+    file.write("}\n")
+
+def write_reqBody_info(file, df):
+    ''' reqBody 정보를 파일에 쓰기'''
+    file.write("\ndata = {\n")
+    inObject  = False
+    for i in range(len(df)):
+        key = df.iloc[i, 0]
+        value = df.iloc[i, 1]
+        typ = df.iloc[i, 2]
+        desc = f"# {df.iloc[i,5]}" if df.iloc[i,5] != "" or df.iloc[i,5] != "nan"  else ""
+        if key.startswith("-"):
+            file.write(f'\t"{key[1:]}" : "{value}", {desc}\n')
+        elif typ.lower() == 'object':
+            file.write(f'\t"{key}" : {{ \n')
+            inObject = True
+
+    if inObject:
+        file.write("\t}\n")        
+    file.write("}\n")
+
+def write_Res_Item(file, obj, df):
+    ''' resBody 정보를 파일에 쓰기'''
+    file.write(f"\nclass {obj['typeName']}(ApiBaseModel):\n")
+    isStart = False
+    for i in range(len(df)):
+        key = df.iloc[i, 0]
+        name = df.iloc[i, 1]
+        typ = df.iloc[i, 2]
+        length_str = df.iloc[i, 4]
+        desc = df.iloc[i,5]
+        desc_str = f"{desc}"
+        if desc_str == "nan":
+            desc = ""
+        if typ == 'String':
+            py_type = 'str'
+        elif typ == 'Number':
+            py_type = 'int'
+            if length_str.find('.') > 0:
+                py_type = 'float'
+
+        if key == obj['varName']:
+            if typ.lower() == 'object' and key == obj['varName']:
+                isStart = not isStart
+        else:
+            if isStart:
+                file.write(f"\t{key[1:]}: {py_type} # {name} {desc if desc else ''}\n")
+
+def write_resBody_info(file, df, tr_cd):
+    ''' resBody 정보를 파일에 쓰기'''
+
+    objects = []
+    for i in range(len(df)):
+        key = df.iloc[i, 0]
+        typ = df.iloc[i, 2]
+        if typ.lower() == 'object':
+            objects.append({"varName": key, "typeName": key.upper()})
+
+    for obj in objects:
+        write_Res_Item(file, obj, df)
+
+    file.write(f"\nclass {tr_cd.upper()}Response(ApiBaseModel):\n")
+    file.write(f"\trsp_cd: str\n")
+    file.write(f"\trsp_msg: str\n")
+    for obj in objects:
+        file.write(f"\t{obj['varName']}: {obj['typeName']}\n")
 
 def main(menu:str, sub_menu:str):
     driver = install_chrome_driver()
     url = "https://openapi.ls-sec.co.kr/apiservice?group_id=ffd2def7-a118-40f7-a0ab-cd4c6a538a90&api_id=33bd887a-6652-4209-88cd-5324bc7c5e36"
-    dataframes = get_url_and_tables(url, menu,sub_menu= sub_menu)    
-  
+    tr_cd, dataframes = get_url_and_tables(url, menu,sub_menu= sub_menu)    
     #드라이버 종료
     driver.quit()
 
     # 데이터프레임 출력
-    for key, df in dataframes.items():
-        print(f"{key} 데이터프레임:")
-        print(df)
-    
+    # with open("ls-doc.txt", "w", encoding="utf-8") as file:
+    #     for key, df in dataframes.items():
+    #         file.write(f"{key} 데이터프레임:\n")
+    #         file.write(df.to_string())
+    #         file.write("\n\n")
+    filename = f"ls-{tr_cd}-{menu}-{sub_menu}.txt"
+    with open(filename, "w", encoding="utf-8") as file:
+        file.write(f"#{menu}-{sub_menu}\n")
+        write_basic_info(file, dataframes['기본정보'])
+        write_reqHeader_info(file, dataframes['reqHeader'], tr_cd)
+        write_reqBody_info(file, dataframes['reqBody'])
+        write_resBody_info(file, dataframes['resBody'], tr_cd)
 
 if __name__ == "__main__":
 
-    menu = "[업종] 시세"
-    sub_menu = "업종기간별추이"
+    menu = "[주식] 시세"
+    sub_menu = "주식현재가호가조회"
     main(menu, sub_menu)
 
     print("Done!")
