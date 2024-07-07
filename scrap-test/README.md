@@ -50,3 +50,5 @@
     ```
 
 5. calc.py를 만들어 줘
+6. kisdoc.py : KIS OPENAPI 문서 사이트를 scrapping해서 소스 생성
+7. lsdoc.py : LS OPENAPI문서 사이트를 scrapping해서 소스 생성
