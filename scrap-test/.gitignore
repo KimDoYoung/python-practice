@@ -2,3 +2,5 @@
 data/
 torrent*.*
 kis*.txt
+*.bak
+lsdoc*.html

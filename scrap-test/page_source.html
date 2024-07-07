@@ -1,0 +1,2032 @@
+<html lang="ko"><head>
+        <meta charset="utf-8">
+        <meta content="max-age=86400, public" http-equiv="Cache-Control">
+        <meta content="IE=edge" http-equiv="X-UA-Compatible">
+        <meta content="width=device-width, initial-scale=1.0" name="viewport">
+        <meta content="" name="keywords">
+        <meta content="" name="description">
+        <meta content="index, follow" name="robots">
+        <meta content="website" property="og:type">
+        <meta content="" property="og:title">
+        <meta content="" property="og:description">
+        <meta content="/images/logo.svg" property="og:image">
+        <meta content="https://openapi.ls-sec.co.kr/" property="og:url">
+
+        <title>LS증권 OPEN API </title>
+
+        <!--<link th:href="@{/images/favicon.ico}" rel="shortcut icon">-->
+        <link href="/bower_components/jquery.bxslider/jquery.bxslider.css" rel="stylesheet" type="text/css">
+        <link href="/bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet" type="text/css">
+        <link href="/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css" rel="stylesheet" type="text/css">
+        <link href="/bower_components/bootstrap-glyphicons/bootstrap-glyphicons.css" rel="stylesheet" type="text/css">
+        <link href="/bower_components/formvalidation/dist/css/formValidation.min.css" rel="stylesheet" type="text/css">
+        <link href="/bower_components/jsgrid/dist/jsgrid.min.css" rel="stylesheet" type="text/css">
+        <link href="/bower_components/jsgrid/dist/jsgrid-theme.min.css" rel="stylesheet" type="text/css">
+        <link href="/bower_components/jstree/dist/themes/default/style.min.css" rel="stylesheet" type="text/css">
+        <link href="/bower_components/sweetalert2/sweetalert2.min.css" rel="stylesheet" type="text/css">
+        <link href="/css/sweetalert2.css" rel="stylesheet" type="text/css">
+
+        <link href="/css/font.css" rel="stylesheet" type="text/css">
+
+        <link href="/bower_components/zTree/css/zTreeStyle/zTreeStyle.css" rel="stylesheet" type="text/css">
+        <link href="/css/zTree.css" rel="stylesheet" type="text/css">
+        <link href="/bower_components/jQuery-contextMenu/dist/jquery.contextMenu.min.css" rel="stylesheet" type="text/css">
+        <link href="/css/jquery.contextMenu.css" rel="stylesheet" type="text/css">
+
+        <link href="/bower_components/summernote/dist/summernote-bs4.css" rel="stylesheet" type="text/css">
+
+        <link href="/bower_components/flatpickr/dist/flatpickr.min.css" rel="stylesheet" type="text/css">
+
+        <link href="/css/uno.css" rel="stylesheet" type="text/css">
+        <link href="/css/uno-dev.css" rel="stylesheet" type="text/css">
+        <link href="/css/jsgrid-approval-history.css" rel="stylesheet" type="text/css">
+
+        <!-- Layout CSS -->
+        <link href="/css/layout/base.css" rel="stylesheet" type="text/css">
+        <link href="/css/layout/user.css" rel="stylesheet" type="text/css">
+        <link href="/css/layout/default.css" rel="stylesheet" type="text/css">
+        <link href="/css/layout/my.css" rel="stylesheet" type="text/css">
+
+        <!-- 사용자 CSS 영역 -->
+        <link href="/css/reset.css" rel="stylesheet" type="text/css">
+        <link href="/css/common.css" rel="stylesheet" type="text/css">
+        <link href="/css/main.css" rel="stylesheet" type="text/css">
+        
+        
+        
+
+        <script src="/bower_components/underscore/underscore-min.js" type="text/javascript"></script>
+        <script src="/bower_components/moment/moment.js" type="text/javascript"></script>
+        <script src="/bower_components/numeral/numeral.js" type="text/javascript"></script>
+        <script src="/bower_components/faker/dist/faker.min.js" type="text/javascript"></script>
+        <script src="/bower_components/clipboard.js/dist/clipboard.min.js" type="text/javascript"></script>
+        <script src="/bower_components/cRonstrue/dist/cronstrue.min.js" type="text/javascript"></script>
+
+        <script src="/bower_components/jquery/dist/jquery.min.js" type="text/javascript"></script>
+        <script src="/bower_components/jquery-ui/jquery-ui.min.js" type="text/javascript"></script>
+        <script src="/bower_components/jquery.serializeJSON/jquery.serializejson.min.js" type="text/javascript"></script>
+        <script src="/bower_components/jquery-form/dist/jquery.form.min.js" type="text/javascript"></script>
+        <script src="/bower_components/bootstrap/dist/js/bootstrap.bundle.js" type="text/javascript"></script>
+        <script src="/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js" type="text/javascript"></script>
+        <script src="/bower_components/bootstrap-datepicker/dist/locales/bootstrap-datepicker.ko.min.js" type="text/javascript"></script>
+
+        <script src="/bower_components/es6-promise-polyfill/promise.min.js" type="text/javascript"></script>
+        <script src="/bower_components/sweetalert2/sweetalert2.min.js" type="text/javascript"></script>
+
+        <script src="/bower_components/jsgrid/dist/jsgrid.js" type="text/javascript"></script>
+        <script src="/bower_components/jstree/dist/jstree.min.js" type="text/javascript"></script>
+
+        <script src="/bower_components/formvalidation/dist/js/FormValidation.full.min.js" type="text/javascript"></script>
+        <script src="/bower_components/formvalidation/dist/js/plugins/Bootstrap.min.js" type="text/javascript"></script>
+
+        <script src="/bower_components/jQuery-contextMenu/dist/jquery.contextMenu.min.js" type="text/javascript"></script>
+        <script src="/bower_components/zTree/js/jquery.ztree.all.min.js" type="text/javascript"></script>
+        <script src="/bower_components/zTree/js/jquery.ztree.exhide.min.js" type="text/javascript"></script>
+
+        <script src="/bower_components/d3/d3.min.js" type="text/javascript"></script>
+        <script src="/bower_components/echarts/dist/echarts.min.js" type="text/javascript"></script>
+        <script src="/bower_components/summernote/dist/summernote-bs4.min.js" type="text/javascript"></script>
+        <script src="/bower_components/summernote/dist/lang/summernote-ko-KR.min.js" type="text/javascript"></script>
+
+        <script src="/bower_components/placeholders/placeholders.min.js" type="text/javascript"></script>
+        <script src="/bower_components/jquery.bxslider/jquery.bxslider.min.js" type="text/javascript"></script>
+        <script src="/bower_components/jquery.fullpage/jquery.fullpage.js" type="text/javascript"></script>
+        <script src="/bower_components/flatpickr/dist/flatpickr.min.js" type="text/javascript"></script>
+        <script src="/bower_components/flatpickr/dist/l10n/ko.js" type="text/javascript"></script>
+
+        <script src="/js/protoext.js" type="text/javascript"></script>
+        <script src="/js/uno.js" type="text/javascript"></script>
+        <!-- 상수값들을 제어하거나 표시를 제한하기 위한 제한적 목적 -->
+        <script>
+            /*<![CDATA[*/
+            UNO.CONTEXT_PATH = "\/";
+            /*]]>*/
+
+            UNO.constants.isAdmin = null;
+            UNO.constants.userId = null;
+            UNO.constants.userLogin = null;
+            UNO.constants.userName = null;
+            UNO.constants.orgId = null;
+            UNO.constants.orgName = null;
+            UNO.constants.orgType = null;
+        </script>
+        <!--  -->
+        <script src="/js/unoUtil.js" type="text/javascript"></script>
+        <script src="/js/unoHTTP.js" type="text/javascript"></script>
+        <script src="/js/unoStorage.js" type="text/javascript"></script>
+        <script src="/js/unoCode.js" type="text/javascript"></script>
+        <script src="/js/unoAuth.js" type="text/javascript"></script>
+        <script src="/js/unoEvents.js" type="text/javascript"></script>
+        <script src="/js/unoShow.js" type="text/javascript"></script>
+        <script src="/js/unoText.js" type="text/javascript"></script>
+        <script src="/js/unoTest.js" type="text/javascript"></script>
+        <script src="/js/unoValidator.js" type="text/javascript"></script>
+        <script src="/js/unoValidation.js" type="text/javascript"></script>
+
+        <!-- 데이터 평문전송 s -->
+        <script src="/js/encdec/aes.js"></script>
+        <script src="/js/encdec/pbkdf2.js"></script>
+    </head>
+
+    <body class="user">
+        <!-- header -->
+        <header>
+            <!--자동완성방지용 더미폼-->
+            <input style="display:none" type="password">
+            <!--더미폼 끝-->
+            <div id="wrap_skip">
+                <a class="skip" href="#content">메뉴 건너뛰기</a>
+            </div>
+            <div class="header-wrap">
+                <div class="gnb-wrap">
+                    <a class="logo" href="/">
+                        <h1>OPEN API</h1>
+                    </a>
+                    <div class="menu-wrap">                              
+                        <button class="btn-menu" href="#" role="button">menu</button>
+                        <nav class="first-depth">
+                            <button class="btn-close" href="#" role="button">close</button>                            
+                            <ul>
+                                <li>
+                                    <div class="first-menu">
+                                        <a class="btn-first-depth" href="#">OPEN API</a>
+                                        <!-- 하위메뉴 열리면  btn-has-sub .active class를 추가 -->
+                                        <a class="btn-has-sub"></a>
+                                    </div>
+                                    <ul class="second-menu">
+                                       <li>
+                                           
+                                           
+                                           
+                                           <a href="/about-openapi">OPEN API 소개</a>
+                                       </li>
+                                       <li>
+                                           
+                                           
+                                           
+                                           <a href="/howto-use">OPEN API 이용안내</a>
+                                       </li>
+                                       <li>
+                                           
+                                           
+                                           
+                                           <a href="/howto-sample">OPEN API 적용예제</a>
+                                       </li>
+                                   </ul>
+                                </li>
+                                <li>
+                                    <div class="first-menu">
+                                        <a class="btn-first-depth" href="/apiservice">API가이드</a>
+                                        <!-- 하위메뉴 열리면  btn-has-sub .active class를 추가 -->
+                                        <a class="btn-has-sub"></a>
+                                    </div>
+                                    
+                                </li>
+                                <li>
+                                    <div class="first-menu">
+                                        <a class="btn-first-depth" href="#">테스트베드</a>
+                                        <!-- 하위메뉴 열리면  btn-has-sub .active class를 추가 -->
+                                        <a class="btn-has-sub"></a>
+                                    </div>
+                                    <ul class="second-menu">
+                                       <li>
+                                           
+                                           
+                                           
+                                           <a href="/testbed-intro">테스트베드 소개</a>
+                                       </li>
+                                       <li>
+                                           
+                                           
+                                           
+                                           <a href="/testbed-console">개발자 콘솔</a>
+                                       </li>
+                                   </ul>
+                                </li>
+                                <li>
+                                    <div class="first-menu">
+                                        <a class="btn-first-depth" href="#">커뮤니티</a>
+                                        <!-- 하위메뉴 열리면  btn-has-sub .active class를 추가 -->
+                                        <a class="btn-has-sub"></a>
+                                    </div>
+                                    <ul class="second-menu">
+                                       <li>
+                                           
+                                           
+                                           
+                                           <a href="/community-notice">공지사항</a>
+                                       </li>
+                                       <li>
+                                           
+                                           <a href="javascript:;" onclick="openNewWindow('faq')">FAQ</a>
+                                           
+                                           
+                                       </li>
+                                       <li>
+                                           
+                                           
+                                           <a href="javascript:;" onclick="openNewWindow('qna')">자료실</a>
+                                           
+                                       </li>
+                                   </ul>
+                                </li>
+                            </ul>
+                        </nav>
+
+                        <!-- 모바일 3뎁스 / bootstrap collapse 참고                      
+                        <nav class="first-depth">                      
+                            <button class="btn-close" href="#" role="button">close</button>                            
+                            <ul>                                 
+                                <li th:each="menu : ${rootMenu}">
+                                    <div class="first-menu">
+                                        <a class="btn-first-depth" th:href="@{'/' + ${menu.id}}" th:text="${menu.name}"></a>
+                                        <a class="btn-has-sub"></a>
+                                    </div>
+                                    <ul class="second-menu" th:if="${#lists.size(menu.subMenus) > 0}">
+                                       <li th:each="subMenu, iterStat: ${menu.subMenus}">
+                                           <a th:href="@{'/' + ${subMenu.id}}" th:text="${subMenu.name}" type="button" data-toggle="collapse" data-target="#meneThird" aria-expanded="false" aria-controls="menuThird" ></a>
+                                           
+                                           <div id="menuThird" class="collapse third-menu">
+                                                <a class="dropdown-item">세번째 메뉴</a>
+                                                <a class="dropdown-item">세번째 메뉴</a>
+                                                <a class="dropdown-item">세번째 메뉴</a>
+                                           </div> 
+
+                                       </li>
+                                   </ul>
+                                </li>
+                            </ul>                            
+                        </nav> -->
+                        
+
+                        <div class="right-area">
+                            
+                            <!-- ebest로 링크 -->
+                            <a class="btn btn-pages01" target="_blank" href="https://www.ls-sec.co.kr/index.jsp?url=/xingapi/registration/XingRegRegistration.jsp%3Fleft_menu_no%3D360%26front_menu_no%3D1198">API 사용신청</a>
+
+                            <!--
+                            <div class="join" th:if="${isLogged == true}">
+                                <a class="memeberID" th:href="@{/mypage}" th:if="${isLogged == true}"><i class="la la-user-circle-o"></i><span class="members" th:text="${userName}">사용자명</span></a>
+                                <button class="logout" id="logout" title="로그아웃" type="button"><i class="flaticon-logout"></i></button>
+                            </div>
+                            <div class="join" th:unless="${isLogged == true}">
+                                <button class="login" id="login" title="로그인" type="button"><i class="flaticon-lock"></i></button>
+                                --><!--<button class="register" id="register" title="회원가입" type="button">회원가입</button>--><!--
+                            </div>
+                            <div class="admin-menu nav-item dropdown"
+                                    th:if="${isLogged == true && mgmtMenu!=null && mgmtMenu.subMenus.size() > 0}">
+                                <button aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" href="#" title="Admin" role="button"><i class="flaticon2-gear"></i></button>
+                                <div aria-labelledby="navbarDropdown" class="admin-sub-menu dropdown-menu dropdown-menu-right">
+                                    <a class="dropdown-item" th:each="menu : ${mgmtMenu.subMenus}" th:href="@{'/' + ${menu.id}}" th:text="${menu.name}"></a>
+                                </div>
+                            </div>-->
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <hr>
+        </header>
+        
+            <script>
+                // gnb fixed horizontal scroll issue
+                $(function () {
+                    var marginLeft = parseInt($("header").css('margin-left'));
+                    $(window).scroll(function (e) {
+                        $("header").css("margin-left", marginLeft - $(this).scrollLeft());
+                    });
+                });
+
+
+                $(function () {
+                    $("#login").on("click", function (e) {
+                        e.preventDefault();
+                        /* */
+                        window.location.href = UNO.CONTEXT_PATH + 'login';
+                    });
+
+                    $("#logout").on("click", function (e) {
+                        e.preventDefault();
+                        /* */
+                        UNO.auth.logout();
+                    });
+
+                    $("#register").on("click", function (e) {
+                        e.preventDefault();
+                        /* */
+                        window.location.href = UNO.CONTEXT_PATH + 'register';
+                    });
+                });
+
+                /* hearder nav dropdown */
+                $(function () {         
+                    /* rollover menu */
+                    $(".first-depth > ul > li").hover(function () {
+                        $(".second-menu", this).fadeIn('fast');
+                    }, function () {
+                        $(".second-menu").hide();
+                    });    
+                    /* focus menu */
+                    $(".first-depth > ul > li > div a").focus(function () {
+                        $("+ul", this).css("display", "block");
+                    });
+                    $(".logo, .memeberID, .login").focus(function () {
+                        $(".second-menu").css("display", "none");
+                    });
+                });
+
+                /* activity-header */
+                var didScroll;
+                var lastScrollTop = 0;
+                var delta = 5;
+                var navbarHeight = $('header, .developer-lnb-wrap').outerHeight();
+
+
+                $(document).ready(function () {
+                    $(window).scrollTop(0);
+                    $(window).scroll(function () {
+                        didScroll = true;
+                    });
+                    setInterval(function () {
+                        if (didScroll) {
+                            hasScrolled();
+                            didScroll = false;
+                        }
+                    }, 250);
+
+                    function hasScrolled() {
+                        var st = $(this).scrollTop();
+
+                        // Make sure they scroll more than delta
+                        if (Math.abs(lastScrollTop - st) <= delta)
+                            return;
+                        // If they scrolled down and are past the navbar, add class .nav-up.
+                        // This is necessary so you never see what is "behind" the navbar.
+                        if (st > lastScrollTop && st > navbarHeight) {
+                            // Scroll Down
+                            $('header').removeClass('nav-down').addClass('nav-up');
+                            $('.developer-lnb-wrap').removeClass('catagory-down').addClass('catagory-up');
+                        } else {
+                            // Scroll Up
+                            if (st + $(window).height() < $(document).height()) {
+                                $('header').removeClass('nav-up').addClass('nav-down');
+                                $('.developer-lnb-wrap').removeClass('catagory-up').addClass('catagory-down');
+                            }
+                        }
+
+                        if (st <= 97) {
+                            $('header').removeClass('nav-down');
+                        }
+                        lastScrollTop = st;
+                    }
+
+                    //mobile menu
+                    if($(window).width()<=995){
+                        $('.btn-menu').click(function() {                       
+                            $('.menu-wrap').addClass('on');
+                            $('body').css('overflow','hidden');
+                        });
+                        $('.btn-close').click(function() {
+                            $('.menu-wrap').removeClass('on');
+                            $('body').css('overflow','inherit');
+                        });    
+                        
+                        $(".btn-first-depth").click(function(event) {  
+                            var submenu=$(this).closest('li').find('second-menu');
+                            if(submenu.length){   
+                                submenu.show();           
+                                $('.btn-first-depth').event.preventDefault();   
+                                $('.btn-has-sub').addClass('active');
+                            } 
+                        });                  
+                    }
+                });
+                
+                function goMenuApiservice(url, $this) {
+                    $('.btn-close').trigger('click');
+					window.location.href = url;
+					let testFunc = test;
+					if (typeof testFunc === 'function') {
+						testFunc();
+						change();
+					}
+					//test();
+					//change();
+				}
+				
+				function openNewWindow(type) {
+					var isMobile = /iPhone|iPad|iPad|Android/i.test(navigator.userAgent);
+					if (isMobile && type === 'faq') {
+						url = 'https://m.ls-sec.co.kr/cs/faq/?faqCategory=FAQ_14';
+					} else if (isMobile && type === 'qna') {
+						url = 'https://m.ls-sec.co.kr/cs/notice/board-list/78';
+					} else if (!isMobile && type === 'faq') {
+						url = 'https://www.ls-sec.co.kr/xingapi/EtwFrontBoard/Faq.jsp?left_menu_no=360&front_menu_no=1199&group_code=FAQ_14';
+					} else if (!isMobile && type === 'qna') {
+						url = 'https://www.ls-sec.co.kr/xingapi/EtwFrontBoard/dataBoard.jsp?board_no=78&left_menu_no=360&front_menu_no=1200';
+					}
+					//let url = type === 'faq' ? 'https://www.ls-sec.co.kr/xingapi/EtwFrontBoard/Faq.jsp?left_menu_no=360&front_menu_no=1199&group_code=FAQ_25'
+					//					: 'https://www.ls-sec.co.kr/xingapi/EtwFrontBoard/dataBoard.jsp?board_no=257&apiTp=openapi&left_menu_no=360&front_menu_no=1688';
+					window.open(url, "_blank");
+				}
+            </script>
+        
+
+        <!-- csrf -->
+        <input id="csrf" name="_csrf" value="f5bd36fa-2f83-4eee-9eb2-33e9c97f4c41" type="hidden">
+
+        <div class="user-content" id="content">
+
+            
+    <!-- menu -->
+    <div class="lnb-wrap">
+	<form id="searchForm" autocomplete="false">
+		<fieldset id="srch_api">
+			<legend>TR명 검색</legend>
+			<label for="searchText" class="sound_only">TR명 검색</label>
+			<input type="text" name="searchText" id="searchText" placeholder="TR명 검색" autocomplete="false">
+			<button value="검색" class="btn_submit" id="searchBtn">
+				<i class="fa fa-search" aria-hidden="true"></i>
+				<span class="sound_only">검색</span>
+			</button>
+		</fieldset>
+	</form>
+    <nav class="lnb" id="lnb">
+        <ul>
+            
+            <li id="apiservice">
+                <div class="sub-title" href="/apiservice">API가이드</div>
+            </li>
+            
+            
+            <li id="ffd2def7-a118-40f7-a0ab-cd4c6a538a90">
+                
+                <ul class="second-depth">
+                    <li>
+                        <a>OAuth 인증</a>
+                        <ul class="third-depth" style="display: none;">
+                            <li id="33bd887a-6652-4209-88cd-5324bc7c5e36">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;ffd2def7-a118-40f7-a0ab-cd4c6a538a90&quot;, &quot;33bd887a-6652-4209-88cd-5324bc7c5e36&quot;, 1)" class="">접근토큰 발급</a>
+                            </li>
+                            <li id="2d923333-f816-4df9-932d-ad390437b66f">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;ffd2def7-a118-40f7-a0ab-cd4c6a538a90&quot;, &quot;2d923333-f816-4df9-932d-ad390437b66f&quot;, 1)" class="">접근토큰 폐기</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li id="f82999f4-eb1a-4ead-a0b1-a4386e8721ab">
+                
+                <ul class="second-depth">
+                    <li>
+                        <a class="on">업종</a>
+                        <ul class="third-depth active" style="display: block;">
+                            <li id="88a7c0d3-fb4f-48ef-bc9b-4c47ac72a87b">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;f82999f4-eb1a-4ead-a0b1-a4386e8721ab&quot;, &quot;88a7c0d3-fb4f-48ef-bc9b-4c47ac72a87b&quot;, 1)" class="on">[업종] 시세</a>
+                            </li>
+                            <li id="5b483d74-407c-4760-8452-1b2b1dc1dcde">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;f82999f4-eb1a-4ead-a0b1-a4386e8721ab&quot;, &quot;5b483d74-407c-4760-8452-1b2b1dc1dcde&quot;, 1)" class="">[업종] 차트</a>
+                            </li>
+                            <li id="3c2b0280-6663-41e2-8995-a179de99e074">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;f82999f4-eb1a-4ead-a0b1-a4386e8721ab&quot;, &quot;3c2b0280-6663-41e2-8995-a179de99e074&quot;, 1)" class="">[업종] 실시간 시세</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li id="73142d9f-1983-48d2-8543-89b75535d34c">
+                
+                <ul class="second-depth">
+                    <li>
+                        <a>주식</a>
+                        <ul class="third-depth" style="display: none;">
+                            <li id="54a99b02-dbba-4057-8756-9ac759c9a2ed">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;73142d9f-1983-48d2-8543-89b75535d34c&quot;, &quot;54a99b02-dbba-4057-8756-9ac759c9a2ed&quot;, 1)" class="">[주식] 시세</a>
+                            </li>
+                            <li id="3dbce945-a73c-475c-9758-88d9922ab94e">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;73142d9f-1983-48d2-8543-89b75535d34c&quot;, &quot;3dbce945-a73c-475c-9758-88d9922ab94e&quot;, 1)" class="">[주식] 거래원</a>
+                            </li>
+                            <li id="580d2770-a7a9-49e3-9ec1-49ed8bc734a2">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;73142d9f-1983-48d2-8543-89b75535d34c&quot;, &quot;580d2770-a7a9-49e3-9ec1-49ed8bc734a2&quot;, 1)" class="">[주식] 투자정보</a>
+                            </li>
+                            <li id="6b554636-7b2a-4e1a-a615-54b0c131a558">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;73142d9f-1983-48d2-8543-89b75535d34c&quot;, &quot;6b554636-7b2a-4e1a-a615-54b0c131a558&quot;, 1)" class="">[주식] 프로그램</a>
+                            </li>
+                            <li id="c148a42f-51a7-4446-b6df-10d6056dd75b">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;73142d9f-1983-48d2-8543-89b75535d34c&quot;, &quot;c148a42f-51a7-4446-b6df-10d6056dd75b&quot;, 1)" class="">[주식] 투자자</a>
+                            </li>
+                            <li id="90378c39-f93e-4f95-9670-f76e5c924cc6">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;73142d9f-1983-48d2-8543-89b75535d34c&quot;, &quot;90378c39-f93e-4f95-9670-f76e5c924cc6&quot;, 1)" class="">[주식] 외인/기관</a>
+                            </li>
+                            <li id="3d58c125-8b45-46b4-baf2-6f98d0373131">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;73142d9f-1983-48d2-8543-89b75535d34c&quot;, &quot;3d58c125-8b45-46b4-baf2-6f98d0373131&quot;, 1)" class="">[주식] ELW</a>
+                            </li>
+                            <li id="30b6dfd6-b0bd-4e63-a510-7d5d94edc740">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;73142d9f-1983-48d2-8543-89b75535d34c&quot;, &quot;30b6dfd6-b0bd-4e63-a510-7d5d94edc740&quot;, 1)" class="">[주식] ETF</a>
+                            </li>
+                            <li id="8f027fa6-4177-43e3-9a7a-a76873efd47c">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;73142d9f-1983-48d2-8543-89b75535d34c&quot;, &quot;8f027fa6-4177-43e3-9a7a-a76873efd47c&quot;, 1)" class="">[주식] 섹터</a>
+                            </li>
+                            <li id="6b67369a-dc7a-4cc7-8c33-71bb6336b6bf">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;73142d9f-1983-48d2-8543-89b75535d34c&quot;, &quot;6b67369a-dc7a-4cc7-8c33-71bb6336b6bf&quot;, 1)" class="">[주식] 종목검색</a>
+                            </li>
+                            <li id="d3d0ef41-6a0f-4bda-9e28-160071f66206">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;73142d9f-1983-48d2-8543-89b75535d34c&quot;, &quot;d3d0ef41-6a0f-4bda-9e28-160071f66206&quot;, 1)" class="">[주식] 상위종목</a>
+                            </li>
+                            <li id="12320341-ad85-429a-90bd-5b3771c5e89f">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;73142d9f-1983-48d2-8543-89b75535d34c&quot;, &quot;12320341-ad85-429a-90bd-5b3771c5e89f&quot;, 1)" class="">[주식] 차트</a>
+                            </li>
+                            <li id="316495d3-6109-45a6-baaf-9e8a0261f30a">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;73142d9f-1983-48d2-8543-89b75535d34c&quot;, &quot;316495d3-6109-45a6-baaf-9e8a0261f30a&quot;, 1)" class="">[주식] 기타</a>
+                            </li>
+                            <li id="37d22d4d-83cd-40a4-a375-81b010a4a627">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;73142d9f-1983-48d2-8543-89b75535d34c&quot;, &quot;37d22d4d-83cd-40a4-a375-81b010a4a627&quot;, 1)" class="">[주식] 계좌</a>
+                            </li>
+                            <li id="d0e216e0-10d9-479f-8a4d-e175b8bae307">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;73142d9f-1983-48d2-8543-89b75535d34c&quot;, &quot;d0e216e0-10d9-479f-8a4d-e175b8bae307&quot;, 1)" class="">[주식] 주문</a>
+                            </li>
+                            <li id="9a2800c3-9bf2-4d67-8d83-905074f06646">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;73142d9f-1983-48d2-8543-89b75535d34c&quot;, &quot;9a2800c3-9bf2-4d67-8d83-905074f06646&quot;, 1)" class="">[주식] 실시간 시세</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li id="2f1eea77-5606-4512-93c6-31b21d2ece90">
+                
+                <ul class="second-depth">
+                    <li>
+                        <a>선물/옵션</a>
+                        <ul class="third-depth" style="display: none;">
+                            <li id="9f467798-6ce6-4d31-ab93-5a0e2860f89f">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;2f1eea77-5606-4512-93c6-31b21d2ece90&quot;, &quot;9f467798-6ce6-4d31-ab93-5a0e2860f89f&quot;, 1)" class="">[선물/옵션] 시세</a>
+                            </li>
+                            <li id="47005ce6-8500-4a3d-ad6c-f96ec3251669">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;2f1eea77-5606-4512-93c6-31b21d2ece90&quot;, &quot;47005ce6-8500-4a3d-ad6c-f96ec3251669&quot;, 1)" class="">[선물/옵션] 투자자</a>
+                            </li>
+                            <li id="a9b39b08-25c2-427d-848b-675c6228a92b">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;2f1eea77-5606-4512-93c6-31b21d2ece90&quot;, &quot;a9b39b08-25c2-427d-848b-675c6228a92b&quot;, 1)" class="">[선물/옵션] 차트</a>
+                            </li>
+                            <li id="09a668df-d7e8-4b5c-977f-91d1429b931a">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;2f1eea77-5606-4512-93c6-31b21d2ece90&quot;, &quot;09a668df-d7e8-4b5c-977f-91d1429b931a&quot;, 1)" class="">[선물/옵션] 계좌</a>
+                            </li>
+                            <li id="b579d38a-3ce5-4b1b-b94e-b0c4bbbf1d27">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;2f1eea77-5606-4512-93c6-31b21d2ece90&quot;, &quot;b579d38a-3ce5-4b1b-b94e-b0c4bbbf1d27&quot;, 1)" class="">[선물/옵션] 주문</a>
+                            </li>
+                            <li id="98373ce4-042a-4fc8-85ef-b9b8f64101ce">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;2f1eea77-5606-4512-93c6-31b21d2ece90&quot;, &quot;98373ce4-042a-4fc8-85ef-b9b8f64101ce&quot;, 1)" class="">[선물/옵션] 기타</a>
+                            </li>
+                            <li id="57936c91-b49d-4702-b7f6-3935c6859462">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;2f1eea77-5606-4512-93c6-31b21d2ece90&quot;, &quot;57936c91-b49d-4702-b7f6-3935c6859462&quot;, 1)" class="">[선물/옵션] 실시간 시세</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li id="c1ef0e8b-4666-4d8c-a77f-6ab488cfdb39">
+                
+                <ul class="second-depth">
+                    <li>
+                        <a>해외선물</a>
+                        <ul class="third-depth" style="display: none;">
+                            <li id="d61d4f85-9845-41ef-b915-4efa8fd0aad1">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;c1ef0e8b-4666-4d8c-a77f-6ab488cfdb39&quot;, &quot;d61d4f85-9845-41ef-b915-4efa8fd0aad1&quot;, 1)" class="">[해외선물] 시세</a>
+                            </li>
+                            <li id="44c1c082-c899-48fb-bc66-bb5be2f0ab4e">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;c1ef0e8b-4666-4d8c-a77f-6ab488cfdb39&quot;, &quot;44c1c082-c899-48fb-bc66-bb5be2f0ab4e&quot;, 1)" class="">[해외선물] 계좌</a>
+                            </li>
+                            <li id="b820f925-e189-4553-a7d1-8e5f2750fe08">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;c1ef0e8b-4666-4d8c-a77f-6ab488cfdb39&quot;, &quot;b820f925-e189-4553-a7d1-8e5f2750fe08&quot;, 1)" class="">[해외선물] 주문</a>
+                            </li>
+                            <li id="906d2d0a-7a6d-4ecc-b574-ca2154a70bca">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;c1ef0e8b-4666-4d8c-a77f-6ab488cfdb39&quot;, &quot;906d2d0a-7a6d-4ecc-b574-ca2154a70bca&quot;, 1)" class="">[해외선물] 차트</a>
+                            </li>
+                            <li id="3dc1c51b-5ff2-456d-ad2a-055e78ba2b03">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;c1ef0e8b-4666-4d8c-a77f-6ab488cfdb39&quot;, &quot;3dc1c51b-5ff2-456d-ad2a-055e78ba2b03&quot;, 1)" class="">[해외선물] 실시간 시세</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li id="6ad419a5-f0ce-47c2-a52a-91685fa86a31">
+                
+                <ul class="second-depth">
+                    <li>
+                        <a>기타</a>
+                        <ul class="third-depth" style="display: none;">
+                            <li id="3c452f0d-715e-43b5-a140-3e26f73dec76">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;6ad419a5-f0ce-47c2-a52a-91685fa86a31&quot;, &quot;3c452f0d-715e-43b5-a140-3e26f73dec76&quot;, 1)" class="">[기타] 시간조회</a>
+                            </li>
+                            <li id="eddd61f7-d595-4370-b9c3-49c4c6178096">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;6ad419a5-f0ce-47c2-a52a-91685fa86a31&quot;, &quot;eddd61f7-d595-4370-b9c3-49c4c6178096&quot;, 1)" class="">[기타] 실시간 시세</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li id="cd909627-82e5-40c9-b313-1a8fd2d7b119">
+                
+                <ul class="second-depth">
+                    <li>
+                        <a>실시간 시세 투자정보</a>
+                        <ul class="third-depth" style="display: none;">
+                            <li id="d67d0790-4b26-447b-82eb-e9642f66057c">
+                                <a href="javascript:;" onclick="goLeftMenuUrl(&quot;cd909627-82e5-40c9-b313-1a8fd2d7b119&quot;, &quot;d67d0790-4b26-447b-82eb-e9642f66057c&quot;, 1)" class="">[실시간 시세 투자정보] 투자정보</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+</div>
+    
+    <script>
+        /*<![CDATA[*/
+        function searchParam(key) {
+			return new URLSearchParams(location.search).get(key);
+		};
+		
+        function goLeftMenuUrl(group_id, sub_id, depth) {
+            window.location.href = window.location.pathname + '?group_id=' + group_id + '&api_id=' + sub_id;
+            change();
+        }
+
+        function change() {
+            let group_id = searchParam('group_id');
+            let api_id = searchParam('api_id');
+
+            $("#lnb").find("li").not("#apiservice").each(function (e) {
+                $(this).find('ul.second-depth > li > a:first-child').removeClass('on');
+                $(this).find('ul.third-depth').removeClass('active').css('display', 'none');
+                $(this).find('ul.third-depth > li').each(function (e) {
+                    $(this).children('a').removeClass();
+                });
+            })
+            $("#" + group_id).find('ul.second-depth > li > a:first-child').addClass('on');
+            $("#" + group_id).find('ul.third-depth').addClass('active').css('display', 'block');
+            $("#" + group_id).find('ul.third-depth').find('#' + api_id).find('a').addClass('on');
+        }
+        
+        function loadSerchApiList(data, searchText) {
+			let list = data;
+			
+			let html = '';
+			html += '<div id="kis_list" style="width: 100%;">';
+			html += '	<section id="sch_res_ov" style="text-align: center; zoom: 1;">';
+			html += '		<h2 style="margin: 0 0 10px; font-size: 1.2em;"><i class="fa-file-o" aria-hidden="true"></i><strong>' + searchText + '</strong>(으)로 전체검색 결과</h2>';
+			html += '	</section>';
+			/*html += '	<hr>';*/
+			html += '	<section style="margin: 0 0 10px; padding: 10px 0 15px;">';
+			html += '		<h2 style="margin 0 0 10px; font-size: 1.2em;">API 문서 내 결과</h2>';
+			html += '		<ul class="sch_res_list_ul">';
+
+			for (let i = 0; i < list.length; i++) {
+				html += '			<li style="border-bottom: 1px solid #e0e0e0; padding: 10px 0; position: relative;">';
+				html += '				<a href="javascript:;" onclick="goLeftMenuUrl(\'' + list[i].apiCollectionId + '\', \'' + list[i].id + '\')">';
+				html += '					<span style="padding: 10px; color: #a4c7db; font-size: 14px; font-weight:bold;"> - ' + list[i].apiCollectionName +'</span> &gt; <span style="padding: 10px; font-size: 13px; font-weight: bold;">' + list[i].name + '</span> &gt; <span style="padding: 10px; font-size: 13px; font-weight: bold;">' + list[i].trName + '</span>';
+				html += '				</a>';
+				html += '			</li>';
+			}
+			html += '		</ul>';
+			html += '	</section>';
+			if (list.length === 0) {
+				html += '	<div>';
+				html += '		<div class="t-center mt-2">조회 결과가 없습니다.</div>';
+				html += '	</div>';
+			}
+			html += '</div>';
+			
+			return html;
+		}
+        /*]]>*/
+
+        /* lnb */
+        $(function () {
+            var lnbUI = {
+                click: function (target, speed) {
+                    var _self = this;
+                    var $target = $(target);
+                    _self.speed = speed || 300;
+
+                    $target.each(function () {
+                        if (findChildren($(this))) {
+                            return;
+                        }
+                    });
+
+                    function findChildren(obj) {
+                        return obj.find('> ul').length > 0;
+                    }
+
+                   $target.on('click', 'a', function (e) {
+                        e.stopPropagation();
+                        var $this = $(this);
+                        var $depthTarget = $this.next();
+                        var antesCss = $depthTarget.css('display');
+                        var $siblings = $this.parent().siblings();
+                        
+                        change();
+
+						if ($this.hasClass("on")) {
+							return;
+						}
+						
+                        if (antesCss === 'none') {
+                            $depthTarget.slideDown(_self.speed); 
+                        } else {
+                            $depthTarget.slideUp(_self.speed);
+                        }
+                    }); 
+
+                },
+                activeOff: function ($target) {
+                    $target.parent().children('a').removeClass('on');
+                },
+                activeOn: function ($target) {
+                    $target.parent().children('a').addClass('on');
+                }
+            };
+
+            // Call lnbUI
+            $(function () {
+                lnbUI.click('.lnb-wrap #lnb li', 300);
+            });
+
+            if (window.location.href.indexOf("?") === -1) {
+				let groupId = "ffd2def7-a118-40f7-a0ab-cd4c6a538a90";
+				let apiId = "33bd887a-6652-4209-88cd-5324bc7c5e36";
+				
+				window.location.href = window.location.pathname + '?group_id=' + groupId + '&api_id=' + apiId;
+            }
+
+            change();
+            
+            $("#searchBtn").on("click", function(e) {
+				e.preventDefault();
+				let searchText = $("#searchText").val();
+				if (searchText === '') {
+					UNO.dialog.alertError("검색문자를 입력해주세요.");
+					return;
+				}
+				
+				search(searchText)
+			});
+			
+			function search(searchText) {
+				let getUrl = "/api/apis/public/search";
+				let getParam = {
+					searchText: searchText
+				};
+				
+				UNO.HTTP.getDeferred(getUrl, getParam)
+					.done(function(data){
+						isPageHide(true);
+						$("div .title-depth02").empty();
+						$("div .title-depth02").html(loadSerchApiList(data, searchText));
+					});
+			}
+        });
+    </script>
+
+
+
+            <div class="content-wrap">
+                <!-- contents -->
+                <div>
+    <!-- api guide-->
+    <section class="apiguide-wrap" id="service-list">
+        <form id="apiInfoForm">
+            <input type="hidden" name="protocolType" value="REST">
+            <div class="page-title">
+                <h2><span name="apiCollectionName">업종</span></h2>
+
+                <nav aria-label="breadscrumb">
+                    <ol class="breadscrumb">
+                        <li class="breadscrumb-item" aria-current="page"><a href="/"></a></li>
+                        <li class="breadscrumb-item" aria-current="page">API 가이드</li>
+                        <li class="breadscrumb-item active" aria-current="page"><span name="apiCollectionName">업종</span></li>
+                    </ol>
+                </nav>
+                
+                <div class="dropdown list-api">
+                	<a aria-expanded="false" aria-haspopup="true" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown" href="#" id="apiGroupSelect" role="button">
+                	API 가이드 목록
+                	</a>
+                	<div aria-labelledby="dropdownMenuLink" class="dropdown-menu dropdown-menu-right">
+	                	<a id="ffd2def7-a118-40f7-a0ab-cd4c6a538a90" class="dropdown-item" href="javascript:;" onclick="loadApiList(&quot;ffd2def7-a118-40f7-a0ab-cd4c6a538a90&quot;,&quot;OAuth \uC778\uC99D&quot;)">OAuth 인증</a><a id="f82999f4-eb1a-4ead-a0b1-a4386e8721ab" class="dropdown-item" href="javascript:;" onclick="loadApiList(&quot;f82999f4-eb1a-4ead-a0b1-a4386e8721ab&quot;,&quot;\uC5C5\uC885&quot;)">업종</a><a id="73142d9f-1983-48d2-8543-89b75535d34c" class="dropdown-item" href="javascript:;" onclick="loadApiList(&quot;73142d9f-1983-48d2-8543-89b75535d34c&quot;,&quot;\uC8FC\uC2DD&quot;)">주식</a><a id="2f1eea77-5606-4512-93c6-31b21d2ece90" class="dropdown-item" href="javascript:;" onclick="loadApiList(&quot;2f1eea77-5606-4512-93c6-31b21d2ece90&quot;,&quot;\uC120\uBB3C\/\uC635\uC158&quot;)">선물/옵션</a><a id="c1ef0e8b-4666-4d8c-a77f-6ab488cfdb39" class="dropdown-item" href="javascript:;" onclick="loadApiList(&quot;c1ef0e8b-4666-4d8c-a77f-6ab488cfdb39&quot;,&quot;\uD574\uC678\uC120\uBB3C&quot;)">해외선물</a><a id="6ad419a5-f0ce-47c2-a52a-91685fa86a31" class="dropdown-item" href="javascript:;" onclick="loadApiList(&quot;6ad419a5-f0ce-47c2-a52a-91685fa86a31&quot;,&quot;\uAE30\uD0C0&quot;)">기타</a><a id="cd909627-82e5-40c9-b313-1a8fd2d7b119" class="dropdown-item" href="javascript:;" onclick="loadApiList(&quot;cd909627-82e5-40c9-b313-1a8fd2d7b119&quot;,&quot;\uC2E4\uC2DC\uAC04 \uC2DC\uC138 \uD22C\uC790\uC815\uBCF4&quot;)">실시간 시세 투자정보</a>
+                	</div>
+                </div>
+            </div>
+
+            <!-- api명 -->
+            <div class="title-depth02">
+                <h3>
+		            <span name="protocolType" class="badge badge-api">REST</span>
+		            <span name="name">[업종] 시세</span>
+                </h3>
+            </div>
+            <div class="title-depth03">
+                <h4>기본정보</h4>
+            </div>
+            <div class="table-wrap">
+                <table class="table table-type-h table-apiguide">
+                    <colgroup>
+                        <col style="width:15%">
+                        <col>
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <th>Method</th>
+                        <td name="httpMethod">POST</td>
+                    </tr>
+                    <tr id="domain">
+                        <th>Domain</th>
+                        <td name="domain">https://openapi.ls-sec.co.kr:8080</td>
+                    </tr>
+                    <tr id="webDomain" style="display: none;">
+                        <th>운영 도메인</th>
+                        <td name="domain">https://openapi.ls-sec.co.kr:8080</td>
+                    </tr>
+                    <tr id="sim" style="display: none;">
+                        <th>모의투자 도메인</th>
+                        <td name="simulatedDomain"></td>
+                    </tr>
+                    <tr>
+                        <th>URL</th>
+                        <td name="accessUrl">/indtp/market-data</td>
+                    </tr>
+                    <tr>
+                        <th>Format</th>
+                        <td name="reqFormat">JSON</td>
+                    </tr>
+                    <tr>
+                        <th>Content-Type</th>
+                        <td name="contentType">application/json; charset=UTF-8</td>
+                    </tr>
+                    <tr>
+                        <th>Description</th>
+                        <td name="description">업종별 시세 및 기간별 추이를 확인할 수 있는 서비스입니다.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </form>
+
+
+        <!--api 목록 -->
+        <form id="trInfoForm">
+            <div class="apiguide-list mt-5" id="apiList">
+                <!-- 헤더 -->
+                <div class="table-wrap">
+                    <table class="table-type-h table-apiguide">
+                        <colgroup>
+                            <col>
+                            <col style="width:18%">
+                            <col style="width:12%">
+                            <col style="width:8%">
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th>TR명</th>
+                            <th>TR코드</th>
+                            <th>초당 전송 건수</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+                <!-- api one -->
+                <!-- 선택된 api명 /.open 토글/  버튼열린상태 btn-min/닫힘상태 .btn-plus -->
+                <div id="cardApis">
+
+                <div class="cardApi open" data-id="6elw1gsv-2ddm-27t2-an4o-6q1s5v18x78n" id="업종기간별추이">    <div class="cardApi-header">        <span class="apiName">업종기간별추이</span>        <span class="apiCode">t1514</span>        <span class="apiTest">1</span>        <span name="btnSpan">            <button class="btn btn-min" type="button" name="toggleBtn" data-toggle="collapse" data-target="#6elw1gsv-2ddm-27t2-an4o-6q1s5v18x78n" aria-expanded="true" aria-controls="6elw1gsv-2ddm-27t2-an4o-6q1s5v18x78n"></button>        </span>    </div><div id="업종기간별추이" class="collapse show" aria-labelledby="업종기간별추이" data-parent="#apiList">   <div class="cardApi-body">       <div class="title-depth03"><h4>요청</h4></div>       <div class="title-depth04"><h5>Header</h5></div>       <div class="table-wrap" id="reqHeader">           <table class="table table-type-v table-apiguide">               <colgroup>                   <col style="width:15%">                   <col style="width:15%">                   <col style="width:9%">                   <col style="width:9%">                   <col style="width:8%">                   <col>               </colgroup>               <thead>                   <tr>                       <th>Element</th>                       <th>한글명</th>                       <th>type</th>                       <th>Required</th>                       <th>Length</th>                       <th>Description</th>                   </tr>               </thead>           <tbody>                   <tr>                       <td name="propertyCd">content-type</td>                       <td name="propertyNm">컨텐츠타입</td>                       <td name="propertyType" align="center">String</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">100</td>                       <td name="description">LS증권 제공 API를 호출하기 위한 Request Body 데이터 포맷으로 "application/json; charset=utf-8 설정"</td>                   </tr>                   <tr>                       <td name="propertyCd">authorization</td>                       <td name="propertyNm">접근토큰</td>                       <td name="propertyType" align="center">String</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">1000</td>                       <td name="description">OAuth 토큰이 필요한 API 경우 발급한 Access Token을 설정하기 위한 Request Heaeder Parameter</td>                   </tr>                   <tr>                       <td name="propertyCd">tr_cd</td>                       <td name="propertyNm">거래 CD</td>                       <td name="propertyType" align="center">String</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">10</td>                       <td name="description">LS증권 거래코드</td>                   </tr>                   <tr>                       <td name="propertyCd">tr_cont</td>                       <td name="propertyNm">연속 거래 여부</td>                       <td name="propertyType" align="center">String</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">1</td>                       <td name="description">연속거래 여부<br>Y:연속○<br>N:연속×</td>                   </tr>                   <tr>                       <td name="propertyCd">tr_cont_key</td>                       <td name="propertyNm">연속 거래 Key</td>                       <td name="propertyType" align="center">String</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">18</td>                       <td name="description">연속일 경우 그전에 내려온 연속키 값 올림</td>                   </tr>                   <tr>                       <td name="propertyCd">mac_address</td>                       <td name="propertyNm">MAC 주소</td>                       <td name="propertyType" align="center">String</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">12</td>                       <td name="description">법인인 경우 필수 세팅</td>                   </tr>           </tbody>           </table></div>       <div class="title-depth04"><h5>Body</h5></div>       <div class="table-wrap" id="reqBody">           <table class="table table-type-v table-apiguide">               <colgroup>                   <col style="width:15%">                   <col style="width:15%">                   <col style="width:9%">                   <col style="width:9%">                   <col style="width:8%">                   <col>               </colgroup>               <thead>                   <tr>                       <th>Element</th>                       <th>한글명</th>                       <th>type</th>                       <th>Required</th>                       <th>Length</th>                       <th>Description</th>                   </tr>               </thead>           <tbody>                   <tr>                       <td name="propertyCd">t1514InBlock</td>                       <td name="propertyNm">t1514InBlock</td>                       <td name="propertyType" align="center">Object</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">-</td>                       <td name="description"></td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-upcode</td>                       <td name="propertyNm">업종코드</td>                       <td name="propertyType" align="center">String</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">3</td>                       <td name="description"></td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-gubun1</td>                       <td name="propertyNm">구분1</td>                       <td name="propertyType" align="center">String</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">1</td>                       <td name="description">미사용항목임 - 스페이스설정</td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-gubun2</td>                       <td name="propertyNm">구분2</td>                       <td name="propertyType" align="center">String</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">1</td>                       <td name="description">일@1
+주@2
+월@3
+분</td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-cts_date</td>                       <td name="propertyNm">CTS_일자</td>                       <td name="propertyType" align="center">String</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">8</td>                       <td name="description">연속조회기준일(LT)
+- 연속조회일 경우 이 값 기준으로 조회(cont:1일때)
+(이전 조회한 t1514OutBlock.cts_date 값으로 설정)
+-처음조회시 스페이스설정.</td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-cnt</td>                       <td name="propertyNm">조회건수</td>                       <td name="propertyType" align="center">Object</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">4</td>                       <td name="description"></td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-rate_gbn</td>                       <td name="propertyNm">비중구분</td>                       <td name="propertyType" align="center">String</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">1</td>                       <td name="description">비중구분
+- 1:거래량비중
+- 2:거래대금비중</td>                   </tr>           </tbody>           </table></div>       <div class="title-depth03"><h4>응답</h4></div>       <div class="title-depth04"><h5>Header</h5></div>       <div class="table-wrap" id="resHeader">           <table class="table table-type-v table-apiguide">               <colgroup>                   <col style="width:15%">                   <col style="width:15%">                   <col style="width:9%">                   <col style="width:9%">                   <col style="width:8%">                   <col>               </colgroup>               <thead>                   <tr>                       <th>Element</th>                       <th>한글명</th>                       <th>type</th>                       <th>Required</th>                       <th>Length</th>                       <th>Description</th>                   </tr>               </thead>           <tbody>                   <tr>                       <td name="propertyCd">content-type</td>                       <td name="propertyNm">컨텐츠타입</td>                       <td name="propertyType" align="center">String</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">100</td>                       <td name="description">LS증권 제공 API를 호출하기 위한 Request Body 데이터 포맷으로 "application/json; charset=utf-8 설정"</td>                   </tr>                   <tr>                       <td name="propertyCd">tr_cd</td>                       <td name="propertyNm">거래 CD</td>                       <td name="propertyType" align="center">String</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">10</td>                       <td name="description">LS증권 거래코드</td>                   </tr>                   <tr>                       <td name="propertyCd">tr_cont</td>                       <td name="propertyNm">연속 거래 여부</td>                       <td name="propertyType" align="center">String</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">1</td>                       <td name="description">연속거래 여부<br>Y:연속○<br>N:연속×</td>                   </tr>                   <tr>                       <td name="propertyCd">tr_cont_key</td>                       <td name="propertyNm">연속 거래 Key</td>                       <td name="propertyType" align="center">String</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">18</td>                       <td name="description">연속일 경우 그전에 내려온 연속키 값 올림</td>                   </tr>           </tbody>           </table></div>       <div class="title-depth04"><h5>Body</h5></div>       <div class="table-wrap" id="resBody">           <table class="table table-type-v table-apiguide">               <colgroup>                   <col style="width:15%">                   <col style="width:15%">                   <col style="width:9%">                   <col style="width:9%">                   <col style="width:8%">                   <col>               </colgroup>               <thead>                   <tr>                       <th>Element</th>                       <th>한글명</th>                       <th>type</th>                       <th>Required</th>                       <th>Length</th>                       <th>Description</th>                   </tr>               </thead>           <tbody>                   <tr>                       <td name="propertyCd">t1514OutBlock</td>                       <td name="propertyNm">t1514OutBlock</td>                       <td name="propertyType" align="center">Object</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">-</td>                       <td name="description"></td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-cts_date</td>                       <td name="propertyNm">CTS_일자</td>                       <td name="propertyType" align="center">String</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">8</td>                       <td name="description">연속조회키값(다음데이타가 있을 경우에 한해서 세팅 됨)
+이 필드의 데이터를 다음 조회시 InBlock의 date 필드에 넣어준다.</td>                   </tr>                   <tr>                       <td name="propertyCd">t1514OutBlock1
+</td>                       <td name="propertyNm">t1514OutBlock1
+</td>                       <td name="propertyType" align="center">Object Array</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">-</td>                       <td name="description"></td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-date</td>                       <td name="propertyNm">일자</td>                       <td name="propertyType" align="center">String</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">8</td>                       <td name="description"></td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-jisu</td>                       <td name="propertyNm">지수</td>                       <td name="propertyType" align="center">Number</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">12.2</td>                       <td name="description"></td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-sign</td>                       <td name="propertyNm">전일대비구분</td>                       <td name="propertyType" align="center">String</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">1</td>                       <td name="description"></td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-change</td>                       <td name="propertyNm">전일대비</td>                       <td name="propertyType" align="center">Number</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">7.2</td>                       <td name="description"></td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-diff</td>                       <td name="propertyNm">등락율</td>                       <td name="propertyType" align="center">Number</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">6.2</td>                       <td name="description"></td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-volume</td>                       <td name="propertyNm">거래량</td>                       <td name="propertyType" align="center">Number</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">12</td>                       <td name="description"></td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-diff_vol</td>                       <td name="propertyNm">거래증가율</td>                       <td name="propertyType" align="center">Number</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">12.2</td>                       <td name="description"></td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-value1</td>                       <td name="propertyNm">거래대금1</td>                       <td name="propertyType" align="center">Number</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">12</td>                       <td name="description"></td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-high</td>                       <td name="propertyNm">상승</td>                       <td name="propertyType" align="center">Number</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">4</td>                       <td name="description"></td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-unchg</td>                       <td name="propertyNm">보합</td>                       <td name="propertyType" align="center">Number</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">4</td>                       <td name="description"></td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-low</td>                       <td name="propertyNm">하락</td>                       <td name="propertyType" align="center">Number</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">4</td>                       <td name="description"></td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-uprate</td>                       <td name="propertyNm">상승종목비율</td>                       <td name="propertyType" align="center">Number</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">6.2</td>                       <td name="description"></td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-frgsvolume</td>                       <td name="propertyNm">외인순매수</td>                       <td name="propertyType" align="center">Number</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">8</td>                       <td name="description"></td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-openjisu</td>                       <td name="propertyNm">시가</td>                       <td name="propertyType" align="center">Number</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">12.2</td>                       <td name="description"></td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-highjisu</td>                       <td name="propertyNm">고가</td>                       <td name="propertyType" align="center">Number</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">12.2</td>                       <td name="description"></td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-lowjisu</td>                       <td name="propertyNm">저가</td>                       <td name="propertyType" align="center">Number</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">12.2</td>                       <td name="description"></td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-value2</td>                       <td name="propertyNm">거래대금2</td>                       <td name="propertyType" align="center">Number</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">12</td>                       <td name="description"></td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-up</td>                       <td name="propertyNm">상한</td>                       <td name="propertyType" align="center">Number</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">4</td>                       <td name="description"></td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-down</td>                       <td name="propertyNm">하한</td>                       <td name="propertyType" align="center">Number</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">4</td>                       <td name="description"></td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-totjo</td>                       <td name="propertyNm">종목수</td>                       <td name="propertyType" align="center">Number</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">4</td>                       <td name="description"></td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-orgsvolume</td>                       <td name="propertyNm">기관순매수</td>                       <td name="propertyType" align="center">Number</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">8</td>                       <td name="description"></td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-upcode</td>                       <td name="propertyNm">업종코드</td>                       <td name="propertyType" align="center">String</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">3</td>                       <td name="description"></td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-rate</td>                       <td name="propertyNm">거래비중</td>                       <td name="propertyType" align="center">Number</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">7.2</td>                       <td name="description"></td>                   </tr>                   <tr>                       <td name="propertyCd">&nbsp;&nbsp;-divrate</td>                       <td name="propertyNm">업종배당수익률</td>                       <td name="propertyType" align="center">Number</td>                       <td name="requireYn" align="center">Y</td>                       <td name="propertyLength" align="center">7.2</td>                       <td name="description"></td>                   </tr>           </tbody>           </table></div>       <div class="sample-wrap">           <div class="title-depth03"><h4>Example</h4></div>           <div class="title-depth04"><h5>Request</h5></div>           <div class="code-wrap" id="reqExample"><pre>{
+  "t1514InBlock": {
+    "upcode": "001",
+    "gubun1": " ",
+    "gubun2": "1",
+    "cts_date": " ",
+    "cnt": 1,
+    "rate_gbn": "1"
+  }
+}</pre></div>           <div class="title-depth04"><h5>Response</h5></div>           <div class="code-wrap" id="resExample"><pre>{
+    "t1514OutBlock": {
+        "cts_date": "20230605"
+    },
+    "rsp_cd": "00000",
+    "t1514OutBlock1": [
+        {
+            "date": "20230605",
+            "divrate": "0.00",
+            "value2": 3884240,
+            "diff_vol": "46.20",
+            "value1": 3884240,
+            "change": "9.26",
+            "sign": "2",
+            "totjo": 950,
+            "diff": "0.36",
+            "orgsvolume": 1210,
+            "unchg": 91,
+            "down": 0,
+            "jisu": "2610.62",
+            "volume": 263165,
+            "high": 606,
+            "highjisu": "2617.58",
+            "low": 253,
+            "rate": "0.00",
+            "upcode": "001",
+            "up": 0,
+            "lowjisu": "2610.40",
+            "uprate": "63.79",
+            "openjisu": "2617.43",
+            "frgsvolume": 351
+        }
+    ],
+    "rsp_msg": "정상적으로 조회가 완료되었습니다."
+}</pre></div>       </div>   </div></div></div><div class="cardApi" data-id="xknl5740-7upu-zukv-7tpa-153466dx54r3" id="전체업종">    <div class="cardApi-header">        <span class="apiName">전체업종</span>        <span class="apiCode">t8424</span>        <span class="apiTest">1</span>        <span name="btnSpan">            <button class="btn btn-plus" type="button" name="toggleBtn" data-toggle="collapse" data-target="#xknl5740-7upu-zukv-7tpa-153466dx54r3" aria-expanded="true" aria-controls="xknl5740-7upu-zukv-7tpa-153466dx54r3"></button>        </span>    </div><div id="전체업종" class="collapse" aria-labelledby="전체업종" data-parent="#apiList">   <div class="cardApi-body">       <div class="title-depth03"><h4>요청</h4></div>       <div class="title-depth04"><h5>Header</h5></div>       <div class="table-wrap" id="reqHeader">       </div>       <div class="title-depth04"><h5>Body</h5></div>       <div class="table-wrap" id="reqBody">       </div>       <div class="title-depth03"><h4>응답</h4></div>       <div class="title-depth04"><h5>Header</h5></div>       <div class="table-wrap" id="resHeader">       </div>       <div class="title-depth04"><h5>Body</h5></div>       <div class="table-wrap" id="resBody">       </div>       <div class="sample-wrap">           <div class="title-depth03"><h4>Example</h4></div>           <div class="title-depth04"><h5>Request</h5></div>           <div class="code-wrap" id="reqExample">           </div>           <div class="title-depth04"><h5>Response</h5></div>           <div class="code-wrap" id="resExample">           </div>       </div>   </div></div></div><div class="cardApi" data-id="3185b57h-f067-16z1-h8wn-xj1vk0wk37mv" id="예상지수">    <div class="cardApi-header">        <span class="apiName">예상지수</span>        <span class="apiCode">t1485</span>        <span class="apiTest">1</span>        <span name="btnSpan">            <button class="btn btn-plus" type="button" name="toggleBtn" data-toggle="collapse" data-target="#3185b57h-f067-16z1-h8wn-xj1vk0wk37mv" aria-expanded="true" aria-controls="3185b57h-f067-16z1-h8wn-xj1vk0wk37mv"></button>        </span>    </div><div id="예상지수" class="collapse" aria-labelledby="예상지수" data-parent="#apiList">   <div class="cardApi-body">       <div class="title-depth03"><h4>요청</h4></div>       <div class="title-depth04"><h5>Header</h5></div>       <div class="table-wrap" id="reqHeader">       </div>       <div class="title-depth04"><h5>Body</h5></div>       <div class="table-wrap" id="reqBody">       </div>       <div class="title-depth03"><h4>응답</h4></div>       <div class="title-depth04"><h5>Header</h5></div>       <div class="table-wrap" id="resHeader">       </div>       <div class="title-depth04"><h5>Body</h5></div>       <div class="table-wrap" id="resBody">       </div>       <div class="sample-wrap">           <div class="title-depth03"><h4>Example</h4></div>           <div class="title-depth04"><h5>Request</h5></div>           <div class="code-wrap" id="reqExample">           </div>           <div class="title-depth04"><h5>Response</h5></div>           <div class="code-wrap" id="resExample">           </div>       </div>   </div></div></div><div class="cardApi" data-id="8ll424vf-400s-6yy2-kc17-rq0s3z16q53b" id="업종현재가">    <div class="cardApi-header">        <span class="apiName">업종현재가</span>        <span class="apiCode">t1511</span>        <span class="apiTest">3</span>        <span name="btnSpan">            <button class="btn btn-plus" type="button" name="toggleBtn" data-toggle="collapse" data-target="#8ll424vf-400s-6yy2-kc17-rq0s3z16q53b" aria-expanded="true" aria-controls="8ll424vf-400s-6yy2-kc17-rq0s3z16q53b"></button>        </span>    </div><div id="업종현재가" class="collapse" aria-labelledby="업종현재가" data-parent="#apiList">   <div class="cardApi-body">       <div class="title-depth03"><h4>요청</h4></div>       <div class="title-depth04"><h5>Header</h5></div>       <div class="table-wrap" id="reqHeader">       </div>       <div class="title-depth04"><h5>Body</h5></div>       <div class="table-wrap" id="reqBody">       </div>       <div class="title-depth03"><h4>응답</h4></div>       <div class="title-depth04"><h5>Header</h5></div>       <div class="table-wrap" id="resHeader">       </div>       <div class="title-depth04"><h5>Body</h5></div>       <div class="table-wrap" id="resBody">       </div>       <div class="sample-wrap">           <div class="title-depth03"><h4>Example</h4></div>           <div class="title-depth04"><h5>Request</h5></div>           <div class="code-wrap" id="reqExample">           </div>           <div class="title-depth04"><h5>Response</h5></div>           <div class="code-wrap" id="resExample">           </div>       </div>   </div></div></div><div class="cardApi" data-id="37w081ao-is0d-7je3-mr3q-5a44p2fju20q" id="업종별종목시세">    <div class="cardApi-header">        <span class="apiName">업종별종목시세</span>        <span class="apiCode">t1516</span>        <span class="apiTest">1</span>        <span name="btnSpan">            <button class="btn btn-plus" type="button" name="toggleBtn" data-toggle="collapse" data-target="#37w081ao-is0d-7je3-mr3q-5a44p2fju20q" aria-expanded="true" aria-controls="37w081ao-is0d-7je3-mr3q-5a44p2fju20q"></button>        </span>    </div><div id="업종별종목시세" class="collapse" aria-labelledby="업종별종목시세" data-parent="#apiList">   <div class="cardApi-body">       <div class="title-depth03"><h4>요청</h4></div>       <div class="title-depth04"><h5>Header</h5></div>       <div class="table-wrap" id="reqHeader">       </div>       <div class="title-depth04"><h5>Body</h5></div>       <div class="table-wrap" id="reqBody">       </div>       <div class="title-depth03"><h4>응답</h4></div>       <div class="title-depth04"><h5>Header</h5></div>       <div class="table-wrap" id="resHeader">       </div>       <div class="title-depth04"><h5>Body</h5></div>       <div class="table-wrap" id="resBody">       </div>       <div class="sample-wrap">           <div class="title-depth03"><h4>Example</h4></div>           <div class="title-depth04"><h5>Request</h5></div>           <div class="code-wrap" id="reqExample">           </div>           <div class="title-depth04"><h5>Response</h5></div>           <div class="code-wrap" id="resExample">           </div>       </div>   </div></div></div></div>
+                <!-- // api one -->
+
+            </div>
+        </form>
+        <!--//api 목록 -->
+    </section> 
+
+</div>
+                
+    <script>
+        /*<![CDATA[*/
+		function searchParam(key) {
+			return new URLSearchParams(location.search).get(key);
+		};
+		
+        function isPageHide(isHide) {
+			if (isHide) {
+				$("div .title-depth03").hide();
+				$("div .table-wrap").hide();
+				$("#apiList").hide();
+			} else {
+				$("div .title-depth03").show
+				$("div .table-wrap").show();
+				$("#apiList").show();
+			}
+ 		 }
+ 		 
+    	 function loadApiList(apiserviceId,apiserviceName) {
+			isPageHide(true);
+            loadPage();
+
+            function loadPage() {
+                UNO.HTTP.getDeferred(`/api/apis/public/api-list/${apiserviceId}`)
+                    .done(function (apiList) {
+						$("div .page-title > h2").empty();
+                    	let htmlTitle = '<span name="apiCollectionName">' + apiserviceName + '</span>';
+                    	$("div .page-title > h2").html(htmlTitle);
+                    	
+                    	$("div .page-title > nav > ol").empty();
+                    	let htmlBread = '<li class="breadscrumb-item" aria-current="page"><a href="/"></a></li><li class="breadscrumb-item" aria-current="page">API 가이드</li><li class="breadscrumb-item active" aria-current="page"><span name="apiCollectionName">' + apiserviceName +'</span></li>';
+                    	$("div .page-title > nav > ol").html(htmlBread);
+                    	
+                    	$("div .title-depth02").empty();
+                    	let html = '';
+                    	apiList.forEach(api => {
+							if (api.open) {
+								html += '<h3 class="m_res_list_h3"><span name="protocolType" class="badge badge-api">' + api.protocolType +'</span><span name="name" onclick="goMenuApiservice(\'/apiservice?group_id=' + apiserviceId + '&api_id=' +  api.id + '\')">' + api.name + '</span></h3>';
+							}
+						});
+                    	$("div .title-depth02").html(html);
+                    });
+            }
+		}
+		
+        function test() {
+			isPageHide(false);
+			
+			let titleDepth02Html = '<h3><span name="protocolType" class="badge badge-api"></span><span name="name"></span></h3>';
+			$("div .title-depth02").html(titleDepth02Html);
+			
+            let $apiInfoForm = $('#apiInfoForm');
+            let apiId = searchParam('api_id');
+            let trInfo;
+            let codeList = [];
+            
+            UNO.code.asyncPublicSystemCode({}, "property_type").done(function (codes) {
+                codeList = codes;
+            });
+            
+            if ($(".title-depth02").children().length > 1) {
+	            const firstDepth = $(".title-depth02").children().first();
+	            $(".title-depth02").html(firstDepth);
+			}
+
+            initPage();
+
+            $("#cardApis").empty();
+
+            function initPage() {
+                UNO.HTTP.getDeferred('/api/apis/public/' + apiId)
+                    .done(function (data) {
+
+                        let isOauth = data.accessUrl.substr(1,5) === 'oauth' ? true : false;
+                        let protocolType = data && data.protocolType || '';
+                        let isAccessUrl = protocolType === 'WEBSOCKET' ? '/websocket' : data.accessUrl;
+                        data.accessUrl = isAccessUrl;
+                        
+                        if (protocolType === 'WEBSOCKET') {
+							$('#sim').css('display','');
+							$('#webDomain').css('display','');
+							$('#domain').css('display','none');
+						} else {
+							$('#sim').css('display','none');
+							$('#domain').css('display','');
+							$('#webDomain').css('display','none');
+						}
+                        
+                        UNO.util.deserializeForm($apiInfoForm, data);
+                        
+                        UNO.HTTP.getDeferred('/api/apis/guide/tr/' + apiId)
+                            .done(function (trData) {
+                                for (let i = 0; i < trData.length; i++) {
+                                    buildCardApi(trData[i], isOauth);
+                                }
+                                trInfo = trData;
+                                initEvent();
+                            })
+                            .fail(function (data) {
+                                initEvent();
+                            });
+                    });
+            }
+
+            function buildCardApi(trData, isOauth) {
+
+                let html = '';
+
+                html += '<div class="cardApi" data-id="' + trData.id + '" id="' + trData.trName + '">';
+                html += '    <div class="cardApi-header">';
+                html += '        <span class="apiName">' + trData.trName + '</span>';
+                html += '        <span class="apiCode">' + trData.trCode + '</span>';
+                html += '        <span class="apiTest">' + trData.transactionPerSec + '</span>';
+                html += '        <span name="btnSpan">';
+                html += '            <button class="btn btn-plus" type="button" name="toggleBtn"' +
+                    ' data-toggle="collapse" data-target="#' + trData.id + '" aria-expanded="true" aria-controls="' + trData.id + '"></button>';
+                html += '        </span>';
+                html += '    </div>';
+
+                // <button class="btn btn-min" type="button" data-toggle="collapse" data-target="#apiDetail1" aria-expanded="true" aria-controls="apiDetail1"></button>
+                html += '<div id="' + trData.trName + '" class="collapse" aria-labelledby="' + trData.trName + '" data-parent="#apiList">'
+                html += '   <div class="cardApi-body">';
+                //<!-- api 상세 내용 -->
+                //<!-- 요청 -->
+                html += '       <div class="title-depth03"><h4>요청</h4></div>';
+                html += '       <div class="title-depth04"><h5>Header</h5></div>';
+                html += '       <div class="table-wrap" id="reqHeader">';
+                html += '       </div>';
+                if (isOauth) {
+	                html += '       <div class="title-depth04"><h5>Parameter</h5></div>';
+				} else {
+	                html += '       <div class="title-depth04"><h5>Body</h5></div>';
+				}
+
+                html += '       <div class="table-wrap" id="reqBody">';
+                html += '       </div>';
+                //<!-- 요청 -->
+                //<!-- 응답 -->
+                html += '       <div class="title-depth03"><h4>응답</h4></div>';
+                html += '       <div class="title-depth04"><h5>Header</h5></div>';
+                html += '       <div class="table-wrap" id="resHeader">';
+                html += '       </div>';
+                html += '       <div class="title-depth04"><h5>Body</h5></div>';
+                html += '       <div class="table-wrap" id="resBody">';
+                html += '       </div>';
+                //<!-- 응답 -->
+                //<!-- sample -->
+                html += '       <div class="sample-wrap">';
+                html += '           <div class="title-depth03"><h4>Example</h4></div>';
+                html += '           <div class="title-depth04"><h5>Request</h5></div>';
+                html += '           <div class="code-wrap" id="reqExample">';
+                html += '           </div>';
+                html += '           <div class="title-depth04"><h5>Response</h5></div>';
+                html += '           <div class="code-wrap" id="resExample">';
+                html += '           </div>';
+                html += '       </div>';
+                //<!-- sample -->
+                html += '   </div>';
+                html += '</div>';
+
+                $('#cardApis').append(html);
+            }
+
+            function buildEachRow(item, type, mainId) {
+                let $type = $("#cardApis").find("[data-id='" + mainId + "']").find("#" + type);
+
+                $type.empty();
+
+                let html = '';
+
+                if (item.length > 0) {
+                    html += '           <table class="table table-type-v table-apiguide">';
+                    html += '               <colgroup>';
+                    html += '                   <col style="width:15%">';
+                    html += '                   <col style="width:15%">';
+                    html += '                   <col style="width:9%">';
+                    html += '                   <col style="width:9%">';
+                    html += '                   <col style="width:8%">';
+                    html += '                   <col>';
+                    html += '               </colgroup>';
+                    html += '               <thead>';
+                    html += '                   <tr>';
+                    html += '                       <th>Element</th>';
+                    html += '                       <th>한글명</th>';
+                    html += '                       <th>type</th>';
+                    html += '                       <th>Required</th>';
+                    html += '                       <th>Length</th>';
+                    html += '                       <th>Description</th>';
+                    html += '                   </tr>';
+                    html += '               </thead>';
+                    html += '           <tbody>';
+                    for (let i = 0; i < item.length; i++) {
+                        html += '                   <tr>';
+                        html += '                       <td name="propertyCd">' + item[i].propertyCd + '</td>';
+                        html += '                       <td name="propertyNm">' + item[i].propertyNm + '</td>';
+                        html += '                       <td name="propertyType" align="center">' + UNO.util.getCodeName(codeList, item[i].propertyType) + '</td>';
+                        html += '                       <td name="requireYn" align="center">' + item[i].requireYn + '</td>';
+                        html += '                       <td name="propertyLength" align="center">' + (_.isEmpty(item[i].propertyLength) ? '-' : item[i].propertyLength) + '</td>';
+                        html += '                       <td name="description">' + (_.isEmpty(item[i].description) ? '' : item[i].description) + '</td>';
+                        html += '                   </tr>';
+                    }
+                    html += '           </tbody>';
+                    html += '           </table>';
+                }
+
+                $type.append(html);
+            }
+
+            function buildExample(item, mainId) {
+                let $reqExample = $("#cardApis").find("[data-id='" + mainId + "']").find("#reqExample");
+                let $resExample = $("#cardApis").find("[data-id='" + mainId + "']").find("#resExample");
+
+                $reqExample.empty();
+                $resExample.empty();
+
+                let preForReq = '';
+                preForReq += '<pre>';
+                preForReq += (_.isEmpty(item[0].reqExample) ? '' : item[0].reqExample);
+                preForReq += '</pre>';
+                $reqExample.append(preForReq);
+
+                let preForRes = '';
+                preForRes += '<pre>';
+                preForRes += (_.isEmpty(item[0].resExample) ? '' : item[0].resExample);
+                preForRes += '</pre>';
+                $resExample.append(preForRes);
+            }
+
+            function initEvent() {
+                $("button[name='toggleBtn']").on('click', function (e) {
+                    let $this = $(this);
+                    let $cardApis = $("#cardApis");
+                    let trId = $this.closest('div').parent().data('id');
+
+                    $cardApis.each(function(e) {
+                        $(this).children().removeClass('open');
+                        $(this).children().each(function (e2) {
+                            $(this).children().removeClass('show');
+                        });
+                    });
+
+                    if ($this.hasClass('btn-plus')) {
+                        $this.removeClass('btn-plus').addClass('btn-min');
+                        $this.parent().parent().parent().addClass('open');
+                        $this.closest('div').next().addClass('show');
+                    } else {
+                        $this.removeClass('btn-min').addClass('btn-plus');
+                        $this.parent().parent().parent().removeClass('open');
+                        $this.closest('div').next().removeClass('show');
+                    }
+
+                    $cardApis.each(function(e) {
+                        $(this).children().each(function (e2) {
+                            if (!$(this).hasClass('open')) {
+                                $(this).find('button').removeClass().addClass('btn btn-plus');
+                            }
+                        });
+                    });
+
+                    UNO.HTTP.getDeferred('/api/apis/guide/tr/property/' + trId)
+                        .done(function (data) {
+                            buildEachRow(data.filter (({bodyType}) => bodyType === 'req_h'), 'reqHeader', trId);
+                            buildEachRow(data.filter (({bodyType}) => bodyType === 'req_b'), 'reqBody', trId);
+
+                            buildEachRow(data.filter (({bodyType}) => bodyType === 'res_h'), 'resHeader', trId);
+                            buildEachRow(data.filter (({bodyType}) => bodyType === 'res_b'), 'resBody', trId);
+
+                            buildExample((trInfo.filter (({id}) => id === trId)), trId);
+                        });
+                });
+            }
+        }
+        /*]]>*/
+
+        $(function () {
+            let $apiInfoForm = $('#apiInfoForm');
+            let apiId = searchParam('api_id');
+            
+            if (apiId == null || apiId == undefined) {
+				apiId = '33bd887a-6652-4209-88cd-5324bc7c5e36';
+			}
+			
+            let trInfo;
+
+            let codeList = [];
+            UNO.code.asyncPublicSystemCode({}, "property_type").done(function (codes) {
+                codeList = codes;
+            });
+
+            initPage();
+
+            function initPage() {
+                UNO.HTTP.getDeferred('/api/apis/public/' + apiId)
+                    .done(function (data) {
+	
+						let isOauth = data.accessUrl.substr(1,5) === 'oauth' ? true : false;
+                        let protocolType = data && data.protocolType || '';
+                        let isAccessUrl = protocolType === 'WEBSOCKET' ? '/websocket' : data.accessUrl;
+                        data.accessUrl = isAccessUrl;
+                        
+                        if (protocolType === 'WEBSOCKET') {
+							$('#sim').css('display','');
+							$('#webDomain').css('display','');
+							$('#domain').css('display','none');
+						} else {
+							$('#sim').css('display','none');
+							$('#domain').css('display','');
+							$('#webDomain').css('display','none');
+						}
+                        
+                        UNO.util.deserializeForm($apiInfoForm, data);
+
+                        UNO.HTTP.getDeferred('/api/apis/guide/tr/' + apiId)
+                            .done(function (trData) {
+                                for (let i = 0; i < trData.length; i++) {
+                                    buildCardApi(trData[i], isOauth);
+                                }
+                                trInfo = trData;
+                                initEvent();
+                            })
+                            .fail(function (data) {
+                                initEvent();
+                            });
+                    });
+            }
+
+            function buildCardApi(trData, isOauth) {
+
+                let html = '';
+
+                html += '<div class="cardApi" data-id="' + trData.id + '" id="' + trData.trName + '">';
+                html += '    <div class="cardApi-header">';
+                html += '        <span class="apiName">' + trData.trName + '</span>';
+                html += '        <span class="apiCode">' + trData.trCode + '</span>';
+                html += '        <span class="apiTest">' + trData.transactionPerSec + '</span>';
+                html += '        <span name="btnSpan">';
+                html += '            <button class="btn btn-plus" type="button" name="toggleBtn"' +
+                    ' data-toggle="collapse" data-target="#' + trData.id + '" aria-expanded="true" aria-controls="' + trData.id + '"></button>';
+                html += '        </span>';
+                html += '    </div>';
+
+                // <button class="btn btn-min" type="button" data-toggle="collapse" data-target="#apiDetail1" aria-expanded="true" aria-controls="apiDetail1"></button>
+                html += '<div id="' + trData.trName + '" class="collapse" aria-labelledby="' + trData.trName + '" data-parent="#apiList">'
+                html += '   <div class="cardApi-body">';
+                //<!-- api 상세 내용 -->
+                //<!-- 요청 -->
+                html += '       <div class="title-depth03"><h4>요청</h4></div>';
+                html += '       <div class="title-depth04"><h5>Header</h5></div>';
+                html += '       <div class="table-wrap" id="reqHeader">';
+                html += '       </div>';
+                if (isOauth) {
+	                html += '       <div class="title-depth04"><h5>Parameter</h5></div>';
+				} else {
+	                html += '       <div class="title-depth04"><h5>Body</h5></div>';
+				}
+                html += '       <div class="table-wrap" id="reqBody">';
+                html += '       </div>';
+                //<!-- 요청 -->
+                //<!-- 응답 -->
+                html += '       <div class="title-depth03"><h4>응답</h4></div>';
+                html += '       <div class="title-depth04"><h5>Header</h5></div>';
+                html += '       <div class="table-wrap" id="resHeader">';
+                html += '       </div>';
+                html += '       <div class="title-depth04"><h5>Body</h5></div>';
+                html += '       <div class="table-wrap" id="resBody">';
+                html += '       </div>';
+                //<!-- 응답 -->
+                //<!-- sample -->
+                html += '       <div class="sample-wrap">';
+                html += '           <div class="title-depth03"><h4>Example</h4></div>';
+                html += '           <div class="title-depth04"><h5>Request</h5></div>';
+                html += '           <div class="code-wrap" id="reqExample">';
+                html += '           </div>';
+                html += '           <div class="title-depth04"><h5>Response</h5></div>';
+                html += '           <div class="code-wrap" id="resExample">';
+                html += '           </div>';
+                html += '       </div>';
+                //<!-- sample -->
+                html += '   </div>';
+                html += '</div>';
+
+                $('#cardApis').append(html);
+            }
+
+            function buildEachRow(item, type, mainId) {
+                let $type = $("#cardApis").find("[data-id='" + mainId + "']").find("#" + type);
+
+                $type.empty();
+
+                let html = '';
+
+                if (item.length > 0) {
+                    html += '           <table class="table table-type-v table-apiguide">';
+                    html += '               <colgroup>';
+                    html += '                   <col style="width:15%">';
+                    html += '                   <col style="width:15%">';
+                    html += '                   <col style="width:9%">';
+                    html += '                   <col style="width:9%">';
+                    html += '                   <col style="width:8%">';
+                    html += '                   <col>';
+                    html += '               </colgroup>';
+                    html += '               <thead>';
+                    html += '                   <tr>';
+                    html += '                       <th>Element</th>';
+                    html += '                       <th>한글명</th>';
+                    html += '                       <th>type</th>';
+                    html += '                       <th>Required</th>';
+                    html += '                       <th>Length</th>';
+                    html += '                       <th>Description</th>';
+                    html += '                   </tr>';
+                    html += '               </thead>';
+                    html += '           <tbody>';
+                    for (let i = 0; i < item.length; i++) {
+                        html += '                   <tr>';
+                        html += '                       <td name="propertyCd">' + item[i].propertyCd + '</td>';
+                        html += '                       <td name="propertyNm">' + item[i].propertyNm + '</td>';
+                        html += '                       <td name="propertyType" align="center">' + UNO.util.getCodeName(codeList, item[i].propertyType) + '</td>';
+                        html += '                       <td name="requireYn" align="center">' + item[i].requireYn + '</td>';
+                        html += '                       <td name="propertyLength" align="center">' + (_.isEmpty(item[i].propertyLength) ? '-' : item[i].propertyLength) + '</td>';
+                        html += '                       <td name="description">' + (_.isEmpty(item[i].description) ? '' : item[i].description) + '</td>';
+                        html += '                   </tr>';
+                    }
+                    html += '           </tbody>';
+                    html += '           </table>';
+                }
+
+                $type.append(html);
+            }
+
+            function buildExample(item, mainId) {
+                let $reqExample = $("#cardApis").find("[data-id='" + mainId + "']").find("#reqExample");
+                let $resExample = $("#cardApis").find("[data-id='" + mainId + "']").find("#resExample");
+
+                $reqExample.empty();
+                $resExample.empty();
+
+                let preForReq = '';
+                preForReq += '<pre>';
+                preForReq += (_.isEmpty(item[0].reqExample) ? '' : item[0].reqExample);
+                preForReq += '</pre>';
+                $reqExample.append(preForReq);
+
+                let preForRes = '';
+                preForRes += '<pre>';
+                preForRes += (_.isEmpty(item[0].resExample) ? '' : item[0].resExample);
+                preForRes += '</pre>';
+                $resExample.append(preForRes);
+            }
+
+            function initEvent() {
+                $("button[name='toggleBtn']").on('click', function (e) {
+                    let $this = $(this);
+                    let $cardApis = $("#cardApis");
+                    let trId = $this.closest('div').parent().data('id');
+
+                    $cardApis.each(function(e) {
+                        $(this).children().removeClass('open');
+                        $(this).children().each(function (e2) {
+                            $(this).children().removeClass('show');
+                        });
+                    });
+
+                    if ($this.hasClass('btn-plus')) {
+                        $this.removeClass('btn-plus').addClass('btn-min');
+                        $this.parent().parent().parent().addClass('open');
+                        $this.closest('div').next().addClass('show');
+                    } else {
+                        $this.removeClass('btn-min').addClass('btn-plus');
+                        $this.parent().parent().parent().removeClass('open');
+                        $this.closest('div').next().removeClass('show');
+                    }
+
+                    $cardApis.each(function(e) {
+                        $(this).children().each(function (e2) {
+                            if (!$(this).hasClass('open')) {
+                                $(this).find('button').removeClass().addClass('btn btn-plus');
+                            }
+                        });
+                    });
+
+                    UNO.HTTP.getDeferred('/api/apis/guide/tr/property/' + trId)
+                        .done(function (data) {
+                            buildEachRow(data.filter (({bodyType}) => bodyType === 'req_h'), 'reqHeader', trId);
+                            buildEachRow(data.filter (({bodyType}) => bodyType === 'req_b'), 'reqBody', trId);
+
+                            buildEachRow(data.filter (({bodyType}) => bodyType === 'res_h'), 'resHeader', trId);
+                            buildEachRow(data.filter (({bodyType}) => bodyType === 'res_b'), 'resBody', trId);
+
+                            buildExample((trInfo.filter (({id}) => id === trId)), trId);
+                        });
+                });
+            }
+        });
+    </script>
+
+            </div>
+        </div>
+
+        <footer>
+            <div class="footer-wrap">
+                <div class="inner">
+                    <div class="footer-link">
+                        <a href="http://ir.ls-sec.co.kr/companykor/index.jsp" target="_blank">회사소개</a>
+                        <a href="https://www.ls-sec.co.kr/guide/privatepolicy/GUPrivatepolicy.jsp?left_menu_no=843&amp;front_menu_no=941&amp;parent_menu_no=843" target="_blank">개인정보 처리방침</a>
+                        <a href="#" id="terms_popup">이용약관</a>
+                        <!--<a href="#" id="privacy_popup">이용약관(법인)</a>-->
+                    </div>
+                    <p class="copyright">LS SECURITIES Co.Ltd. All Rights Reserved.</p>
+                </div>
+            </div>
+            <div class="topbutton-wrap">
+                <button class="btn-top" title="맨위로 이동" type="button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28px" height="20px" preserveAspectRatio="xMidYMid">
+                        <path fill="#047099" d="M-0.013,5.488 C-0.013,5.054 0.280,4.702 0.641,4.702 L14.764,4.702 L11.954,1.332 C11.699,1.025 11.699,0.527 11.954,0.220 C12.210,-0.087 12.625,-0.087 12.881,0.220 L16.806,4.932 C17.062,5.238 17.062,5.735 16.807,6.042 C16.807,6.043 16.807,6.043 16.806,6.043 L12.881,10.755 C12.625,11.062 12.210,11.062 11.954,10.755 C11.699,10.448 11.699,9.950 11.954,9.643 L14.764,6.273 L0.641,6.273 C0.280,6.273 -0.013,5.921 -0.013,5.488 Z"></path>
+                     </svg>
+                </button>
+            </div>
+            <script>
+                $(function () {
+                    $("#terms_popup").on("click", function (e) {
+                        e.preventDefault();
+                        UNO.dialog.showTerms("MARKET");
+                    });
+
+                    $("#privacy_popup").on("click", function (e) {
+                        e.preventDefault();
+                        UNO.dialog.showTerms("PRIVACY");
+                    });
+                });
+                /* 탑 버튼 */
+                $(function () {
+                    $(window).scroll(function () {
+                        if ($(this).scrollTop() >= 200) {
+                            $('.topbutton-wrap').fadeIn();
+                        } else {
+                            $('.topbutton-wrap').fadeOut();
+                        }
+                    });
+
+                    $(".btn-top").click(function () {
+                        $('html').animate({scrollTop: 0}, 500);
+                    });
+                });
+            </script>
+        </footer>
+
+        <!-- common dialog -->
+        <div>
+
+            <!-- alert dialog -->
+            <div class="modal" id="__alert_dialog__">
+                <div class="modal-dialog modal-dialog-centered modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 id="title">CONFIRM</h2>
+                            <button aria-label="Close" class="close" data-dismiss="modal" type="button"></button>
+                        </div>
+                        <div class="modal-body column-1">
+                            <div class="form-group">
+                                <p id="subTitle"></p>
+                                <p id="message"></p>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-primary" data-dismiss="modal" id="confirmBtn" type="button">확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- confirm dialog -->
+            <div class="modal" id="__confirm_dialog__">
+                <div class="modal-dialog modal-dialog-centered modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 id="title">CONFIRM</h2>
+                            <button aria-label="Close" class="close" data-dismiss="modal" type="button"></button>
+                        </div>
+                        <div class="modal-body column-1">
+                            <div class="form-group">
+                                <p class="text-primary" id="subTitle"></p>
+                                <p id="message"></p>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-primary" id="confirmBtn" type="button">예</button>
+                            <button class="btn btn-secondary" data-dismiss="modal" id="denyBtn" type="button">아니오</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- check user & confirm dialog -->
+            <div class="modal" id="__auth_confirm_dialog__">
+                <div class="modal-dialog modal-dialog-centered modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 id="title">CONFIRM</h2>
+                            <button aria-label="Close" class="close" data-dismiss="modal" type="button"></button>
+                        </div>
+                        <div class="modal-body column-1">
+                            <div class="form-group">
+                                <p class="text-primary" id="subTitle"></p>
+                                <p id="message"></p>
+                                <input class="form-control" id="passwordForDeleting" placeholder="로그인 비밀번호를 입력하세요." type="password">
+                            </div>
+                            <p id="errorMsg" style="color:red;"></p>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-primary" id="confirmBtn" type="button">예</button>
+                            <button class="btn btn-secondary" data-dismiss="modal" type="button">아니오</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- 패스워드 팝업 -->
+            <div class="modal" id="__password_dialog__">
+                <div class="modal-dialog modal-dialog-centered modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header" style="height:50px !important;">
+                            <h2 id="title">시크릿조회</h2>
+                            <button aria-label="Close" class="close" data-dismiss="modal" type="button"></button>
+                        </div>
+                        <div class="modal-body column-1">
+                            <div class="form-group">
+                                <p class="text-primary" id="subTitle"></p>
+                                <p id="message"></p>
+                                <input class="form-control" id="passwordForSecret" placeholder="로그인 비밀번호를 입력하세요." type="password">
+                            </div>
+                            <p id="errorMsg" style="color:red;"></p>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="button btn-primary" id="confirmBtn" type="button">확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal" id="__forum_dialog__">
+                <div class="modal-dialog modal-dialog-centered modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header" style="height:50px !important;">
+                            <h2 id="title">시크릿조회</h2>
+                            <button aria-label="Close" class="close" data-dismiss="modal" type="button"></button>
+                        </div>
+                        <div class="modal-body column-1">
+                            <div class="form-group">
+                                <p class="text-primary" id="subTitle"></p>
+                                <p id="message"></p>
+                                <input class="form-control" id="passwordForSecret" placeholder="게시물 비밀번호를 입력하세요." type="password">
+                            </div>
+                            <p id="errorMsg" style="color:red;"></p>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="button btn-primary" id="confirmBtn" type="button">확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tooltip -->
+            <div id="__tooltip_dialog__" style="position:absolute;z-index:99999;display:none;">
+                <div class="modal-dialog modal-dialog-centered modal-sm">
+                    <!-- 디자이너가 작업해 줄 부분 -->
+                    <div class="modal-content">
+                        <div class="modal-header" style="height:50px !important;">
+                            <h2 id="title"></h2>
+                            <button class="close" type="button"></button>
+                        </div>
+                        <div class="modal-body column-1">
+                            <div class="form-group">
+                                <p id="message"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notice -->
+            <div class="modal notice_dialog" id="__notice_dialog__">
+                <div class="modal-dialog modal-dialog-centered modal-md">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 class="notice_title">제목</h2>
+                            <button aria-label="Close" class="close notice-modal-close" type="button"></button>
+                        </div>
+                        <div class="modal-body column-1">
+                            <!-- [TO DO] -->
+                            <div>
+                                <div class="form-group">
+                                    <div class="content notice_content"></div>
+                                </div>
+                            </div>
+                            <!-- END OF [TO DO] -->
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-primary notice_close">오늘 하루 닫기</button>
+                            <button class="btn btn-secondary notice-modal-close">닫기</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal" id="__terms_dialog__">
+                <div class="modal-dialog modal-dialog-centered modal-md">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 class="terms_title">제목</h2>
+                            <button aria-label="Close" class="close" data-dismiss="modal" type="button"></button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- [TO DO] -->
+                            <div>
+                                <div class="form-group">
+                                    <div id="attachFile"></div>
+                                    <div class="content terms_content"></div>
+                                </div>
+                            </div>
+
+                            <!-- END OF [TO DO] -->
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-primary" data-dismiss="modal" type="button">확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        
+            <script>
+                /* */
+                UNO.dialog = (function () {
+                    var exports = {};
+
+                    /* */
+                    function refreshDialog($dialog, title, subTitle, message) {
+                        /* */
+                        var $title = $dialog.find("#title");
+                        var $subTitle = $dialog.find("#subTitle");
+                        var $message = $dialog.find("#message");
+
+                        if (_.isString(title)) $title.html(title);
+                        else $title.html("CONFIRM");
+
+                        if (_.isString(subTitle)) {
+                            $subTitle.show();
+                            $subTitle.html(subTitle);
+                        } else {
+                            $subTitle.hide();
+                        }
+
+                        if (_.isString(message)) {
+                            $message.show();
+                            $message.html(message);
+                        } else {
+                            $message.hide();
+                        }
+                    }
+
+                    /* */
+                    exports.alertError = function (message) {
+                        this.alert("[ERROR]", null, message);
+                    };
+
+                    /* */
+                    exports.alert = function (title, subTitle, message) {
+                        var deferred = $.Deferred();
+
+                        var $dialog = $("#__alert_dialog__");
+
+                        refreshDialog($dialog, title, subTitle, message);
+
+                        $dialog.find("#confirmBtn").off("click").on("click", function (e) {
+                            e.preventDefault();
+                            deferred.resolve();
+
+                            /* */
+                            $dialog.modal("hide");
+                        });
+
+                        $dialog.modal({backdrop: 'static', keyboard: false});
+
+                        return deferred.promise();
+                    };
+
+
+                    /* */
+                    exports.confirm = function (title, subTitle, message) {
+                        var deferred = $.Deferred();
+
+                        var $dialog = $("#__confirm_dialog__");
+
+                        refreshDialog($dialog, title, subTitle, message);
+
+                        $dialog.find("#confirmBtn").off("click").on("click", function (e) {
+                            e.preventDefault();
+                            deferred.resolve();
+
+                            /* */
+                            $dialog.modal("hide");
+                        });
+
+                        $dialog.find("#denyBtn").off("click").on("click", function (e) {
+                            e.preventDefault();
+                            deferred.reject();
+                        });
+
+                        /* */
+                        $dialog.modal({backdrop: 'static', keyboard: false});
+
+                        return deferred.promise();
+                    };
+
+                    /*
+                     * [under construction]
+                     */
+                    exports.authConfirm = function (title, subTitle, message) {
+                        /* */
+                        if (true) {
+                            return this.confirm(title, subTitle, message);
+                        }
+
+
+                        /* [deprecated] */
+                        var deferred = $.Deferred();
+
+                        var $dialog = $("#__auth_confirm_dialog__");
+
+                        refreshDialog($dialog, title, subTitle, message);
+
+                        /* */
+                        function checkDeleteAuth(password) {
+                            UNO.HTTP.postDeferred(
+                                '/api/account/delete-confirm',
+                                {
+                                    loginPassword: password
+                                },
+                                {
+                                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                                }
+                            )
+                                .done(function () {
+                                    deferred.resolve();
+
+                                    /* */
+                                    $dialog.modal("hide");
+                                })
+                                .fail(function () {
+                                    deferred.reject();
+                                });
+                        }
+
+                        var $password = $dialog.find("#passwordForDeleting");
+                        $password.val('');
+                        var $errorMsg = $dialog.find("#errorMsg");
+                        $errorMsg.html('');
+                        $dialog.find("#confirmBtn").off("click").on("click", function (e) {
+                            e.preventDefault();
+                            if (_.isEmpty($password.val())) {
+                                $errorMsg.html('비밀번호를 입력해 주십시오.');
+                                return;
+                            }
+                            checkDeleteAuth($password.val());
+                        });
+
+                        /* */
+                        $dialog.modal({backdrop: 'static', keyboard: false});
+
+                        return deferred.promise();
+                    };
+
+
+                    /* [deprecated] */
+                    exports.passwordDialog = function (event, title, message) {
+                        var deferred = $.Deferred();
+
+                        var $dialog = $("#__password_dialog__");
+
+                        refreshDialog($dialog, "시크릿조회");
+
+                        var $password = $dialog.find("#passwordForSecret");
+                        $password.val('');
+
+                        var $errorMsg = $dialog.find("#errorMsg");
+                        $errorMsg.html('');
+                        $dialog.find("#confirmBtn").off("click").on("click", function (e) {
+                            e.preventDefault();
+                            if (_.isEmpty($password.val())) {
+                                $errorMsg.html('비밀번호를 입력해 주십시오.');
+                                return;
+                            }
+
+                            deferred.resolve($password.val());
+
+                            /* */
+                            $dialog.modal("hide");
+                        });
+
+                        $dialog.modal({backdrop: 'static', keyboard: false});
+
+                        return deferred.promise();
+                    };
+
+                    exports.forumDialog = function (title) {
+                        var deferred = $.Deferred();
+
+                        var $dialog = $("#__forum_dialog__");
+
+                        refreshDialog($dialog, title);
+
+                        var $password = $dialog.find("#passwordForSecret");
+                        $password.val('');
+
+                        var $errorMsg = $dialog.find("#errorMsg");
+                        $errorMsg.html('');
+                        $dialog.find("#confirmBtn").off("click").on("click", function (e) {
+                            e.preventDefault();
+                            if (_.isEmpty($password.val())) {
+                                $errorMsg.html('비밀번호를 입력해 주십시오.');
+                                return;
+                            }
+
+                            deferred.resolve($password.val());
+
+                            /* */
+                            $dialog.modal("hide");
+                        });
+
+                        $dialog.modal({backdrop: 'static', keyboard: false});
+
+                        return deferred.promise();
+                    };
+
+                    /* tooltip */
+                    function moveToLocation($dialog, top, left) {
+                        if (!_.isNumber(top)) {
+                            top = (window.innerHeight / 2) - $dialog.height() / 2;
+                        }
+                        if (!_.isNumber(left)) {
+                            left = (window.innerWidth / 2) - $dialog.width() / 2;
+                        }
+
+                        /* */
+                        $dialog.stop(true, false).animate({top: top + "px", left: left + "px"}, 0);
+                    }
+
+                    /* */
+                    exports.pinnedTooltip = function (event, title, message) {
+                        var $tooltip = $("#__tooltip_dialog__");
+
+                        refreshDialog($tooltip, title, null, message);
+
+                        $tooltip.find("button.close").off("click").on("click", function (e) {
+                            $tooltip.hide();
+                        });
+
+                        /* */
+                        var left = event.screenX;
+                        var top = event.screenY - 50;
+
+                        /* */
+                        moveToLocation($tooltip, top, left);
+                        $tooltip.show();
+                    };
+
+                    exports.showNotice = function (notice) {
+                        var $notice = $("#__notice_dialog__").clone();
+
+                        var $title = $notice.find(".notice_title");
+                        var $content = $notice.find(".notice_content");
+                        var $close = $notice.find(".notice_close");
+
+                        $title.text(notice.title);
+                        $content.html(notice.content);
+                        $close.on("click", function (e) {
+                            UNO.util.setCookie(notice.id + 'done', notice.id);
+                            $notice.modal('hide');
+                        });
+
+                        $notice.find("button.notice-modal-close").on('click', function (e) {
+                            $notice.modal('hide');
+                        });
+
+                        $notice.on('hidden.bs.modal', function () {
+                            $notice.remove();
+                        });
+
+                        $notice.modal({backdrop: 'static', keyboard: false});
+                    };
+
+                    exports.showTerms = function (type) {
+                        var $terms = $("#__terms_dialog__");
+
+                        var url = "/api/terms/public?termsType=" + type;
+
+                        UNO.HTTP.getDeferred(url, {}).done(function (response) {
+
+                            var $title = $terms.find(".terms_title");
+                            $title.text('제목');
+
+                            var $content = $terms.find(".terms_content");
+                            $content.html('');
+
+                            var $attachFile = $terms.find("#attachFile");
+                            $attachFile.empty();
+
+                            if (response.length > 0) {
+                                var termsOfUse = response;
+
+                                if (termsOfUse.length > 0) {
+                                    $title.text(termsOfUse[0].name);
+                                    $content.html(termsOfUse[0].content);
+
+                                    if (!_.isEmpty(termsOfUse) && _.isArray(termsOfUse[0].attachFileList) && termsOfUse[0].attachFileList.length !== 0) {
+                                        var file = termsOfUse[0].attachFileList[0];
+                                        var $download = $('<span>');
+                                        var $link = $('<a>').attr({
+                                            href: UNO.CONTEXT_PATH + "files/view/public/" + file.id,
+                                            target: '_blank'
+                                        }).html("<i class='glyphicon glyphicon-download-alt'></i>&nbsp;&nbsp;" + file.fileName);
+
+                                        $download.append($link);
+                                        $attachFile.append($download);
+                                    }
+                                }
+                            }
+
+                        });
+
+                        $terms.modal({backdrop: 'static', keyboard: false});
+                    };
+
+                    return exports;
+                })();
+
+                /*
+                    status : 500,
+                    error  : 'Internal Server Error',
+                    message: 'Internal Server Error',
+                    path   : '/'
+                */
+                UNO.HTTP.setErrorCallback(function (err) {
+                    var message = _.isString(err.description) ? err.description : err.message;
+
+                    /* */
+                    UNO.dialog.alert("API ERROR" + " (status:" + err.status + ")", null, message);
+                });
+
+                var popups = [];
+
+                if (_.isArray(popups)) {
+                    popups.forEach(function (notice) {
+                        var closeDay = UNO.util.getCookie(notice.id + 'done');
+                        if (_.isEmpty(closeDay)) {
+                            // 오늘 하루 닫기 정보가 없는 경우
+                            UNO.dialog.showNotice(notice);
+                        }
+                    });
+                }
+            </script>
+        
+    
+</body></html>
