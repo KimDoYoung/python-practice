@@ -126,7 +126,7 @@ class LsStockApi(StockApi):
         return T1102_Response(**response_data)
 
 
-async def order_cash(self, req: CSPAT00601_Request) -> CSPAT00601_Response:
+async def order(self, req: CSPAT00601_Request) -> CSPAT00601_Response:
     ''' 현물 주문 '''
     PATH = "/stock/order"        
     url = f'{self._BASE_URL}/{PATH}'
@@ -158,8 +158,60 @@ async def order_cash(self, req: CSPAT00601_Request) -> CSPAT00601_Response:
 
 async def modify_cash(self, req: CSPAT00701_Request) -> CSPAT00701_Response:
     ''' 현물 정정 주문'''
-    pass
+    PATH = "/stock/order"        
+    url = f'{self._BASE_URL}/{PATH}'
+
+    headers = {
+        "Content-Type": "application/json; charset=utf-8",
+        "Authorization" : "Bearer " + self.ACCESS_TOKEN, 
+        "tr_cd" : "CSPAT00701", #LS증권 거래코드
+        "tr_cont" : req.tr_cont, #연속거래 여부 Y:연속○ N:연속×
+        "tr_cont_key" : req.tr_cont_key, #연속일 경우 그전에 내려온 연속키 값 올림
+        "mac_address" : req.mac_address, #법인인 경우 필수 세팅
+    }
+
+    data = {
+        "CSPAT00701InBlock1" : req.CSPAT00701InBlock1.model_dump()
+    }
+    try:
+        response = requests.post(url, verify=False, headers=headers, data=json.dumps(data))
+        response.raise_for_status()  # HTTPError 발생 시 예외 처리
+        response_data = response.json()
+    except requests.exceptions.RequestException as e:
+        logger.error(f"LS API 현재가 조회 실패: {e}")
+        raise CurrentCostException(f"LS API 현재가 조회 실패: {e}")
+    except json.JSONDecodeError:
+        logger.error("응답이 JSON 형식이 아닙니다.")
+        raise InvalidResponseException("응답이 JSON 형식이 아닙니다.")
+
+    return CSPAT00701_Response(**response_data)
 
 async def cancel_cash(self, req: CSPAT00801_Request) -> CSPAT00801_Response:
     ''' 현물 취소 주문 '''
-    pass    
+    PATH = "/stock/order"        
+    url = f'{self._BASE_URL}/{PATH}'
+
+    headers = {
+        "Content-Type": "application/json; charset=utf-8",
+        "Authorization" : "Bearer " + self.ACCESS_TOKEN, 
+        "tr_cd" : "CSPAT00601", #LS증권 거래코드
+        "tr_cont" : req.tr_cont, #연속거래 여부 Y:연속○ N:연속×
+        "tr_cont_key" : req.tr_cont_key, #연속일 경우 그전에 내려온 연속키 값 올림
+        "mac_address" : req.mac_address, #법인인 경우 필수 세팅
+    }
+
+    data = {
+        "CSPAT00801InBlock1" : req.CSPAT00801InBlock1.model_dump()
+    }
+    try:
+        response = requests.post(url, verify=False, headers=headers, data=json.dumps(data))
+        response.raise_for_status()  # HTTPError 발생 시 예외 처리
+        response_data = response.json()
+    except requests.exceptions.RequestException as e:
+        logger.error(f"LS API 현재가 조회 실패: {e}")
+        raise CurrentCostException(f"LS API 현재가 조회 실패: {e}")
+    except json.JSONDecodeError:
+        logger.error("응답이 JSON 형식이 아닙니다.")
+        raise InvalidResponseException("응답이 JSON 형식이 아닙니다.")
+
+    return CSPAT00801_Response(**response_data)

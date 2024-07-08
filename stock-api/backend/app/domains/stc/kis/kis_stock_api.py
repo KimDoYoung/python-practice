@@ -190,7 +190,7 @@ class KisStockApi(StockApi):
         return kis_inquire_balance
 
 
-    def order_cash(self,  order_cash : KisOrderCashRequest ) -> KisOrderCashResponse:
+    def order(self,  order_cash : KisOrderCashRequest ) -> KisOrderCashResponse:
         ''' 현금 매수 or 매도 '''
         logger.info(f"현금 매수 매도(order_cash) : {order_cash}")
 

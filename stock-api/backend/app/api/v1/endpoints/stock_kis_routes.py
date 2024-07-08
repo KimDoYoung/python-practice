@@ -54,5 +54,5 @@ async def order_cash(user_id:str, acctno:str, order_cash_request: KisOrderCashRe
     kis_api = await api_manager.stock_api(user_id, acctno,'KIS')
     # kis_api = StockApiManager(user_service).stock_api(user_id, acctno,'KIS')
     
-    order_cash_response = kis_api.order_cash(order_cash_request)
+    order_cash_response = kis_api.order(order_cash_request)
     return order_cash_response

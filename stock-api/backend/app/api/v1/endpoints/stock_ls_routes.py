@@ -48,7 +48,7 @@ async def order_cash(user_id:str, acctno:str, req:Order_Request, user_service:Us
 
     cspat00601_Request = order_to_cspat00601_Request(req)
 
-    response = await ls_api.order_cash(cspat00601_Request)
+    response = await ls_api.order(cspat00601_Request)
     return response
 
 @router.post("/modify-order/{user_id}/{acctno}",response_model=CSPAT00701_Response)
