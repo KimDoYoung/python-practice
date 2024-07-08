@@ -34,7 +34,9 @@ class StockApiManager:
         # cache에 있으면 cache에서 반환
         key = (user_id, acctno, stk_abbr)
         if key in self._cache:
-            return self._cache[key]
+            stock_api =  self._cache[key]
+            # TODO cache에 있는것이 만약 ACCESS_KEY가 만료되었으면 다시 초기화
+            return stock_api
 
         user = await self._user_service.get_1(user_id)
         if user is None:

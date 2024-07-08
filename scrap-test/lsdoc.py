@@ -88,7 +88,7 @@ def get_url_and_tables(url:str, menu:str, sub_menu:str):
         #기본정보 테이블들
         service_list_div = soup.find(id="service-list")
         title_div = service_list_div.find('div', class_='title-depth03')
-        if title_div and title_div.find('h4', text='기본정보'):
+        if title_div and title_div.find('h4', string='기본정보'):
             # 해당 div 다음에 있는 형제 요소 중 div를 찾기
             next_div = title_div.find_next_sibling('div')
             if next_div:
@@ -103,20 +103,36 @@ def get_url_and_tables(url:str, menu:str, sub_menu:str):
         # ID가 각각 reqHeader, reqBody, resHeader, resBody인 div 요소 내의 테이블을 데이터프레임으로 변환
         ids = ["reqHeader", "reqBody", "resHeader", "resBody"]
         
-
         for div_id in ids:
-            div_element = soup.find(id=div_id)
-            if div_element:
-                table = div_element.find("table")
-                if table:
-                    html_table_io = StringIO(str(table))
-                    df = pd.read_html(html_table_io)[0]
-                    dataframes[div_id] = df
-                    print(f"{div_id} OK")
-                else:
-                    print(f"{div_id} 안에 테이블이 없습니다.")
+            div_elements = soup.find_all(id=div_id)
+            if div_elements:
+                for div_element in div_elements:
+                    table = div_element.find("table")
+                    if table:
+                        html_table_io = StringIO(str(table))
+                        df = pd.read_html(html_table_io)[0]
+                        dataframes[div_id] = df
+                        print(f"{div_id} OK")
+                        break
+                    else:
+                        print(f"{div_id} 안에 테이블이 없습니다.")
             else:
                 print(f"{div_id}를 찾을 수 없습니다.")
+
+        # for div_id in ids:
+        #     div_element = soup.find_all(id=div_id)
+        #     if div_element:
+        #         print(f"div_element 내용:\n{div_element.prettify()}")  # div_element의 내용을 출력
+        #         table = div_element.find("table")
+        #         if table:
+        #             html_table_io = StringIO(str(table))
+        #             df = pd.read_html(html_table_io)[0]
+        #             dataframes[div_id] = df
+        #             print(f"{div_id} OK")
+        #         else:
+        #             print(f"{div_id} 안에 테이블이 없습니다.")
+        #     else:
+        #         print(f"{div_id}를 찾을 수 없습니다.")
     except TimeoutException :
         print("페이지 parsing 시간 초과")
         driver.quit()
@@ -177,7 +193,7 @@ def write_reqBody_info(file, df):
 
 def write_Res_Item(file, obj, df):
     ''' resBody 정보를 파일에 쓰기'''
-    file.write(f"\nclass {obj['typeName']}(ApiBaseModel):\n")
+    file.write(f"\nclass {obj['typeName']}(StockApiBaseModel):\n")
     isStart = False
     for i in range(len(df)):
         key = df.iloc[i, 0]
@@ -215,7 +231,7 @@ def write_resBody_info(file, df, tr_cd):
     for obj in objects:
         write_Res_Item(file, obj, df)
 
-    file.write(f"\nclass {tr_cd.upper()}Response(ApiBaseModel):\n")
+    file.write(f"\nclass {tr_cd.upper()}_Response(ApiBaseModel):\n")
     file.write(f"\trsp_cd: str\n")
     file.write(f"\trsp_msg: str\n")
     for obj in objects:
@@ -244,8 +260,8 @@ def main(menu:str, sub_menu:str):
 
 if __name__ == "__main__":
 
-    menu = "[주식] 시세"
-    sub_menu = "주식현재가호가조회"
+    menu = "[주식] 주문"
+    sub_menu = "현물취소주문"
     main(menu, sub_menu)
 
     print("Done!")

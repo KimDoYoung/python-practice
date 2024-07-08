@@ -1,0 +1,53 @@
+{% extends 'common/base.html' %}
+{% block style %}
+{% endblock %}
+{% block content %}
+
+<div>
+    <h1>LS-Restful API Test</h1>
+    <div id="basic-info-area" class="border m-2 p-2">
+        user_id: <input type="text" name="user_id" id="user_id" value="kdy987">
+        acct_no: <input type="text" name="acctno" id="acctno" value="00501716387">
+        stk_code: <input type="text" name="stk_coe" id="stk_code" value="295310">
+    </div>
+    <div id="current-cost-area">
+        <button id="btnCurrentCost">현재가</button>
+        <input type="text" name="current_cost" id="current_cost" readonly>
+    </div>
+    <div id="buy-sell-area">
+        qty:<input type="number" name="qty" id="qty" value="1">
+        cost:<input type="number" name="cost" id="cost" value="0">
+        <button id="btnBuy">매수</button>
+        <button id="btnSell">매도</button>
+    </div>    
+</div>
+<div id="error-area"></div>
+{% raw %}
+<!--handlebar scripts-->
+{% endraw %}
+{% endblock %}
+{% block script %}
+{% raw %}
+<script>
+$( document ).ready(function() {
+    $('#btnCurrentCost').on('click', function(){
+        var user_id = $('#user_id').val();
+        var acctno = $('#acctno').val();
+        var stk_code = $('#stk_code').val();
+        var url = `/api/v1/ls/current-cost/${user_id}/${acctno}/${stk_code}`;
+        getFetch(url)
+        .then(data => {
+            console.log(data);
+            if(data.rsp_cd == "00000"){
+                $('#current_cost').val(data.t1102OutBlock.price)
+            }
+
+        }).catch(error => {
+            console.error('Error:', error)
+            $('#error-area').html(error.message);
+        });
+    });
+});
+</script>
+{% endraw %}
+{% endblock %}

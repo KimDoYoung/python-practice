@@ -11,7 +11,7 @@ from backend.app.domains.user.user_model import User
 from backend.app.core.mongodb import MongoDb
 from backend.app.core.config import config
 from backend.app.api.v1.endpoints import (
-    stock_kis_routes, user_routes, home_routes, websocket_routes
+    stock_kis_routes, stock_ls_routes, user_routes, home_routes, websocket_routes
 )
 from backend.app.core.exception_handler import add_exception_handlers
 from backend.app.core.logger import get_logger
@@ -44,6 +44,7 @@ def add_routes(app: FastAPI):
     app.include_router(home_routes.router) # 화면
     app.include_router(user_routes.router, prefix="/api/v1/user", tags=["user"])
     app.include_router(stock_kis_routes.router, prefix="/api/v1/kis", tags=["kis"])
+    app.include_router(stock_ls_routes.router, prefix="/api/v1/ls", tags=["ls"])
     app.include_router(websocket_routes.router, prefix="/api/v1", tags=["websocket"])
 
 def add_static_files(app: FastAPI):

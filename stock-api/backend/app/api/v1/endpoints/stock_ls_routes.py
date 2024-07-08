@@ -9,25 +9,55 @@
 작성일: 04
 버전: 1.0
 """
-from fastapi import APIRouter, Depends, HTTPException, Body, Path
+from fastapi import APIRouter, Depends
 from backend.app.core.dependency import get_user_service
-from backend.app.domains.user.user_model import User
+from backend.app.domains.stc.ls.model.t1102_model import T1102_Request, T1102_Response
 from backend.app.domains.user.user_service import UserService
+from backend.app.managers.stock_api_manager import StockApiManager
 
 # APIRouter 인스턴스 생성
 router = APIRouter()
 
-@app.post("/order-cash/{user_id}/{acctno}")
-async def order_cash(user_id:str, acctno:str, order_cash_request: OrderCashRequest):
+@router.get("/current-cost/{user_id}/{acctno}/{stk_code}",response_model=T1102_Response)
+async def current_cost(user_id:str, acctno:str, stk_code:str, user_service:UserService = Depends(get_user_service) ):
+    ''' 현재가 '''
+    api_manager = StockApiManager(user_service)
+    ls_api = await api_manager.stock_api(user_id, acctno,'LS')
+    
+    req = T1102_Request(stk_code=stk_code)
 
-    user = await user_service.get_1(user_id)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user
+    t1102_response = await ls_api.current_cost(req)
+    return t1102_response
 
-@router.put("/{user_id}", response_model=User)
-async def update_user(user_id: str = Path(...), update_data: dict = Body(...), user_service :UserService=Depends(get_user_service)):
-    user = await user_service.update_user(user_id, update_data)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user
+@router.get("/order-cash/{user_id}/{acctno}",response_model=CSPAT00601_Response)
+async def order_cash(user_id:str, acctno:str, CSPAT00601_Req:CSPAT00601_Request, user_service:UserService = Depends(get_user_service) ):
+    ''' 현물주문 '''
+    api_manager = StockApiManager(user_service)
+    ls_api = await api_manager.stock_api(user_id, acctno,'LS')
+    
+    req = T1102_Request(stk_code=stk_code)
+
+    t1102_response = await ls_api.current_cost(req)
+    return t1102_response
+
+@router.get("/modify-cash/{user_id}/{acctno}",response_model=CSPAT00701_Response)
+async def order_cash(user_id:str, acctno:str, CSPAT00601_Req:CSPAT00701_Request, user_service:UserService = Depends(get_user_service) ):
+    ''' 현물정정주문 '''
+    api_manager = StockApiManager(user_service)
+    ls_api = await api_manager.stock_api(user_id, acctno,'LS')
+    
+    req = T1102_Request(stk_code=stk_code)
+
+    t1102_response = await ls_api.current_cost(req)
+    return t1102_response
+
+@router.get("/modify-cash/{user_id}/{acctno}",response_model=CSPAT00801_Response)
+async def cancel_cash(user_id:str, acctno:str, CSPAT00601_Req:CSPAT00801_Request, user_service:UserService = Depends(get_user_service) ):
+    ''' 현물정정주문 '''
+    api_manager = StockApiManager(user_service)
+    ls_api = await api_manager.stock_api(user_id, acctno,'LS')
+    
+    req = T1102_Request(stk_code=stk_code)
+
+    t1102_response = await ls_api.current_cost(req)
+    return t1102_response

@@ -63,7 +63,7 @@ class KisStockApi(StockApi):
         if access_token:
             self.ACCESS_TOKEN = access_token
 
-
+    #TODO 시간을 체크해서 23시간 이상이면 다시 발급해야 한다.
     async def initialize(self) -> bool:
         ''' Access Token 존재여부 및  만료 여부 확인 '''
 
