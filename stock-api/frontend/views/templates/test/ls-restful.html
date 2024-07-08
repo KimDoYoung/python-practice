@@ -30,6 +30,7 @@
 {% raw %}
 <script>
 $( document ).ready(function() {
+    //현재가
     $('#btnCurrentCost').on('click', function(){
         var user_id = $('#user_id').val();
         var acctno = $('#acctno').val();
@@ -47,6 +48,10 @@ $( document ).ready(function() {
             $('#error-area').html(error.message);
         });
     });
+    //매수
+    $('#btnSell').on('click', function(){
+        
+    })
 });
 </script>
 {% endraw %}
