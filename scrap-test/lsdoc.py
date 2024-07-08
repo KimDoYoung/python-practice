@@ -172,7 +172,7 @@ def write_reqHeader_info(file, df, tr_cd):
             file.write(f'\t"{key}" : "{value}", #{desc}\n')
     file.write("}\n")
 
-def write_reqBody_info(file, df):
+def write_reqBody_info(file, df, tr_cd):
     ''' reqBody 정보를 파일에 쓰기'''
     file.write("\ndata = {\n")
     inObject  = False
@@ -190,6 +190,36 @@ def write_reqBody_info(file, df):
     if inObject:
         file.write("\t}\n")        
     file.write("}\n")
+
+    file.write(f"\n\n#요청모델 데이터\n")
+    file.write(f"class {tr_cd.upper()}_Request(StockApiBaseModel):\n")
+    file.write(f"\ttr_cont: Optional[str] = 'N'\n")
+    file.write(f"\ttr_cont_key: Optional[str] = ''\n")
+    file.write(f"\tmac_address: Optional[str] = ''\n")
+    for i in range(len(df)):
+        key = df.iloc[i, 0]
+        value = df.iloc[i, 1]
+        typ = df.iloc[i, 2]
+        length = df.iloc[i, 3]
+        if typ.lower() == 'string':
+            py_type = 'str'
+        elif typ.lower() == 'number':
+            py_type = 'int'
+            if length.find('.') > 0:
+                py_type = 'float'
+
+        desc = f"{df.iloc[i,5]}"
+        if desc == "" or desc == "nan":
+            desc = ""
+
+        if key.startswith("-"):
+            file.write(f'\t{key[1:]} : {py_type} # {value} {desc}\n')
+        elif typ.lower() == 'object':
+            file.write(f'\t{key} : {{ \n')
+            inObject = True
+    if inObject:
+        file.write("\t}\n")        
+
 
 def write_Res_Item(file, obj, df):
     ''' resBody 정보를 파일에 쓰기'''
@@ -237,6 +267,8 @@ def write_resBody_info(file, df, tr_cd):
     for obj in objects:
         file.write(f"\t{obj['varName']}: {obj['typeName']}\n")
 
+
+
 def main(menu:str, sub_menu:str):
     driver = install_chrome_driver()
     url = "https://openapi.ls-sec.co.kr/apiservice?group_id=ffd2def7-a118-40f7-a0ab-cd4c6a538a90&api_id=33bd887a-6652-4209-88cd-5324bc7c5e36"
@@ -255,13 +287,13 @@ def main(menu:str, sub_menu:str):
         file.write(f"#{menu}-{sub_menu}\n")
         write_basic_info(file, dataframes['기본정보'])
         write_reqHeader_info(file, dataframes['reqHeader'], tr_cd)
-        write_reqBody_info(file, dataframes['reqBody'])
+        write_reqBody_info(file, dataframes['reqBody'], tr_cd)
         write_resBody_info(file, dataframes['resBody'], tr_cd)
 
 if __name__ == "__main__":
 
     menu = "[주식] 주문"
-    sub_menu = "현물취소주문"
+    sub_menu = "현물정정주문"
     main(menu, sub_menu)
 
     print("Done!")

@@ -15,6 +15,9 @@ import json
 import requests
 
 from backend.app.core.logger import get_logger
+from backend.app.domains.stc.ls.model.cspat00601_model import CSPAT00601_Request, CSPAT00601_Response
+from backend.app.domains.stc.ls.model.cspat00701_model import CSPAT00701_Request, CSPAT00701_Response
+from backend.app.domains.stc.ls.model.cspat00801_model import CSPAT00801_Request, CSPAT00801_Response
 from backend.app.domains.stc.ls.model.t1102_model import T1102_Request, T1102_Response
 from backend.app.domains.stc.stock_api import StockApi
 from backend.app.domains.user.user_model import StkAccount, User
@@ -121,3 +124,16 @@ class LsStockApi(StockApi):
             raise InvalidResponseException("응답이 JSON 형식이 아닙니다.")
 
         return T1102_Response(**response_data)
+
+
+async def order_cash(self, req: CSPAT00601_Request) -> CSPAT00601_Response:
+    ''' 현물 주문 '''
+    pass
+
+async def modify_cash(self, req: CSPAT00701_Request) -> CSPAT00701_Response:
+    ''' 현물 정정 주문'''
+    pass
+
+async def cancel_cash(self, req: CSPAT00801_Request) -> CSPAT00801_Response:
+    ''' 현물 취소 주문 '''
+    pass    

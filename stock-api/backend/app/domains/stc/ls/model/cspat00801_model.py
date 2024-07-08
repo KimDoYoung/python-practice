@@ -8,6 +8,9 @@
 버전: 1.0
 """
 
+from typing import Optional
+
+from pydantic import Field
 from backend.app.domains.stock_api_base_model import StockApiBaseModel
 
 
@@ -77,3 +80,15 @@ class CSPAT00801_Response(StockApiBaseModel):
 	rsp_msg: str
 	CSPAT00801OutBlock1: CSPAT00801OUTBLOCK1
 	CSPAT00801OutBlock2: CSPAT00801OUTBLOCK2
+
+
+class CSPAT00801InBlock1(StockApiBaseModel):
+    OrgOrdNo: int = Field(..., description="원주문번호")
+    IsuNo: str = Field(..., description="종목번호")
+    OrdQty: int = Field(..., description="주문수량")
+
+class CSPAT00801_Request(StockApiBaseModel):
+    tr_cont: Optional[str] = 'N'
+    tr_cont_key: Optional[str] = ''
+    mac_address: Optional[str] = ''
+    CSPAT00801InBlock1: CSPAT00801InBlock1	

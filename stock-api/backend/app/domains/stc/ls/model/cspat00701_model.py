@@ -11,6 +11,7 @@
 버전: 1.0
 """
 
+from typing import Optional
 from backend.app.domains.stock_api_base_model import StockApiBaseModel
 
 
@@ -91,3 +92,18 @@ class CSPAT00701_Response(StockApiBaseModel):
 	rsp_msg: str
 	CSPAT00701OutBlock1: CSPAT00701OUTBLOCK1
 	CSPAT00701OutBlock2: CSPAT00701OUTBLOCK2
+
+
+class CSPAT00701InBlock1(StockApiBaseModel):
+	OrgOrdNo : int # 원주문번호 # nan
+	IsuNo : str # 종목번호 # 주식 : 종목코드 or A+종목코드(모의투자는 A+종목코드) ELW : J+종목코드 ETN : Q+종목코드
+	OrdQty : int # 주문수량 # nan
+	OrdprcPtnCode : str # 호가유형코드 # 00@지정가 03@시장가 05@조건부지정가 06@최유리지정가 07@최우선지정가 61@장개시전시간외종가 81@시간외종가 82@시간외단일가
+	OrdCndiTpCode : str # 주문조건구분 # 0:없음, 1:IOC, 2:FOK
+	OrdPrc : int # 주문가 # nan
+
+class CSPAT00701_Request(StockApiBaseModel):
+	tr_cont: Optional[str] = 'N'
+	tr_cont_key: Optional[str] = ''
+	mac_address: Optional[str] = ''
+	CSPAT00701InBlock1 :CSPAT00701InBlock1
