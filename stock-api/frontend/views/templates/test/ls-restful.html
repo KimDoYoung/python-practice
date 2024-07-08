@@ -8,13 +8,14 @@
     <div id="basic-info-area" class="border m-2 p-2">
         user_id: <input type="text" name="user_id" id="user_id" value="kdy987">
         acct_no: <input type="text" name="acctno" id="acctno" value="00501716387">
-        stk_code: <input type="text" name="stk_coe" id="stk_code" value="295310">
     </div>
     <div id="current-cost-area">
+        stk_code: <input type="text" name="stk_code" id="stk_code" value="295310"> 
         <button id="btnCurrentCost">현재가</button>
         <input type="text" name="current_cost" id="current_cost" readonly>
     </div>
     <div id="buy-sell-area">
+        stk_code: <input type="text" name="stk_code" id="stk_code1" value="295310"> 
         qty:<input type="number" name="qty" id="qty" value="1">
         cost:<input type="number" name="cost" id="cost" value="0">
         <button id="btnBuy">매수</button>
@@ -50,7 +51,25 @@ $( document ).ready(function() {
     });
     //매수
     $('#btnSell').on('click', function(){
-        
+        const user_id = $('#user_id').val();
+        const acctno = $('#acctno').val();
+        const stk_code = $('#stk_code1').val();
+        const qty = $('#qty').val();
+        const cost = $('#cost').val();
+        const url = `/api/v1/ls/order_cash/${user_id}/${acctno}`;
+        const data = {
+            "buy_sell_gb" : "매수",
+            "user_id": user_id,
+            "acctno": acctno,
+            "stk_code": stk_code,
+            "qty": qty,
+            "cost": cost
+        }
+        postFetch(url, data).then(data => {
+            console.log(data);
+        }).catch(error=> {
+            console.error(error);
+        });
     })
 });
 </script>

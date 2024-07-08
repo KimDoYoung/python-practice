@@ -12,17 +12,17 @@
         "body" :[
             "fetchData('${1: url}')",
             "  .then(data => {\n console.log(data); \n})",
-            "  .catch(error=> {\n console.error(error); \n});"
+            "  .catch(error=> {\n console.error(error.message); \n});"
         ]
     },
-    "postData 전형적인 것" : {
-        "prefix": "mypostData",
+    "post fetch 전형적인 것" : {
+        "prefix": "mypostFetch",
         "body" :[
             "const url = '${1: url}';",
             "const data = { abc : 'abc', def : 'def'};",
             "postData(url, data)",
             "  .then(data => {\nconsole.log(data);\n})",
-            "  .catch(error=> {\n console.error(error);\n });"
+            "  .catch(error=> {\n console.error(error.message);\n });"
         ]
     },
     "html페이지" : {
