@@ -68,7 +68,6 @@ def get_offering(offering_info, expected_participation):
     offering['경쟁율'] = competition_rate
     return offering
 
-#TODO 판정정보를 넣어야하지 않을까?
 def calculate_expected_cost(eval_data=None, calc_expression=None) -> Optional[int]:
 
     required_keys = ['매출액', '확정공모가', '액면가', '기관경쟁률', '의무보유확약']

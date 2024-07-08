@@ -195,10 +195,16 @@ def extract_stock_and_limit(s):
     
     # 주식수 및 청약한도 범위 처리
     if '~' not in stock:
-        stock = f'{int(stock.replace(",", "")):,}~{int(stock.replace(",", "")):,}'
+        if stock == '':
+            stock = None
+        else:
+            stock = f'{int(stock.replace(",", "")):,}~{int(stock.replace(",", "")):,}'
     if limit:
         if '~' not in limit:
-            limit = f'{int(limit.replace(",", "")):,}~{int(limit.replace(",", "")):,}'
+            if limit == '':
+                limit = None
+            else:
+                limit = f'{int(limit.replace(",", "")):,}~{int(limit.replace(",", "")):,}'
     else:
         limit = None    
     return stock, limit

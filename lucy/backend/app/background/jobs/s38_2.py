@@ -540,6 +540,9 @@ def scrapping_38_fill_ipo_38(is_test = False) -> bool:
             i = 0
             for basic in data_list:
                 detail_url = basic['detail_url']
+                # 테스팅 특정 url을 잘못해석할때
+                #detail_url = 'https://www.38.co.kr/html/fund/?o=v&no=2078&l=&page=1'
+
                 logging.info('---------------------------------------------------------')
                 logging.info('Scraping details: %s', detail_url)
                 logging.info('---------------------------------------------------------')
