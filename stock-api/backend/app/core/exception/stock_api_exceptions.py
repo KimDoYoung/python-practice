@@ -3,8 +3,8 @@ class StockApiException(Exception):
         self.detail = detail
         super().__init__(self.detail)
 
-class KisAccessTokenExpireException(StockApiException):
+class AccessTokenExpireException(StockApiException):
     pass
 
-class KisAccessTokenInvalidException(StockApiException):
+class AccessTokenInvalidException(StockApiException):
     pass

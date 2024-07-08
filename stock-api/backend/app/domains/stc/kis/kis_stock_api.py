@@ -42,11 +42,10 @@ from backend.app.domains.stc.kis.model.kis_search_stock_info_model import Search
 from backend.app.domains.stc.kis.model.kis_psearch_title_model import PsearchTitleDto
 from backend.app.domains.stc.stock_api import StockApi
 from backend.app.domains.user.user_model import StkAccount, User
-from backend.app.core.exception.stock_api_exceptions import KisAccessTokenExpireException, KisAccessTokenInvalidException
+from backend.app.core.exception.stock_api_exceptions import AccessTokenExpireException, AccessTokenInvalidException
 logger = get_logger(__name__)
 
 class KisStockApi(StockApi):
-    # _instance = None
 
     _BASE_URL = 'https://openapi.koreainvestment.com:9443'
     
@@ -75,7 +74,7 @@ class KisStockApi(StockApi):
         # 만료여부 체크
         try:
             cost = self.get_current_price("005930") # 삼성전자
-        except KisAccessTokenExpireException as e:
+        except AccessTokenExpireException as e:
             await self.set_access_token_from_kis()
 
         return True    
@@ -102,7 +101,6 @@ class KisStockApi(StockApi):
 
         self.account.set_value('KIS_ACCESS_TOKEN', ACCESS_TOKEN)
         await self.user_service.update_user(self.user.user_id, self.user)
-        #self.user.save()
         return ACCESS_TOKEN
     
     def hashkey(self, datas):
@@ -120,9 +118,9 @@ class KisStockApi(StockApi):
     def check_access_token(self, json:dict) -> None:
         ''' 토큰 만료 여부 확인 '''
         if json['rt_cd'] == '1' and json['msg_cd'] == 'EGW00123':
-            raise KisAccessTokenExpireException("KIS Access Token Expired(접속토큰이 만료됨)")
+            raise AccessTokenExpireException("KIS Access Token Expired(접속토큰이 만료됨)")
         if json['rt_cd'] == '1' and json['msg_cd'] == 'EGW00121':
-            raise KisAccessTokenInvalidException("KIS Access Token Invalid(접속토큰이 유효하지 않음)")
+            raise AccessTokenInvalidException("KIS Access Token Invalid(접속토큰이 유효하지 않음)")
 
         return None
 

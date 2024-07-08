@@ -1,3 +1,14 @@
+# stock_api.py
+"""
+모듈 설명: 
+    - 주식회사 API를 사용하기 위한 추상 클래스
+    - kis_stock_api (KisStockApi)와 ls_stock_api (LsStockApi)가 상속받는다.
+주요 기능:
+    - user_id, acctno를 가지고, user_service를 가지고 있다.
+작성자: 김도영
+작성일: 2024-07-08
+버전: 1.0
+"""
 from abc import ABC, abstractmethod
 
 class StockApi(ABC):
