@@ -10,12 +10,10 @@
 작성일: 2024-07-08
 버전: 1.0
 """
-
 from typing import Literal
-from backend.app.domains.stock_api_base_model import ApiStockBaseModel
+from backend.app.domains.stock_api_base_model import StockApiBaseModel
 
-
-class OrderCash_Request(ApiStockBaseModel):
+class Order_Request(StockApiBaseModel):
     ''' 주문 요청 '''
     buy_sell_gb: Literal['매수', '매도']
     user_id: str # 사용자 ID
@@ -23,3 +21,6 @@ class OrderCash_Request(ApiStockBaseModel):
     stk_code: str
     qty: int
     cost: int = 0 # cost가 0이면 시장가로 주문
+
+class ModifyOrder_Request(Order_Request):
+    org_ord_no: int # 원주문번호

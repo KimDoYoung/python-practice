@@ -11,15 +11,15 @@
 """
 from fastapi import APIRouter, Depends
 from backend.app.core.dependency import get_user_service
-from backend.app.domains.stc.common_model import OrderCash_Request
+from backend.app.domains.stc.common_model import Order_Request
 from backend.app.domains.stc.ls.model.cspat00601_model import CSPAT00601_Response
-from backend.app.domains.stc.ls.model.cspat00701_model import CSPAT00701_Request, CSPAT00701_Response
+from backend.app.domains.stc.ls.model.cspat00701_model import CSPAT00701_Response
 from backend.app.domains.stc.ls.model.cspat00801_model import CSPAT00801_Request, CSPAT00801_Response
 from backend.app.domains.stc.ls.model.t1102_model import T1102_Request, T1102_Response
 from backend.app.domains.user.user_service import UserService
 from backend.app.managers.stock_api_manager import StockApiManager
 from backend.app.core.logger import get_logger
-from backend.app.utils.model_util import order_cash_to_cspat00601_Request
+from backend.app.utils.model_util import order_to_cspat00601_Request, modify_order_to_cspat00701_Request
 
 logger = get_logger(__name__)
 
@@ -39,29 +39,30 @@ async def current_cost(user_id:str, acctno:str, stk_code:str, user_service:UserS
     logger.info(f"current_cost: {t1102_response}")
     return t1102_response
 
-@router.post("/order-cash/{user_id}/{acctno}",response_model=CSPAT00601_Response)
-async def order_cash(user_id:str, acctno:str, req:OrderCash_Request, user_service:UserService = Depends(get_user_service) ):
+@router.post("/order/{user_id}/{acctno}",response_model=CSPAT00601_Response)
+async def order_cash(user_id:str, acctno:str, req:Order_Request, user_service:UserService = Depends(get_user_service) ):
     ''' 현물주문 '''
     
     api_manager = StockApiManager(user_service)
     ls_api = await api_manager.stock_api(user_id, acctno,'LS')
 
-    cspat00601_Request = order_cash_to_cspat00601_Request(req)
+    cspat00601_Request = order_to_cspat00601_Request(req)
 
     response = await ls_api.order_cash(cspat00601_Request)
     return response
 
-@router.post("/modify-cash/{user_id}/{acctno}",response_model=CSPAT00701_Response)
-async def modify_cash(user_id:str, acctno:str, req:CSPAT00701_Request, user_service:UserService = Depends(get_user_service) ):
+@router.post("/modify-order/{user_id}/{acctno}",response_model=CSPAT00701_Response)
+async def modify_order(user_id:str, acctno:str, req:Order_Request, user_service:UserService = Depends(get_user_service) ):
     ''' 현물정정주문 '''
     api_manager = StockApiManager(user_service)
     ls_api = await api_manager.stock_api(user_id, acctno,'LS')
-    response = await ls_api.modify_cash(req)
+    capat00701_req = modify_order_to_cspat00701_Request(req)
+    response = await ls_api.modify_cash(capat00701_req)
     return response
 
-@router.post("/modify-cash/{user_id}/{acctno}",response_model=CSPAT00801_Response)
-async def cancel_cash(user_id:str, acctno:str, req:CSPAT00801_Request, user_service:UserService = Depends(get_user_service) ):
-    ''' 현물정정주문 '''
+@router.post("/cancel-order/{user_id}/{acctno}",response_model=CSPAT00801_Response)
+async def cancel_order(user_id:str, acctno:str, req:CSPAT00801_Request, user_service:UserService = Depends(get_user_service) ):
+    ''' 현물주문취소 '''
     api_manager = StockApiManager(user_service)
     ls_api = await api_manager.stock_api(user_id, acctno,'LS')
     
