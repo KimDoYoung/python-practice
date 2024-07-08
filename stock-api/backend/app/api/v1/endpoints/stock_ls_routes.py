@@ -19,7 +19,7 @@ from backend.app.domains.stc.ls.model.t1102_model import T1102_Request, T1102_Re
 from backend.app.domains.user.user_service import UserService
 from backend.app.managers.stock_api_manager import StockApiManager
 from backend.app.core.logger import get_logger
-from backend.app.utils.model_util import order_to_cspat00601_Request, modify_order_to_cspat00701_Request
+from backend.app.utils.model_util import cancel_order_to_cspat00801_Request, order_to_cspat00601_Request, modify_order_to_cspat00701_Request
 
 logger = get_logger(__name__)
 
@@ -65,8 +65,6 @@ async def cancel_order(user_id:str, acctno:str, req:CSPAT00801_Request, user_ser
     ''' 현물주문취소 '''
     api_manager = StockApiManager(user_service)
     ls_api = await api_manager.stock_api(user_id, acctno,'LS')
-    
-    req = CSPAT00801_Request(stk_code=stk_code)
-
-    response = await ls_api.cancel_cash(req)
+    capat00801_req = cancel_order_to_cspat00801_Request(req)
+    response = await ls_api.cancel_cash(capat00801_req)
     return response

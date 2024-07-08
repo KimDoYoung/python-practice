@@ -24,3 +24,8 @@ class Order_Request(StockApiBaseModel):
 
 class ModifyOrder_Request(Order_Request):
     org_ord_no: int # 원주문번호
+
+class CancelOrder_Request(StockApiBaseModel):
+    org_order_no :str
+    qty: int
+    cost: int = 0 # cost가 0이면 시장가로 주문   
