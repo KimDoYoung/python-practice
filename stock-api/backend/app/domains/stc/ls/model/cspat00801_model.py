@@ -29,28 +29,6 @@ class CSPAT00801OUTBLOCK1(StockApiBaseModel):
 	BskNo: int # 바스켓번호 
 	TrchNo: int # 트렌치번호 
 	ItemNo: int # 아이템번호 
-	SPAT00801OutBlock2: int # CSPAT00801OutBlock2 
-	RecCnt: int # 레코드갯수 
-	OrdNo: int # 주문번호 
-	PrntOrdNo: int # 모주문번호 
-	OrdTime: str # 주문시각 
-	OrdMktCode: str # 주문시장코드 
-	OrdPtnCode: str # 주문유형코드 
-	ShtnIsuNo: str # 단축종목번호 
-	PrgmOrdprcPtnCode: str # 프로그램호가유형코드 
-	StslOrdprcTpCode: str # 공매도호가구분 
-	StslAbleYn: str # 공매도가능여부 
-	MgntrnCode: str # 신용거래코드 
-	LoanDt: str # 대출일 
-	CvrgOrdTp: str # 반대매매주문구분 
-	LpYn: str # 유동성공급자여부 
-	MgempNo: str # 관리사원번호 
-	BnsTpCode: str # 매매구분 
-	SpareOrdNo: int # 예비주문번호 
-	CvrgSeqno: int # 반대매매일련번호 
-	RsvOrdNo: int # 예약주문번호 
-	AcntNm: str # 계좌명 
-	IsuNm: str # 종목명 
 
 class CSPAT00801OUTBLOCK2(StockApiBaseModel):
 	RecCnt: int # 레코드갯수 

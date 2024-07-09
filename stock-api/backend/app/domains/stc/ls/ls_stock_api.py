@@ -160,6 +160,7 @@ class LsStockApi(StockApi):
             response = requests.post(url, verify=False, headers=headers, data=json.dumps(data))
             response.raise_for_status()  # HTTPError 발생 시 예외 처리
             response_data = response.json()
+            logger.debug("현물 주문 : response_data : [%s]", response_data)
         except requests.exceptions.RequestException as e:
             logger.error(f"LS API 현재가 조회 실패: {e}")
             raise CurrentCostException(f"LS API 현재가 조회 실패: {e}")
@@ -208,7 +209,7 @@ class LsStockApi(StockApi):
         headers = {
             "Content-Type": "application/json; charset=utf-8",
             "Authorization" : "Bearer " + self.ACCESS_TOKEN, 
-            "tr_cd" : "CSPAT00601", #LS증권 거래코드
+            "tr_cd" : "CSPAT00801", #LS증권 거래코드
             "tr_cont" : req.tr_cont, #연속거래 여부 Y:연속○ N:연속×
             "tr_cont_key" : req.tr_cont_key, #연속일 경우 그전에 내려온 연속키 값 올림
             "mac_address" : req.mac_address, #법인인 경우 필수 세팅
@@ -217,6 +218,7 @@ class LsStockApi(StockApi):
         data = {
             "CSPAT00801InBlock1" : req.CSPAT00801InBlock1.model_dump()
         }
+        logger.debug(f"LS 현물취소 cancel_cash : data : [{data}]")
         try:
             response = requests.post(url, verify=False, headers=headers, data=json.dumps(data))
             response.raise_for_status()  # HTTPError 발생 시 예외 처리

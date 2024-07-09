@@ -35,9 +35,9 @@ def modify_order_to_cspat00701_Request(order: ModifyOrder_Request)-> CSPAT00701_
 
 def cancel_order_to_cspat00801_Request(order: CancelOrder_Request)-> CSPAT00801_Request:
     in_block = CSPAT00801InBlock1(
-        OrgOrdNo=order.org_order_no,
-        IsuNo=order.stk_code,
-        OrdQty=order.qty,
+        OrgOrdNo = order.org_ord_no,
+        IsuNo = order.stk_code,
+        OrdQty = order.qty
     )
     
     return CSPAT00801_Request(CSPAT00801InBlock1=in_block)

@@ -22,10 +22,13 @@ class Order_Request(StockApiBaseModel):
     qty: int
     cost: int = 0 # cost가 0이면 시장가로 주문
 
-class ModifyOrder_Request(Order_Request):
+class ModifyOrder_Request(StockApiBaseModel):
     org_ord_no: int # 원주문번호
+    stk_code: str
+    qty: int
+    cost: int = 0 # cost가 0이면 시장가로 주문
 
 class CancelOrder_Request(StockApiBaseModel):
-    org_order_no :str
+    org_ord_no :str
+    stk_code:str
     qty: int
-    cost: int = 0 # cost가 0이면 시장가로 주문   

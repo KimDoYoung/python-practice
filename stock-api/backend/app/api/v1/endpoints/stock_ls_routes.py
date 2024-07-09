@@ -11,10 +11,10 @@
 """
 from fastapi import APIRouter, Depends
 from backend.app.core.dependency import get_user_service
-from backend.app.domains.stc.common_model import Order_Request
+from backend.app.domains.stc.common_model import CancelOrder_Request, ModifyOrder_Request, Order_Request
 from backend.app.domains.stc.ls.model.cspat00601_model import CSPAT00601_Response
 from backend.app.domains.stc.ls.model.cspat00701_model import CSPAT00701_Response
-from backend.app.domains.stc.ls.model.cspat00801_model import CSPAT00801_Request, CSPAT00801_Response
+from backend.app.domains.stc.ls.model.cspat00801_model import CSPAT00801_Response
 from backend.app.domains.stc.ls.model.t1102_model import T1102_Request, T1102_Response
 from backend.app.domains.user.user_service import UserService
 from backend.app.managers.stock_api_manager import StockApiManager
@@ -52,19 +52,21 @@ async def order_cash(user_id:str, acctno:str, req:Order_Request, user_service:Us
     return response
 
 @router.post("/modify-order/{user_id}/{acctno}",response_model=CSPAT00701_Response)
-async def modify_order(user_id:str, acctno:str, req:Order_Request, user_service:UserService = Depends(get_user_service) ):
+async def modify_order(user_id:str, acctno:str, req:ModifyOrder_Request, user_service:UserService = Depends(get_user_service) ):
     ''' 현물정정주문 '''
     api_manager = StockApiManager(user_service)
     ls_api = await api_manager.stock_api(user_id, acctno,'LS')
     capat00701_req = modify_order_to_cspat00701_Request(req)
     response = await ls_api.modify_cash(capat00701_req)
+    logger.debug(f"modify_order 응답: [{response.to_str()}]")
     return response
 
 @router.post("/cancel-order/{user_id}/{acctno}",response_model=CSPAT00801_Response)
-async def cancel_order(user_id:str, acctno:str, req:CSPAT00801_Request, user_service:UserService = Depends(get_user_service) ):
+async def cancel_order(user_id:str, acctno:str, req:CancelOrder_Request, user_service:UserService = Depends(get_user_service) ):
     ''' 현물주문취소 '''
     api_manager = StockApiManager(user_service)
     ls_api = await api_manager.stock_api(user_id, acctno,'LS')
     capat00801_req = cancel_order_to_cspat00801_Request(req)
     response = await ls_api.cancel_cash(capat00801_req)
+    logger.debug(f"cancel_order 응답: [{response.to_str()}]")
     return response

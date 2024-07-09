@@ -21,6 +21,14 @@
         <button id="btnBuy">매수</button>
         <button id="btnSell">매도</button>
     </div>    
+    <div id="modify-area" class="m-2 p-2">
+        ordno: <input type="text" name="ordno" id="ordno" value=""> 
+        stk_code: <input type="text" name="stk_code" id="stk_code2" value="295310"> 
+        qty:<input type="number" name="qty" id="qty2" value="1">
+        cost:<input type="number" name="cost" id="cost2" value="0">
+        <button id="btnModifyOrder">정정주문</button>
+        <button id="btnCancelOrder">주문취소</button>
+    </div>    
 </div>
 <div id="error-area"></div>
 {% raw %}
@@ -50,6 +58,12 @@ $( document ).ready(function() {
         postFetch(url, data)
             .then(data => {
                 console.log(data);
+                const stk_nm = data.CSPAT00601OutBlock2.IsuNm
+                const qty = data.CSPAT00601OutBlock1.OrdQty
+                const cost = data.CSPAT00601OutBlock1.OrdPrc == 0 ? "시장가" : data.CSPAT00601OutBlock1.OrdPrc
+                const ordno = data.CSPAT00601OutBlock2.OrdNo
+                const msg = `주문번호:${ordno} : ${stk_nm} ${buySellType} 주문이 완료되었습니다. 주문수량: ${qty}, 주문금액: ${cost}`;
+                $('#error-area').html(msg);
             })
             .catch(error => {
                 console.error(error);
@@ -77,9 +91,63 @@ $( document ).ready(function() {
     $('#btnBuy').on('click', function(){
         orderProcess('매수');
     });
-//매도
+    //매도
     $('#btnSell').on('click', function(){
         orderProcess('매도');
+    })    
+    $('#btnModifyOrder').on('click', function(){
+        const user_id = $('#user_id').val();
+        const acctno = $('#acctno').val();
+        const ordno = $('#ordno').val();
+        const stk_code = $('#stk_code2').val();
+        const qty = $('#qty2').val();
+        const cost = $('#cost2').val();
+        const url = `/api/v1/ls/modify-order/${user_id}/${acctno}`;
+        const data = {
+            "org_ord_no": ordno,
+            "stk_code": stk_code,
+            "qty": qty,
+            "cost": cost
+        };
+        postFetch(url, data)
+            .then(data => {
+                console.log(data);
+                const stk_nm = data.CSPAT00700OutBlock2.IsuNm
+                const qty = data.CSPAT00700OutBlock1.OrdQty
+                const cost = data.CSPAT00700OutBlock1.OrdPrc == 0 ? "시장가" : data.CSPAT00700OutBlock1.OrdPrc
+                const ordno = data.CSPAT00700OutBlock2.OrdNo
+                const msg = `주문번호:${ordno} : ${stk_nm} 정정주문이 완료되었습니다. 주문수량: ${qty}, 주문금액: ${cost}`;
+                $('#error-area').html(msg);
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    })
+    $('#btnCancelOrder').on('click', function(){
+        const user_id = $('#user_id').val();
+        const acctno = $('#acctno').val();
+        const ordno = $('#ordno').val();
+        const stk_code = $('#stk_code2').val();
+        const qty = $('#qty2').val();
+        const cost = $('#cost2').val();
+        const url = `/api/v1/ls/cancel-order/${user_id}/${acctno}`;
+        const data = {
+            "org_ord_no": ordno,
+            "stk_code": stk_code,
+            "qty": qty
+        };
+        postFetch(url, data)
+            .then(data => {
+                console.log(data);
+                const stk_nm = data.CSPAT00801OutBlock2.IsuNm
+                const qty = data.CSPAT00801OutBlock1.OrdQty
+                const orgOrdNo = data.CSPAT00801OutBlock1.OrgOrdNo
+                const msg = `주문번호:${orgOrdNo} : ${stk_nm} 주문이 취소되었습니다. 주문수량: ${qty}`;
+                $('#error-area').html(msg);
+            })
+            .catch(error => {
+                console.error(error);
+            });
     })    
 }); //doc ready
 </script>

@@ -37,25 +37,6 @@ class CSPAT00601OUTBLOCK1(StockApiBaseModel):
 	OpDrtnNo: str # 운용지시번호 
 	LpYn: str # 유동성공급자여부 
 	CvrgTpCode: str # 반대매매구분 
-	SPAT00601OutBlock2: str # CSPAT00601OutBlock2 
-	RecCnt: int # 레코드갯수 
-	OrdNo: int # 주문번호 
-	OrdTime: str # 주문시각 
-	OrdMktCode: str # 주문시장코드 
-	OrdPtnCode: str # 주문유형코드 
-	ShtnIsuNo: str # 단축종목번호 
-	MgempNo: str # 관리사원번호 
-	OrdAmt: int # 주문금액 
-	SpareOrdNo: int # 예비주문번호 
-	CvrgSeqno: int # 반대매매일련번호 
-	RsvOrdNo: int # 예약주문번호 
-	SpotOrdQty: int # 실물주문수량 
-	RuseOrdQty: int # 재사용주문수량 
-	MnyOrdAmt: int # 현금주문금액 
-	SubstOrdAmt: int # 대용주문금액 
-	RuseOrdAmt: int # 재사용주문금액 
-	AcntNm: str # 계좌명 
-	IsuNm: str # 종목명 
 
 class CSPAT00601OUTBLOCK2(StockApiBaseModel):
 	RecCnt: int # 레코드갯수 
