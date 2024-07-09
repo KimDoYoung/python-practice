@@ -44,5 +44,7 @@ class AcctHistory_Request(StockApiBaseModel):
     start_no: int = 0
 
 class Fulfill_Request(StockApiBaseModel):
-    ''' 체결내역 조회 요청 '''
-    pass
+    ''' 체결/미체결 조회 요청 '''
+    stk_code: str
+    fullfill_type: Literal['전체', '체결', '미체결']
+    buy_sell_gb: Literal['전체', '매수', '매도']

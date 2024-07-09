@@ -19,6 +19,7 @@ from backend.app.domains.stc.ls.model.cdpcq04700_model import CDPCQ04700_Request
 from backend.app.domains.stc.ls.model.cspat00601_model import CSPAT00601_Request, CSPAT00601_Response
 from backend.app.domains.stc.ls.model.cspat00701_model import CSPAT00701_Request, CSPAT00701_Response
 from backend.app.domains.stc.ls.model.cspat00801_model import CSPAT00801_Request, CSPAT00801_Response
+from backend.app.domains.stc.ls.model.t0425_model import T0425_Request, T0425_Response
 from backend.app.domains.stc.ls.model.t1102_model import T1102_Request, T1102_Response
 from backend.app.domains.stc.stock_api import StockApi
 from backend.app.domains.user.user_model import StkAccount, User
@@ -192,10 +193,10 @@ class LsStockApi(StockApi):
             response = requests.post(url, verify=False, headers=headers, data=json.dumps(data))
             response.raise_for_status()  # HTTPError 발생 시 예외 처리
             response_data = response.json()
-            logger.debug(f"response_data : {response_data}")
+            logger.debug(f"LS 주문정정  : {response_data}")
         except requests.exceptions.RequestException as e:
-            logger.error(f"LS API 현재가 조회 실패: {e}")
-            raise CurrentCostException(f"LS API 현재가 조회 실패: {e}")
+            logger.error(f"LS 주문정정 실패: {e}")
+            raise CurrentCostException(f"주문정정 실패: {e}")
         except json.JSONDecodeError:
             logger.error("응답이 JSON 형식이 아닙니다.")
             raise InvalidResponseException("응답이 JSON 형식이 아닙니다.")
@@ -225,7 +226,7 @@ class LsStockApi(StockApi):
             response.raise_for_status()  # HTTPError 발생 시 예외 처리
             response_data = response.json()
         except requests.exceptions.RequestException as e:
-            logger.error(f"LS API 현재가 조회 실패: {e}")
+            logger.error(f"LS 현물취소 조회 실패: {e}")
             raise CurrentCostException(f"LS API 현재가 조회 실패: {e}")
         except json.JSONDecodeError:
             logger.error("응답이 JSON 형식이 아닙니다.")
@@ -257,10 +258,42 @@ class LsStockApi(StockApi):
             response_data = response.json()
             logger.debug(f"계좌별 거래내역 : response_data : [{response_data}]")
         except requests.exceptions.RequestException as e:
-            logger.error(f"계좌별거래내역 실패: {e}")
+            logger.error(f"계좌별 거래내역 실패: {e}")
             raise CurrentCostException(f"계좌별 거래내역  조회 실패: {e}")
         except json.JSONDecodeError:
             logger.error("응답이 JSON 형식이 아닙니다.")
             raise InvalidResponseException("응답이 JSON 형식이 아닙니다.")
 
-        return CDPCQ04700_Response(**response_data)    
+        return CDPCQ04700_Response(**response_data)
+    
+    async def fulfill_list(self, req: T0425_Request) -> T0425_Response:
+        '''체결/미체결'''
+        PATH = "/stock/accno"
+        url = f'{self._BASE_URL}/{PATH}'
+
+        headers = {
+            "Content-Type": "application/json; charset=utf-8",
+            "Authorization" : "Bearer " + self.ACCESS_TOKEN, 
+            "tr_cd" : "t0425", #LS증권 거래코드
+            "tr_cont" : req.tr_cont, #연속거래 여부 Y:연속○ N:연속×
+            "tr_cont_key" : req.tr_cont_key, #연속일 경우 그전에 내려온 연속키 값 올림
+            "mac_address" : req.mac_address, #법인인 경우 필수 세팅
+        }
+
+        data = {
+            "t0425InBlock" : req.t0425InBlock.model_dump()
+        }
+        logger.debug(f"체결/미체결 : data : [{data}]")
+        try:
+            response = requests.post(url, verify=False, headers=headers, data=json.dumps(data))
+            response.raise_for_status()  # HTTPError 발생 시 예외 처리
+            response_data = response.json()
+            logger.debug(f"체결/미체결 : response_data : [{response_data}]")
+        except requests.exceptions.RequestException as e:
+            logger.error(f"체결/미체결 실패: {e}")
+            raise CurrentCostException(f"체결/미체결  조회 실패: {e}")
+        except json.JSONDecodeError:
+            logger.error("응답이 JSON 형식이 아닙니다.")
+            raise InvalidResponseException("응답이 JSON 형식이 아닙니다.")
+
+        return T0425_Response(**response_data)    

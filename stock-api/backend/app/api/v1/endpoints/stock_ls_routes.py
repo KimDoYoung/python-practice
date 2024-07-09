@@ -16,11 +16,12 @@ from backend.app.domains.stc.ls.model.cdpcq04700_model import CDPCQ04700_Respons
 from backend.app.domains.stc.ls.model.cspat00601_model import CSPAT00601_Response
 from backend.app.domains.stc.ls.model.cspat00701_model import CSPAT00701_Response
 from backend.app.domains.stc.ls.model.cspat00801_model import CSPAT00801_Response
+from backend.app.domains.stc.ls.model.t0425_model import T0425_Response
 from backend.app.domains.stc.ls.model.t1102_model import T1102_Request, T1102_Response
 from backend.app.domains.user.user_service import UserService
 from backend.app.managers.stock_api_manager import StockApiManager
 from backend.app.core.logger import get_logger
-from backend.app.utils.model_util import acct_history_to_CDPCQ04700_Request, cancel_order_to_cspat00801_Request, order_to_cspat00601_Request, modify_order_to_cspat00701_Request
+from backend.app.utils.model_util import acct_history_to_CDPCQ04700_Request, cancel_order_to_cspat00801_Request, fulfill_to_t0425_Request, order_to_cspat00601_Request, modify_order_to_cspat00701_Request
 
 logger = get_logger(__name__)
 
@@ -88,6 +89,7 @@ async def acct_history(user_id:str, acctno:str, req:AcctHistory_Request, user_se
 @router.post("/fulfill-list/{user_id}/{acctno}",response_model=T0425_Response)
 async def fulfill_list(user_id:str, acctno:str, req:Fulfill_Request, user_service:UserService = Depends(get_user_service) ):
     ''' 체결/미체결내역 '''
+    #TODO: user_service를 뺄 수 없는가?
     api_manager = StockApiManager(user_service)
     ls_api = await api_manager.stock_api(user_id, acctno,'LS')
     
