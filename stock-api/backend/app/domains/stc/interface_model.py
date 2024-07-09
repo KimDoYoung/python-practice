@@ -42,3 +42,7 @@ class AcctHistory_Request(StockApiBaseModel):
     to_ymd: str
     stk_code: str = ''
     start_no: int = 0
+
+class Fulfill_Request(StockApiBaseModel):
+    ''' 체결내역 조회 요청 '''
+    pass

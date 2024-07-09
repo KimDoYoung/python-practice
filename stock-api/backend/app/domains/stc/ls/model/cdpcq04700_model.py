@@ -11,7 +11,7 @@
 """
 
 #요청모델 데이터
-from typing import Optional
+from typing import List, Optional
 from backend.app.domains.stock_api_base_model import StockApiBaseModel
 
 class CDPCQ04700InBlock1(StockApiBaseModel):
@@ -155,6 +155,6 @@ class CDPCQ04700_Response(StockApiBaseModel):
 	rsp_msg: str
 	CDPCQ04700OutBlock1: CDPCQ04700OUTBLOCK1
 	CDPCQ04700OutBlock2: CDPCQ04700OUTBLOCK2
-	CDPCQ04700OutBlock3: CDPCQ04700OUTBLOCK3
+	CDPCQ04700OutBlock3: List[CDPCQ04700OUTBLOCK3]  # 리스트로 변경
 	CDPCQ04700OutBlock4: CDPCQ04700OUTBLOCK4
 	CDPCQ04700OutBlock5: CDPCQ04700OUTBLOCK5

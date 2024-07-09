@@ -282,7 +282,7 @@ def main(menu:str, sub_menu:str):
     #         file.write(f"{key} 데이터프레임:\n")
     #         file.write(df.to_string())
     #         file.write("\n\n")
-    filename = f"ls-{tr_cd}-{menu}-{sub_menu}.txt"
+    filename = f"ls-{tr_cd}-{menu}-{sub_menu}.txt".replace("/", "_")
     with open(filename, "w", encoding="utf-8") as file:
         file.write(f"#{menu}-{sub_menu}\n")
         write_basic_info(file, dataframes['기본정보'])
@@ -293,7 +293,7 @@ def main(menu:str, sub_menu:str):
 if __name__ == "__main__":
 
     menu = "[주식] 계좌"
-    sub_menu = "계좌 거래내역"
+    sub_menu = "주식체결/미체결"
     main(menu, sub_menu)
 
     print("Done!")

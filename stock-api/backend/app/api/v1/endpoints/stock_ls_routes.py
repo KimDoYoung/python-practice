@@ -11,7 +11,7 @@
 """
 from fastapi import APIRouter, Depends
 from backend.app.core.dependency import get_user_service
-from backend.app.domains.stc.interface_model import AcctHistory_Request, CancelOrder_Request, ModifyOrder_Request, Order_Request
+from backend.app.domains.stc.interface_model import AcctHistory_Request, CancelOrder_Request, Fulfill_Request, ModifyOrder_Request, Order_Request
 from backend.app.domains.stc.ls.model.cdpcq04700_model import CDPCQ04700_Response
 from backend.app.domains.stc.ls.model.cspat00601_model import CSPAT00601_Response
 from backend.app.domains.stc.ls.model.cspat00701_model import CSPAT00701_Response
@@ -81,6 +81,19 @@ async def acct_history(user_id:str, acctno:str, req:AcctHistory_Request, user_se
     CDPCQ04700_Req = acct_history_to_CDPCQ04700_Request(req)
     
     response = await ls_api.acct_history(CDPCQ04700_Req)
+
+    logger.debug(f"acct_history 응답: [{response.to_str()}]")
+    return response    
+
+@router.post("/fulfill-list/{user_id}/{acctno}",response_model=T0425_Response)
+async def fulfill_list(user_id:str, acctno:str, req:Fulfill_Request, user_service:UserService = Depends(get_user_service) ):
+    ''' 체결/미체결내역 '''
+    api_manager = StockApiManager(user_service)
+    ls_api = await api_manager.stock_api(user_id, acctno,'LS')
+    
+    t042_Req = fulfill_to_t0425_Request(req)
+    
+    response = await ls_api.fulfill_list(t042_Req)
 
     logger.debug(f"acct_history 응답: [{response.to_str()}]")
     return response    

@@ -255,6 +255,7 @@ class LsStockApi(StockApi):
             response = requests.post(url, verify=False, headers=headers, data=json.dumps(data))
             response.raise_for_status()  # HTTPError 발생 시 예외 처리
             response_data = response.json()
+            logger.debug(f"계좌별 거래내역 : response_data : [{response_data}]")
         except requests.exceptions.RequestException as e:
             logger.error(f"계좌별거래내역 실패: {e}")
             raise CurrentCostException(f"계좌별 거래내역  조회 실패: {e}")
@@ -262,4 +263,4 @@ class LsStockApi(StockApi):
             logger.error("응답이 JSON 형식이 아닙니다.")
             raise InvalidResponseException("응답이 JSON 형식이 아닙니다.")
 
-        return CSPAT00801_Response(**response_data)    
+        return CDPCQ04700_Response(**response_data)    

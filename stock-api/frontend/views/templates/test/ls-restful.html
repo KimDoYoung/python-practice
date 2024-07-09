@@ -163,14 +163,14 @@ $( document ).ready(function() {
         const url = `/api/v1/ls/acct-history/${user_id}/${acctno}`;
         const data = {
             "acctno" : acctno,
-            "from_date": from_date,
-            "to_date": to_date,
+            "from_ymd": from_date,
+            "to_ymd": to_date,
             "stk_code": stk_code
         };
         postFetch(url, data)
             .then(data => {
                 console.log(data);
-                $('#error-area').html(msg);
+                $('#error-area').html(data.rsp_msg);
             })
             .catch(error => {
                 console.error(error);
