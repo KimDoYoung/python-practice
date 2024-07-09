@@ -1,5 +1,4 @@
 from typing import List, Optional
-from pydantic import BaseModel
 
 from backend.app.domains.stock_api_base_model import StockApiBaseModel
 
@@ -53,4 +52,4 @@ class T0425_Response(StockApiBaseModel):
 	rsp_cd: str
 	rsp_msg: str
 	t0425OutBlock: T0425OUTBLOCK
-	T0425OutBlock1: List[T0425OUTBLOCK1]
+	t0425OutBlock1: List[T0425OUTBLOCK1]

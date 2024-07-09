@@ -34,6 +34,20 @@
         stk_code: <input type="text" name="stk_code" id="stk_code3" value="295310"> 
         <button id="btnAcctHistory">거래내역조회</button>
     </div>        
+    <div id="fulfill-list-area" class="m-2 p-2">
+        stk code : <input type="text" id="stk_code3" value="295310">
+        체결/미체결 : <select name="fullfill_type" id="fullfill_type">
+            <option value="전체">전체</option>
+            <option value="미체결">미체결</option>
+            <option value="체결">체결</option>
+        </select>
+        매수/매도: <select name="buy_sell_gb" id="buy_sell_gb">
+            <option value="전체">전체</option>
+            <option value="매수">매수</option>
+            <option value="매도">매도</option>
+        </select>
+        <button id="btnFulfill">체결/미체결 조회</button>
+    </div>        
 </div>
 <div id="error-area"></div>
 {% raw %}
@@ -125,7 +139,7 @@ $( document ).ready(function() {
                 $('#error-area').html(msg);
             })
             .catch(error => {
-                console.error(error);
+                $('#error-area').html(error.message);
             });
     })
     $('#btnCancelOrder').on('click', function(){
@@ -151,7 +165,7 @@ $( document ).ready(function() {
                 $('#error-area').html(msg);
             })
             .catch(error => {
-                console.error(error);
+                $('#error-area').html(error.message);
             });
     })
     $('#btnAcctHistory').on('click', function(){
@@ -173,7 +187,29 @@ $( document ).ready(function() {
                 $('#error-area').html(data.rsp_msg);
             })
             .catch(error => {
-                console.error(error);
+                $('#error-area').html(error.message);
+            });
+    });
+    $('#btnFulfill').on('click', function(){
+        const user_id = $('#user_id').val();
+        const acctno = $('#acctno').val();
+        const stk_code = $('#stk_code3').val();
+        const fullfill_type = $('#fullfill_type').val();
+        const buy_sell_gb = $('#buy_sell_gb').val();
+        const url = `/api/v1/ls/fulfill-list/${user_id}/${acctno}`;
+        const data = {
+            "acctno" : acctno,
+            "stk_code": stk_code,
+            "fullfill_type": fullfill_type,
+            "buy_sell_gb": buy_sell_gb
+        };
+        postFetch(url, data)
+            .then(data => {
+                console.log(data);
+                $('#error-area').html(data.rsp_msg);
+            })
+            .catch(error => {
+                $('#error-area').html(error.message);
             });
     });  
 }); //doc ready

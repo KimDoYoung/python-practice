@@ -293,7 +293,7 @@ def main(menu:str, sub_menu:str):
 if __name__ == "__main__":
 
     menu = "[주식] 계좌"
-    sub_menu = "주식체결/미체결"
+    sub_menu = "현물계좌 주문체결내역 조회(API)"
     main(menu, sub_menu)
 
     print("Done!")
