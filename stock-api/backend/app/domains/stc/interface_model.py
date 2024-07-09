@@ -23,12 +23,22 @@ class Order_Request(StockApiBaseModel):
     cost: int = 0 # cost가 0이면 시장가로 주문
 
 class ModifyOrder_Request(StockApiBaseModel):
+    ''' 주문 수정 요청 '''
     org_ord_no: int # 원주문번호
     stk_code: str
     qty: int
     cost: int = 0 # cost가 0이면 시장가로 주문
 
 class CancelOrder_Request(StockApiBaseModel):
+    ''' 주문 취소 요청 '''
     org_ord_no :str
     stk_code:str
     qty: int
+
+class AcctHistory_Request(StockApiBaseModel):
+    ''' 계좌별 거래내역 조회 요청 '''
+    acctno: str
+    from_ymd: str
+    to_ymd: str
+    stk_code: str = ''
+    start_no: int = 0

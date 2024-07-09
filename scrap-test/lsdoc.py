@@ -292,8 +292,8 @@ def main(menu:str, sub_menu:str):
 
 if __name__ == "__main__":
 
-    menu = "[주식] 주문"
-    sub_menu = "현물정정주문"
+    menu = "[주식] 계좌"
+    sub_menu = "계좌 거래내역"
     main(menu, sub_menu)
 
     print("Done!")

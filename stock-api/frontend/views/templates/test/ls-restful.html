@@ -28,7 +28,12 @@
         cost:<input type="number" name="cost" id="cost2" value="0">
         <button id="btnModifyOrder">정정주문</button>
         <button id="btnCancelOrder">주문취소</button>
-    </div>    
+    </div>  
+    <div id="acct-history-area" class="m-2 p-2">
+        날짜범위: <input type="text" id="from_date" value="20210701"> ~ <input type="text" id="to_date" value="20240730">
+        stk_code: <input type="text" name="stk_code" id="stk_code3" value="295310"> 
+        <button id="btnAcctHistory">조회</button>
+    </div>        
 </div>
 <div id="error-area"></div>
 {% raw %}
@@ -148,7 +153,29 @@ $( document ).ready(function() {
             .catch(error => {
                 console.error(error);
             });
-    })    
+    })
+    $('#btnAcctHistory').on('click', function(){
+        const user_id = $('#user_id').val();
+        const acctno = $('#acctno').val();
+        const from_date = $('#from_date').val();
+        const to_date = $('#to_date').val();
+        const stk_code = $('#stk_code3').val();
+        const url = `/api/v1/ls/acct-history/${user_id}/${acctno}`;
+        const data = {
+            "acctno" : acctno,
+            "from_date": from_date,
+            "to_date": to_date,
+            "stk_code": stk_code
+        };
+        postFetch(url, data)
+            .then(data => {
+                console.log(data);
+                $('#error-area').html(msg);
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    });  
 }); //doc ready
 </script>
 {% endraw %}

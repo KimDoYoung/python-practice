@@ -15,6 +15,7 @@ import json
 import requests
 
 from backend.app.core.logger import get_logger
+from backend.app.domains.stc.ls.model.cdpcq04700_model import CDPCQ04700_Request, CDPCQ04700_Response
 from backend.app.domains.stc.ls.model.cspat00601_model import CSPAT00601_Request, CSPAT00601_Response
 from backend.app.domains.stc.ls.model.cspat00701_model import CSPAT00701_Request, CSPAT00701_Response
 from backend.app.domains.stc.ls.model.cspat00801_model import CSPAT00801_Request, CSPAT00801_Response
@@ -231,3 +232,34 @@ class LsStockApi(StockApi):
             raise InvalidResponseException("응답이 JSON 형식이 아닙니다.")
 
         return CSPAT00801_Response(**response_data)
+    
+    async def acct_history(self, req: CDPCQ04700_Request) -> CDPCQ04700_Response:
+        ''' 계좌별 거래내역 및 잔고 등 계좌에 관련된 서비스를 확인'''
+        PATH = "/stock/accno"
+        url = f'{self._BASE_URL}/{PATH}'
+
+        headers = {
+            "Content-Type": "application/json; charset=utf-8",
+            "Authorization" : "Bearer " + self.ACCESS_TOKEN, 
+            "tr_cd" : "CDPCQ04700", #LS증권 거래코드
+            "tr_cont" : req.tr_cont, #연속거래 여부 Y:연속○ N:연속×
+            "tr_cont_key" : req.tr_cont_key, #연속일 경우 그전에 내려온 연속키 값 올림
+            "mac_address" : req.mac_address, #법인인 경우 필수 세팅
+        }
+
+        data = {
+            "CDPCQ04700InBlock1" : req.CDPCQ04700InBlock1.model_dump()
+        }
+        logger.debug(f"계좌별 거래내역 : data : [{data}]")
+        try:
+            response = requests.post(url, verify=False, headers=headers, data=json.dumps(data))
+            response.raise_for_status()  # HTTPError 발생 시 예외 처리
+            response_data = response.json()
+        except requests.exceptions.RequestException as e:
+            logger.error(f"계좌별거래내역 실패: {e}")
+            raise CurrentCostException(f"계좌별 거래내역  조회 실패: {e}")
+        except json.JSONDecodeError:
+            logger.error("응답이 JSON 형식이 아닙니다.")
+            raise InvalidResponseException("응답이 JSON 형식이 아닙니다.")
+
+        return CSPAT00801_Response(**response_data)    

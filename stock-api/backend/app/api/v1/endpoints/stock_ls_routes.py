@@ -11,7 +11,8 @@
 """
 from fastapi import APIRouter, Depends
 from backend.app.core.dependency import get_user_service
-from backend.app.domains.stc.common_model import CancelOrder_Request, ModifyOrder_Request, Order_Request
+from backend.app.domains.stc.interface_model import AcctHistory_Request, CancelOrder_Request, ModifyOrder_Request, Order_Request
+from backend.app.domains.stc.ls.model.cdpcq04700_model import CDPCQ04700_Response
 from backend.app.domains.stc.ls.model.cspat00601_model import CSPAT00601_Response
 from backend.app.domains.stc.ls.model.cspat00701_model import CSPAT00701_Response
 from backend.app.domains.stc.ls.model.cspat00801_model import CSPAT00801_Response
@@ -19,7 +20,7 @@ from backend.app.domains.stc.ls.model.t1102_model import T1102_Request, T1102_Re
 from backend.app.domains.user.user_service import UserService
 from backend.app.managers.stock_api_manager import StockApiManager
 from backend.app.core.logger import get_logger
-from backend.app.utils.model_util import cancel_order_to_cspat00801_Request, order_to_cspat00601_Request, modify_order_to_cspat00701_Request
+from backend.app.utils.model_util import acct_history_to_CDPCQ04700_Request, cancel_order_to_cspat00801_Request, order_to_cspat00601_Request, modify_order_to_cspat00701_Request
 
 logger = get_logger(__name__)
 
@@ -70,3 +71,16 @@ async def cancel_order(user_id:str, acctno:str, req:CancelOrder_Request, user_se
     response = await ls_api.cancel_cash(capat00801_req)
     logger.debug(f"cancel_order 응답: [{response.to_str()}]")
     return response
+
+@router.post("/acct-history/{user_id}/{acctno}",response_model=CDPCQ04700_Response)
+async def acct_history(user_id:str, acctno:str, req:AcctHistory_Request, user_service:UserService = Depends(get_user_service) ):
+    ''' 계좌 주문내역 '''
+    api_manager = StockApiManager(user_service)
+    ls_api = await api_manager.stock_api(user_id, acctno,'LS')
+    
+    CDPCQ04700_Req = acct_history_to_CDPCQ04700_Request(req)
+    
+    response = await ls_api.acct_history(CDPCQ04700_Req)
+
+    logger.debug(f"acct_history 응답: [{response.to_str()}]")
+    return response    
