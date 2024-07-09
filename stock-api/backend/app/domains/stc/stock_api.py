@@ -10,6 +10,7 @@
 버전: 1.0
 """
 from abc import ABC, abstractmethod
+from datetime import datetime
 
 class StockApi(ABC):
     def __init__(self, user_id, acctno):
@@ -25,3 +26,6 @@ class StockApi(ABC):
     async def initialize(self)-> bool:
         pass  # stock company api 연결가능여부 확인
 
+    @abstractmethod  # 추상 메서드로 선언
+    def get_access_token_time(self)->datetime:
+        pass  # token 발급시간 반환 

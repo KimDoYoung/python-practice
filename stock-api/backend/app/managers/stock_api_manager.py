@@ -12,6 +12,7 @@
 작성일: 04
 버전: 1.0
 """
+from datetime import datetime, timedelta
 from backend.app.domains.stc.kis.kis_stock_api import KisStockApi
 from backend.app.domains.stc.ls.ls_stock_api import LsStockApi
 class StockApiManager:
@@ -36,6 +37,13 @@ class StockApiManager:
         if key in self._cache:
             stock_api =  self._cache[key]
             # TODO cache에 있는것이 만약 ACCESS_KEY가 만료되었으면 다시 초기화
+            access_token_time = stock_api.get_access_token_time()
+            if access_token_time is not None:
+                if (datetime.now() - access_token_time) > timedelta(hours=12):
+                    await stock_api.initialize()
+            else:
+                await stock_api.initialize()
+                        
             return stock_api
 
         user = await self._user_service.get_1(user_id)

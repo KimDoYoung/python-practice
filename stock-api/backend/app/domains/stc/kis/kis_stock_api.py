@@ -24,6 +24,7 @@
 작성일: 07
 버전: 1.0
 """
+from datetime import datetime
 import json
 from fastapi import HTTPException
 from pydantic import ValidationError
@@ -62,7 +63,14 @@ class KisStockApi(StockApi):
         access_token = account.get_value('KIS_ACCESS_TOKEN')
         if access_token:
             self.ACCESS_TOKEN = access_token
+            self.ACCESS_TOKEN_TIME = account.get_value('KIS_ACCESS_TOKEN_TIME')
 
+    def get_access_token_time(self)->datetime:
+        if self.ACCESS_TOKEN_TIME:
+            return datetime.strptime(self.ACCESS_TOKEN_TIME, "%Y-%m-%d %H:%M:%S")
+        else:
+            return None
+        
     #TODO 시간을 체크해서 23시간 이상이면 다시 발급해야 한다.
     async def initialize(self) -> bool:
         ''' Access Token 존재여부 및  만료 여부 확인 '''
