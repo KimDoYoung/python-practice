@@ -179,7 +179,7 @@ class T1102_Response(StockApiBaseModel):
 	''' t1102: 현재가 결과'''
 	rsp_cd: str
 	rsp_msg: str
-	t1102OutBlock: T1102OUTBLOCK
+	t1102OutBlock: Optional[T1102OUTBLOCK] = None
 
 
 class T1102_Request(StockApiBaseModel):

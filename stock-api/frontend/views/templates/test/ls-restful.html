@@ -48,6 +48,34 @@
         </select>
         <button id="btnFulfill">체결/미체결 조회</button>
     </div>        
+    <div id="fulfill-api-list-area" class="m-2 p-2">
+        stk code : <input type="text" id="stk_code4" value="295310">
+        order date: <input type="text" id="order_dt4" value="20240710">
+        시장구분 : <select  id="market_gb4">
+            <option value="전체">전체</option>
+            <option value="거래소">거래소</option>
+            <option value="코스닥">코스닥</option>
+            <option value="프리보드">프리보드</option>
+            </select>
+        체결/미체결 : <select  id="fullfill_type4">
+            <option value="전체">전체</option>
+            <option value="미체결">미체결</option>
+            <option value="체결">체결</option>
+        </select>
+        매수/매도: <select  id="buy_sell_gb4">
+            <option value="전체">전체</option>
+            <option value="매수">매수</option>
+            <option value="매도">매도</option>
+        </select>
+        주문형태: <select  id="ord_ptn_code4">
+            <option value="전체">전체</option>
+            <option value="매도전체">매도전체</option>
+            <option value="매수전체">매수전체</option>
+            <option value="현금매도">현금매도</option>
+            <option value="현금매수">현금매수</option>
+        </select>
+        <button id="btnFulfillApi">체결/미체결 Api 조회</button>
+    </div>        
 </div>
 <div id="error-area"></div>
 {% raw %}
@@ -211,7 +239,35 @@ $( document ).ready(function() {
             .catch(error => {
                 $('#error-area').html(error.message);
             });
-    });  
+    });
+    $('#btnFulfillApi').on('click', function(){
+        const user_id = $('#user_id').val();
+        const acctno = $('#acctno').val();
+        const stk_code = $('#stk_code4').val();
+        const order_dt = $('#order_dt4').val();
+        const market_gb = $('#market_gb4').val();
+        const fullfill_type = $('#fullfill_type4').val();
+        const buy_sell_gb = $('#buy_sell_gb4').val();
+        const ord_ptn_code = $('#ord_ptn_code4').val();
+        const url = `/api/v1/ls/fulfill-api-list/${user_id}/${acctno}`;
+        const data = {
+            "market_gb": market_gb,
+            "buy_sell_gb": buy_sell_gb,
+            "stk_code": stk_code,
+            "fullfill_type": fullfill_type,
+            "order_dt": order_dt,
+            "ord_ptn_code": ord_ptn_code
+        };
+        postFetch(url, data)
+            .then(data => {
+                console.log(data);
+
+                $('#error-area').html(data.rsp_msg);
+            })
+            .catch(error => {
+                $('#error-area').html(error.message);
+            });
+    })  
 }); //doc ready
 </script>
 {% endraw %}

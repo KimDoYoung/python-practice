@@ -7,7 +7,7 @@ class T0425INBLOCK(StockApiBaseModel):
 	chegb : str = "0" # 체결구분 0;전체 1:체결 2:미체결
 	medosu : str = "0" # 매매구분 0:전체 1:매도 2:매수
 	sortgb : str = "2" # 정렬순서 1:주문번호 역순 2:주문번호 순
-	cts_ordno : str ="" # 주문번호 연속조회시 OutBlock의 동일필드 입력	
+	cts_ordno : str =" " # 주문번호 연속조회시 OutBlock의 동일필드 입력	
 
 class T0425_Request(StockApiBaseModel):
 	tr_cont: Optional[str] = 'N'
@@ -51,5 +51,5 @@ class T0425OUTBLOCK(StockApiBaseModel):
 class T0425_Response(StockApiBaseModel):
 	rsp_cd: str
 	rsp_msg: str
-	t0425OutBlock: T0425OUTBLOCK
-	t0425OutBlock1: List[T0425OUTBLOCK1]
+	t0425OutBlock: Optional[T0425OUTBLOCK] = None
+	t0425OutBlock1: Optional[List[T0425OUTBLOCK1]] = None

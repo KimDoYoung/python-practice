@@ -21,7 +21,7 @@ class CDPCQ04700InBlock1(StockApiBaseModel):
 	SrtNo : int = 0 # 시작번호 
 	PdptnCode : str = '01' # 상품유형코드 01
 	IsuLgclssCode : str = '01' # 종목대분류코드 00@전체, 01@주식, 02@채권, 04@펀드, 03@선물, 05@해외주식, 06@해외파생
-	IsuNo : str # 종목번호 
+	IsuNo : str # 종목번호 12자리
 	
 class CDPCQ04700_Request(StockApiBaseModel):
 	tr_cont: Optional[str] = 'N'
@@ -153,8 +153,8 @@ class CDPCQ04700OUTBLOCK5(StockApiBaseModel):
 class CDPCQ04700_Response(StockApiBaseModel):
 	rsp_cd: str
 	rsp_msg: str
-	CDPCQ04700OutBlock1: CDPCQ04700OUTBLOCK1
-	CDPCQ04700OutBlock2: CDPCQ04700OUTBLOCK2
-	CDPCQ04700OutBlock3: List[CDPCQ04700OUTBLOCK3]  # 리스트로 변경
-	CDPCQ04700OutBlock4: CDPCQ04700OUTBLOCK4
-	CDPCQ04700OutBlock5: CDPCQ04700OUTBLOCK5
+	CDPCQ04700OutBlock1: Optional[CDPCQ04700OUTBLOCK1] = None
+	CDPCQ04700OutBlock2: Optional[CDPCQ04700OUTBLOCK2] = None
+	CDPCQ04700OutBlock3: Optional[List[CDPCQ04700OUTBLOCK3]] = None  # 리스트로 변경
+	CDPCQ04700OutBlock4: Optional[CDPCQ04700OUTBLOCK4] = None
+	CDPCQ04700OutBlock5: Optional[CDPCQ04700OUTBLOCK5] = None
