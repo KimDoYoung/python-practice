@@ -183,7 +183,7 @@ def write_reqBody_info(file, df, tr_cd):
         desc = f"# {df.iloc[i,5]}" if df.iloc[i,5] != "" or df.iloc[i,5] != "nan"  else ""
         if key.startswith("-"):
             file.write(f'\t"{key[1:]}" : "{value}", {desc}\n')
-        elif typ.lower() == 'object':
+        elif (typ.lower() == 'object' or typ.lower() == 'object array'):
             file.write(f'\t"{key}" : {{ \n')
             inObject = True
 
@@ -214,7 +214,7 @@ def write_reqBody_info(file, df, tr_cd):
 
         if key.startswith("-"):
             file.write(f'\t{key[1:]} : {py_type} # {value} {desc}\n')
-        elif typ.lower() == 'object':
+        elif (typ.lower() == 'object' or typ.lower() == 'object array'):
             file.write(f'\t{key} : {{ \n')
             inObject = True
     if inObject:
@@ -242,7 +242,7 @@ def write_Res_Item(file, obj, df):
                 py_type = 'float'
 
         if key == obj['varName']:
-            if typ.lower() == 'object' and key == obj['varName']:
+            if (typ.lower() == 'object' or typ.lower() == 'object array') and key == obj['varName']:
                 isStart = not isStart
         else:
             if isStart:
@@ -255,13 +255,13 @@ def write_resBody_info(file, df, tr_cd):
     for i in range(len(df)):
         key = df.iloc[i, 0]
         typ = df.iloc[i, 2]
-        if typ.lower() == 'object':
+        if typ.lower() == 'object' or typ.lower() == 'object array':
             objects.append({"varName": key, "typeName": key.upper()})
 
     for obj in objects:
         write_Res_Item(file, obj, df)
 
-    file.write(f"\nclass {tr_cd.upper()}_Response(ApiBaseModel):\n")
+    file.write(f"\nclass {tr_cd.upper()}_Response(StockApiBaseModel):\n")
     file.write(f"\trsp_cd: str\n")
     file.write(f"\trsp_msg: str\n")
     for obj in objects:
@@ -292,8 +292,8 @@ def main(menu:str, sub_menu:str):
 
 if __name__ == "__main__":
 
-    menu = "[주식] 계좌"
-    sub_menu = "현물계좌 주문체결내역 조회(API)"
+    menu = "[주식] 시세"
+    sub_menu = "API용주식멀티현재가조회"
     main(menu, sub_menu)
 
     print("Done!")

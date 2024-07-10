@@ -75,7 +75,18 @@
             <option value="현금매수">현금매수</option>
         </select>
         <button id="btnFulfillApi">체결/미체결 Api 조회</button>
-    </div>        
+    </div>
+    <div id="master-api-area" class="m-2 p-2">
+        <button id="btnMaster">종목마스터</button>
+    </div>
+    <div id="multi-current-cost-area" class="m-2 p-2">
+        <input type="text" name="stk_code5" value="005930">
+        <input type="text" name="stk_code5" value="295310">
+        <input type="text" name="stk_code5" value="000120">
+        <input type="text" name="stk_code5" value="034020">
+        <input type="text" name="stk_code5" value="272450">
+        <button id="btnMultiCurrentCost">멀티현재가</button>
+    </div>
 </div>
 <div id="error-area"></div>
 {% raw %}
@@ -267,7 +278,40 @@ $( document ).ready(function() {
             .catch(error => {
                 $('#error-area').html(error.message);
             });
-    })  
+    })
+    $('#btnMaster').on('click', function(){
+        const user_id = $('#user_id').val();
+        const acctno = $('#acctno').val();
+        const url = `/api/v1/ls/master-api/${user_id}/${acctno}`;
+        getFetch(url)
+        .then(data => {
+            console.log(data);
+            $('#error-area').html(data.rsp_msg);
+        }).catch(error => {
+            console.error('Error:', error)
+            $('#error-area').html(error.message);
+        });
+    });
+    $('#btnMultiCurrentCost').on('click', function(){
+        const user_id = $('#user_id').val();
+        const acctno = $('#acctno').val();
+        const stk_codes = [];
+        $('input[name="stk_code5"]').each(function(){
+            stk_codes.push($(this).val());
+        });
+        const url = `/api/v1/ls/multi-current-cost/${user_id}/${acctno}`;
+        const data = {
+            "stk_codes": stk_codes
+        };
+        postFetch(url, data)
+            .then(data => {
+                console.log(data);
+                $('#error-area').html(data.rsp_msg);
+            })
+            .catch(error => {
+                $('#error-area').html(error.message);
+            });
+    });  
 }); //doc ready
 </script>
 {% endraw %}

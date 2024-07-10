@@ -23,6 +23,8 @@ from backend.app.domains.stc.ls.model.cspat00701_model import CSPAT00701_Request
 from backend.app.domains.stc.ls.model.cspat00801_model import CSPAT00801_Request, CSPAT00801_Response
 from backend.app.domains.stc.ls.model.t0425_model import T0425_Request, T0425_Response
 from backend.app.domains.stc.ls.model.t1102_model import T1102_Request, T1102_Response
+from backend.app.domains.stc.ls.model.t8407_model import T8407_Request, T8407_Response
+from backend.app.domains.stc.ls.model.t9945_model import T9945_Response
 from backend.app.domains.stc.stock_api import StockApi
 from backend.app.domains.user.user_model import StkAccount, User
 from backend.app.core.exception.stock_api_exceptions import CurrentCostException, InvalidResponseException
@@ -88,17 +90,6 @@ class LsStockApi(StockApi):
         await self.user_service.update_user(self.user.user_id, self.user)
         return ACCESS_TOKEN
 
-    def hashkey(self, datas):
-        """암호화"""
-        url = self._BASE_URL + "/uapi/hashkey"
-        headers = {
-            'content-Type': 'application/json',
-            'appKey': self.APP_KEY,
-            'appSecret': self.APP_SECRET
-        }
-        res = requests.post(url, headers=headers, data=json.dumps(datas))
-        return res.json()["HASH"]
-
     async def send_request(self, request_dict: dict):
         ''' LS증권으로 요청을 보내고 응답을 받는다.'''
         url = f'{self._BASE_URL}/{request_dict["path"]}'
@@ -106,9 +97,9 @@ class LsStockApi(StockApi):
             "Content-Type": "application/json; charset=utf-8",
             "Authorization": "Bearer " + self.ACCESS_TOKEN,
             "tr_cd": request_dict["tr_cd"],
-            "tr_cont": request_dict["tr_cont"],
-            "tr_cont_key": request_dict["tr_cont_key"],
-            "mac_address": request_dict["mac_address"]
+            "tr_cont": request_dict.get("tr_cont","N"),
+            "tr_cont_key":request_dict.get("tr_cont_key",""),
+            "mac_address": request_dict.get("mac_address","")
         }
         data = request_dict["data"]
         logger.debug(f"-------------------------------------------------------------")
@@ -135,9 +126,6 @@ class LsStockApi(StockApi):
         req_dict = {
             "path": "/stock/market-data",
             "tr_cd": "t1102",
-            "tr_cont": req.tr_cont,
-            "tr_cont_key": req.tr_cont_key,
-            "mac_address": req.mac_address,
             "data": {
                 "t1102InBlock": {
                     "shcode": req.stk_code
@@ -152,9 +140,6 @@ class LsStockApi(StockApi):
         req_dict = {
             "path": "/stock/order",
             "tr_cd": "CSPAT00601",
-            "tr_cont": req.tr_cont,
-            "tr_cont_key": req.tr_cont_key,
-            "mac_address": req.mac_address,
             "data": {
                 "CSPAT00601InBlock1": req.CSPAT00601InBlock1.model_dump()
             }
@@ -167,9 +152,6 @@ class LsStockApi(StockApi):
         req_dict = {
             "path": "/stock/order",
             "tr_cd": "CSPAT00701",
-            "tr_cont": req.tr_cont,
-            "tr_cont_key": req.tr_cont_key,
-            "mac_address": req.mac_address,
             "data": {
                 "CSPAT00701InBlock1": req.CSPAT00701InBlock1.model_dump()
             }
@@ -182,9 +164,6 @@ class LsStockApi(StockApi):
         req_dict = {
             "path": "/stock/order",
             "tr_cd": "CSPAT00801",
-            "tr_cont": req.tr_cont,
-            "tr_cont_key": req.tr_cont_key,
-            "mac_address": req.mac_address,
             "data": {
                 "CSPAT00801InBlock1": req.CSPAT00801InBlock1.model_dump()
             }
@@ -197,9 +176,6 @@ class LsStockApi(StockApi):
         req_dict = {
             "path": "/stock/accno",
             "tr_cd": "CDPCQ04700",
-            "tr_cont": req.tr_cont,
-            "tr_cont_key": req.tr_cont_key,
-            "mac_address": req.mac_address,
             "data": {
                 "CDPCQ04700InBlock1": req.CDPCQ04700InBlock1.model_dump()
             }
@@ -212,9 +188,6 @@ class LsStockApi(StockApi):
         req_dict = {
             "path": "/stock/accno",
             "tr_cd": "t0425",
-            "tr_cont": req.tr_cont,
-            "tr_cont_key": req.tr_cont_key,
-            "mac_address": req.mac_address,
             "data": {
                 "t0425InBlock": req.t0425InBlock.model_dump()
             }
@@ -227,12 +200,36 @@ class LsStockApi(StockApi):
         req_dict = {
             "path": "/stock/accno",
             "tr_cd": "CSPAQ13700",
-            "tr_cont": req.tr_cont,
-            "tr_cont_key": req.tr_cont_key,
-            "mac_address": req.mac_address,
             "data": {
                 "CSPAQ13700InBlock1": req.CSPAQ13700InBlock1.model_dump()
             }
         }
         response_data = await self.send_request(req_dict)
         return CSPAQ13700_Response(**response_data)
+
+    async def master_api(self, gubun:str) -> T9945_Response:
+        '''  [주식] 시세-주식마스터조회API용 '''
+        req_dict = {
+            "path": "/stock/market-data",
+            "tr_cd": "t9945",
+            "data": {
+                "t9945InBlock": {
+                    "gubun" : gubun
+                }
+            }
+        }
+        response_data = await self.send_request(req_dict)
+        return T9945_Response(**response_data)
+
+
+    async def multi_current_cost(self, req:T8407_Request) -> T8407_Response:
+        ''' [주식] 시세-API용주식멀티현재가조회 '''
+        req_dict = {
+            "path": "/stock/market-data",
+            "tr_cd": "t8407",
+            "data": {
+                "t8407InBlock": req.t8407InBlock.model_dump()
+            }
+        }
+        response_data = await self.send_request(req_dict)
+        return T8407_Response(**response_data)        

@@ -19,6 +19,8 @@ from backend.app.domains.stc.ls.model.cspat00701_model import CSPAT00701_Respons
 from backend.app.domains.stc.ls.model.cspat00801_model import CSPAT00801_Response
 from backend.app.domains.stc.ls.model.t0425_model import T0425_Response
 from backend.app.domains.stc.ls.model.t1102_model import T1102_Request, T1102_Response
+from backend.app.domains.stc.ls.model.t8407_model import ArrayStkCodes, T8407_Request, T8407_Response, T8407InBLOCK
+from backend.app.domains.stc.ls.model.t9945_model import T9945_Response
 from backend.app.domains.user.user_service import UserService
 from backend.app.managers.stock_api_manager import StockApiManager
 from backend.app.core.logger import get_logger
@@ -113,4 +115,31 @@ async def fulfill_api_list(user_id:str, acctno:str, req:Fulfill_Api_Request, use
     response = await ls_api.fulfill_api_list(cspaq13700_req)
 
     logger.debug(f"fulfill-api-list 응답: [{response.to_str()}]")
-    return response   
+    return response
+
+@router.get("/master-api/{user_id}/{acctno}",response_model=T9945_Response)
+async def master_api(user_id:str, acctno:str, user_service:UserService = Depends(get_user_service) ):
+    ''' [주식] 시세-주식마스터조회API용 '''
+    #TODO: user_service를 뺄 수 없는가?
+    api_manager = StockApiManager(user_service)
+    ls_api = await api_manager.stock_api(user_id, acctno,'LS')
+    
+    response = await ls_api.master_api("1") # 1 코스피, 2 코스닥
+
+    logger.debug(f"master_api 응답: [{response.to_str()}]")
+    return response
+
+@router.post("/multi-current-cost/{user_id}/{acctno}",response_model=T8407_Response)
+async def multi_current_cost(user_id:str, acctno:str, array_stk_codes: ArrayStkCodes, user_service:UserService = Depends(get_user_service) ):
+    ''' [주식] 시세-API용주식멀티현재가조회 '''
+    #TODO: user_service를 뺄 수 없는가?
+    api_manager = StockApiManager(user_service)
+    ls_api = await api_manager.stock_api(user_id, acctno,'LS')
+    length =  len(array_stk_codes.stk_codes)
+    stk_code_str = ''.join(array_stk_codes.stk_codes)
+    inBlock = T8407InBLOCK(nrec=length, shcode=stk_code_str)
+    req_data = T8407_Request(t8407InBlock=inBlock) 
+    response = await ls_api.multi_current_cost(req_data)
+
+    logger.debug(f"multi-current-cost 응답: [{response.to_str()}]")
+    return response
