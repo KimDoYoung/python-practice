@@ -192,7 +192,7 @@
         console.log('ipo list.... ');
         async function initialize() {
 
-            await fetchData('/api/v1/ipo').then(data => {
+            fetchData('/api/v1/ipo').then(data => {
                 console.log(data);
 
                 let newList = data.map(item => {
