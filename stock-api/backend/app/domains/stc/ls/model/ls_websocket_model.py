@@ -1,0 +1,168 @@
+# ls_websocket_model.py
+"""
+모듈 설명: 
+    - LS증권 웹소켓으로 받는 데이터 모델들
+주요 기능:
+    -   기능을 넣으시오
+
+작성자: 김도영
+작성일: 2024-07-11
+버전: 1.0
+"""
+from typing import Optional
+from pydantic import BaseModel
+
+
+class Header(BaseModel):
+    tr_cd: str
+    tr_key: Optional[str] = None
+
+class NewsBody(BaseModel):
+    date: str
+    code: str
+    realkey: str
+    bodysize: str
+    time: str
+    id: str
+    title: str
+
+class Sc1Body(BaseModel):
+    grpId: str
+    trchno: str
+    trtzxLevytp: str
+    ordtrxptncode: str
+    acntnm: str
+    trcode: str
+    userid: str
+    agrgbrnno: str
+    regmktcode: str
+    len: str
+    opdrtnno: str
+    orgordmdfyqty: str
+    avrpchsprc: str
+    exectime: str
+    cont: str
+    mnymgnrat: str
+    mdfycnfqty: str
+    orgordcancqty: str
+    compress: str
+    execprc: str
+    mdfycnfprc: str
+    unercsellordqty: str
+    cmsnamtexecamt: str
+    ruseableamt: str
+    gubun: str
+    trid: str
+    flctqty: str
+    execno: str
+    lptp: str
+    varmsglen: str
+    ordno: str
+    futsmkttp: str
+    crdtexecamt: str
+    deposit: str
+    frgrunqno: str
+    crdayruseexecval: str
+    trsrc: str
+    ordacntno: str
+    reqcnt: str
+    shtnIsuno: str
+    accno1: str
+    strtgcode: str
+    ordseqno: str
+    Isunm: str
+    ordablesubstamt: str
+    encrypt: str
+    Isuno: str
+    accno2: str
+    contkey: str
+    Loandt: str
+    seq: str
+    lineseq: str
+    varlen: str
+    orduserId: str
+    mgmtbrnno: str
+    rjtqty: str
+    ordprcptncode: str
+    stdIsuno: str
+    pchsant: str
+    filler: str
+    secbalqty: str
+    ordxctptncode: str
+    canccnfqty: str
+    ordablemny: str
+    pubip: str
+    privip: str
+    funckey: str
+    accno: str
+    compreq: str
+    crdtpldgruseamt: str
+    ordamt: str
+    termno: str
+    crdtpldgexecamt: str
+    ordcndi: str
+    rmndLoanamt: str
+    bpno: str
+    substamt: str
+    mgempno: str
+    csgnsubstmgn: str
+    offset: str
+    rcptexectime: str
+    sellableqty: str
+    spotexecqty: str
+    varhdlen: str
+    substmgnrat: str
+    ordavrexecprc: str
+    itemno: str
+    mgntrncode: str
+    nsavtrdqty: str
+    ifinfo: str
+    ordableruseqty: str
+    ptflno: str
+    secbalqtyd2: str
+    brwmgmtYn: str
+    eventid: str
+    csgnmnymgn: str
+    pcbpno: str
+    orgordno: str
+    ifid: str
+    media: str
+    mtiordseqno: str
+    filler1: str
+    orgordunercqty: str
+    mbrnmbrno: str
+    futsLnkbrnno: str
+    commdacode: str
+    stslexecqty: str
+    proctm: str
+    bfstdIsuno: str
+    futsLnkacntno: str
+    lang: str
+    unercqty: str
+    execqty: str
+    adduptp: str
+    bskno: str
+    spotordableqty: str
+    ubstexecamt: str
+    cvrgordtp: str
+    ordqty: str
+    mnyexecamt: str
+    outgu: str
+    msgcode: str
+    ordtrdptncode: str
+    ordmktcode: str
+    ordptncode: str
+    prdayruseexecval: str
+    comid: str
+    bnstp: str
+    user: str
+    ordprc: str
+
+class LsWsResponse(BaseModel):
+    header: Header
+
+class NewsResponse(LsWsResponse):
+    body: NewsBody
+
+class Sc1Response(LsWsResponse):
+    body: Sc1Body
