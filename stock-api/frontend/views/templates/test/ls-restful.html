@@ -87,6 +87,10 @@
         <input type="text" name="stk_code5" value="272450">
         <button id="btnMultiCurrentCost">멀티현재가</button>
     </div>
+    <div>
+        <button id="btnJango2">잔고2</button>
+        <button id="btnBEP">BEP단가조회</button>
+    </div>
 </div>
 <div id="error-area"></div>
 {% raw %}
@@ -311,7 +315,34 @@ $( document ).ready(function() {
             .catch(error => {
                 $('#error-area').html(error.message);
             });
-    });  
+    });
+    $('#btnJango2').on('click', function(){
+        const user_id = $('#user_id').val();
+        const acctno = $('#acctno').val();
+        const url = `/api/v1/ls/jango2/${user_id}/${acctno}`;
+        getFetch(url)
+        .then(data => {
+            console.log(data);
+            $('#error-area').html(data.rsp_msg);
+        }).catch(error => {
+            console.error('Error:', error)
+            $('#error-area').html(error.message);
+        });
+    });
+    $('#btnBEP').on('click', function(){
+        const user_id = $('#user_id').val();
+        const acctno = $('#acctno').val();
+        const stk_code = $('#stk_code').val();
+        const url = `/api/v1/ls/bep_danga/${user_id}/${acctno}`;
+        getFetch(url)
+        .then(data => {
+            console.log(data);
+            $('#error-area').html(data.rsp_msg);
+        }).catch(error => {
+            console.error('Error:', error)
+            $('#error-area').html(error.message);
+        });
+    })
 }); //doc ready
 </script>
 {% endraw %}

@@ -292,8 +292,8 @@ def main(menu:str, sub_menu:str):
 
 if __name__ == "__main__":
 
-    menu = "[주식] 시세"
-    sub_menu = "API용주식멀티현재가조회"
+    menu = "[주식] 계좌"
+    sub_menu = "BEP단가조회"
     main(menu, sub_menu)
 
     print("Done!")

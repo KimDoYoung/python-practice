@@ -13,10 +13,12 @@ from fastapi import APIRouter, Depends
 from backend.app.core.dependency import get_user_service
 from backend.app.domains.stc.interface_model import AcctHistory_Request, CancelOrder_Request, Fulfill_Api_Request, Fulfill_Request, ModifyOrder_Request, Order_Request
 from backend.app.domains.stc.ls.model.cdpcq04700_model import CDPCQ04700_Response
+from backend.app.domains.stc.ls.model.cspaq12300_model import CSPAQ12300_Request, CSPAQ12300_Response, CSPAQ12300InBlock1
 from backend.app.domains.stc.ls.model.cspaq13700_model import CSPAQ13700_Response
 from backend.app.domains.stc.ls.model.cspat00601_model import CSPAT00601_Response
 from backend.app.domains.stc.ls.model.cspat00701_model import CSPAT00701_Response
 from backend.app.domains.stc.ls.model.cspat00801_model import CSPAT00801_Response
+from backend.app.domains.stc.ls.model.t0424_model import T0424INBLOCK, T0424_Request, T0424_Response
 from backend.app.domains.stc.ls.model.t0425_model import T0425_Response
 from backend.app.domains.stc.ls.model.t1102_model import T1102_Request, T1102_Response
 from backend.app.domains.stc.ls.model.t8407_model import ArrayStkCodes, T8407_Request, T8407_Response, T8407InBLOCK
@@ -142,4 +144,28 @@ async def multi_current_cost(user_id:str, acctno:str, array_stk_codes: ArrayStkC
     response = await ls_api.multi_current_cost(req_data)
 
     logger.debug(f"multi-current-cost 응답: [{response.to_str()}]")
+    return response
+
+@router.get("/jango2/{user_id}/{acctno}",response_model=T0424_Response)
+async def jango2(user_id:str, acctno:str, user_service:UserService = Depends(get_user_service) ):
+    ''' [주식] 계좌-주식잔고2 '''
+    #TODO: user_service를 뺄 수 없는가?
+    api_manager = StockApiManager(user_service)
+    ls_api = await api_manager.stock_api(user_id, acctno,'LS')
+    req = T0424_Request(t0424InBlock=T0424INBLOCK())
+    response = await ls_api.jango2(req)
+
+    logger.debug(f"jango2 응답: [{response.to_str()}]")
+    return response
+
+@router.get("/bep_danga/{user_id}/{acctno}",response_model=CSPAQ12300_Response)
+async def bep_danga(user_id:str, acctno:str, user_service:UserService = Depends(get_user_service) ):
+    '''[주식] 계좌-BEP단가조회'''
+    #TODO: user_service를 뺄 수 없는가?
+    api_manager = StockApiManager(user_service)
+    ls_api = await api_manager.stock_api(user_id, acctno,'LS')
+    req = CSPAQ12300_Request(CSPAQ12300InBlock1=CSPAQ12300InBlock1())
+    response = await ls_api.bep_danga(req)
+
+    logger.debug(f"bep_danga 응답: [{response.to_str()}]")
     return response

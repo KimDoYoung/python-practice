@@ -17,10 +17,12 @@ from datetime import datetime, timedelta
 
 from backend.app.core.logger import get_logger
 from backend.app.domains.stc.ls.model.cdpcq04700_model import CDPCQ04700_Request, CDPCQ04700_Response
+from backend.app.domains.stc.ls.model.cspaq12300_model import CSPAQ12300_Request, CSPAQ12300_Response
 from backend.app.domains.stc.ls.model.cspaq13700_model import CSPAQ13700_Request, CSPAQ13700_Response
 from backend.app.domains.stc.ls.model.cspat00601_model import CSPAT00601_Request, CSPAT00601_Response
 from backend.app.domains.stc.ls.model.cspat00701_model import CSPAT00701_Request, CSPAT00701_Response
 from backend.app.domains.stc.ls.model.cspat00801_model import CSPAT00801_Request, CSPAT00801_Response
+from backend.app.domains.stc.ls.model.t0424_model import T0424_Request, T0424_Response
 from backend.app.domains.stc.ls.model.t0425_model import T0425_Request, T0425_Response
 from backend.app.domains.stc.ls.model.t1102_model import T1102_Request, T1102_Response
 from backend.app.domains.stc.ls.model.t8407_model import T8407_Request, T8407_Response
@@ -221,7 +223,6 @@ class LsStockApi(StockApi):
         response_data = await self.send_request(req_dict)
         return T9945_Response(**response_data)
 
-
     async def multi_current_cost(self, req:T8407_Request) -> T8407_Response:
         ''' [주식] 시세-API용주식멀티현재가조회 '''
         req_dict = {
@@ -232,4 +233,28 @@ class LsStockApi(StockApi):
             }
         }
         response_data = await self.send_request(req_dict)
-        return T8407_Response(**response_data)        
+        return T8407_Response(**response_data)
+
+    async def jango2(self, req:T0424_Request) -> T0424_Response:
+        '''[주식] 계좌-주식잔고2  '''
+        req_dict = {
+            "path": "/stock/accno",
+            "tr_cd": "t0424",
+            "data": {
+                "t0424InBlock": req.t0424InBlock.model_dump()
+            }
+        }
+        response_data = await self.send_request(req_dict)
+        return T0424_Response(**response_data)
+    
+    async def bep_danga(self, req:CSPAQ12300_Request) -> CSPAQ12300_Response:
+        '''[주식] 계좌-BEP단가조회'''
+        req_dict = {
+            "path": "/stock/accno",
+            "tr_cd": "CSPAQ12300",
+            "data": {
+                "CSPAQ12300InBlock1": req.CSPAQ12300InBlock1.model_dump()
+            }
+        }
+        response_data = await self.send_request(req_dict)
+        return CSPAQ12300_Response(**response_data)
