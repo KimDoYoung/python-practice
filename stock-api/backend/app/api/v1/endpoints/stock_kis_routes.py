@@ -35,7 +35,7 @@ async def notice_start(user_id:str, acctno:str, user_service:UserService = Depen
     return result
 
 @router.get("/notice/stop/{user_id}/{acctno}")
-async def notice_start(user_id:str, acctno:str, user_service:UserService = Depends(get_user_service) ):
+async def notice_stop(user_id:str, acctno:str, user_service:UserService = Depends(get_user_service) ):
     ''' KIS 체결통보 연결 시작-실시간으로 체결결과를 Websockect으로 통보해제 '''
     client_ws_manager = ClientWsManager()
     stock_ws_manager = StockWsManager(client_ws_manager)

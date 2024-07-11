@@ -24,14 +24,28 @@ from backend.app.domains.stc.ls.model.t1102_model import T1102_Request, T1102_Re
 from backend.app.domains.stc.ls.model.t8407_model import ArrayStkCodes, T8407_Request, T8407_Response, T8407InBLOCK
 from backend.app.domains.stc.ls.model.t9945_model import T9945_Response
 from backend.app.domains.user.user_service import UserService
+from backend.app.managers.client_ws_manager import ClientWsManager
 from backend.app.managers.stock_api_manager import StockApiManager
 from backend.app.core.logger import get_logger
+from backend.app.managers.stock_ws_manager import StockWsManager
 from backend.app.utils.model_util import acct_history_to_CDPCQ04700_Request, cancel_order_to_cspat00801_Request, fulfill_api_to_cspaq13700_Request, fulfill_to_t0425_Request, order_to_cspat00601_Request, modify_order_to_cspat00701_Request
 
 logger = get_logger(__name__)
 
 # APIRouter 인스턴스 생성
 router = APIRouter()
+@router.get("/news/start/{user_id}/{acctno}")
+async def news_start(user_id:str, acctno:str, user_service:UserService = Depends(get_user_service) ):
+    ''' websocket으로 실시간 뉴스를 받기 위한 연결 시작 '''
+    client_ws_manager = ClientWsManager()
+
+    stock_ws_manager = StockWsManager(client_ws_manager)
+    if stock_ws_manager.is_connected(user_id, acctno):
+        return {"code":"01", "detail": f"{user_id}, {acctno} 이미 연결되어 있습니다."}
+    
+    result = await stock_ws_manager.connect(user_id, acctno)
+    return result
+
 
 @router.get("/current-cost/{user_id}/{acctno}/{stk_code}",response_model=T1102_Response)
 async def current_cost(user_id:str, acctno:str, stk_code:str, user_service:UserService = Depends(get_user_service) ):

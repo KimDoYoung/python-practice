@@ -119,7 +119,7 @@ class StockWsManager:
             
             logger.debug(f"KIS 작업 완료: {user_id}/{acctno}/{abbr} ")
         elif abbr == "LS":
-            ls_task = LSTask()
+            ls_task = LSTask(user_id, acctno, self.client_ws_manager)
             await ls_task.initialize()
             await ls_task.run(user_id)
             logger.debug(f"LS 작업 완료: {user_id}")
