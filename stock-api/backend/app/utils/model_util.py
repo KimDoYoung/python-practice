@@ -138,10 +138,15 @@ def fulfill_api_to_cspaq13700_Request(req: Fulfill_Api_Request) -> CSPAQ13700_Re
     }
     ord_ptn_code = ord_ptn_code_map[req.ord_ptn_code]
 
+    if req.stk_code:
+        IsuNo = 'A'+ req.stk_code 
+    else:
+        IsuNo = ''
+
     in_block = CSPAQ13700InBlock1_Item(
         OrdMktCode=ord_mkt_code,
         BnsTpCode=bns_tp_code,
-        IsuNo='A'+req.stk_code,
+        IsuNo=IsuNo,
         ExecYn=exec_yn,
         OrdDt=req.order_dt,
         OrdPtnCode=ord_ptn_code

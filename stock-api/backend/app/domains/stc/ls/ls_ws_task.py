@@ -79,6 +79,7 @@ class LSTask:
         return "access_token", datetime.now()
 
     async def create_ls_ws_request(self, tr_type:str, data:dict):
+        ''' LS 웹소켓 요청 문자열(json형태의 문자열) 생성 '''
         req = new_ls_ws_request()
         req.header.token = self.ACCESS_TOKEN
         req.header.tr_type = tr_type
@@ -92,6 +93,12 @@ class LSTask:
             return await self.create_ls_ws_request("3", self.request_data[req])
         elif req == LS_WSReq.주식주문체결:
             return await self.create_ls_ws_request("1", self.request_data[req])
+        
+    async def unsubscribe(self, req: LS_WSReq):
+        if req == LS_WSReq.뉴스:
+            return await self.create_ls_ws_request("4", self.request_data[req])
+        elif req == LS_WSReq.주식주문체결:
+            return await self.create_ls_ws_request("2", self.request_data[req])
 
     async def on_open(self):
 
@@ -103,14 +110,14 @@ class LSTask:
         logger.debug(f"{self.user_id}/{self.acctno}/{self.abbr} 체결통보 등록 senddata: [{senddata}]")
         await asyncio.sleep(0.5)
 
-    async def run(self, user_id: str):
+    async def run(self):
         logger.debug(f"{self.user_id}/{self.acctno}/{self.abbr} 증권사 웹소켓 시작")
         try:
             async with websockets.connect(self.url, ping_interval=None) as websocket:
                 self.stk_websocket = websocket
                 await self.on_open()
                 if self.stk_websocket is None:
-                    raise Exception("korea_investment_websocket 웹소켓 연결이 안됨")
+                    raise Exception("LS증권 웹소켓 연결이 안됨")
 
                 while True:
                     received_text = await websocket.recv()
