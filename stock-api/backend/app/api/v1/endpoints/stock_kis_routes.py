@@ -17,7 +17,9 @@ from backend.app.managers.client_ws_manager import ClientWsManager
 from backend.app.managers.stock_api_manager import StockApiManager
 from backend.app.core.dependency import get_user_service
 from backend.app.managers.stock_ws_manager import StockWsManager
-#from backend.app.core.globals import api_manager
+from backend.app.core.logger import get_logger
+
+logger = get_logger(__name__)
 
 # APIRouter 인스턴스 생성
 router = APIRouter()
@@ -46,11 +48,21 @@ async def notice_stop(user_id:str, acctno:str, user_service:UserService = Depend
         result = {"code":"01", "detail": f"{user_id}, {acctno} 연결되어 있지 않습니다."}
     return result
 
+@router.get("/current-cost/{user_id}/{acctno}/{stk_code}",response_model=KisOrderCashResponse)
+async def current_cost(user_id:str, acctno:str, stk_code:str):
+    ''' 현재가 '''
+    logger.info(f"current_cost 요청: {user_id}, {acctno}, {stk_code}")
+    api_manager = StockApiManager()
+    kis_api = await api_manager.stock_api(user_id, acctno,'KIS')
+    response = kis_api.current_cost(stk_code)
+    logger.info(f"current_cost 응답: {response}")
+    return response
+
 @router.post("/order-cash/{user_id}/{acctno}",response_model=KisOrderCashResponse)
-async def order_cash(user_id:str, acctno:str, order_cash_request: KisOrderCashRequest, user_service:UserService = Depends(get_user_service) ):
+async def order_cash(user_id:str, acctno:str, order_cash_request: KisOrderCashRequest):
     ''' 매도/매수 주문'''
     # raise StockApiException("이것은 잘못된 데이터입니다.")
-    api_manager = StockApiManager(user_service)
+    api_manager = StockApiManager()
     kis_api = await api_manager.stock_api(user_id, acctno,'KIS')
     # kis_api = StockApiManager(user_service).stock_api(user_id, acctno,'KIS')
     

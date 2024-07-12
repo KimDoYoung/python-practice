@@ -34,6 +34,7 @@ from backend.app.core.logger import get_logger
 from backend.app.domains.stc.kis.model.kis_chk_holiday_model import ChkHolidayDto
 from backend.app.domains.stc.kis.model.kis_inquire_balance_model import KisInquireBalance
 from backend.app.domains.stc.kis.model.kis_inquire_daily_ccld_model import InquireDailyCcldDto, InquireDailyCcldRequest
+from backend.app.domains.stc.kis.model.kis_inquire_price import InquirePrice_Response
 from backend.app.domains.stc.kis.model.kis_inquire_psbl_rvsecncl_model import InquirePsblRvsecnclDto
 from backend.app.domains.stc.kis.model.kis_inquire_psbl_sell_model import InquirePsblSellDto
 from backend.app.domains.stc.kis.model.kis_inquire_psble_order import InquirePsblOrderDto, InquirePsblOrderRequest
@@ -43,7 +44,7 @@ from backend.app.domains.stc.kis.model.kis_search_stock_info_model import Search
 from backend.app.domains.stc.kis.model.kis_psearch_title_model import PsearchTitleDto
 from backend.app.domains.stc.stock_api import StockApi
 from backend.app.domains.user.user_model import StkAccount, User
-from backend.app.core.exception.stock_api_exceptions import AccessTokenExpireException, AccessTokenInvalidException
+from backend.app.core.exception.stock_api_exceptions import AccessTokenExpireException, AccessTokenInvalidException, InvalidResponseException, KisApiException
 logger = get_logger(__name__)
 
 class KisStockApi(StockApi):
@@ -131,6 +132,33 @@ class KisStockApi(StockApi):
             raise AccessTokenInvalidException("KIS Access Token Invalid(접속토큰이 유효하지 않음)")
 
         return None
+    def current_cost(self, stk_code:str) -> InquirePrice_Response:
+        ''' 현재가 조회 '''
+        url = self._BASE_URL + '/uapi/domestic-stock/v1/quotations/inquire-price' 
+        headers = {"Content-Type":"application/json", 
+                "authorization": f"Bearer {self.ACCESS_TOKEN}",
+                "appKey":self.APP_KEY,
+                "appSecret":self.APP_SECRET,
+                "tr_id":"FHKST01010100"}
+        params = {
+            "fid_cond_mrkt_div_code":"J",
+            "fid_input_iscd":stk_code,
+        }
+        try:
+            response = requests.get(url, headers=headers, params=params)
+            response.raise_for_status()
+            response_data = response.json()
+            logger.debug(f"-------------------------------------------------------------")
+            logger.debug(f"API 응답 current_cost : [{response_data}]")
+            logger.debug(f"-------------------------------------------------------------")
+            return InquirePrice_Response(**response_data)
+        except requests.exceptions.HTTPError as e:
+            logger.error(f"API 응답 에러 : {e}")
+            raise KisApiException(status_code=500, detail=f"API 응답 에러 : {e}")    
+        except json.JSONDecodeError as e:
+            logger.error("응답이 JSON 형식이 아닙니다.")
+            raise InvalidResponseException("응답이 JSON 형식이 아닙니다.")
+
 
     def get_current_price(self, stk_code:str ) ->int:
         ''' 현재가 조회 '''

@@ -1,7 +1,7 @@
 # stock_ls_routes.py
 """
 모듈 설명: 
-    - LS등 증권사의 API
+    - LS등 증권사의 API Router
 주요 기능:
     -   기능을 넣으시오
 
@@ -59,10 +59,10 @@ async def news_stop(user_id:str, acctno:str, user_service:UserService = Depends(
 
 
 @router.get("/current-cost/{user_id}/{acctno}/{stk_code}",response_model=T1102_Response)
-async def current_cost(user_id:str, acctno:str, stk_code:str, user_service:UserService = Depends(get_user_service) ):
+async def current_cost(user_id:str, acctno:str, stk_code:str ):
     ''' 현재가 '''
-    logger.info(f"current_cost: {user_id}, {acctno}, {stk_code}")
-    api_manager = StockApiManager(user_service)
+    logger.info(f"current_cost 요청: {user_id}, {acctno}, {stk_code}")
+    api_manager = StockApiManager()
     ls_api = await api_manager.stock_api(user_id, acctno,'LS')
     
     req = T1102_Request(stk_code=stk_code)
@@ -72,10 +72,10 @@ async def current_cost(user_id:str, acctno:str, stk_code:str, user_service:UserS
     return t1102_response
 
 @router.post("/order/{user_id}/{acctno}",response_model=CSPAT00601_Response)
-async def order_cash(user_id:str, acctno:str, req:Order_Request, user_service:UserService = Depends(get_user_service) ):
+async def order_cash(user_id:str, acctno:str, req:Order_Request):
     ''' 현물주문 '''
     
-    api_manager = StockApiManager(user_service)
+    api_manager = StockApiManager()
     ls_api = await api_manager.stock_api(user_id, acctno,'LS')
 
     cspat00601_Request = order_to_cspat00601_Request(req)
@@ -84,9 +84,9 @@ async def order_cash(user_id:str, acctno:str, req:Order_Request, user_service:Us
     return response
 
 @router.post("/modify-order/{user_id}/{acctno}",response_model=CSPAT00701_Response)
-async def modify_order(user_id:str, acctno:str, req:ModifyOrder_Request, user_service:UserService = Depends(get_user_service) ):
+async def modify_order(user_id:str, acctno:str, req:ModifyOrder_Request):
     ''' 현물정정주문 '''
-    api_manager = StockApiManager(user_service)
+    api_manager = StockApiManager()
     ls_api = await api_manager.stock_api(user_id, acctno,'LS')
     capat00701_req = modify_order_to_cspat00701_Request(req)
     response = await ls_api.modify_cash(capat00701_req)
@@ -94,9 +94,9 @@ async def modify_order(user_id:str, acctno:str, req:ModifyOrder_Request, user_se
     return response
 
 @router.post("/cancel-order/{user_id}/{acctno}",response_model=CSPAT00801_Response)
-async def cancel_order(user_id:str, acctno:str, req:CancelOrder_Request, user_service:UserService = Depends(get_user_service) ):
+async def cancel_order(user_id:str, acctno:str, req:CancelOrder_Request):
     ''' 현물주문취소 '''
-    api_manager = StockApiManager(user_service)
+    api_manager = StockApiManager()
     ls_api = await api_manager.stock_api(user_id, acctno,'LS')
     capat00801_req = cancel_order_to_cspat00801_Request(req)
     response = await ls_api.cancel_cash(capat00801_req)
@@ -104,9 +104,9 @@ async def cancel_order(user_id:str, acctno:str, req:CancelOrder_Request, user_se
     return response
 
 @router.post("/acct-history/{user_id}/{acctno}",response_model=CDPCQ04700_Response)
-async def acct_history(user_id:str, acctno:str, req:AcctHistory_Request, user_service:UserService = Depends(get_user_service) ):
+async def acct_history(user_id:str, acctno:str, req:AcctHistory_Request):
     ''' 계좌 주문내역 '''
-    api_manager = StockApiManager(user_service)
+    api_manager = StockApiManager()
     ls_api = await api_manager.stock_api(user_id, acctno,'LS')
     
     CDPCQ04700_Req = acct_history_to_CDPCQ04700_Request(req)
@@ -117,10 +117,9 @@ async def acct_history(user_id:str, acctno:str, req:AcctHistory_Request, user_se
     return response    
 
 @router.post("/fulfill-list/{user_id}/{acctno}",response_model=T0425_Response)
-async def fulfill_list(user_id:str, acctno:str, req:Fulfill_Request, user_service:UserService = Depends(get_user_service) ):
+async def fulfill_list(user_id:str, acctno:str, req:Fulfill_Request):
     ''' 체결/미체결내역 '''
-    #TODO: user_service를 뺄 수 없는가?
-    api_manager = StockApiManager(user_service)
+    api_manager = StockApiManager()
     ls_api = await api_manager.stock_api(user_id, acctno,'LS')
     
     t042_Req = fulfill_to_t0425_Request(req)
@@ -131,10 +130,9 @@ async def fulfill_list(user_id:str, acctno:str, req:Fulfill_Request, user_servic
     return response    
 
 @router.post("/fulfill-api-list/{user_id}/{acctno}",response_model=CSPAQ13700_Response)
-async def fulfill_api_list(user_id:str, acctno:str, req:Fulfill_Api_Request, user_service:UserService = Depends(get_user_service) ):
+async def fulfill_api_list(user_id:str, acctno:str, req:Fulfill_Api_Request,):
     ''' 현물계좌 주문체결내역 조회(API) '''
-    #TODO: user_service를 뺄 수 없는가?
-    api_manager = StockApiManager(user_service)
+    api_manager = StockApiManager()
     ls_api = await api_manager.stock_api(user_id, acctno,'LS')
     
     cspaq13700_req = fulfill_api_to_cspaq13700_Request(req)
@@ -145,10 +143,9 @@ async def fulfill_api_list(user_id:str, acctno:str, req:Fulfill_Api_Request, use
     return response
 
 @router.get("/master-api/{user_id}/{acctno}",response_model=T9945_Response)
-async def master_api(user_id:str, acctno:str, user_service:UserService = Depends(get_user_service) ):
+async def master_api(user_id:str, acctno:str):
     ''' [주식] 시세-주식마스터조회API용 '''
-    #TODO: user_service를 뺄 수 없는가?
-    api_manager = StockApiManager(user_service)
+    api_manager = StockApiManager()
     ls_api = await api_manager.stock_api(user_id, acctno,'LS')
     
     response = await ls_api.master_api("1") # 1 코스피, 2 코스닥
@@ -157,10 +154,9 @@ async def master_api(user_id:str, acctno:str, user_service:UserService = Depends
     return response
 
 @router.post("/multi-current-cost/{user_id}/{acctno}",response_model=T8407_Response)
-async def multi_current_cost(user_id:str, acctno:str, array_stk_codes: ArrayStkCodes, user_service:UserService = Depends(get_user_service) ):
+async def multi_current_cost(user_id:str, acctno:str, array_stk_codes: ArrayStkCodes):
     ''' [주식] 시세-API용주식멀티현재가조회 '''
-    #TODO: user_service를 뺄 수 없는가?
-    api_manager = StockApiManager(user_service)
+    api_manager = StockApiManager()
     ls_api = await api_manager.stock_api(user_id, acctno,'LS')
     length =  len(array_stk_codes.stk_codes)
     stk_code_str = ''.join(array_stk_codes.stk_codes)
@@ -172,10 +168,9 @@ async def multi_current_cost(user_id:str, acctno:str, array_stk_codes: ArrayStkC
     return response
 
 @router.get("/jango2/{user_id}/{acctno}",response_model=T0424_Response)
-async def jango2(user_id:str, acctno:str, user_service:UserService = Depends(get_user_service) ):
+async def jango2(user_id:str, acctno:str):
     ''' [주식] 계좌-주식잔고2 '''
-    #TODO: user_service를 뺄 수 없는가?
-    api_manager = StockApiManager(user_service)
+    api_manager = StockApiManager()
     ls_api = await api_manager.stock_api(user_id, acctno,'LS')
     req = T0424_Request(t0424InBlock=T0424INBLOCK())
     response = await ls_api.jango2(req)
@@ -184,10 +179,9 @@ async def jango2(user_id:str, acctno:str, user_service:UserService = Depends(get
     return response
 
 @router.get("/bep_danga/{user_id}/{acctno}",response_model=CSPAQ12300_Response)
-async def bep_danga(user_id:str, acctno:str, user_service:UserService = Depends(get_user_service) ):
+async def bep_danga(user_id:str, acctno:str):
     '''[주식] 계좌-BEP단가조회'''
-    #TODO: user_service를 뺄 수 없는가?
-    api_manager = StockApiManager(user_service)
+    api_manager = StockApiManager()
     ls_api = await api_manager.stock_api(user_id, acctno,'LS')
     req = CSPAQ12300_Request(CSPAQ12300InBlock1=CSPAQ12300InBlock1())
     response = await ls_api.bep_danga(req)

@@ -9,8 +9,11 @@ class AccessTokenExpireException(StockApiException):
 class AccessTokenInvalidException(StockApiException):
     pass
 
-class CurrentCostException(StockApiException):
+class LsApiException(StockApiException):
     pass
 
 class InvalidResponseException(StockApiException):
+    pass
+
+class KisApiException(StockApiException):
     pass

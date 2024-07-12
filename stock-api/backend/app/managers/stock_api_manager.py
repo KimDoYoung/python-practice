@@ -15,20 +15,21 @@
 from datetime import datetime, timedelta
 from backend.app.domains.stc.kis.kis_stock_api import KisStockApi
 from backend.app.domains.stc.ls.ls_stock_api import LsStockApi
+from backend.app.core.dependency import get_user_service
 class StockApiManager:
     _instance = None
     _cache = {}
     _user_service = None
 
-    def __new__(cls, user_service=None):
+    def __new__(cls):
         if cls._instance is None:
             cls._instance = super(StockApiManager, cls).__new__(cls)
             cls._instance._initialized = False
         return cls._instance
 
-    def __init__(self, user_service=None):
+    def __init__(self):
         if not self._initialized:
-            self._user_service = user_service
+            self._user_service = get_user_service() # user_service
             self._initialized = True
 
     async def stock_api(self, user_id, acctno, stk_abbr):

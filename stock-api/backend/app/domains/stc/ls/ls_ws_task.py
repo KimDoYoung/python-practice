@@ -9,7 +9,7 @@
 작성일: 2024-07-11
 버전: 1.0
 """
-#TODO base를 둔다. initialize, subscribe, unsubscribe 을 외부에 둔다.
+
 import asyncio
 from datetime import datetime, timedelta
 import json

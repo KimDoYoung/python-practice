@@ -29,7 +29,7 @@ from backend.app.domains.stc.ls.model.t8407_model import T8407_Request, T8407_Re
 from backend.app.domains.stc.ls.model.t9945_model import T9945_Response
 from backend.app.domains.stc.stock_api import StockApi
 from backend.app.domains.user.user_model import StkAccount, User
-from backend.app.core.exception.stock_api_exceptions import CurrentCostException, InvalidResponseException
+from backend.app.core.exception.stock_api_exceptions import LsApiException, InvalidResponseException
 
 logger = get_logger(__name__)
 
@@ -116,7 +116,7 @@ class LsStockApi(StockApi):
             logger.debug(f"-------------------------------------------------------------")
         except requests.exceptions.RequestException as e:
             logger.error(f"API 요청 실패: {e}")
-            raise CurrentCostException(f"API 요청 실패: {e}")
+            raise LsApiException(f"API 요청 실패: {e}")
         except json.JSONDecodeError:
             logger.error("응답이 JSON 형식이 아닙니다.")
             raise InvalidResponseException("응답이 JSON 형식이 아닙니다.")

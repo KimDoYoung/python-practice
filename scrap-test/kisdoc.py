@@ -186,7 +186,7 @@ def maker_params_code(df):
     s += "}\n"
     return s
 def item_script(df, class_name, ele_name):
-    s = f"class {class_name}Item(BaseModel):\n"
+    s = f"class {class_name}Item(StockApiBaseModel):\n"
     start : bool = False
     for i in range(len(df)):
         element_name = df.loc[i, 'Element']
@@ -206,7 +206,7 @@ def item_script(df, class_name, ele_name):
 def make_pydantic_model(class_name, df):
     item_str= ""
     s = "from pydantic import BaseModel\n\n"
-    s += f"class {class_name}Dto(BaseModel):\n"
+    s += f"class {class_name}_Response(StockApiBaseModel):\n"
     for i in range(len(df)):
         element_name = df.loc[i, 'Element']
         han_name = df.loc[i, '한글명']
@@ -295,11 +295,14 @@ if __name__ == "__main__":
     # main_menu  = "[국내주식] 종목정보"
     # sub_menu = "주식일별주문체결조회"
 
-    main_menu  = "[국내주식] 주문계좌"
-    sub_menu = "매도가능수량조회 "
+    # main_menu  = "[국내주식] 주문계좌"
+    # sub_menu = "매도가능수량조회 "
     
     # main_menu  = "[국내주식] 업종/기타"
     # sub_menu = "국내휴장일조회"
+
+    main_menu  = "[국내주식] 기본시세"
+    sub_menu = "주식현재가 시세"
 
     main(main_menu, sub_menu)
     print("Done!")
