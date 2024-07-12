@@ -1,0 +1,35 @@
+{% extends 'common/base.html' %}
+{% block style %}
+<style>
+.log {
+    height: 400px;
+    overflow-y: scroll;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+input {
+    width:120px;
+}
+</style>
+
+{% endblock %}
+{% block content %}
+<h1>KIS-Restful API Test</h1>
+<div class="bg-secondary m-2 p-2">
+    user id: <input type="text" id="user_id" value="kdy987">
+    account no : <input type="text" id="acct_no" value="6577792801">
+</div>
+{% raw %} 
+<!--handlebar scripts-->
+{% endraw %}
+{% endblock %}
+{% block script %}
+{% raw %}
+<script>
+$( document ).ready(function() {
+    console.log( "ready!")
+    
+}); //end document ready
+</script>
+{% endraw %}
+{% endblock %}
