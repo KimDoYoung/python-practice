@@ -123,9 +123,9 @@ class LSTask(StockTask):
         try:
             senddata = await self.subscribe_data(data_name)
             await websocket.send(senddata)
-            logger.debug(f"{self.user_id}/{self.acctno}/{self.abbr} 체결통보 등록 senddata: [{senddata}]")
+            logger.debug(f"{self.user_id}/{self.acctno}/{self.abbr} {data_name.value} 등록 senddata: [{senddata}]")
         except Exception as e:
-            logger.error(f"Error during subscription: {e}")
+            logger.error(f"subscription 중 오류 발생: {e}")
         await asyncio.sleep(0.5)
 
     async def unsubscribe(self, data_name: LS_WSReq):
@@ -133,9 +133,9 @@ class LSTask(StockTask):
         try:
             senddata = await self.unsubscribe_data(data_name)
             await websocket.send(senddata)
-            logger.debug(f"{self.user_id}/{self.acctno}/{self.abbr} 체결통보 해제 등록 senddata: [{senddata}]")
+            logger.debug(f"{self.user_id}/{self.acctno}/{self.abbr} {data_name.value} 해제 등록 senddata: [{senddata}]")
         except Exception as e:
-            logger.error(f"Error during unsubscription: {e}")
+            logger.error(f"unsubscription 중 오류 발생: {e}")
         await asyncio.sleep(0.5)
 
     async def on_open(self):
@@ -144,8 +144,6 @@ class LSTask(StockTask):
         websocket = self.stk_websocket
         # senddata = await self.subscribe(LS_WSReq.뉴스)
         senddata = await self.subscribe(LS_WSReq.주식주문체결)
-        await websocket.send(senddata)
-        logger.debug(f"{self.user_id}/{self.acctno}/{self.abbr} 체결통보 등록 senddata: [{senddata}]")
         await asyncio.sleep(0.5)
 
     async def broadcast(self, message: str):

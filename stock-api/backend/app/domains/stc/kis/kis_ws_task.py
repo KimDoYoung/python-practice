@@ -154,5 +154,7 @@ class KISTask(StockTask):
         except Exception as e:
             logger.error(f"{self.user_id}/{self.acctno}/{self.abbr} 웹소켓 연결 중 에러 발생: {e}")
         finally:
-            logger.debug(f"{self.user_id}/{self.acctno}/{self.abbr} finally 증권사 웹소켓 close")
+            msg = f"{self.user_id}/{self.acctno}/{self.abbr} finally 증권사 웹소켓 close"
+            logger.debug(msg)
+            await self.broadcast(msg)
             self.stk_websocket = None
