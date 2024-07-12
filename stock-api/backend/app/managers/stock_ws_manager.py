@@ -121,7 +121,7 @@ class StockWsManager:
         elif abbr == "LS":
             ls_task = LSTask(user_id, acctno, self.client_ws_manager)
             await ls_task.initialize()
-            await ls_task.run(user_id)
+            await ls_task.run()
             logger.debug(f"LS 작업 완료: {user_id}")
         else:
             logger.error(f"알 수 없는 증권사: {abbr}")        

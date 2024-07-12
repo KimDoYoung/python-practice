@@ -46,6 +46,17 @@ async def news_start(user_id:str, acctno:str, user_service:UserService = Depends
     result = await stock_ws_manager.connect(user_id, acctno)
     return result
 
+@router.get("/news/stop/{user_id}/{acctno}")
+async def news_stop(user_id:str, acctno:str, user_service:UserService = Depends(get_user_service) ):
+    ''' websocket으로 실시간 뉴스를 받기 위한 연결 시작 '''
+    client_ws_manager = ClientWsManager()
+    stock_ws_manager = StockWsManager(client_ws_manager)
+    if stock_ws_manager.is_connected(user_id, acctno):
+        result = await stock_ws_manager.disconnect(user_id, acctno)
+    else:
+        result = {"code":"01", "detail": f"{user_id}, {acctno} 연결되어 있지 않습니다."}
+    return result
+
 
 @router.get("/current-cost/{user_id}/{acctno}/{stk_code}",response_model=T1102_Response)
 async def current_cost(user_id:str, acctno:str, stk_code:str, user_service:UserService = Depends(get_user_service) ):

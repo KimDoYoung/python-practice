@@ -17,7 +17,8 @@
         acct_no: <input type="text" name="acctno" id="acctno" value="00501716387">
     </div>
     <div>
-        <button id="btnNewsWsStart">뉴스웹소켓연결</button>
+        <button id="btnNewsWsStart">LS웹소켓연결</button> 
+        <button id="btnNewsWsStop">LS웹소켓해제</button> 
     </div>
     <div class="log" id="log">
     </div>
@@ -75,6 +76,16 @@ $( document ).ready(function() {
         const user_id = $('#user_id').val();
         const acctno = $('#acctno').val();
         const url = `/api/v1/ls/news/start/${user_id}/${acctno}`;
+        getFetch(url)
+        .then((data) => {
+            console.log(data);
+            $('#log').append(`<div>from Restful: ${data.code}: ${data.detail}</div>`)
+        });
+    });
+    $('#btnNewsWsStop').click(function() {
+        const user_id = $('#user_id').val();
+        const acctno = $('#acctno').val();
+        const url = `/api/v1/ls/news/stop/${user_id}/${acctno}`;
         getFetch(url)
         .then((data) => {
             console.log(data);
