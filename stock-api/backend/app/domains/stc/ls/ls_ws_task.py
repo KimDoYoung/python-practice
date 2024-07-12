@@ -146,7 +146,7 @@ class LSTask:
     async def run(self):
         logger.debug(f"{self.user_id}/{self.acctno}/{self.abbr} 증권사 웹소켓 시작")
         try:
-            async with websockets.connect(self.url, ping_interval=None) as websocket:
+            async with websockets.connect(self.url, ping_interval=30) as websocket:
                 self.stk_websocket = websocket
                 await self.on_open()
                 if self.stk_websocket is None:
@@ -175,5 +175,7 @@ class LSTask:
         except Exception as e:
             logger.error(f"{self.user_id}/{self.acctno}/{self.abbr} 웹소켓 연결 중 에러 발생: {e}")
         finally:
-            logger.debug(f"{self.user_id}/{self.acctno}/{self.abbr} finally 증권사 웹소켓 close")
+            msg = f"{self.user_id}/{self.acctno}/{self.abbr} finally 증권사 웹소켓 close"
+            logger.debug(msg)
+            await self.broadcast(msg)
             self.stk_websocket = None

@@ -34,9 +34,9 @@ logger = get_logger(__name__)
 
 # APIRouter 인스턴스 생성
 router = APIRouter()
-@router.get("/news/start/{user_id}/{acctno}")
+@router.get("/notice/start/{user_id}/{acctno}")
 async def news_start(user_id:str, acctno:str, user_service:UserService = Depends(get_user_service) ):
-    ''' websocket으로 실시간 뉴스를 받기 위한 연결 시작 '''
+    ''' websocket으로 Notice 연결 시작 '''
     client_ws_manager = ClientWsManager()
 
     stock_ws_manager = StockWsManager(client_ws_manager)
@@ -46,9 +46,9 @@ async def news_start(user_id:str, acctno:str, user_service:UserService = Depends
     result = await stock_ws_manager.connect(user_id, acctno)
     return result
 
-@router.get("/news/stop/{user_id}/{acctno}")
+@router.get("/notice/stop/{user_id}/{acctno}")
 async def news_stop(user_id:str, acctno:str, user_service:UserService = Depends(get_user_service) ):
-    ''' websocket으로 실시간 뉴스를 받기 위한 연결 시작 '''
+    ''' websocket으로 Notice 연결 종료 '''
     client_ws_manager = ClientWsManager()
     stock_ws_manager = StockWsManager(client_ws_manager)
     if stock_ws_manager.is_connected(user_id, acctno):

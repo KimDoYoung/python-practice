@@ -17,10 +17,17 @@
         acct_no: <input type="text" name="acctno" id="acctno" value="00501716387">
     </div>
     <div>
-        <button id="btnNewsWsStart">LS웹소켓연결</button> 
-        <button id="btnNewsWsStop">LS웹소켓해제</button> 
+        <button id="btnNoticeWsStart">LS웹소켓연결</button> 
+        <button id="btnNoticeWsStop">LS웹소켓해제</button> 
+        <button id="btnNewsStart">뉴스시작</button>
+        <button id="btnNewsStop">뉴스종료</button>
+
     </div>
     <div class="log" id="log">
+    </div>
+    <div>
+        stk_code: <input type="text" name="stk_code" id="stk_code" value="005930">
+
     </div>
 {% raw %}
 <!--handlebar scripts-->
@@ -72,20 +79,20 @@ $( document ).ready(function() {
     console.log( "ready!")
     const user_id = $('#user_id').val();
     startWebSocket(user_id);
-    $('#btnNewsWsStart').click(function() {
+    $('#btnNoticeWsStart').click(function() {
         const user_id = $('#user_id').val();
         const acctno = $('#acctno').val();
-        const url = `/api/v1/ls/news/start/${user_id}/${acctno}`;
+        const url = `/api/v1/ls/notice/start/${user_id}/${acctno}`;
         getFetch(url)
         .then((data) => {
             console.log(data);
             $('#log').append(`<div>from Restful: ${data.code}: ${data.detail}</div>`)
         });
     });
-    $('#btnNewsWsStop').click(function() {
+    $('#btnNoticeWsStop').click(function() {
         const user_id = $('#user_id').val();
         const acctno = $('#acctno').val();
-        const url = `/api/v1/ls/news/stop/${user_id}/${acctno}`;
+        const url = `/api/v1/ls/notice/stop/${user_id}/${acctno}`;
         getFetch(url)
         .then((data) => {
             console.log(data);
