@@ -8,6 +8,9 @@
     border: 1px solid #000;
     padding: 10px;
 }
+input {
+    width: 120px;
+}
 </style>
 {% endblock %}
 {% block content %}
@@ -17,6 +20,7 @@
         acct_no: <input type="text" name="acctno" id="acctno" value="00501716387">
     </div>
     <div>
+        <button id="btnClear" onclick="$('#log').empty()">로그지우기</button> 
         <button id="btnNoticeWsStart">LS웹소켓연결</button> 
         <button id="btnNoticeWsStop">LS웹소켓해제</button> 
         <button id="btnNewsStart">뉴스시작</button>
@@ -27,7 +31,12 @@
     </div>
     <div>
         stk_code: <input type="text" name="stk_code" id="stk_code" value="005930">
-
+        qty: <input type="text" name="qty" id="qty" value="1">
+        cost: <input type="text" name="cost" id="cost" value="0">
+        <button id="btnBuy">매수</button>
+        <button id="btnSell">매도</button>
+    </div>
+    <div id="error-area" class="border m-2 p-2 text-danger">
     </div>
 {% raw %}
 <!--handlebar scripts-->
@@ -76,6 +85,36 @@ function stopWebSocket() {
     ws = null;
 }    
 $( document ).ready(function() {
+    function orderProcess(buySellType) {
+        const user_id = $('#user_id').val();
+        const acctno = $('#acctno').val();
+        const stk_code = $('#stk_code').val();
+        const qty = $('#qty').val();
+        const cost = $('#cost').val();
+        const url = `/api/v1/ls/order/${user_id}/${acctno}`;
+        const data = {
+            "buy_sell_gb": buySellType,
+            "user_id": user_id,
+            "acctno": acctno,
+            "stk_code": stk_code,
+            "qty": qty,
+            "cost": cost
+        };
+        postFetch(url, data)
+            .then(data => {
+                console.log(data);
+                const stk_nm = data.CSPAT00601OutBlock2.IsuNm
+                const qty = data.CSPAT00601OutBlock1.OrdQty
+                const cost = data.CSPAT00601OutBlock1.OrdPrc == 0 ? "시장가" : data.CSPAT00601OutBlock1.OrdPrc
+                const ordno = data.CSPAT00601OutBlock2.OrdNo
+                const msg = `주문번호:${ordno} : ${stk_nm} ${buySellType} 주문이 완료되었습니다. 주문수량: ${qty}, 주문금액: ${cost}`;
+                $('#error-area').html(msg);
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    }
+
     console.log( "ready!")
     const user_id = $('#user_id').val();
     startWebSocket(user_id);
@@ -99,6 +138,14 @@ $( document ).ready(function() {
             $('#log').append(`<div>from Restful: ${data.code}: ${data.detail}</div>`)
         });
     });
+    //매수
+    $('#btnBuy').on('click', function(){
+        orderProcess('매수');
+    });
+    //매도
+    $('#btnSell').on('click', function(){
+        orderProcess('매도');
+    })  
 });
 </script>
 {% endraw %}

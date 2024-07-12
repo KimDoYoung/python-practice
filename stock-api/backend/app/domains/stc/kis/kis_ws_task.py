@@ -1,29 +1,31 @@
+# kis_ws_task.py
+"""
+모듈 설명: 
+    - KIS Websocket Client Task
+주요 기능:
+    - Notice 연결
+    - 호가, 체결가 연결은 하지 않음
+
+작성자: 김도영
+작성일: 2024-07-12
+버전: 1.0
+"""
 import asyncio
 from datetime import datetime
 import json
 
 import websockets
+from backend.app.domains.stc.stock_task import StockTask
 from backend.app.managers.client_ws_manager import ClientWsManager
 from backend.app.core.logger import get_logger
 from backend.app.domains.stc.kis.model.kis_websocket_model import KisWsResponse
 from backend.app.utils.kis_ws_util import KIS_WSReq, get_ws_approval_key, is_real_data, kis_ws_real_data_parsing, new_kis_ws_request
-from backend.app.core.dependency import get_user_service
 
 logger = get_logger(__name__)
 
-#TODO BASE가 있어야하지않을까?
-class KISTask:
-    def __init__(self, user_id:str, acctno:str, client_ws_manager: ClientWsManager):
-        self.client_ws_manager = client_ws_manager
-        self.user_id = user_id
-        self.url = "ws://ops.koreainvestment.com:21000"
-        self.abbr = 'KIS'
-        self.user_service = get_user_service()
-        self.stk_websocket = None
-        self.user = None
-        self.acctno = acctno
-        self.account = None
-        logger.debug(f"{self.user_id}/{self.acctno}/{self.abbr} 증권사 웹소켓 생성")
+class KISTask(StockTask):
+    def __init__(self, user_id: str, acctno: str, client_ws_manager: ClientWsManager):
+        super().__init__(user_id, acctno, client_ws_manager, "ws://ops.koreainvestment.com:21000", "KIS")
 
     async def initialize(self) -> dict:
         self.user = await self.user_service.get_1(self.user_id)
