@@ -11,6 +11,7 @@
 """
 from fastapi import APIRouter, Depends
 
+from backend.app.domains.stc.kis.model.kis_inquire_price import InquirePrice_Response
 from backend.app.domains.stc.kis.model.kis_order_cash_model import KisOrderCashRequest, KisOrderCashResponse
 from backend.app.domains.user.user_service import UserService
 from backend.app.managers.client_ws_manager import ClientWsManager
@@ -48,7 +49,7 @@ async def notice_stop(user_id:str, acctno:str, user_service:UserService = Depend
         result = {"code":"01", "detail": f"{user_id}, {acctno} 연결되어 있지 않습니다."}
     return result
 
-@router.get("/current-cost/{user_id}/{acctno}/{stk_code}",response_model=KisOrderCashResponse)
+@router.get("/current-cost/{user_id}/{acctno}/{stk_code}",response_model=InquirePrice_Response)
 async def current_cost(user_id:str, acctno:str, stk_code:str):
     ''' 현재가 '''
     logger.info(f"current_cost 요청: {user_id}, {acctno}, {stk_code}")
