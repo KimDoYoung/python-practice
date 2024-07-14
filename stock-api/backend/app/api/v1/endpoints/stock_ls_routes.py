@@ -11,7 +11,7 @@
 """
 from fastapi import APIRouter, Depends
 from backend.app.core.dependency import get_user_service
-from backend.app.domains.stc.interface_model import AcctHistory_Request, CancelOrder_Request, Fulfill_Api_Request, Fulfill_Request, ModifyOrder_Request, Order_Request
+from backend.app.domains.stc.ls_interface_model import AcctHistory_Request, CancelOrder_Request, Fulfill_Api_Request, Fulfill_Request, ModifyOrder_Request, Order_Request
 from backend.app.domains.stc.ls.model.cdpcq04700_model import CDPCQ04700_Response
 from backend.app.domains.stc.ls.model.cspaq12300_model import CSPAQ12300_Request, CSPAQ12300_Response, CSPAQ12300InBlock1
 from backend.app.domains.stc.ls.model.cspaq13700_model import CSPAQ13700_Response
@@ -28,7 +28,7 @@ from backend.app.managers.client_ws_manager import ClientWsManager
 from backend.app.managers.stock_api_manager import StockApiManager
 from backend.app.core.logger import get_logger
 from backend.app.managers.stock_ws_manager import StockWsManager
-from backend.app.utils.model_util import acct_history_to_CDPCQ04700_Request, cancel_order_to_cspat00801_Request, fulfill_api_to_cspaq13700_Request, fulfill_to_t0425_Request, order_to_cspat00601_Request, modify_order_to_cspat00701_Request
+from backend.app.utils.ls_model_util import acct_history_to_CDPCQ04700_Request, cancel_order_to_cspat00801_Request, fulfill_api_to_cspaq13700_Request, fulfill_to_t0425_Request, order_to_cspat00601_Request, modify_order_to_cspat00701_Request
 
 logger = get_logger(__name__)
 

@@ -4,6 +4,22 @@ from pydantic import BaseModel, field_validator
 from backend.app.domains.stock_api_base_model import StockApiBaseModel
 from pydantic import BaseModel
 
+class InquireDailyCcld_Request(StockApiBaseModel):
+    inqr_strt_dt:str
+    inqr_end_dt:str
+    sll_buy_dvsn_cd: Optional[str] = "00" # 00 : 전체, 01 : 매도, 02 : 매수",  
+    inqr_dvsn :  Optional[str] = "00" # 00 : 역순 01 : 정순",
+    pdno: Optional[str] = "" # 종목번호 공란은 전체
+    ccld_dvsn: Optional[str] = "" #00 : 전체 01 : 체결 02 : 미체결"
+    inqr_dvsn_3:Optional[str] = "00" #00 : 전체 01 : 체결 02 : 미체결"
+    CTX_AREA_FK100:Optional[str] = "" 
+    CTX_AREA_NK100:Optional[str] = ""
+
+
+    @field_validator('inqr_strt_dt', 'inqr_end_dt', mode='before')
+    def remove_hyphens(cls, value):
+        return value.replace('[^0-9]', '')
+
 class InquireDailyCcldItem1(BaseModel):
     ord_dt: str  # 주문일자
     ord_gno_brno: str  # 주문채번지점번호
@@ -40,7 +56,7 @@ class InquireDailyCcldItem2(BaseModel):
     tot_ccld_amt: str # 총체결금액 
     prsm_tlex_smtl: str # 추정제비용합계 제세 + 주문수수료 ※ 해당 값은 당일 데이터에 대해서만 제공됩니다.
 
-class InquireDailyCcldDto(StockApiBaseModel):
+class InquireDailyCcld_Response(StockApiBaseModel):
     rt_cd: str # 성공 실패 여부 0 : 성공 0 이외의 값 : 실패
     msg_cd: str # 응답코드 응답코드
     msg1: str # 응답메세지 응답메세지
@@ -50,18 +66,4 @@ class InquireDailyCcldDto(StockApiBaseModel):
     output2: InquireDailyCcldItem2
 
 
-class InquireDailyCcldRequest(BaseModel):
-    inqr_strt_dt:str
-    inqr_end_dt:str
-    sll_buy_dvsn_cd: Optional[str] = "00" # 00 : 전체, 01 : 매도, 02 : 매수",  
-    inqr_dvsn :  Optional[str] = "00" # 00 : 역순 01 : 정순",
-    pdno: Optional[str] = "" # 종목번호 공란은 전체
-    ccld_dvsn: Optional[str] = "" #00 : 전체 01 : 체결 02 : 미체결"
-    inqr_dvsn_3:Optional[str] = "00" #00 : 전체 01 : 체결 02 : 미체결"
-    CTX_AREA_FK100:Optional[str] = "" 
-    CTX_AREA_NK100:Optional[str] = ""
 
-
-    @field_validator('inqr_strt_dt', 'inqr_end_dt', mode='before')
-    def remove_hyphens(cls, value):
-        return value.replace('[^0-9]', '')

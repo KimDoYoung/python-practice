@@ -33,15 +33,15 @@ import requests
 from backend.app.core.logger import get_logger
 from backend.app.domains.stc.kis.model.kis_chk_holiday_model import ChkHolidayDto
 from backend.app.domains.stc.kis.model.kis_inquire_balance_model import KisInquireBalance_Response
-from backend.app.domains.stc.kis.model.kis_inquire_daily_ccld_model import InquireDailyCcldDto, InquireDailyCcldRequest
+from backend.app.domains.stc.kis.model.kis_inquire_daily_ccld_model import InquireDailyCcld_Response, InquireDailyCcld_Request
 from backend.app.domains.stc.kis.model.kis_inquire_price import InquirePrice_Response
 from backend.app.domains.stc.kis.model.kis_inquire_psbl_rvsecncl_model import InquirePsblRvsecnclDto
 from backend.app.domains.stc.kis.model.kis_inquire_psbl_sell_model import InquirePsblSellDto
 from backend.app.domains.stc.kis.model.kis_inquire_psble_order import InquirePsblOrderDto, InquirePsblOrderRequest
 from backend.app.domains.stc.kis.model.kis_order_cash_model import KisOrderCancelRequest, OrderCash_Request, KisOrderCash_Response, KisOrderCancelResponse
-from backend.app.domains.stc.kis.model.kis_psearch_result_model import PsearchResultDto
+from backend.app.domains.stc.kis.model.kis_psearch_result_model import PsearchResult_Response
 from backend.app.domains.stc.kis.model.kis_search_stock_info_model import SearchStockInfo_Response
-from backend.app.domains.stc.kis.model.kis_psearch_title_model import PsearchTitleDto
+from backend.app.domains.stc.kis.model.kis_psearch_title_model import PsearchTitle_Result
 from backend.app.domains.stc.stock_api import StockApi
 from backend.app.domains.user.user_model import StkAccount, User
 from backend.app.core.exception.stock_api_exceptions import AccessTokenExpireException, AccessTokenInvalidException, InvalidResponseException, KisApiException
@@ -307,7 +307,7 @@ class KisStockApi(StockApi):
 
         return kis_inquire_balance
 
-    def psearch_title(self) -> PsearchTitleDto:
+    def psearch_title(self) -> PsearchTitle_Result:
         ''' 조건식 목록 조회 '''
         logger.info(f"조건식 목록 조회 ")
         url = self._BASE_URL + "/uapi/domestic-stock/v1/quotations/psearch-title"
@@ -330,7 +330,7 @@ class KisStockApi(StockApi):
             raise HTTPException(status_code=response.status_code, detail=f"Error fetching balance: {response.text}")
         try:
             json_data = response.json()
-            psearch_title = PsearchTitleDto(**json_data)
+            psearch_title = PsearchTitle_Result(**json_data)
             logger.info(f"조건식 목록 조회 : {psearch_title}")
         except requests.exceptions.JSONDecodeError:
             logger.error(f"Error decoding JSON: {response.text}")
@@ -339,7 +339,7 @@ class KisStockApi(StockApi):
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
         return psearch_title
     
-    def psearch_result(self, seq: str) -> PsearchResultDto:
+    def psearch_result(self, seq: str) -> PsearchResult_Response:
         ''' 조건식 결과 리스트  '''
         logger.info(f"조건식 결과 조회 ")
         url = self._BASE_URL + "/uapi/domestic-stock/v1/quotations/psearch-result"
@@ -362,7 +362,7 @@ class KisStockApi(StockApi):
             raise HTTPException(status_code=response.status_code, detail=f"Error fetching balance: {response.text}")
         try:
             json_data = response.json()
-            psearch_result = PsearchResultDto(**json_data)
+            psearch_result = PsearchResult_Response(**json_data)
             logger.info(f"조건식 목록 조회 : {psearch_result}")
         except requests.exceptions.JSONDecodeError:
             logger.error(f"Error decoding JSON: {response.text}")
@@ -371,7 +371,7 @@ class KisStockApi(StockApi):
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
         return psearch_result    
 
-    def inquire_daily_ccld(self, inquire_daily_ccld: InquireDailyCcldRequest) -> InquireDailyCcldDto:
+    def inquire_daily_ccld(self, inquire_daily_ccld: InquireDailyCcld_Request) -> InquireDailyCcld_Response:
         '''주식일별주문체결조회 '''
         logger.info(f"주식일별주문체결조회")
         url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/inquire-daily-ccld"
@@ -404,7 +404,7 @@ class KisStockApi(StockApi):
             raise HTTPException(status_code=response.status_code, detail=f"Error 주식일별주문체결조회 : {response.text}")
         try:
             json_data = response.json()
-            inquire_daily_ccld = InquireDailyCcldDto(**json_data)
+            inquire_daily_ccld = InquireDailyCcld_Response(**json_data)
             logger.debug(f"주식일별주문체결조회 됨")
         except requests.exceptions.JSONDecodeError:
             logger.error(f"Error decoding JSON: {response.text}")

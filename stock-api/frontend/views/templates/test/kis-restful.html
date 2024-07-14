@@ -36,6 +36,8 @@ input {
 </div>
 <div>
     <button id="btnInquireBalance">주식잔고</button>
+    <button id="btnPsearchList">조건식리스트</button>
+
 </div>
 
 <div id="log" class="log"></div><div id="error-area" class="text-danger"></div>
@@ -154,6 +156,23 @@ $( document ).ready(function() {
         const user_id = $('#user_id').val();
         const acct_no = $('#acct_no').val();
         getFetch(`/api/v1/kis/inquire-balance/${user_id}/${acct_no}`)
+        .then(
+            response => {
+                console.log(response);
+                $('#log').append(JSON.stringify(response) + '<br>');
+            }
+        )
+        .catch(
+            error => {
+                console.error(error.message);
+                $('#error-area').append(error.toString()) + '<br>';
+            }
+        );
+    })
+    $('#btnPsearchList').on('click', function(){
+        const user_id = $('#user_id').val();
+        const acct_no = $('#acct_no').val();
+        getFetch(`/api/v1/kis/psearch-title/${user_id}/${acct_no}`)
         .then(
             response => {
                 console.log(response);

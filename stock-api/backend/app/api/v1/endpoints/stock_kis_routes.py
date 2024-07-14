@@ -14,13 +14,17 @@ from fastapi import APIRouter, Depends
 from backend.app.domains.stc.kis.model.kis_inquire_balance_model import KisInquireBalance_Response
 from backend.app.domains.stc.kis.model.kis_inquire_price import InquirePrice_Response
 from backend.app.domains.stc.kis.model.kis_order_cash_model import OrderCash_Request, KisOrderCash_Response
+from backend.app.domains.stc.kis.model.kis_psearch_result_model import PsearchResult_Response
+from backend.app.domains.stc.kis.model.kis_psearch_title_model import PsearchTitle_Result
 from backend.app.domains.stc.kis.model.kis_search_stock_info_model import SearchStockInfo_Response
+from backend.app.domains.stc.kis_interface_model import DailyCcld_Request
 from backend.app.domains.user.user_service import UserService
 from backend.app.managers.client_ws_manager import ClientWsManager
 from backend.app.managers.stock_api_manager import StockApiManager
 from backend.app.core.dependency import get_user_service
 from backend.app.managers.stock_ws_manager import StockWsManager
 from backend.app.core.logger import get_logger
+from backend.app.utils.kis_model_util import daily_ccld_to_inquire_daily_ccld
 
 logger = get_logger(__name__)
 
@@ -81,9 +85,36 @@ async def search_stock_info(user_id:str, acctno:str, stk_code:str):
 
 @router.get("/inquire-balance/{user_id}/{acctno}",response_model=KisInquireBalance_Response)
 async def inquire_balance(user_id:str, acctno:str):
-    ''' 상품정보 '''
+    ''' 주식 잔고 조회 '''
     api_manager = StockApiManager()
     kis_api = await api_manager.stock_api(user_id, acctno,'KIS')
     
     response = kis_api.inquire_balance()
+    return response
+
+@router.get("/psearch-title/{user_id}/{acctno}",response_model=PsearchTitle_Result)
+async def psearch_title(user_id:str, acctno:str):
+    ''' 조건식 목록 조회 '''
+    api_manager = StockApiManager()
+    kis_api = await api_manager.stock_api(user_id, acctno,'KIS')
+    
+    response = kis_api.psearch_title()
+    return response
+
+@router.get("/psearch-result/{user_id}/{acctno}/{seq}",response_model=PsearchResult_Response)
+async def psearch_reulst(user_id:str, acctno:str, seq:str):
+    ''' 조건식 결과 리스트 '''
+    api_manager = StockApiManager()
+    kis_api = await api_manager.stock_api(user_id, acctno,'KIS')
+    
+    response = kis_api.psearch_result(seq)
+    return response
+
+@router.post("/inquire-daily-ccld/{user_id}/{acctno}",response_model=InquireDailyCcld_Response)
+async def inquire_daily_ccld(user_id:str, acctno:str, daily_ccld: DailyCcld_Request ):
+    '''주식일별주문체결조회 '''
+    api_manager = StockApiManager()
+    kis_api = await api_manager.stock_api(user_id, acctno, 'KIS')
+    inquire_daily_ccld_req = daily_ccld_to_inquire_daily_ccld(daily_ccld)
+    response = kis_api.inquire_daily_ccld(inquire_daily_ccld_req)
     return response
