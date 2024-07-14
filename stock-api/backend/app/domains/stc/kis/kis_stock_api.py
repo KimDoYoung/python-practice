@@ -32,15 +32,15 @@ import requests
 
 from backend.app.core.logger import get_logger
 from backend.app.domains.stc.kis.model.kis_chk_holiday_model import ChkHolidayDto
-from backend.app.domains.stc.kis.model.kis_inquire_balance_model import KisInquireBalance
+from backend.app.domains.stc.kis.model.kis_inquire_balance_model import KisInquireBalance_Response
 from backend.app.domains.stc.kis.model.kis_inquire_daily_ccld_model import InquireDailyCcldDto, InquireDailyCcldRequest
 from backend.app.domains.stc.kis.model.kis_inquire_price import InquirePrice_Response
 from backend.app.domains.stc.kis.model.kis_inquire_psbl_rvsecncl_model import InquirePsblRvsecnclDto
 from backend.app.domains.stc.kis.model.kis_inquire_psbl_sell_model import InquirePsblSellDto
 from backend.app.domains.stc.kis.model.kis_inquire_psble_order import InquirePsblOrderDto, InquirePsblOrderRequest
-from backend.app.domains.stc.kis.model.kis_order_cash_model import KisOrderCancelRequest, KisOrderCashRequest, KisOrderCashResponse, KisOrderCancelResponse
+from backend.app.domains.stc.kis.model.kis_order_cash_model import KisOrderCancelRequest, OrderCash_Request, KisOrderCash_Response, KisOrderCancelResponse
 from backend.app.domains.stc.kis.model.kis_psearch_result_model import PsearchResultDto
-from backend.app.domains.stc.kis.model.kis_search_stock_info_model import SearchStockInfoDto
+from backend.app.domains.stc.kis.model.kis_search_stock_info_model import SearchStockInfo_Response
 from backend.app.domains.stc.kis.model.kis_psearch_title_model import PsearchTitleDto
 from backend.app.domains.stc.stock_api import StockApi
 from backend.app.domains.user.user_model import StkAccount, User
@@ -61,6 +61,7 @@ class KisStockApi(StockApi):
         self.APP_SECRET = account.get_value('KIS_APP_SECRET')
         self.ACCTNO = account.account_no
         self.ACCESS_TOKEN = None
+        self.ACCESS_TOKEN_TIME = None
         access_token = account.get_value('KIS_ACCESS_TOKEN')
         if access_token:
             self.ACCESS_TOKEN = access_token
@@ -182,7 +183,88 @@ class KisStockApi(StockApi):
 
         return int(json['output']['stck_prpr'])
         
-    def get_inquire_balance(self) ->KisInquireBalance:
+
+    def order(self, order_cash : OrderCash_Request ) -> KisOrderCash_Response:
+        ''' 현금 매수 or 매도 '''
+        logger.info(f"현금 매수 매도(order_cash) : {order_cash}")
+
+        url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/order-cash"
+        tr_id = "TTTC0802U" if order_cash.buy_sell_gb == "매수" else "TTTC0801U"
+        headers = {
+            "Content-Type":"application/json", 
+            "authorization":f"Bearer {self.ACCESS_TOKEN}",
+            "appkey":self.APP_KEY,
+            "appsecret":self.APP_SECRET,
+            "tr_id":tr_id,
+            "custtype":"P"
+        }
+        if order_cash.cost == 0:
+            data = {
+                "CANO": self.ACCTNO[0:8],
+                "ACNT_PRDT_CD": self.ACCTNO[8:10],
+                "PDNO" : order_cash.stk_code,
+                "ORD_DVSN" : "01", # 시장가
+                "ORD_QTY" : str(order_cash.qty), 
+                "ORD_UNPR" : "0" 
+            }
+        else:
+            data = {
+                "CANO": self.ACCTNO[0:8],
+                "ACNT_PRDT_CD": self.ACCTNO[8:10],
+                "PDNO" : order_cash.stk_code,
+                "ORD_DVSN" : "00", 
+                "ORD_QTY" : str(order_cash.qty), 
+                "ORD_UNPR" : str(order_cash.cost)
+            }
+
+        response = requests.post(url, headers=headers, data=json.dumps(data))
+        logger.debug(f"response : {response.text}")
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail=f"Error fetching balance: {response.text}")
+        try:
+            json_data = response.json()
+            kis_order_cash = KisOrderCash_Response(**json_data)
+            logger.info(f"주문결과 : {kis_order_cash}")
+        except requests.exceptions.JSONDecodeError:
+            logger.error(f"Error decoding JSON: {response.text}")
+            raise HTTPException(status_code=500, detail="Invalid JSON response")
+        except ValidationError as e:
+            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
+        return kis_order_cash
+    
+    def search_stock_info(self, stk_code:str) -> SearchStockInfo_Response:
+        ''' 국내 상품정보 '''
+        logger.info(f"상품정보 : {stk_code}")
+        url = self._BASE_URL + "/uapi/domestic-stock/v1/quotations/search-stock-info"
+        headers ={
+            "content-type": "application/json; charset=utf-8",
+            'Accept': 'application/json',
+            "authorization": f"Bearer {self.ACCESS_TOKEN}",
+            "appkey": self.APP_KEY,
+            "appsecret": self.APP_SECRET,
+            "tr_id": "CTPF1002R",
+            "custtype": "P" # B : 법인 P : 개인",
+        }        
+        data = {
+            "PRDT_TYPE_CD": "300", #300 주식, ETF, ETN, ELW 301 : 선물옵션 302 : 채권 306 : ELS'",
+            "PDNO" : stk_code
+        }
+        response = requests.get(url, headers=headers, params=data)
+        logger.debug(f"response : {response.text}")
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail=f"Error fetching balance: {response.text}")
+        try:
+            json_data = response.json()
+            stock_info = SearchStockInfo_Response(**json_data)
+            logger.info(f"상품정보 : {stock_info}")
+        except requests.exceptions.JSONDecodeError:
+            logger.error(f"Error decoding JSON: {response.text}")
+            raise HTTPException(status_code=500, detail="Invalid JSON response")
+        except ValidationError as e:
+            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
+        return stock_info
+
+    def inquire_balance(self) ->KisInquireBalance_Response:
         ''' 주식 잔고 조회 '''
         # url = self._PATHS["주식잔고조회"]
         url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/inquire-balance"
@@ -216,7 +298,7 @@ class KisStockApi(StockApi):
 
         try:
             json_data = response.json()
-            kis_inquire_balance = KisInquireBalance(**json_data)
+            kis_inquire_balance = KisInquireBalance_Response(**json_data)
         except requests.exceptions.JSONDecodeError:
             logger.error(f"Error decoding JSON: {response.text}")
             raise HTTPException(status_code=500, detail="Invalid JSON response")            
@@ -224,87 +306,6 @@ class KisStockApi(StockApi):
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
 
         return kis_inquire_balance
-
-
-    def order(self,  order_cash : KisOrderCashRequest ) -> KisOrderCashResponse:
-        ''' 현금 매수 or 매도 '''
-        logger.info(f"현금 매수 매도(order_cash) : {order_cash}")
-
-        url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/order-cash"
-        tr_id = "TTTC0802U" if order_cash.buy_sell_gb == "매수" else "TTTC0801U"
-        headers = {
-            "Content-Type":"application/json", 
-            "authorization":f"Bearer {self.ACCESS_TOKEN}",
-            "appkey":self.APP_KEY,
-            "appsecret":self.APP_SECRET,
-            "tr_id":tr_id,
-            "custtype":"P"
-        }
-        if order_cash.cost == 0:
-            data = {
-                "CANO": self.ACCTNO[0:8],
-                "ACNT_PRDT_CD": self.ACCTNO[8:10],
-                "PDNO" : order_cash.stk_code,
-                "ORD_DVSN" : "01", # 시장가
-                "ORD_QTY" : str(order_cash.qty), 
-                "ORD_UNPR" : "0" 
-            }
-        else:
-            data = {
-                "CANO": self.ACCTNO[0:8],
-                "ACNT_PRDT_CD": self.ACCTNO[8:10],
-                "PDNO" : order_cash.stk_code,
-                "ORD_DVSN" : "00", # 시장가
-                "ORD_QTY" : str(order_cash.qty), 
-                "ORD_UNPR" : str(order_cash.cost)
-            }
-
-        response = requests.post(url, headers=headers, data=json.dumps(data))
-        logger.debug(f"response : {response.text}")
-        if response.status_code != 200:
-            raise HTTPException(status_code=response.status_code, detail=f"Error fetching balance: {response.text}")
-        try:
-            json_data = response.json()
-            kis_order_cash = KisOrderCashResponse(**json_data)
-            logger.info(f"주문결과 : {kis_order_cash}")
-        except requests.exceptions.JSONDecodeError:
-            logger.error(f"Error decoding JSON: {response.text}")
-            raise HTTPException(status_code=500, detail="Invalid JSON response")
-        except ValidationError as e:
-            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
-        return kis_order_cash
-    
-    def search_stock_info(self, stk_code:str) -> SearchStockInfoDto:
-        ''' 국내 상품정보 '''
-        logger.info(f"상품정보 : {stk_code}")
-        url = self._BASE_URL + "/uapi/domestic-stock/v1/quotations/search-stock-info"
-        headers ={
-            "content-type": "application/json; charset=utf-8",
-            'Accept': 'application/json',
-            "authorization": f"Bearer {self.ACCESS_TOKEN}",
-            "appkey": self.APP_KEY,
-            "appsecret": self.APP_SECRET,
-            "tr_id": "CTPF1002R",
-            "custtype": "P" # B : 법인 P : 개인",
-        }        
-        data = {
-            "PRDT_TYPE_CD": "300", #300 주식, ETF, ETN, ELW 301 : 선물옵션 302 : 채권 306 : ELS'",
-            "PDNO" : stk_code
-        }
-        response = requests.get(url, headers=headers, params=data)
-        logger.debug(f"response : {response.text}")
-        if response.status_code != 200:
-            raise HTTPException(status_code=response.status_code, detail=f"Error fetching balance: {response.text}")
-        try:
-            json_data = response.json()
-            stock_info = SearchStockInfoDto(**json_data)
-            logger.info(f"상품정보 : {stock_info}")
-        except requests.exceptions.JSONDecodeError:
-            logger.error(f"Error decoding JSON: {response.text}")
-            raise HTTPException(status_code=500, detail="Invalid JSON response")
-        except ValidationError as e:
-            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
-        return stock_info
 
     def psearch_title(self) -> PsearchTitleDto:
         ''' 조건식 목록 조회 '''

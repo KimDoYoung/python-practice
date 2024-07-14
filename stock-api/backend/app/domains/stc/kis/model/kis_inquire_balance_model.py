@@ -56,7 +56,7 @@ class InquireBalanceItem2(StockApiBaseModel):
     asst_icdc_amt: str
     asst_icdc_erng_rt: str
 
-class KisInquireBalance(StockApiBaseModel):
+class KisInquireBalance_Response(StockApiBaseModel):
     rt_cd: str
     msg_cd: str
     msg1: str

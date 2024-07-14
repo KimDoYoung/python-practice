@@ -5,7 +5,7 @@ from backend.app.domains.stock_api_base_model import StockApiBaseModel
 
 
 # 주문 요청
-class KisOrderCashRequest(BaseModel):
+class OrderCash_Request(BaseModel):
     ''' 주문 요청 '''
     buy_sell_gb: Literal['매수', '매도']
     user_id: str # 사용자 ID
@@ -20,7 +20,7 @@ class OrderCashItem(StockApiBaseModel):
     ORD_TMD: str
 
 # 주문 응답
-class KisOrderCashResponse(StockApiBaseModel):
+class KisOrderCash_Response(StockApiBaseModel):
     '''order_cash  결과'''
     rt_cd: str
     msg_cd: str

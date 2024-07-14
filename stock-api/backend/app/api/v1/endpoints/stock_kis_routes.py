@@ -11,8 +11,10 @@
 """
 from fastapi import APIRouter, Depends
 
+from backend.app.domains.stc.kis.model.kis_inquire_balance_model import KisInquireBalance_Response
 from backend.app.domains.stc.kis.model.kis_inquire_price import InquirePrice_Response
-from backend.app.domains.stc.kis.model.kis_order_cash_model import KisOrderCashRequest, KisOrderCashResponse
+from backend.app.domains.stc.kis.model.kis_order_cash_model import OrderCash_Request, KisOrderCash_Response
+from backend.app.domains.stc.kis.model.kis_search_stock_info_model import SearchStockInfo_Response
 from backend.app.domains.user.user_service import UserService
 from backend.app.managers.client_ws_manager import ClientWsManager
 from backend.app.managers.stock_api_manager import StockApiManager
@@ -54,18 +56,34 @@ async def current_cost(user_id:str, acctno:str, stk_code:str):
     ''' 현재가 '''
     logger.info(f"current_cost 요청: {user_id}, {acctno}, {stk_code}")
     api_manager = StockApiManager()
-    kis_api = await api_manager.stock_api(user_id, acctno,'KIS')
+    kis_api = await api_manager.stock_api(user_id, acctno, 'KIS')
     response = kis_api.current_cost(stk_code)
     logger.info(f"current_cost 응답: {response}")
     return response
 
-@router.post("/order-cash/{user_id}/{acctno}",response_model=KisOrderCashResponse)
-async def order_cash(user_id:str, acctno:str, order_cash_request: KisOrderCashRequest):
-    ''' 매도/매수 주문'''
-    # raise StockApiException("이것은 잘못된 데이터입니다.")
+@router.post("/order/{user_id}/{acctno}",response_model=KisOrderCash_Response)
+async def order(user_id:str, acctno:str, order_request: OrderCash_Request):
+    ''' 매도/매수 현금주문'''
     api_manager = StockApiManager()
     kis_api = await api_manager.stock_api(user_id, acctno,'KIS')
-    # kis_api = StockApiManager(user_service).stock_api(user_id, acctno,'KIS')
     
-    order_cash_response = kis_api.order(order_cash_request)
+    order_cash_response = kis_api.order(order_request)
     return order_cash_response
+
+@router.get("/stock-info/{user_id}/{acctno}/{stk_code}",response_model=SearchStockInfo_Response)
+async def search_stock_info(user_id:str, acctno:str, stk_code:str):
+    ''' 상품정보 '''
+    api_manager = StockApiManager()
+    kis_api = await api_manager.stock_api(user_id, acctno,'KIS')
+    
+    response = kis_api.search_stock_info(stk_code)
+    return response
+
+@router.get("/inquire-balance/{user_id}/{acctno}",response_model=KisInquireBalance_Response)
+async def inquire_balance(user_id:str, acctno:str):
+    ''' 상품정보 '''
+    api_manager = StockApiManager()
+    kis_api = await api_manager.stock_api(user_id, acctno,'KIS')
+    
+    response = kis_api.inquire_balance()
+    return response
