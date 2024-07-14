@@ -12,8 +12,9 @@
 from fastapi import APIRouter, Depends
 
 from backend.app.domains.stc.kis.model.kis_inquire_balance_model import KisInquireBalance_Response
+from backend.app.domains.stc.kis.model.kis_inquire_daily_ccld_model import InquireDailyCcld_Response
 from backend.app.domains.stc.kis.model.kis_inquire_price import InquirePrice_Response
-from backend.app.domains.stc.kis.model.kis_order_cash_model import OrderCash_Request, KisOrderCash_Response
+from backend.app.domains.stc.kis.model.kis_order_cash_model import KisOrderCancel_Request, KisOrderCancel_Response, OrderCash_Request, KisOrderCash_Response
 from backend.app.domains.stc.kis.model.kis_psearch_result_model import PsearchResult_Response
 from backend.app.domains.stc.kis.model.kis_psearch_title_model import PsearchTitle_Result
 from backend.app.domains.stc.kis.model.kis_search_stock_info_model import SearchStockInfo_Response
@@ -73,6 +74,15 @@ async def order(user_id:str, acctno:str, order_request: OrderCash_Request):
     
     order_cash_response = kis_api.order(order_request)
     return order_cash_response
+
+@router.post("/order-cancel/{user_id}/{acctno}",response_model=KisOrderCancel_Response)
+async def order(user_id:str, acctno:str):
+    ''' 주식 주문 취소'''
+    api_manager = StockApiManager()
+    kis_api = await api_manager.stock_api(user_id, acctno,'KIS')
+    req = KisOrderCancel_Request()
+    resp = kis_api.order_cancel(req)
+    return resp
 
 @router.get("/stock-info/{user_id}/{acctno}/{stk_code}",response_model=SearchStockInfo_Response)
 async def search_stock_info(user_id:str, acctno:str, stk_code:str):
