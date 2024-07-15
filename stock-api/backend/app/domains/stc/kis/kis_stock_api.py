@@ -73,7 +73,6 @@ class KisStockApi(StockApi):
         else:
             return None
         
-    #TODO 시간을 체크해서 23시간 이상이면 다시 발급해야 한다.
     async def initialize(self) -> bool:
         ''' Access Token 존재여부 및  만료 여부 확인 '''
 
@@ -133,9 +132,28 @@ class KisStockApi(StockApi):
             raise AccessTokenInvalidException("KIS Access Token Invalid(접속토큰이 유효하지 않음)")
 
         return None
+
+    def send_request(self, title, method, url, headers, params=None, data=None):
+        try:
+            if method == 'GET':
+                response = requests.get(url, headers=headers, params=params)
+            elif method == 'POST':
+                response = requests.post(url, headers=headers, data=data)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.HTTPError as e:
+            logger.error(f"HTTP 오류 ({title}): {e}")
+            raise KisApiException(status_code=500, detail=f"HTTP 오류 ({title}): {e}")
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error occurred: {e}")
+            raise KisApiException(status_code=500, detail=f"Error occurred ({title}): {e}")
+        except json.JSONDecodeError as e:
+            logger.error(f"Response is not in JSON format.{title}")
+            raise InvalidResponseException(f"Response is not in JSON format.({title})")
+
     def current_cost(self, stk_code:str) -> InquirePrice_Response:
         ''' 현재가 조회 '''
-        url = self._BASE_URL + '/uapi/domestic-stock/v1/quotations/inquire-price' 
+        url = self._BASE_URL +  '/uapi/domestic-stock/v1/quotations/inquire-price' 
         headers = {"Content-Type":"application/json", 
                 "authorization": f"Bearer {self.ACCESS_TOKEN}",
                 "appKey":self.APP_KEY,
@@ -145,20 +163,13 @@ class KisStockApi(StockApi):
             "fid_cond_mrkt_div_code":"J",
             "fid_input_iscd":stk_code,
         }
+        json_response = self.send_request('현재가 조회', 'GET', url, headers, params=params)
+        self.check_access_token(json_response)
+        logger.debug(f"현재가: {stk_code} : {json_response['output']['stck_prpr']}")
         try:
-            response = requests.get(url, headers=headers, params=params)
-            response.raise_for_status()
-            response_data = response.json()
-            logger.debug(f"-------------------------------------------------------------")
-            logger.debug(f"API 응답 current_cost : [{response_data}]")
-            logger.debug(f"-------------------------------------------------------------")
-            return InquirePrice_Response(**response_data)
-        except requests.exceptions.HTTPError as e:
-            logger.error(f"API 응답 에러 : {e}")
-            raise KisApiException(status_code=500, detail=f"API 응답 에러 : {e}")    
-        except json.JSONDecodeError as e:
-            logger.error("응답이 JSON 형식이 아닙니다.")
-            raise InvalidResponseException("응답이 JSON 형식이 아닙니다.")
+            return InquirePrice_Response(**json_response)
+        except ValidationError as e:
+            raise HTTPException(status_code=500, detail=f"받은 json 파싱 오류: {e}")        
 
 
     def get_current_price(self, stk_code:str ) ->int:
@@ -185,7 +196,7 @@ class KisStockApi(StockApi):
         
 
     def order(self, order_cash : OrderCash_Request ) -> KisOrderCash_Response:
-        ''' 현금 매수 or 매도 '''
+        ''' 현금 매수/매도 '''
         logger.info(f"현금 매수 매도(order_cash) : {order_cash}")
 
         url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/order-cash"
@@ -216,22 +227,13 @@ class KisStockApi(StockApi):
                 "ORD_QTY" : str(order_cash.qty), 
                 "ORD_UNPR" : str(order_cash.cost)
             }
-
-        response = requests.post(url, headers=headers, data=json.dumps(data))
-        logger.debug(f"response : {response.text}")
-        if response.status_code != 200:
-            raise HTTPException(status_code=response.status_code, detail=f"Error fetching balance: {response.text}")
+        
+        json_response = self.send_request('현금 매수/매도', 'POST', url, headers, data=json.dumps(data))
         try:
-            json_data = response.json()
-            kis_order_cash = KisOrderCash_Response(**json_data)
-            logger.info(f"주문결과 : {kis_order_cash}")
-        except requests.exceptions.JSONDecodeError:
-            logger.error(f"Error decoding JSON: {response.text}")
-            raise HTTPException(status_code=500, detail="Invalid JSON response")
+            return KisOrderCash_Response(**json_response)
         except ValidationError as e:
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
-        return kis_order_cash
-    
+        
     def search_stock_info(self, stk_code:str) -> SearchStockInfo_Response:
         ''' 국내 상품정보 '''
         logger.info(f"상품정보 : {stk_code}")
@@ -245,24 +247,15 @@ class KisStockApi(StockApi):
             "tr_id": "CTPF1002R",
             "custtype": "P" # B : 법인 P : 개인",
         }        
-        data = {
+        params = {
             "PRDT_TYPE_CD": "300", #300 주식, ETF, ETN, ELW 301 : 선물옵션 302 : 채권 306 : ELS'",
             "PDNO" : stk_code
         }
-        response = requests.get(url, headers=headers, params=data)
-        logger.debug(f"response : {response.text}")
-        if response.status_code != 200:
-            raise HTTPException(status_code=response.status_code, detail=f"Error fetching balance: {response.text}")
+        json_response = self.send_request('국내 상품정보', 'GET', url, headers, params=params)
         try:
-            json_data = response.json()
-            stock_info = SearchStockInfo_Response(**json_data)
-            logger.info(f"상품정보 : {stock_info}")
-        except requests.exceptions.JSONDecodeError:
-            logger.error(f"Error decoding JSON: {response.text}")
-            raise HTTPException(status_code=500, detail="Invalid JSON response")
+            return SearchStockInfo_Response(**json_response)
         except ValidationError as e:
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
-        return stock_info
 
     def order_cancel(self, org_order_no: str) -> KisOrderCancel_Response:
         '''주식 주문 취소 '''
@@ -285,22 +278,11 @@ class KisStockApi(StockApi):
             "appsecret": self.APP_SECRET,
             "tr_id": "TTTC0803U" #[실전투자] TTTC0803U : 주식 정정 취소 주문 [모의투자] VTTC0803U : 주식 정정 취소 주문",                        
         }        
-
-        response = requests.post(url, headers=headers, data=json.dumps(body))
-        logger.debug(f"response : {response.text}")
-        if response.status_code != 200:
-            raise HTTPException(status_code=response.status_code, detail=f"Error 주식일별주문체결조회 : {response.text}")
+        json_response = self.send_request('주식 주문취소', 'POST', url, headers, data=json.dumps(body))
         try:
-            json_data = response.json()
-            order_cancel = KisOrderCancel_Response(**json_data)
-            logger.debug(f"주식 주문 잔량 전부 취소 됨")
-        except requests.exceptions.JSONDecodeError:
-            logger.error(f"Error decoding JSON: {response.text}")
-            raise HTTPException(status_code=500, detail="Invalid JSON response")
+            return KisOrderCancel_Response(**json_response)
         except ValidationError as e:
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
-        return order_cancel
-
 
     def order_modify(self, req: KisOrderRvsecncl_Request) -> KisOrderCancel_Response:
         '''주식 주문 정정 '''
@@ -324,24 +306,14 @@ class KisStockApi(StockApi):
             "tr_id": "TTTC0803U" #[실전투자] TTTC0803U : 주식 정정 취소 주문 [모의투자] VTTC0803U : 주식 정정 취소 주문",                        
         }        
 
-        response = requests.post(url, headers=headers, data=json.dumps(body))
-        logger.debug(f"response : {response.text}")
-        if response.status_code != 200:
-            raise HTTPException(status_code=response.status_code, detail=f"Error 주문정정 : {response.text}")
+        json_response = self.send_request('주식 주문 정정','POST', url, headers, data=json.dumps(body))
         try:
-            json_data = response.json()
-            order_cancel = KisOrderCancel_Response(**json_data)
-            logger.debug(f"주식 주문 정정 됨")
-        except requests.exceptions.JSONDecodeError:
-            logger.error(f"Error decoding JSON: {response.text}")
-            raise HTTPException(status_code=500, detail="Invalid JSON response")
+            return KisOrderCancel_Response(**json_response)
         except ValidationError as e:
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
-        return order_cancel
 
     def inquire_balance(self) ->KisInquireBalance_Response:
         ''' 주식 잔고 조회 '''
-        # url = self._PATHS["주식잔고조회"]
         url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/inquire-balance"
         headers = {
             "Content-Type":"application/json", 
@@ -365,28 +337,17 @@ class KisStockApi(StockApi):
             "CTX_AREA_FK100": "",
             "CTX_AREA_NK100": ""
         }
-        response = requests.get(url, headers=headers, params=params)
-
-        if response.status_code != 200:
-            self.check_access_token(response.json())  
-            raise HTTPException(status_code=response.status_code, detail=f"Error fetching balance: {response.text}")
-
+        json_response = self.send_request('주식 잔고 조회', 'GET', url, headers, params=params)
         try:
-            json_data = response.json()
-            kis_inquire_balance = KisInquireBalance_Response(**json_data)
-        except requests.exceptions.JSONDecodeError:
-            logger.error(f"Error decoding JSON: {response.text}")
-            raise HTTPException(status_code=500, detail="Invalid JSON response")            
+            return KisInquireBalance_Response(**json_response)
         except ValidationError as e:
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
-
-        return kis_inquire_balance
 
     def psearch_title(self) -> PsearchTitle_Result:
         ''' 조건식 목록 조회 '''
         logger.info(f"조건식 목록 조회 ")
         url = self._BASE_URL + "/uapi/domestic-stock/v1/quotations/psearch-title"
-        data = {
+        params = {
             "user_id": self.HTS_USER_ID
         }        
         headers ={
@@ -398,27 +359,17 @@ class KisStockApi(StockApi):
             "custtype": "P", # B : 법인 P : 개인",
             "tr_cont" : ""
         }        
-
-        response = requests.get(url, headers=headers, params=data)
-        logger.debug(f"response : {response.text}")
-        if response.status_code != 200:
-            raise HTTPException(status_code=response.status_code, detail=f"Error fetching balance: {response.text}")
+        json_response = self.send_request('조건식 목록 조회', 'GET', url, headers, params=params)
         try:
-            json_data = response.json()
-            psearch_title = PsearchTitle_Result(**json_data)
-            logger.info(f"조건식 목록 조회 : {psearch_title}")
-        except requests.exceptions.JSONDecodeError:
-            logger.error(f"Error decoding JSON: {response.text}")
-            raise HTTPException(status_code=500, detail="Invalid JSON response")
+            return PsearchTitle_Result(**json_response)
         except ValidationError as e:
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
-        return psearch_title
     
     def psearch_result(self, seq: str) -> PsearchResult_Response:
         ''' 조건식 결과 리스트  '''
         logger.info(f"조건식 결과 리스트 조회 ")
         url = self._BASE_URL + "/uapi/domestic-stock/v1/quotations/psearch-result"
-        data = {
+        params = {
             "user_id": self.HTS_USER_ID,
             "seq" : seq
         }        
@@ -430,21 +381,11 @@ class KisStockApi(StockApi):
             "tr_id": "HHKST03900400",
             "custtype": "P"
         }        
-
-        response = requests.get(url, headers=headers, params=data)
-        logger.debug(f"response : {response.text}")
-        if response.status_code != 200:
-            raise HTTPException(status_code=response.status_code, detail=f"Error 조건식 결과 리스트: {response.text}")
+        json_response = self.send_request('조건식 결과 리스트', 'GET', url, headers, params=params)
         try:
-            json_data = response.json()
-            psearch_result = PsearchResult_Response(**json_data)
-            logger.info(f"조건식 결과 리스트 : {psearch_result}")
-        except requests.exceptions.JSONDecodeError:
-            logger.error(f"Error decoding JSON: {response.text}")
-            raise HTTPException(status_code=500, detail="Invalid JSON response")
+            return PsearchResult_Response(**json_response)
         except ValidationError as e:
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
-        return psearch_result    
 
     def inquire_daily_ccld(self, inquire_daily_ccld: InquireDailyCcld_Request) -> InquireDailyCcld_Response:
         '''주식일별주문체결조회 '''
@@ -472,21 +413,11 @@ class KisStockApi(StockApi):
             "appsecret": self.APP_SECRET,
             "tr_id": "TTTC8001R" # TTTC8001R: 주식 일별 주문 체결 조회(3개월이내) CTSC9115R : 주식 일별 주문 체결 조회(3개월이전)
         }        
-
-        response = requests.get(url, headers=headers, params=params)
-        logger.debug(f"response : {response.text}")
-        if response.status_code != 200:
-            raise HTTPException(status_code=response.status_code, detail=f"Error 주식일별주문체결조회 : {response.text}")
+        json_response = self.send_request('주식일별주문체결조회','GET', url, headers, params=params)
         try:
-            json_data = response.json()
-            inquire_daily_ccld = InquireDailyCcld_Response(**json_data)
-            logger.debug(f"주식일별주문체결조회 됨")
-        except requests.exceptions.JSONDecodeError:
-            logger.error(f"Error decoding JSON: {response.text}")
-            raise HTTPException(status_code=500, detail="Invalid JSON response")
+            return InquireDailyCcld_Response(**json_response)
         except ValidationError as e:
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
-        return inquire_daily_ccld    
     
     ##############################################################################################
     # [국내주식] 주문/계좌 > 주식정정취소가능주문조회[v1_국내주식-004]
@@ -510,21 +441,12 @@ class KisStockApi(StockApi):
             "appkey": self.APP_KEY,
             "appsecret": self.APP_SECRET,
             "tr_id":  "TTTC8036R" #모의투자 사용 불가", 
-        }       
-        response = requests.get(url, headers=headers, params=params)
-        logger.debug(f"response : {response.text}")
-        if response.status_code != 200:
-            raise HTTPException(status_code=response.status_code, detail=f"Error 정정취소 가능수량 조회: {response.text}")
+        }
+        json_response = self.send_request('정정취소 가능수량 조회', 'GET', url, headers, params=params)
         try:
-            json_data = response.json()
-            possible_cancel_result = InquirePsblRvsecncl_Response(**json_data)
-            logger.info(f"정정취소 가능수량 조회 : {possible_cancel_result}")
-        except requests.exceptions.JSONDecodeError:
-            logger.error(f"Error decoding JSON: {response.text}")
-            raise HTTPException(status_code=500, detail="Invalid JSON response")
+            return InquirePsblRvsecncl_Response(**json_response)
         except ValidationError as e:
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
-        return possible_cancel_result    
 
     ##############################################################################################
     # [국내주식] 주문/계좌 > 매수가능조회
@@ -547,21 +469,12 @@ class KisStockApi(StockApi):
             "appkey": self.APP_KEY,
             "appsecret": self.APP_SECRET,
             "tr_id":  "TTTC8908R" #매수가능조회
-        }       
-        response = requests.get(url, headers=headers, params=params)
-        logger.debug(f"response : {response.text}")
-        if response.status_code != 200:
-            raise HTTPException(status_code=response.status_code, detail=f"Error 매수가능조회: {response.text}")
+        }
+        json_response = self.send_request('매수가능조회', 'GET', url, headers, params=params)
         try:
-            json_data = response.json()
-            psbl_order = InquirePsblOrder_Response(**json_data)
-            logger.info(f"매수가능조회 목록 조회 : {psbl_order}")
-        except requests.exceptions.JSONDecodeError:
-            logger.error(f"Error decoding JSON: {response.text}")
-            raise HTTPException(status_code=500, detail="Invalid JSON response")
+            return InquirePsblOrder_Response(**json_response)
         except ValidationError as e:
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
-        return psbl_order
 
     ##############################################################################################
     # [국내주식] 주문계좌 > 매도가능수량
@@ -587,20 +500,11 @@ class KisStockApi(StockApi):
             "tr_id": "TTTC8408R",
             "custtype": "P",
         }
-        response = requests.get(url, headers=headers, params=params)
-        logger.debug(f"response : {response.text}")
-        if response.status_code != 200:
-            raise HTTPException(status_code=response.status_code, detail=f"Error 매도가능수량조회: {response.text}")
+        json_response = self.send_request('매도가능수량', 'GET', url, headers, params=params)
         try:
-            json_data = response.json()
-            inquire_psbl_sell = InquirePsblSell_Response(**json_data)
-            logger.info(f"매도가능수량조회 : {inquire_psbl_sell}")
-        except requests.exceptions.JSONDecodeError:
-            logger.error(f"Error decoding JSON: {response.text}")
-            raise HTTPException(status_code=500, detail="Invalid JSON response")
+            return InquirePsblSell_Response(**json_response)
         except ValidationError as e:
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
-        return inquire_psbl_sell
 
     ##############################################################################################
     # [국내주식] 업종/기타 > 국내휴장일조회
@@ -626,18 +530,8 @@ class KisStockApi(StockApi):
             "tr_id": "CTCA0903R",
             "custtype": "P"
         }    
-
-        response = requests.get(url, headers=headers, params=params)
-        logger.debug(f"response : {response.text}")
-        if response.status_code != 200:
-            raise HTTPException(status_code=response.status_code, detail=f"Error 국내휴장일조회: {response.text}")
+        json_response = self.send_request('국내휴장일조회', 'GET', url, headers, params=params)
         try:
-            json_data = response.json()
-            chk_holiday = ChkWorkingDay_Response(**json_data)
-            logger.info(f"국내휴장일조회 목록 조회 : {chk_holiday}")
-        except requests.exceptions.JSONDecodeError:
-            logger.error(f"Error decoding JSON: {response.text}")
-            raise HTTPException(status_code=500, detail="Invalid JSON response")
+            return ChkWorkingDay_Response(**json_response)
         except ValidationError as e:
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
-        return chk_holiday
