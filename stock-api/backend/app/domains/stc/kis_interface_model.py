@@ -26,4 +26,9 @@ class Modify_Order_Request(StockApiBaseModel):
     dvsn_cd : Literal['정정', '취소']
     modify_qty: str="0"
     modify_cost: str="0"
-    all_yn = "Y"
+    all_yn: str = "Y"
+
+class Buy_Max_Request(StockApiBaseModel):
+    ''' 매수가능 수량  '''
+    stk_code : str
+    cost : str = "0"

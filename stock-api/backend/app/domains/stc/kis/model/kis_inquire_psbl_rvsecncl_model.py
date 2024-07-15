@@ -27,7 +27,7 @@ class InquirePsblRvsecnclItem(StockApiBaseModel):
     mgco_aptm_odno: str # 운용사지정주문번호 주문 번호 (운용사 통한 주문)
 
 
-class InquirePsblRvsecnclDto(StockApiBaseModel):
+class InquirePsblRvsecncl_Response(StockApiBaseModel):
     rt_cd: str # 성공 실패 여부 0 : 성공 0 이외의 값 : 실패
     msg_cd: str # 응답코드 응답코드
     msg1: str # 응답메세지 응답메세지

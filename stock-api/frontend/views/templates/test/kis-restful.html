@@ -18,6 +18,7 @@ input {
 <div class="bg-secondary m-2 p-2">
     user id: <input type="text" id="user_id" value="kdy987">
     account no : <input type="text" id="acct_no" value="6577792801">
+    <button id="btnClear" class="float-end">결과Clear</button>
 </div>
 <div>
     stk_code : <input type="text" id="stk_code" value="005930"> 
@@ -37,7 +38,32 @@ input {
 <div>
     <button id="btnInquireBalance">주식잔고</button>
     <button id="btnPsearchList">조건식리스트</button>
-
+    <button id="btnPsearchResult">조건식결과</button>
+</div>
+<div>
+    <input type="date" name="start_ymd" id="start_ymd"> ~ <input type="date" name="end_ymd" id="end_ymd"> 
+    <button id="btnDailyCcid">일일주문체결</button>
+</div>
+<div>
+    <input type="text" id="org_ord_no">
+    <button id="btnOrderCancel">주문취소</button>
+</div>
+<div>
+    <button id="btnOrderModifyQty">주문정정가능수량조회</button>
+    org ord no: <input type="text" id="org_ord_no3">
+    qty : <input type="number" name="qty" id="qty3">
+    cost : <input type="number" name="cost" id="cost3">
+    <button id="btnOrderModify">주문정정</button>
+</div>
+<div>
+    stk_code : <input type="text" id="stk_code4" value="005930">
+    cost(0:시장가) : <input type="number" name="cost" id="cost4" value="0">
+    <button id="btnBuyMaxQty">매수가능수량</button>
+    <button id="btnSellMaxQty">매도가능수량</button>
+</div>
+<div>
+    base_dt: <input type="date" name="base_dt" id="base_dt" value="2024.07.15">
+    <button id="btnChkWorkingday">휴장일 체크</button>
 </div>
 
 <div id="log" class="log"></div><div id="error-area" class="text-danger"></div>
@@ -48,6 +74,10 @@ input {
 <script>
 $( document ).ready(function() {
     console.log( "ready!")
+    $('#btnClear').on('click', function(){
+        $('#log').empty();
+        $('#error-area').empty();
+    });
     $('#btnCurrentCost').on('click', function(){
         var user_id = $('#user_id').val();
         var acct_no = $('#acct_no').val();
@@ -186,6 +216,182 @@ $( document ).ready(function() {
             }
         );
     })
+    $('#btnPsearchResult').on('click', function(){
+        const user_id = $('#user_id').val();
+        const acct_no = $('#acct_no').val();
+        getFetch(`/api/v1/kis/psearch-result/${user_id}/${acct_no}/0`)
+        .then(
+            response => {
+                console.log(response);
+                $('#log').append(JSON.stringify(response) + '<br>');
+            }
+        )
+        .catch(
+            error => {
+                console.error(error.message);
+                $('#error-area').append(error.toString()) + '<br>';
+            }
+        );
+    });
+    $('#btnDailyCcid').on('click', function(){
+        const user_id = $('#user_id').val();
+        const acct_no = $('#acct_no').val();
+        const start_ymd = $('#start_ymd').val();
+        const end_ymd = $('#end_ymd').val();
+        const data = {
+            start_ymd: start_ymd,
+            end_ymd: end_ymd
+        }
+        postFetch(`/api/v1/kis/inquire-daily-ccld/${user_id}/${acct_no}`, data)
+        .then(
+            response => {
+                console.log(response);
+                $('#log').append(JSON.stringify(response) + '<br>');
+            }
+        )
+        .catch(
+            error => {
+                console.error(error.message);
+                $('#error-area').append(error.toString()) + '<br>';
+            }
+        );
+    });
+    $('#btnOrderCancel').on('click', function(){
+        const user_id = $('#user_id').val();
+        const acct_no = $('#acct_no').val();
+        const org_ord_no = $('#org_ord_no').val();
+        const url = `/api/v1/kis/order-cancel/${user_id}/${acct_no}/${org_ord_no}`;
+        console.log(url);
+        getFetch(url)
+        .then(
+            response => {
+                console.log(response);
+                $('#log').append(JSON.stringify(response) + '<br>');
+            }
+        )
+        .catch(
+            error => {
+                console.error(error.message);
+                $('#error-area').append(error.toString()) + '<br>';
+            }
+        );
+    });
+    $('#btnOrderModify').on('click', function(){
+        const user_id = $('#user_id').val();
+        const acct_no = $('#acct_no').val();
+        const org_ord_no = $('#org_ord_no3').val();
+        const qty = $('#qty3').val();
+        const cost = $('#cost3').val();
+        const url = `/api/v1/kis/order-modify/${user_id}/${acct_no}/${org_ord_no}`;
+        const order_type = cost == 0 ? '시장가' : '지정가';
+        const data = {
+            order_no :org_ord_no,
+            order_type: order_type,
+            dvsn_cd : '정정',
+            modify_qty: qty,
+            modify_cost: cost,
+            all_yn : 'N'
+        }
+        console.log(url);
+        postFetch(url, data)
+        .then(
+            response => {
+                console.log(response);
+                $('#log').append(JSON.stringify(response) + '<br>');
+            }
+        )
+        .catch(
+            error => {
+                console.error(error.message);
+                $('#error-area').append(error.toString()) + '<br>';
+            }
+        );
+    });
+    $('#btnOrderModifyQty').on('click', function(){
+        const user_id = $('#user_id').val();
+        const acct_no = $('#acct_no').val();
+        const url = `/api/v1/kis/order-modify-qty/${user_id}/${acct_no}`;
+        console.log(url);
+        getFetch(url)
+        .then(
+            response => {
+                console.log(response);
+                $('#log').append(JSON.stringify(response) + '<br>');
+            }
+        )
+        .catch(
+            error => {
+                console.error(error.message);
+                $('#error-area').append(error.toString()) + '<br>';
+            }
+        );
+    })
+    $('#btnBuyMaxQty').on('click',function(){
+        const user_id = $('#user_id').val();
+        const acct_no = $('#acct_no').val();
+        const stk_code = $('#stk_code4').val();
+        const cost = $('#cost4').val();
+        const url = `/api/v1/kis/buy-max-qty/${user_id}/${acct_no}`;
+        console.log(url);
+        data = {
+            stk_code: stk_code,
+            cost: cost
+        }
+        postFetch(url,data)
+        .then(
+            response => {
+                console.log(response);
+                $('#log').append(JSON.stringify(response) + '<br>');
+            }
+        )
+        .catch(
+            error => {
+                console.error(error.message);
+                $('#error-area').append(error.toString()) + '<br>';
+            }
+        );
+    
+    })
+    $('#btnSellMaxQty').on('click', function(){
+        const user_id = $('#user_id').val();
+        const acct_no = $('#acct_no').val();
+        const stk_code = $('#stk_code4').val();
+        const url = `/api/v1/kis/sell-max-qty/${user_id}/${acct_no}/${stk_code}`;
+        console.log(url);
+        getFetch(url)
+        .then(
+            response => {
+                console.log(response);
+                $('#log').append(JSON.stringify(response) + '<br>');
+            }
+        )
+        .catch(
+            error => {
+                console.error(error.message);
+                $('#error-area').append(error.toString()) + '<br>';
+            }
+        );
+    })
+    $('#btnChkWorkingday').on('click', function(){
+        const user_id = $('#user_id').val();
+        const acct_no = $('#acct_no').val();        
+        const base_dt = $('#base_dt').val();
+        const url = `/api/v1/kis/chk-workingday/${user_id}/${acct_no}/${base_dt}`;
+        console.log(url);
+        getFetch(url)
+        .then(
+            response => {
+                console.log(response);
+                $('#log').append(JSON.stringify(response) + '<br>');
+            }
+        )
+        .catch(
+            error => {
+                console.error(error.message);
+                $('#error-area').append(error.toString()) + '<br>';
+            }
+        );
+    });
 }); //end document ready
 </script>
 {% endraw %}

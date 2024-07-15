@@ -9,3 +9,7 @@ def get_today():
     today = datetime.now().strftime("%Y-%m-%d")
     today = f"{today} ({yoil_korean})"
     return today
+
+def only_number(s:str):
+    ''' 숫자만 추출 '''
+    return ''.join(filter(str.isdigit, s))
