@@ -1,0 +1,126 @@
+{% extends 'common/base.html' %}
+{% block style %}
+{% endblock %}
+{% block content %}
+<h1>LS-Restful API Test</h1>
+<div id="basic-info-area" class="border m-2 p-2 bg-secondary">
+    user_id: <input type="text" name="user_id" id="user_id" value="kdy987">
+    acct_no: <input type="text" name="acctno" id="acctno" value="00501716387">
+</div>
+<div>
+        <div class="row">
+            <div class="col-4">
+            <div class="mb-3">
+                <label class="form-label">Market</label>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="market_gb" id="market_all" value="전체" checked>
+                    <label class="form-check-label" for="market_all">
+                        전체
+                    </label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="market_gb" id="market_kospi" value="코스피">
+                    <label class="form-check-label" for="market_kospi">
+                        코스피
+                    </label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="market_gb" id="market_kosdaq" value="코스닥">
+                    <label class="form-check-label" for="market_kosdaq">
+                        코스닥
+                    </label>
+                </div>
+            </div>
+            </div>
+        <div class="col-4">
+            <div class="mb-3">
+                <label class="form-label">Up/Down</label>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="updown_gb" id="up" value="상승" checked>
+                    <label class="form-check-label" for="up">
+                        상승
+                    </label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="updown_gb" id="down" value="하락">
+                    <label class="form-check-label" for="down">
+                        하락
+                    </label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="updown_gb" id="steady" value="보합">
+                    <label class="form-check-label" for="steady">
+                        보합
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="mb-3">
+                <label class="form-label">Yesterday/Today</label>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="yester_or_today" id="yesterday" value="전일" checked>
+                    <label class="form-check-label" for="yesterday">
+                        전일
+                    </label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="yester_or_today" id="today" value="금일">
+                    <label class="form-check-label" for="today">
+                        금일
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div>
+    <button id="btnRange">1.등락률</button>
+    <button id="btnVolumn">2.거래량</button>
+    <button id="btnRapidUp">3.전일대비거래급증</button>
+    <button id="btnTimeoutRange">4.시간외등락율</button>
+    <button id="btnTimeoutVolume">5.시간외거래량</button>
+    <button id="btnExpectFilfull">6.예상체결량</button>
+    <button id="btnExpectDanilgaRange">7.단일가예상등락율</button>
+</div>
+<div id="list-area"></div>
+{% raw %}
+<!--handlebar scripts-->
+
+{% endraw %}
+{% endblock %}
+{% block script %}
+{% raw %}
+<script>
+$( document ).ready(function() {
+    console.log( "ready!")
+    $('#btnRange').click(async function(){
+        const user_id = $('#user_id').val()
+        const acct_no = $('#acctno').val()
+        const url = `/api/v1/ls/rank/range/${user_id}/${acct_no}`
+        const market_gb = $('input[name=market_gb]:checked').val()
+        const updown_gb = $('input[name=updown_gb]:checked').val()
+        const yester_or_today = $('input[name=yester_or_today]:checked').val()
+
+        const data = {
+            market_gb : market_gb,
+            updown_gb: updown_gb,
+            yester_or_today : yester_or_today,
+        }
+        debugger;
+        const template_html = await fetch('/template?path=handlebar/range.html')
+        postFetch(url, data)
+            .then(data => {
+                console.log(data);
+                const template = Handlebars.compile(template_html);
+                const html = template(data);
+                $('#list-area').html(html);
+            })
+            .catch(error => {
+                $('#list-area').html(error.message);
+            });
+    });
+});
+</script>
+{% endraw %}
+{% endblock %}

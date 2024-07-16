@@ -25,6 +25,13 @@ from backend.app.domains.stc.ls.model.cspat00801_model import CSPAT00801_Request
 from backend.app.domains.stc.ls.model.t0424_model import T0424_Request, T0424_Response
 from backend.app.domains.stc.ls.model.t0425_model import T0425_Request, T0425_Response
 from backend.app.domains.stc.ls.model.t1102_model import T1102_Request, T1102_Response
+from backend.app.domains.stc.ls.model.t1441_model import T1441_Request, T1441_Response
+from backend.app.domains.stc.ls.model.t1452_model import T1452_Request, T1452_Response
+from backend.app.domains.stc.ls.model.t1466_model import T1466_Request, T1466_Response
+from backend.app.domains.stc.ls.model.t1481_model import T1481_Request, T1481_Response
+from backend.app.domains.stc.ls.model.t1482_model import T1482_Request, T1482_Response
+from backend.app.domains.stc.ls.model.t1489_model import T1489_Request, T1489_Response
+from backend.app.domains.stc.ls.model.t1492_model import T1492_Request, T1492_Response
 from backend.app.domains.stc.ls.model.t8407_model import T8407_Request, T8407_Response
 from backend.app.domains.stc.ls.model.t9945_model import T9945_Response
 from backend.app.domains.stc.stock_api import StockApi
@@ -258,3 +265,90 @@ class LsStockApi(StockApi):
         }
         response_data = await self.send_request(req_dict)
         return CSPAQ12300_Response(**response_data)
+
+#--------------------------------------------------------------------------------------
+# 상위랭크 route
+#--------------------------------------------------------------------------------------
+    async def rank_range(self, req:T1441_Request) -> T1441_Response:
+        '''[주식] 상위종목 : 등락률'''
+        req_dict = {
+            "path": "/stock/high-item",
+            "tr_cd": "t1441",
+            "data": {
+                "t1441InBlock": req.t1441InBlock.model_dump()
+            }
+        }
+        response_data = await self.send_request(req_dict)
+        return T1441_Response(**response_data)
+    
+    async def rank_volumn(self, req:T1452_Request) -> T1452_Response:
+        '''[주식] 상위종목-거래량상위'''
+        req_dict = {
+            "path": "/stock/high-item",
+            "tr_cd": "t1452",
+            "data": {
+                "t1452InBlock": req.t1452InBlock.model_dump()
+            }
+        }
+        response_data = await self.send_request(req_dict)
+        return T1452_Response(**response_data)
+    
+    async def rank_rapidup(self, req:T1466_Request) -> T1466_Response:
+        '''[주식] 상위종목-전일동시간대비거래급증 '''
+        req_dict = {
+            "path": "/stock/high-item",
+            "tr_cd": "t1466",
+            "data": {
+                "t1466InBlock": req.t1466InBlock.model_dump()
+            }
+        }
+        response_data = await self.send_request(req_dict)
+        return T1466_Response(**response_data)
+    
+    async def rank_timeout_range(self, req:T1481_Request) -> T1481_Response:
+        '''[주식] 상위종목-시간외등락율상위 '''
+        req_dict = {
+            "path": "/stock/high-item",
+            "tr_cd": "t1481",
+            "data": {
+                "t1481InBlock": req.t1481InBlock.model_dump()
+            }
+        }
+        response_data = await self.send_request(req_dict)
+        return T1481_Response(**response_data)
+    
+    async def rank_timeout_volume(self, req:T1482_Request) -> T1482_Response:
+        '''[주식] 상위종목-시간외거래량상위 '''
+        req_dict = {
+            "path": "/stock/high-item",
+            "tr_cd": "t1482",
+            "data": {
+                "t1481InBlock": req.t1482InBlock.model_dump()
+            }
+        }
+        response_data = await self.send_request(req_dict)
+        return T1482_Response(**response_data)
+    
+    async def rank_expect_filfull(self, req:T1489_Request) -> T1489_Response:
+        '''[주식]  상위종목-예상체결량상위조회 '''
+        req_dict = {
+            "path": "/stock/high-item",
+            "tr_cd": "t1489",
+            "data": {
+                "t1489InBlock": req.t1489InBlock.model_dump()
+            }
+        }
+        response_data = await self.send_request(req_dict)
+        return T1489_Response(**response_data)    
+
+    async def rank_expect_danilga_range(self, req:T1492_Request) -> T1492_Response:
+        '''[주식]  상위종목-단일가예상등락율상위 '''
+        req_dict = {
+            "path": "/stock/high-item",
+            "tr_cd": "t1492",
+            "data": {
+                "t1492InBlock": req.t1492InBlock.model_dump()
+            }
+        }
+        response_data = await self.send_request(req_dict)
+        return T1492_Response(**response_data)    

@@ -1,8 +1,8 @@
 
 from fastapi import APIRouter, Query, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 
-from backend.app.core.template_engine import render_template
+from backend.app.core.template_engine import get_template_html, render_template
 
 
 from backend.app.core.logger import get_logger
@@ -20,7 +20,7 @@ def display_root(request: Request):
 @router.get("/main", response_class=HTMLResponse, include_in_schema=False)
 async def display_main(request: Request):
     ''' 메인 '''
-   
+
     today_str = get_today()
     context = { "request": request,  
                 "today": today_str}    
@@ -44,3 +44,11 @@ async def page(request: Request, path: str = Query(..., description="template pa
 
     return render_template(template_page, context)    
 
+@router.get("/template", response_class=JSONResponse, include_in_schema=False)
+async def handlebar_template(request: Request, path: str = Query(..., description="handlebar-template path")):
+
+    handlebar_template = get_template_html(path)
+    data = {
+        "template": handlebar_template
+    }
+    return JSONResponse(content=data)

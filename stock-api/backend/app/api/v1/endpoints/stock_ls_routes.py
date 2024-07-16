@@ -11,7 +11,14 @@
 """
 from fastapi import APIRouter, Depends
 from backend.app.core.dependency import get_user_service
-from backend.app.domains.stc.ls_interface_model import AcctHistory_Request, CancelOrder_Request, Fulfill_Api_Request, Fulfill_Request, ModifyOrder_Request, Order_Request
+from backend.app.domains.stc.ls.model.t1441_model import T1441_Response
+from backend.app.domains.stc.ls.model.t1452_model import T1452_Response
+from backend.app.domains.stc.ls.model.t1466_model import T1466_Response
+from backend.app.domains.stc.ls.model.t1481_model import T1481_Response
+from backend.app.domains.stc.ls.model.t1482_model import T1482_Response
+from backend.app.domains.stc.ls.model.t1489_model import T1489_Response
+from backend.app.domains.stc.ls.model.t1492_model import T1492_Response
+from backend.app.domains.stc.ls_interface_model import AcctHistory_Request, CancelOrder_Request, Fulfill_Api_Request, Fulfill_Request, HighItem_Request, ModifyOrder_Request, Order_Request
 from backend.app.domains.stc.ls.model.cdpcq04700_model import CDPCQ04700_Response
 from backend.app.domains.stc.ls.model.cspaq12300_model import CSPAQ12300_Request, CSPAQ12300_Response, CSPAQ12300InBlock1
 from backend.app.domains.stc.ls.model.cspaq13700_model import CSPAQ13700_Response
@@ -28,7 +35,7 @@ from backend.app.managers.client_ws_manager import ClientWsManager
 from backend.app.managers.stock_api_manager import StockApiManager
 from backend.app.core.logger import get_logger
 from backend.app.managers.stock_ws_manager import StockWsManager
-from backend.app.utils.ls_model_util import acct_history_to_CDPCQ04700_Request, cancel_order_to_cspat00801_Request, fulfill_api_to_cspaq13700_Request, fulfill_to_t0425_Request, order_to_cspat00601_Request, modify_order_to_cspat00701_Request
+from backend.app.utils.ls_model_util import acct_history_to_CDPCQ04700_Request, cancel_order_to_cspat00801_Request, fulfill_api_to_cspaq13700_Request, fulfill_to_t0425_Request, high_item_to_T1441_Request, high_item_to_T1452_Request, high_item_to_T1466_Request, high_item_to_T1481_Request, high_item_to_T1482_Request, high_item_to_T1489_Request, high_item_to_T1492_Request, order_to_cspat00601_Request, modify_order_to_cspat00701_Request
 
 logger = get_logger(__name__)
 
@@ -187,4 +194,84 @@ async def bep_danga(user_id:str, acctno:str):
     response = await ls_api.bep_danga(req)
 
     logger.debug(f"bep_danga 응답: [{response.to_str()}]")
+    return response
+
+#--------------------------------------------------------------------------------------
+# 상위랭크 route
+#--------------------------------------------------------------------------------------
+@router.post("/rank/range/{user_id}/{acctno}",response_model=T1441_Response)
+async def rank_range(user_id:str, acctno:str, req:HighItem_Request):
+    '''[주식] 상위종목 : 등락률'''
+    api_manager = StockApiManager()
+    ls_api = await api_manager.stock_api(user_id, acctno,'LS')
+    t1441_req = high_item_to_T1441_Request(req) 
+    response = await ls_api.rank_range(t1441_req)
+
+    logger.debug(f"rank 응답: [{response.to_str()}]")
+    return response
+
+@router.post("/rank/volumn/{user_id}/{acctno}",response_model=T1452_Response)
+async def rank_volumn(user_id:str, acctno:str, req:HighItem_Request):
+    '''[주식] 상위종목-거래량상위'''
+    api_manager = StockApiManager()
+    ls_api = await api_manager.stock_api(user_id, acctno,'LS')
+    t1452_req = high_item_to_T1452_Request(req) 
+    response = await ls_api.rank_volumn(t1452_req)
+
+    logger.debug(f"rank 응답: [{response.to_str()}]")
+    return response
+
+@router.post("/rank/rapidup/{user_id}/{acctno}",response_model=T1466_Response)
+async def rank_rapidup(user_id:str, acctno:str, req:HighItem_Request):
+    '''[주식] 상위종목-전일동시간대비거래급증 '''
+    api_manager = StockApiManager()
+    ls_api = await api_manager.stock_api(user_id, acctno,'LS')
+    t1466_req = high_item_to_T1466_Request(req) 
+    response = await ls_api.rank_rapidup(t1466_req)
+
+    logger.debug(f"rank 응답: [{response.to_str()}]")
+    return response
+
+@router.post("/rank/timout-range/{user_id}/{acctno}",response_model=T1481_Response)
+async def rank_timeout_range(user_id:str, acctno:str, req:HighItem_Request):
+    '''[주식] 상위종목-시간외등락율상위 '''
+    api_manager = StockApiManager()
+    ls_api = await api_manager.stock_api(user_id, acctno,'LS')
+    t1481_req = high_item_to_T1481_Request(req) 
+    response = await ls_api.rank_timeout_range(t1481_req)
+
+    logger.debug(f"rank 응답: [{response.to_str()}]")
+    return response
+
+@router.post("/rank/timout-volume/{user_id}/{acctno}",response_model=T1482_Response)
+async def rank_timeout_volume(user_id:str, acctno:str, req:HighItem_Request):
+    '''[주식] 상위종목-시간외거래량상위 '''
+    api_manager = StockApiManager()
+    ls_api = await api_manager.stock_api(user_id, acctno,'LS')
+    t1482_req = high_item_to_T1482_Request(req) 
+    response = await ls_api.rank_timeout_volume(t1482_req)
+
+    logger.debug(f"rank 응답: [{response.to_str()}]")
+    return response
+
+@router.post("/rank/expect_filfull/{user_id}/{acctno}",response_model=T1489_Response)
+async def rank_expect_filfull(user_id:str, acctno:str, req:HighItem_Request):
+    '''[주식]  상위종목-예상체결량상위조회 '''
+    api_manager = StockApiManager()
+    ls_api = await api_manager.stock_api(user_id, acctno,'LS')
+    t1489_req = high_item_to_T1489_Request(req) 
+    response = await ls_api.rank_expect_filfull(t1489_req)
+
+    logger.debug(f"rank 응답: [{response.to_str()}]")
+    return response
+
+@router.post("/rank/expect_danilga_range/{user_id}/{acctno}",response_model=T1492_Response)
+async def rank_expect_danilga_range(user_id:str, acctno:str, req:HighItem_Request):
+    '''[주식]  상위종목-예상체결량상위조회 '''
+    api_manager = StockApiManager()
+    ls_api = await api_manager.stock_api(user_id, acctno,'LS')
+    t1492_req = high_item_to_T1492_Request(req) 
+    response = await ls_api.rank_expect_danilga_range(t1492_req)
+
+    logger.debug(f"rank 응답: [{response.to_str()}]")
     return response

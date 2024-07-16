@@ -57,3 +57,11 @@ class Fulfill_Api_Request(StockApiBaseModel):
     fullfill_type: Literal['전체', '체결', '미체결']
     order_dt: str
     ord_ptn_code: Literal['전체', '매도전체', '매수전체', '현금매도', '현금매수'] #, '저축매도', '저축매수', '상품매도', '상품매수', '융자매도', '융자매수', '대주매도', '대주매수', '선물대용매도', '현금매도(프)', '현금매수(프)', '대출', '대출상환']
+
+
+class HighItem_Request(StockApiBaseModel):
+    ''' 상위종목 조회 요청 '''
+    market_gb: Literal['전체', '코스피', '코스닥']
+    updown_gb: Literal['상승', '하락', '보합']
+    yester_or_today: Literal['전일', '금일']
+    
