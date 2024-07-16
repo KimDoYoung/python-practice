@@ -194,11 +194,11 @@ def high_item_to_T1441_Request(req: HighItem_Request) -> T1441_Request:
         gubun1=gubun1,
         gubun2=gubun2,
         gubun3=gubun3,
-        jc_num=0,
+        jc_num=0x00400000 | 0x00800000 | 0x00200000 | 0x00000080 |0x00000100 | 0x00000200 | 0x00004000 | 0x04000000 | 0x01000000 | 0x80000000,
         sprice=0,
         eprice=0,
         volume=0,
-        idx=0,
+        idx=req.idx,
         jc_num2=0
     )
 

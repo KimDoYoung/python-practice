@@ -1,4 +1,19 @@
 {
+    "fetch Handlebar template" :{
+        "prefix" : "myFetchHandlebarTemplate",
+        "body": [
+            "const template = await fetch_handlebar_and_compile('range.html')",
+            "postFetch(url, data)",
+            "    .then(data => {",
+            "        console.log(data.t1441OutBlock1);",
+            "        const html = template({list: data.t1441OutBlock1});",
+            "        $('#list-area').html(html);",
+            "    })",
+            "    .catch(error => {",
+            "        $('#list-area').html(error.message);",
+            "    });",
+            ],
+    },
     "event on some element" : {
         "prefix": "myEventOnInElevment",
         "body":  [

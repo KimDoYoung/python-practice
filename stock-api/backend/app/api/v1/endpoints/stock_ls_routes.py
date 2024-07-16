@@ -200,11 +200,11 @@ async def bep_danga(user_id:str, acctno:str):
 # 상위랭크 route
 #--------------------------------------------------------------------------------------
 @router.post("/rank/range/{user_id}/{acctno}",response_model=T1441_Response)
-async def rank_range(user_id:str, acctno:str, req:HighItem_Request):
+async def rank_range(user_id:str, acctno:str, user_req:HighItem_Request):
     '''[주식] 상위종목 : 등락률'''
     api_manager = StockApiManager()
     ls_api = await api_manager.stock_api(user_id, acctno,'LS')
-    t1441_req = high_item_to_T1441_Request(req) 
+    t1441_req = high_item_to_T1441_Request(user_req) 
     response = await ls_api.rank_range(t1441_req)
 
     logger.debug(f"rank 응답: [{response.to_str()}]")

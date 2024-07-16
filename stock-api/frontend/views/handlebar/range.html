@@ -1,36 +1,53 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-<table class="table">
+{% raw %}
+<table>
     <thead>
         <tr>
-            <th scope="col">ID</th>
-            <th scope="col">Name</th>
-            <th scope="col">Price</th>
+            <th>한글명</th>
+            <th>현재가</th>
+            <th>전일대비구분</th>
+            <th>전일대비</th>
+            <th>등락율</th>
+            <th>누적거래량</th>
+            <th>매도잔량</th>
+            <th>매도호가</th>
+            <th>매수호가</th>
+            <th>매수잔량</th>
+            <th>연속</th>
+            <th>전일등락율</th>
+            <th>종목코드</th>
+            <th>시가</th>
+            <th>고가</th>
+            <th>저가</th>
+            <th>거래량대비율</th>
+            <th>거래대금</th>
+            <th>시가총액</th>
         </tr>
     </thead>
     <tbody>
+        {{#each list}}
         <tr>
-            <th scope="row">1</th>
-            <td>Product 1</td>
-            <td>$10</td>
+            <td>{{hname}}</td>
+            <td>{{price}}</td>
+            <td>{{sign}}</td>
+            <td>{{change}}</td>
+            <td>{{diff}}</td>
+            <td>{{volume}}</td>
+            <td>{{offerrem1}}</td>
+            <td>{{offerho1}}</td>
+            <td>{{bidho1}}</td>
+            <td>{{bidrem1}}</td>
+            <td>{{updaycnt}}</td>
+            <td>{{jnildiff}}</td>
+            <td>{{shcode}}</td>
+            <td>{{open}}</td>
+            <td>{{high}}</td>
+            <td>{{low}}</td>
+            <td>{{voldiff}}</td>
+            <td>{{value}}</td>
+            <td>{{total}}</td>
         </tr>
-        <tr>
-            <th scope="row">2</th>
-            <td>Product 2</td>
-            <td>$20</td>
-        </tr>
-        <tr>
-            <th scope="row">3</th>
-            <td>Product 3</td>
-            <td>$30</td>
-        </tr>
+        {{/each}}
     </tbody>
 </table>
-</body>
-</html>
+
+{% endraw %}

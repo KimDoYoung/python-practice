@@ -28,6 +28,9 @@ def get_template_html(template_name):
     template_str = template.render()  # 템플릿을 문자열로 렌더링
 
     # 정규 표현식을 사용하여 <body> 태그 안의 내용 추출
-    body_content = re.search(r'<body[^>]*>(.*?)</body>', template_str, re.DOTALL).group(1)
+    if template_str.find('<body') != -1:
+        body_content = re.search(r'<body[^>]*>(.*?)</body>', template_str, re.DOTALL).group(1)
+    else:
+        body_content = template_str
 
     return body_content

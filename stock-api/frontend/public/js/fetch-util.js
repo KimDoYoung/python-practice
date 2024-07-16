@@ -97,3 +97,19 @@ async function putFetch(url, data) {
 async function deleteData(url, data) {
     return callStockApi(url, 'DELETE', data);
 }
+
+//------------------------------------------------------------
+// handlebar template 사용
+//------------------------------------------------------------
+async function fetch_handlebar(hbs_file_path) {
+    const response = await fetch(`/template?path=${hbs_file_path}`);
+    if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+    }
+    const data = await response.json();
+    return data.template;
+}
+async function fetch_handlebar_and_compile(path) {
+    const data = await fetch_handlebar(path);
+    return Handlebars.compile(data);
+}

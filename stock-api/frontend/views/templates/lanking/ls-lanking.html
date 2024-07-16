@@ -92,6 +92,19 @@
 {% block script %}
 {% raw %}
 <script>
+async function fetch_handlebar(hbs_file_path) {
+    const response = await fetch(`/template?path=${hbs_file_path}`);
+    if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+    }
+    const data = await response.json();
+    return data.template;
+}
+async function fetch_handlebar_and_compile(path) {
+    const data = await fetch_handlebar(path);
+    return Handlebars.compile(data);
+}
+
 $( document ).ready(function() {
     console.log( "ready!")
     $('#btnRange').click(async function(){
@@ -107,13 +120,13 @@ $( document ).ready(function() {
             updown_gb: updown_gb,
             yester_or_today : yester_or_today,
         }
-        debugger;
-        const template_html = await fetch('/template?path=handlebar/range.html')
+        // debugger;
+        const template = await fetch_handlebar_and_compile('range.html')
         postFetch(url, data)
             .then(data => {
+                //TODO 코드에 따라서 처리해야함. 왜냐하면 잘못된 데이터가 올수 있음
                 console.log(data);
-                const template = Handlebars.compile(template_html);
-                const html = template(data);
+                const html = template({list: data.t1441OutBlock1});
                 $('#list-area').html(html);
             })
             .catch(error => {

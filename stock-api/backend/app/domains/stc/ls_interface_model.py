@@ -64,4 +64,5 @@ class HighItem_Request(StockApiBaseModel):
     market_gb: Literal['전체', '코스피', '코스닥']
     updown_gb: Literal['상승', '하락', '보합']
     yester_or_today: Literal['전일', '금일']
+    idx: int = 0
     
