@@ -293,15 +293,15 @@ async def rank_timeout_range(user_id:str, acctno:str, req:HighItem_Request):
         t1481_req.t1481InBlock.idx = response.t1481OutBlock.idx
         await asyncio.sleep(1)
     # 필터링과 정렬
-    filtered_sorted_list = sorted(
-        [item for item in list if item.diff is not None and item.diff > 3.0],
-        key=lambda x: x.offerrem1,
-        reverse=True
-    )
+    # filtered_sorted_list = sorted(
+    #     [item for item in list if item.diff is not None and item.diff > 3.0],
+    #     key=lambda x: x.offerrem1,
+    #     reverse=True
+    # )
     final_response = T1481_Response(rsp_cd="0000",
                                     rsp_msg="정상처리",
                                     t1481OutBlock=response.t1481OutBlock,
-                                    t1481OutBlock1=filtered_sorted_list[0:30])
+                                    t1481OutBlock1=list)
     return final_response
 
 @router.post("/rank/timeout-volume/{user_id}/{acctno}",response_model=T1482_Response)
