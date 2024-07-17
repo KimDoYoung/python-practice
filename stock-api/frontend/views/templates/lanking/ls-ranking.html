@@ -328,14 +328,17 @@ $( document ).ready(function() {
             yester_or_today : yester_or_today,
         }
         // debugger;
+        JuliaUtil.displayLoading(true)
         const template = await fetch_handlebar_and_compile('purchase_cost.html')
         postFetch(url, data)
             .then(data => {
+                JuliaUtil.displayLoading(false)
                 console.log(data);
                 const html = template({list: data.t1463OutBlock1});
                 $('#list-area').html(html);
             })
             .catch(error => {
+                JuliaUtil.displayLoading(false)
                 $('#list-area').html(error.message);
             });        
     })

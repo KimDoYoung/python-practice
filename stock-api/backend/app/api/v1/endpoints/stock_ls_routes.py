@@ -317,18 +317,18 @@ async def rank_timeout_volume(user_id:str, acctno:str, req:HighItem_Request):
         t1482_req.t1482InBlock.idx = response.t1482OutBlock.idx
         await asyncio.sleep(1)
     # 필터링과 정렬
-    filtered_sorted_list = sorted(
-        [item for item in list if item.diff is not None and item.diff > 3.0],
-        key=lambda x: x.volume,
-        reverse=True
-    )
+    # filtered_sorted_list = sorted(
+    #     [item for item in list if item.diff is not None and item.diff > 3.0],
+    #     key=lambda x: x.volume,
+    #     reverse=True
+    # )
     final_response = T1482_Response(rsp_cd="0000",
                                     rsp_msg="정상처리",
                                     t1482OutBlock=response.t1482OutBlock,
-                                    t1482OutBlock1=filtered_sorted_list[0:30])
+                                    t1482OutBlock1=list)
     return final_response
 
-@router.post("/rank/expect-filfull/{user_id}/{acctno}",response_model=T1489_Response)
+@router.post("/rank/expect-fulfill/{user_id}/{acctno}",response_model=T1489_Response)
 async def rank_expect_filfull(user_id:str, acctno:str, req:HighItem_Request):
     '''[주식]  상위종목-예상체결량상위조회 '''
     api_manager = StockApiManager()
@@ -341,20 +341,20 @@ async def rank_expect_filfull(user_id:str, acctno:str, req:HighItem_Request):
         list.extend(response.t1489OutBlock1)
         t1489_req.t1489InBlock.idx = response.t1489OutBlock.idx
     # 필터링과 정렬
-    filtered_sorted_list = sorted(
-        [item for item in list if item.diff is not None and item.diff > 3.0],
-        key=lambda x: x.volume,
-        reverse=True
-    )
+    # filtered_sorted_list = sorted(
+    #     [item for item in list if item.diff is not None and item.diff > 3.0],
+    #     key=lambda x: x.volume,
+    #     reverse=True
+    # )
     final_response = T1489_Response(rsp_cd="0000",
                                     rsp_msg="정상처리",
                                     t1489OutBlock=response.t1489OutBlock,
-                                    t1489OutBlock1=filtered_sorted_list[0:30])
+                                    t1489OutBlock1=list)
     return final_response
 
 @router.post("/rank/expect-danilga-range/{user_id}/{acctno}",response_model=T1492_Response)
 async def rank_expect_danilga_range(user_id:str, acctno:str, req:HighItem_Request):
-    '''[주식]  상위종목-예상체결량상위조회 '''
+    '''[주식]  상위종목-단일가예상등락율 '''
     api_manager = StockApiManager()
     ls_api = await api_manager.stock_api(user_id, acctno,'LS')
     t1492_req = high_item_to_T1492_Request(req) 
