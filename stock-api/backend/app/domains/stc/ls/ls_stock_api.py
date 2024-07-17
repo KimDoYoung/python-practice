@@ -27,6 +27,7 @@ from backend.app.domains.stc.ls.model.t0425_model import T0425_Request, T0425_Re
 from backend.app.domains.stc.ls.model.t1102_model import T1102_Request, T1102_Response
 from backend.app.domains.stc.ls.model.t1441_model import T1441_Request, T1441_Response
 from backend.app.domains.stc.ls.model.t1452_model import T1452_Request, T1452_Response
+from backend.app.domains.stc.ls.model.t1463_model import T1463_Request, T1463_Response
 from backend.app.domains.stc.ls.model.t1466_model import T1466_Request, T1466_Response
 from backend.app.domains.stc.ls.model.t1481_model import T1481_Request, T1481_Response
 from backend.app.domains.stc.ls.model.t1482_model import T1482_Request, T1482_Response
@@ -274,6 +275,7 @@ class LsStockApi(StockApi):
         req_dict = {
             "path": "/stock/high-item",
             "tr_cd": "t1441",
+            "tr_cont": req.tr_cont,
             "data": {
                 "t1441InBlock": req.t1441InBlock.model_dump()
             }
@@ -351,4 +353,17 @@ class LsStockApi(StockApi):
             }
         }
         response_data = await self.send_request(req_dict)
-        return T1492_Response(**response_data)    
+        return T1492_Response(**response_data)
+
+    async def rank_purchase_cost(self, req:T1463_Request) -> T1463_Response:
+        '''[주식]  상위종목-거래대금상위  '''
+        req_dict = {
+            "path": "/stock/high-item",
+            "tr_cd": "t1463",
+            "tr_cont": req.tr_cont,
+            "data": {
+                "t1463InBlock": req.t1463InBlock.model_dump()
+            }
+        }
+        response_data = await self.send_request(req_dict)
+        return T1463_Response(**response_data)

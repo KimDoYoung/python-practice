@@ -82,6 +82,7 @@
     <button id="btnTimeoutVolume">5.시간외거래량</button>
     <button id="btnExpectFilfull">6.예상체결량</button>
     <button id="btnExpectDanilgaRange">7.단일가예상등락율</button>
+    <button id="btnPurchaseCost">8.거래대금</button>
 </div>
 <div id="list-area"></div>
 {% raw %}
@@ -133,6 +134,33 @@ $( document ).ready(function() {
                 $('#list-area').html(error.message);
             });
     });
+    //거래대금
+    $('#btnPurchaseCost').on('click', async function(){
+        const user_id = $('#user_id').val()
+        const acct_no = $('#acctno').val()
+        const url = `/api/v1/ls/rank/purchase_cost/${user_id}/${acct_no}`
+        const market_gb = $('input[name=market_gb]:checked').val()
+        const updown_gb = $('input[name=updown_gb]:checked').val()
+        const yester_or_today = $('input[name=yester_or_today]:checked').val()
+
+        const data = {
+            market_gb : market_gb,
+            updown_gb: updown_gb,
+            yester_or_today : yester_or_today,
+        }
+        // debugger;
+        const template = await fetch_handlebar_and_compile('purchase_cost.html')
+        postFetch(url, data)
+            .then(data => {
+                //TODO 코드에 따라서 처리해야함. 왜냐하면 잘못된 데이터가 올수 있음
+                console.log(data);
+                const html = template({list: data.t1463OutBlock1});
+                $('#list-area').html(html);
+            })
+            .catch(error => {
+                $('#list-area').html(error.message);
+            });        
+    })
 });
 </script>
 {% endraw %}

@@ -1,5 +1,6 @@
 from backend.app.domains.stc.ls.model.t1441_model import T1441INBLOCK, T1441_Request
 from backend.app.domains.stc.ls.model.t1452_model import T1452INBLOCK, T1452_Request
+from backend.app.domains.stc.ls.model.t1463_model import T1463INBLOCK, T1463_Request
 from backend.app.domains.stc.ls.model.t1466_model import T1466INBLOCK, T1466_Request
 from backend.app.domains.stc.ls.model.t1481_model import T1481INBLOCK, T1481_Request
 from backend.app.domains.stc.ls.model.t1482_model import T1482INBLOCK, T1482_Request
@@ -204,6 +205,7 @@ def high_item_to_T1441_Request(req: HighItem_Request) -> T1441_Request:
 
     # T1441_Request 객체 생성 및 반환
     t1441_req = T1441_Request(
+        tr_cont='Y',
         t1441InBlock=t1441InBlock
     )
 
@@ -319,7 +321,7 @@ def high_item_to_T1481_Request(req: HighItem_Request) -> T1481_Request:
     
     # T1481_Request 객체 생성 및 반환
     t1481_req = T1481_Request(
-        tr_cont='N',
+        tr_cont='Y',
         tr_cont_key='',
         mac_address='',
         t1481InBlock=t1481InBlock
@@ -349,7 +351,7 @@ def high_item_to_T1482_Request(req: HighItem_Request) -> T1482_Request:
     
     # T1482_Request 객체 생성 및 반환
     t1482_req = T1482_Request(
-        tr_cont='N',
+        tr_cont='Y',
         tr_cont_key='',
         mac_address='',
         t1482InBlock=t1482InBlock
@@ -393,7 +395,7 @@ def high_item_to_T1489_Request(req: HighItem_Request) -> T1489_Request:
     
     # T1489_Request 객체 생성 및 반환
     t1489_req = T1489_Request(
-        tr_cont='N',
+        tr_cont='Y',
         tr_cont_key='',
         mac_address='',
         t1489InBlock=t1489InBlock
@@ -436,10 +438,33 @@ def high_item_to_T1492_Request(req: HighItem_Request) -> T1492_Request:
     
     # T1492_Request 객체 생성 및 반환
     t1492_req = T1492_Request(
-        tr_cont='N',
+        tr_cont='Y',
         tr_cont_key='',
         mac_address='',
         t1492InBlock=t1492InBlock
     )
     
     return t1492_req
+
+def high_item_to_T1463_Request(req: HighItem_Request) -> T1463_Request:
+    ''' 거래대금상위 '''
+    market_gb_map = {'전체': '0', '코스피': '1', '코스닥': '2'}
+    yester_or_today_map = {'금일': '0', '전일': '1'}
+
+    t1463InBlock = T1463INBLOCK(
+        gubun=market_gb_map[req.market_gb],
+        jnilgubun=yester_or_today_map[req.yester_or_today],
+        jc_num=0,  # 필요에 따라 설정
+        sprice=0,  # 필요에 따라 설정
+        eprice=0,  # 필요에 따라 설정
+        volume=0,  # 필요에 따라 설정
+        idx=req.idx,
+        jc_num2=0  # 필요에 따라 설정
+    )
+
+    return T1463_Request(
+        tr_cont='Y',
+        tr_cont_key='',
+        mac_address='',
+        t1463InBlock=t1463InBlock
+    )

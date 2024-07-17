@@ -9,10 +9,12 @@
 작성일: 04
 버전: 1.0
 """
+import asyncio
 from fastapi import APIRouter, Depends
 from backend.app.core.dependency import get_user_service
 from backend.app.domains.stc.ls.model.t1441_model import T1441_Response
 from backend.app.domains.stc.ls.model.t1452_model import T1452_Response
+from backend.app.domains.stc.ls.model.t1463_model import T1463_Response
 from backend.app.domains.stc.ls.model.t1466_model import T1466_Response
 from backend.app.domains.stc.ls.model.t1481_model import T1481_Response
 from backend.app.domains.stc.ls.model.t1482_model import T1482_Response
@@ -35,7 +37,7 @@ from backend.app.managers.client_ws_manager import ClientWsManager
 from backend.app.managers.stock_api_manager import StockApiManager
 from backend.app.core.logger import get_logger
 from backend.app.managers.stock_ws_manager import StockWsManager
-from backend.app.utils.ls_model_util import acct_history_to_CDPCQ04700_Request, cancel_order_to_cspat00801_Request, fulfill_api_to_cspaq13700_Request, fulfill_to_t0425_Request, high_item_to_T1441_Request, high_item_to_T1452_Request, high_item_to_T1466_Request, high_item_to_T1481_Request, high_item_to_T1482_Request, high_item_to_T1489_Request, high_item_to_T1492_Request, order_to_cspat00601_Request, modify_order_to_cspat00701_Request
+from backend.app.utils.ls_model_util import acct_history_to_CDPCQ04700_Request, cancel_order_to_cspat00801_Request, fulfill_api_to_cspaq13700_Request, fulfill_to_t0425_Request, high_item_to_T1441_Request, high_item_to_T1452_Request, high_item_to_T1463_Request, high_item_to_T1466_Request, high_item_to_T1481_Request, high_item_to_T1482_Request, high_item_to_T1489_Request, high_item_to_T1492_Request, order_to_cspat00601_Request, modify_order_to_cspat00701_Request
 
 logger = get_logger(__name__)
 
@@ -204,17 +206,32 @@ async def rank_range(user_id:str, acctno:str, user_req:HighItem_Request):
     '''[주식] 상위종목 : 등락률'''
     api_manager = StockApiManager()
     ls_api = await api_manager.stock_api(user_id, acctno,'LS')
-    t1441_req = high_item_to_T1441_Request(user_req) 
-    response = await ls_api.rank_range(t1441_req)
-
-    logger.debug(f"rank 응답: [{response.to_str()}]")
-    return response
+    t1441_req = high_item_to_T1441_Request(user_req)
+    list = []
+    for i in range(5):
+        response = await ls_api.rank_range(t1441_req)
+        await asyncio.sleep(1)
+        list.extend(response.t1441OutBlock1)
+        t1441_req.t1441InBlock.idx = response.t1441OutBlock.idx
+    # 필터링과 정렬
+    filtered_sorted_list = sorted(
+        [item for item in list if item.diff is not None and item.diff > 3.0],
+        key=lambda x: x.diff,
+        reverse=True
+    )    
+    final_response = T1441_Response(rsp_cd="0000",
+                                    rsp_msg="정상처리",
+                                    t1441OutBlock=response.t1441OutBlock,
+                                    t1441OutBlock1=filtered_sorted_list[0:30])
+    logger.debug(f"rank 응답: [{list}]")
+    return final_response
 
 @router.post("/rank/volumn/{user_id}/{acctno}",response_model=T1452_Response)
 async def rank_volumn(user_id:str, acctno:str, req:HighItem_Request):
     '''[주식] 상위종목-거래량상위'''
     api_manager = StockApiManager()
     ls_api = await api_manager.stock_api(user_id, acctno,'LS')
+
     t1452_req = high_item_to_T1452_Request(req) 
     response = await ls_api.rank_volumn(t1452_req)
 
@@ -275,3 +292,28 @@ async def rank_expect_danilga_range(user_id:str, acctno:str, req:HighItem_Reques
 
     logger.debug(f"rank 응답: [{response.to_str()}]")
     return response
+
+@router.post("/rank/purchase_cost/{user_id}/{acctno}",response_model=T1463_Response)
+async def rank_purchase_cost(user_id:str, acctno:str, req:HighItem_Request):
+    '''[주식]  상위종목-거래대금상위 '''
+    api_manager = StockApiManager()
+    ls_api = await api_manager.stock_api(user_id, acctno,'LS')
+    t1463_req = high_item_to_T1463_Request(req) 
+    list = []
+    for i in range(5):
+        response = await ls_api.rank_purchase_cost(t1463_req)
+        await asyncio.sleep(1)
+        list.extend(response.t1463OutBlock1)
+        t1463_req.t1463InBlock.idx = response.t1463OutBlock.idx
+    # 필터링과 정렬
+    filtered_sorted_list = sorted(
+        [item for item in list if item.diff is not None and item.diff > 3.0],
+        key=lambda x: x.volume,
+        reverse=True
+    )
+    final_response = T1463_Response(rsp_cd="0000",
+                                    rsp_msg="정상처리",
+                                    t1463OutBlock=response.t1463OutBlock,
+                                    t1463OutBlock1=filtered_sorted_list[0:30])
+    #logger.debug(f"rank 응답: [{list}]")
+    return final_response
