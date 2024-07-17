@@ -110,7 +110,7 @@ var JuliaUtil = (function(){
 			var body = document.body;
 			var top = (doc.clientHeight / 2 ) + (doc.scrollTop + body.scrollTop)-190;
 			var left = (doc.clientWidth / 2 );
-			var path = contextPath();
+			var path = "/public";
 			var div_html = `<div id='${loading_div_nm}' style='display:none;position:absolute;top:${top}px;left:${left}px'><img src='${path}/images/loading.gif'></div>`;
 			$("body").append(div_html);
 		} 

@@ -122,15 +122,18 @@ $( document ).ready(function() {
             yester_or_today : yester_or_today,
         }
         // debugger;
+        JuliaUtil.displayLoading(true)
         const template = await fetch_handlebar_and_compile('range.html')
         postFetch(url, data)
             .then(data => {
                 //TODO 코드에 따라서 처리해야함. 왜냐하면 잘못된 데이터가 올수 있음
+                JuliaUtil.displayLoading(false)
                 console.log(data);
                 const html = template({list: data.t1441OutBlock1});
                 $('#list-area').html(html);
             })
             .catch(error => {
+                JuliaUtil.displayLoading(false)
                 $('#list-area').html(error.message);
             });
     });
