@@ -7,7 +7,7 @@
 작성일: 2024-07-16
 버전: 1.0
 """
-from typing import Optional
+from typing import List, Optional
 from backend.app.domains.stock_api_base_model import StockApiBaseModel
 
 class T1482INBLOCK(StockApiBaseModel):
@@ -17,7 +17,7 @@ class T1482INBLOCK(StockApiBaseModel):
 
 
 class T1482_Request(StockApiBaseModel):
-	tr_cont: Optional[str] = 'N'
+	tr_cont: Optional[str] = 'Y'
 	tr_cont_key: Optional[str] = ''
 	mac_address: Optional[str] = ''
 	t1482InBlock : T1482INBLOCK
@@ -40,4 +40,4 @@ class T1482_Response(StockApiBaseModel):
 	rsp_cd: str
 	rsp_msg: str
 	t1482OutBlock: T1482OUTBLOCK
-	t1482OutBlock1: T1482OUTBLOCK1
+	t1482OutBlock1: List[T1482OUTBLOCK1] = []

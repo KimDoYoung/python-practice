@@ -7,7 +7,7 @@
 작성일: 2024-07-16
 버전: 1.0
 """
-from typing import Optional
+from typing import List, Optional
 from backend.app.domains.stock_api_base_model import StockApiBaseModel
 #요청모델 데이터
 class T1489INBLOCK(StockApiBaseModel):
@@ -20,7 +20,7 @@ class T1489INBLOCK(StockApiBaseModel):
 	yevolume : int # 예상체결량 예상체결량 >= yevolume 인 종목
 
 class T1489_Request(StockApiBaseModel):
-	tr_cont: Optional[str] = 'N'
+	tr_cont: Optional[str] = 'Y'
 	tr_cont_key: Optional[str] = ''
 	mac_address: Optional[str] = ''
 	t1489InBlock : T1489INBLOCK
@@ -44,4 +44,4 @@ class T1489_Response(StockApiBaseModel):
 	rsp_cd: str
 	rsp_msg: str
 	t1489OutBlock: T1489OUTBLOCK
-	t1489OutBlock1: T1489OUTBLOCK1
+	t1489OutBlock1: List[T1489OUTBLOCK1] = []

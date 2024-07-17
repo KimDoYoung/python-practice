@@ -233,10 +233,27 @@ async def rank_volumn(user_id:str, acctno:str, req:HighItem_Request):
     ls_api = await api_manager.stock_api(user_id, acctno,'LS')
 
     t1452_req = high_item_to_T1452_Request(req) 
-    response = await ls_api.rank_volumn(t1452_req)
+    list = []
+    for i in range(5):
+        response = await ls_api.rank_volumn(t1452_req)
+        list.extend(response.t1452OutBlock1)
+        if t1452_req.t1452InBlock.idx == response.t1452OutBlock.idx:
+            break
+        t1452_req.t1452InBlock.idx = response.t1452OutBlock.idx
+        await asyncio.sleep(1)
+    #필터링과 정렬
+    # filtered_sorted_list = sorted(
+    #     [item for item in list if item.diff is not None and item.diff >= 0.0],
+    #     key=lambda x: x.bef_diff,
+    #     reverse=True
+    # )
 
-    logger.debug(f"rank 응답: [{response.to_str()}]")
-    return response
+    final_response = T1452_Response(rsp_cd="0000",
+                                    rsp_msg="정상처리",
+                                    t1452OutBlock=response.t1452OutBlock,
+                                    t1452OutBlock1=list)
+    logger.debug(f"rank 응답: [{list}]")
+    return final_response
 
 @router.post("/rank/rapidup/{user_id}/{acctno}",response_model=T1466_Response)
 async def rank_rapidup(user_id:str, acctno:str, req:HighItem_Request):
@@ -244,56 +261,123 @@ async def rank_rapidup(user_id:str, acctno:str, req:HighItem_Request):
     api_manager = StockApiManager()
     ls_api = await api_manager.stock_api(user_id, acctno,'LS')
     t1466_req = high_item_to_T1466_Request(req) 
-    response = await ls_api.rank_rapidup(t1466_req)
+    list = []
+    for i in range(5):
+        response = await ls_api.rank_rapidup(t1466_req)
+        list.extend(response.t1466OutBlock1)
+        if t1466_req.t1466InBlock.idx == response.t1466OutBlock.idx:
+            break
+        t1466_req.t1466InBlock.idx = response.t1466OutBlock.idx
+        await asyncio.sleep(1)
+    # 필터링과 정렬
+    # filtered_sorted_list = sorted(
+    #     [item for item in list if item.voldiff is not None and item.voldiff > 3.0],
+    #     key=lambda x: x.volume,
+    #     reverse=True)
+    final_response = T1466_Response(rsp_cd="0000",
+                                    rsp_msg="정상처리",
+                                    t1466OutBlock=response.t1466OutBlock,
+                                    t1466OutBlock1=list)
+    return final_response
 
-    logger.debug(f"rank 응답: [{response.to_str()}]")
-    return response
-
-@router.post("/rank/timout-range/{user_id}/{acctno}",response_model=T1481_Response)
+@router.post("/rank/timeout-range/{user_id}/{acctno}",response_model=T1481_Response)
 async def rank_timeout_range(user_id:str, acctno:str, req:HighItem_Request):
     '''[주식] 상위종목-시간외등락율상위 '''
     api_manager = StockApiManager()
     ls_api = await api_manager.stock_api(user_id, acctno,'LS')
-    t1481_req = high_item_to_T1481_Request(req) 
-    response = await ls_api.rank_timeout_range(t1481_req)
+    t1481_req = high_item_to_T1481_Request(req)
+    list = []
+    for i in range(5):
+        response = await ls_api.rank_timeout_range(t1481_req)
+        list.extend(response.t1481OutBlock1)
+        t1481_req.t1481InBlock.idx = response.t1481OutBlock.idx
+        await asyncio.sleep(1)
+    # 필터링과 정렬
+    filtered_sorted_list = sorted(
+        [item for item in list if item.diff is not None and item.diff > 3.0],
+        key=lambda x: x.offerrem1,
+        reverse=True
+    )
+    final_response = T1481_Response(rsp_cd="0000",
+                                    rsp_msg="정상처리",
+                                    t1481OutBlock=response.t1481OutBlock,
+                                    t1481OutBlock1=filtered_sorted_list[0:30])
+    return final_response
 
-    logger.debug(f"rank 응답: [{response.to_str()}]")
-    return response
-
-@router.post("/rank/timout-volume/{user_id}/{acctno}",response_model=T1482_Response)
+@router.post("/rank/timeout-volume/{user_id}/{acctno}",response_model=T1482_Response)
 async def rank_timeout_volume(user_id:str, acctno:str, req:HighItem_Request):
     '''[주식] 상위종목-시간외거래량상위 '''
     api_manager = StockApiManager()
     ls_api = await api_manager.stock_api(user_id, acctno,'LS')
-    t1482_req = high_item_to_T1482_Request(req) 
-    response = await ls_api.rank_timeout_volume(t1482_req)
+    t1482_req = high_item_to_T1482_Request(req)
+    list = []
+    for i in range(5):
+        response = await ls_api.rank_timeout_volume(t1482_req)
+        list.extend(response.t1482OutBlock1)
+        t1482_req.t1482InBlock.idx = response.t1482OutBlock.idx
+        await asyncio.sleep(1)
+    # 필터링과 정렬
+    filtered_sorted_list = sorted(
+        [item for item in list if item.diff is not None and item.diff > 3.0],
+        key=lambda x: x.volume,
+        reverse=True
+    )
+    final_response = T1482_Response(rsp_cd="0000",
+                                    rsp_msg="정상처리",
+                                    t1482OutBlock=response.t1482OutBlock,
+                                    t1482OutBlock1=filtered_sorted_list[0:30])
+    return final_response
 
-    logger.debug(f"rank 응답: [{response.to_str()}]")
-    return response
-
-@router.post("/rank/expect_filfull/{user_id}/{acctno}",response_model=T1489_Response)
+@router.post("/rank/expect-filfull/{user_id}/{acctno}",response_model=T1489_Response)
 async def rank_expect_filfull(user_id:str, acctno:str, req:HighItem_Request):
     '''[주식]  상위종목-예상체결량상위조회 '''
     api_manager = StockApiManager()
     ls_api = await api_manager.stock_api(user_id, acctno,'LS')
     t1489_req = high_item_to_T1489_Request(req) 
-    response = await ls_api.rank_expect_filfull(t1489_req)
+    list = []
+    for i in range(5):
+        response = await ls_api.rank_expect_filfull(t1489_req)
+        await asyncio.sleep(1)
+        list.extend(response.t1489OutBlock1)
+        t1489_req.t1489InBlock.idx = response.t1489OutBlock.idx
+    # 필터링과 정렬
+    filtered_sorted_list = sorted(
+        [item for item in list if item.diff is not None and item.diff > 3.0],
+        key=lambda x: x.volume,
+        reverse=True
+    )
+    final_response = T1489_Response(rsp_cd="0000",
+                                    rsp_msg="정상처리",
+                                    t1489OutBlock=response.t1489OutBlock,
+                                    t1489OutBlock1=filtered_sorted_list[0:30])
+    return final_response
 
-    logger.debug(f"rank 응답: [{response.to_str()}]")
-    return response
-
-@router.post("/rank/expect_danilga_range/{user_id}/{acctno}",response_model=T1492_Response)
+@router.post("/rank/expect-danilga-range/{user_id}/{acctno}",response_model=T1492_Response)
 async def rank_expect_danilga_range(user_id:str, acctno:str, req:HighItem_Request):
     '''[주식]  상위종목-예상체결량상위조회 '''
     api_manager = StockApiManager()
     ls_api = await api_manager.stock_api(user_id, acctno,'LS')
     t1492_req = high_item_to_T1492_Request(req) 
+    list = []
+    for i in range(5):
+        response = await ls_api.rank_expect_danilga_range(t1492_req)
+        list.extend(response.t1492OutBlock1)
+        t1492_req.t1492InBlock.idx = response.t1492OutBlock.idx
+        await asyncio.sleep(1)
+    # 필터링과 정렬
+    filtered_sorted_list = sorted(
+        [item for item in list if item.diff is not None and item.diff > 3.0],
+        key=lambda x: x.change,
+        reverse=True
+    )
     response = await ls_api.rank_expect_danilga_range(t1492_req)
+    final_response = T1492_Response(rsp_cd="0000",
+                                    rsp_msg="정상처리",
+                                    t1492OutBlock=response.t1492OutBlock,
+                                    t1492OutBlock1=filtered_sorted_list[0:30])
+    return final_response
 
-    logger.debug(f"rank 응답: [{response.to_str()}]")
-    return response
-
-@router.post("/rank/purchase_cost/{user_id}/{acctno}",response_model=T1463_Response)
+@router.post("/rank/purchase-cost/{user_id}/{acctno}",response_model=T1463_Response)
 async def rank_purchase_cost(user_id:str, acctno:str, req:HighItem_Request):
     '''[주식]  상위종목-거래대금상위 '''
     api_manager = StockApiManager()

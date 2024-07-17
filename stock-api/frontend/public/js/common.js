@@ -115,11 +115,11 @@ var JuliaUtil = (function(){
 			$("body").append(div_html);
 		} 
 		if( show ){
-			//$(loading_div_id).show();
-			$(loading_div_id).addClass('active');
+			$(loading_div_id).show();
+			//$(loading_div_id).addClass('active');
 		}else{
-			//$(loading_div_id).hide();
-			$(loading_div_id).removeClass('active');
+			$(loading_div_id).hide();
+			//$(loading_div_id).removeClass('active');
 		}
 	}
     var displayComma = function (str){

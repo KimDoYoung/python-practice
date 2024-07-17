@@ -77,7 +77,7 @@
 <div>
     <button id="btnRange">1.등락률</button>
     <button id="btnVolumn">2.거래량</button>
-    <button id="btnRapidUp">3.전일대비거래급증</button>
+    <button id="btnRapidUp">3.전일동시간대비거래급증</button>
     <button id="btnTimeoutRange">4.시간외등락율</button>
     <button id="btnTimeoutVolume">5.시간외거래량</button>
     <button id="btnExpectFilfull">6.예상체결량</button>
@@ -108,6 +108,7 @@ async function fetch_handlebar_and_compile(path) {
 
 $( document ).ready(function() {
     console.log( "ready!")
+    //등락률
     $('#btnRange').click(async function(){
         const user_id = $('#user_id').val()
         const acct_no = $('#acctno').val()
@@ -137,11 +138,186 @@ $( document ).ready(function() {
                 $('#list-area').html(error.message);
             });
     });
-    //거래대금
+    //거래량
+    $('#btnVolumn').on('click', async function(){
+        const user_id = $('#user_id').val()
+        const acct_no = $('#acctno').val()
+        const url = `/api/v1/ls/rank/volumn/${user_id}/${acct_no}`
+        const market_gb = $('input[name=market_gb]:checked').val()
+        const updown_gb = $('input[name=updown_gb]:checked').val()
+        const yester_or_today = $('input[name=yester_or_today]:checked').val()
+
+        const data = {
+            market_gb : market_gb,
+            updown_gb: updown_gb,
+            yester_or_today : yester_or_today,
+        }
+        // debugger;
+        JuliaUtil.displayLoading(true)
+        const template = await fetch_handlebar_and_compile('volumn.html')
+        postFetch(url, data)
+            .then(data => {
+                JuliaUtil.displayLoading(false)
+                console.log(data);
+                const html = template({list: data.t1452OutBlock1});
+                $('#list-area').html(html);
+            })
+            .catch(error => {
+                JuliaUtil.displayLoading(false)
+                $('#list-area').html(error.message);
+            });
+    })
+    //3.전일대비거래급증
+    $('#btnRapidUp').on('click', async function(){
+        const user_id = $('#user_id').val()
+        const acct_no = $('#acctno').val()
+        const url = `/api/v1/ls/rank/rapidup/${user_id}/${acct_no}`
+        const market_gb = $('input[name=market_gb]:checked').val()
+        const updown_gb = $('input[name=updown_gb]:checked').val()
+        const yester_or_today = $('input[name=yester_or_today]:checked').val()
+
+        const data = {
+            market_gb : market_gb,
+            updown_gb: updown_gb,
+            yester_or_today : yester_or_today,
+        }
+        // debugger;
+        JuliaUtil.displayLoading(true)
+        const template = await fetch_handlebar_and_compile('rapid_up.html')
+        postFetch(url, data)
+            .then(data => {
+                JuliaUtil.displayLoading(false)
+                console.log(data);
+                const html = template({list: data.t1466OutBlock1});
+                $('#list-area').html(html);
+            })
+            .catch(error => {
+                JuliaUtil.displayLoading(false)
+                $('#list-area').html(error.message);
+            });
+    });
+    //4.시간외등락율
+    $('#btnTimeoutRange').on('click', async function(){
+        const user_id = $('#user_id').val()
+        const acct_no = $('#acctno').val()
+        const url = `/api/v1/ls/rank/timeout-range/${user_id}/${acct_no}`
+        const market_gb = $('input[name=market_gb]:checked').val()
+        const updown_gb = $('input[name=updown_gb]:checked').val()
+        const yester_or_today = $('input[name=yester_or_today]:checked').val()
+
+        const data = {
+            market_gb : market_gb,
+            updown_gb: updown_gb,
+            yester_or_today : yester_or_today,
+        }
+        // debugger;
+        JuliaUtil.displayLoading(true)
+        const template = await fetch_handlebar_and_compile('timeout_range.html')
+        postFetch(url, data)
+            .then(data => {
+                JuliaUtil.displayLoading(false)
+                console.log(data);
+                const html = template({list: data.t1481OutBlock1});
+                $('#list-area').html(html);
+            })
+            .catch(error => {
+                JuliaUtil.displayLoading(false)
+                $('#list-area').html(error.message);
+            });
+    });
+    //5.시간외거래량
+    $('#btnTimeoutVolume').on('click', async function(){
+        const user_id = $('#user_id').val()
+        const acct_no = $('#acctno').val()
+        const url = `/api/v1/ls/rank/timeout-volume/${user_id}/${acct_no}`
+        const market_gb = $('input[name=market_gb]:checked').val()
+        const updown_gb = $('input[name=updown_gb]:checked').val()
+        const yester_or_today = $('input[name=yester_or_today]:checked').val()
+
+        const data = {
+            market_gb : market_gb,
+            updown_gb: updown_gb,
+            yester_or_today : yester_or_today,
+        }
+        // debugger;
+        JuliaUtil.displayLoading(true)
+        const template = await fetch_handlebar_and_compile('timeout_volume.html')
+        postFetch(url, data)
+            .then(data => {
+                JuliaUtil.displayLoading(false)
+                console.log(data);
+                const html = template({list: data.t1482OutBlock1});
+                $('#list-area').html(html);
+            })
+            .catch(error => {
+                JuliaUtil.displayLoading(false)
+                $('#list-area').html(error.message);
+            });
+    });
+    //6.예상체결량
+    $('#btnExpectFilfull').on('click', async function(){
+        const user_id = $('#user_id').val()
+        const acct_no = $('#acctno').val()
+        const url = `/api/v1/ls/rank/expect-fulfill/${user_id}/${acct_no}`
+        const market_gb = $('input[name=market_gb]:checked').val()
+        const updown_gb = $('input[name=updown_gb]:checked').val()
+        const yester_or_today = $('input[name=yester_or_today]:checked').val()
+
+        const data = {
+            market_gb : market_gb,
+            updown_gb: updown_gb,
+            yester_or_today : yester_or_today,
+        }
+        // debugger;
+        JuliaUtil.displayLoading(true)
+        const template = await fetch_handlebar_and_compile('expect_fulfill.html')
+        postFetch(url, data)
+            .then(data => {
+                JuliaUtil.displayLoading(false)
+                console.log(data);
+                const html = template({list: data.t1489OutBlock1});
+                $('#list-area').html(html);
+            })
+            .catch(error => {
+                JuliaUtil.displayLoading(false)
+                $('#list-area').html(error.message);
+            });
+    });
+    //7.단일가예상등락율
+    $('#btnExpectDanilgaRange').on('click', async function(){
+        const user_id = $('#user_id').val()
+        const acct_no = $('#acctno').val()
+        const url = `/api/v1/ls/rank/expect-danilga-range/${user_id}/${acct_no}`
+        const market_gb = $('input[name=market_gb]:checked').val()
+        const updown_gb = $('input[name=updown_gb]:checked').val()
+        const yester_or_today = $('input[name=yester_or_today]:checked').val()
+
+        const data = {
+            market_gb : market_gb,
+            updown_gb: updown_gb,
+            yester_or_today : yester_or_today,
+        }
+        // debugger;
+        JuliaUtil.displayLoading(true)
+        const template = await fetch_handlebar_and_compile('expect_danilga_range.html')
+        postFetch(url, data)
+            .then(data => {
+                JuliaUtil.displayLoading(false)
+                console.log(data);
+                const html = template({list: data.t1492OutBlock1});
+                $('#list-area').html(html);
+            })
+            .catch(error => {
+                JuliaUtil.displayLoading(false)
+                $('#list-area').html(error.message);
+            });
+    });
+    
+    //8.거래대금
     $('#btnPurchaseCost').on('click', async function(){
         const user_id = $('#user_id').val()
         const acct_no = $('#acctno').val()
-        const url = `/api/v1/ls/rank/purchase_cost/${user_id}/${acct_no}`
+        const url = `/api/v1/ls/rank/purchase-cost/${user_id}/${acct_no}`
         const market_gb = $('input[name=market_gb]:checked').val()
         const updown_gb = $('input[name=updown_gb]:checked').val()
         const yester_or_today = $('input[name=yester_or_today]:checked').val()
@@ -155,7 +331,6 @@ $( document ).ready(function() {
         const template = await fetch_handlebar_and_compile('purchase_cost.html')
         postFetch(url, data)
             .then(data => {
-                //TODO 코드에 따라서 처리해야함. 왜냐하면 잘못된 데이터가 올수 있음
                 console.log(data);
                 const html = template({list: data.t1463OutBlock1});
                 $('#list-area').html(html);

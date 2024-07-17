@@ -8,7 +8,7 @@
 버전: 1.0
 """
 
-from typing import Optional
+from typing import List, Optional
 from backend.app.domains.stock_api_base_model import StockApiBaseModel
 
 #요청모델 데이터
@@ -20,7 +20,7 @@ class T1492INBLOCK(StockApiBaseModel):
 	idx : int # IDX 연속조회시 OutBlock의 idx 입력
 	
 class T1492_Request(StockApiBaseModel):
-	tr_cont: Optional[str] = 'N'
+	tr_cont: Optional[str] = 'Y'
 	tr_cont_key: Optional[str] = ''
 	mac_address: Optional[str] = ''
 	t1492InBlock : T1492INBLOCK
@@ -47,4 +47,4 @@ class T1492_Response(StockApiBaseModel):
 	rsp_cd: str
 	rsp_msg: str
 	t1492OutBlock: T1492OUTBLOCK
-	t1492OutBlock1: T1492OUTBLOCK1
+	t1492OutBlock1: List[T1492OUTBLOCK1] = []

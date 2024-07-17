@@ -7,7 +7,7 @@
 작성일: 2024-07-16
 버전: 1.0
 """
-from typing import Optional
+from typing import List, Optional
 from backend.app.domains.stock_api_base_model import StockApiBaseModel
 
 #요청모델 데이터
@@ -23,7 +23,7 @@ class T1466INBLOCK(StockApiBaseModel):
 	jc_num2 : int # 대상제외2 기본 => 000000000000 상장지수펀드 => 000000000001 선박투자회사 => 000000000002 스펙 => 000000000004 ETN => 000000000008(0x00000008) 투자주의 => 000000000016(0x00000010) 투자위험 => 000000000032(0x00000020) 위험예고 => 000000000064(0x00000040) 담보불가 => 000000000128(0x00000080) 두개 이상 제외시 해당 값을 합산한다.
 
 class T1466_Request(StockApiBaseModel):
-	tr_cont: Optional[str] = 'N'
+	tr_cont: Optional[str] = 'Y'
 	tr_cont_key: Optional[str] = ''
 	mac_address: Optional[str] = ''
 	t1466InBlock :  T1466INBLOCK 
@@ -50,4 +50,4 @@ class T1466_Response(StockApiBaseModel):
 	rsp_cd: str
 	rsp_msg: str
 	t1466OutBlock: T1466OUTBLOCK
-	t1466OutBlock1: T1466OUTBLOCK1
+	t1466OutBlock1: List[T1466OUTBLOCK1] = []

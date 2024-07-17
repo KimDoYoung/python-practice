@@ -9,7 +9,7 @@
 작성일: 2024-07-16
 버전: 1.0
 """
-from typing import Optional
+from typing import List, Optional
 from backend.app.domains.stock_api_base_model import StockApiBaseModel
 
 #요청모델 데이터
@@ -25,7 +25,7 @@ class T1452INBLOCK(StockApiBaseModel):
 	idx : int # IDX 처음 조회시는 Space 연속 조회시에 이전 조회한 OutBlock의 idx 값으로 설정
 	
 class T1452_Request(StockApiBaseModel):
-	tr_cont: Optional[str] = 'N'
+	tr_cont: Optional[str] = 'Y'
 	tr_cont_key: Optional[str] = ''
 	mac_address: Optional[str] = ''
 	t1452InBlock : T1452INBLOCK 
@@ -49,4 +49,4 @@ class T1452_Response(StockApiBaseModel):
 	rsp_cd: str
 	rsp_msg: str
 	t1452OutBlock: T1452OUTBLOCK
-	t1452OutBlock1: T1452OUTBLOCK1
+	t1452OutBlock1: List[T1452OUTBLOCK1] = []
