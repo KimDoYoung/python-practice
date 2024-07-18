@@ -1,5 +1,7 @@
+import io
 import os
 import re
+import sys
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 import pandas as pd
@@ -101,6 +103,9 @@ def get_hrefs(url):
     return df
 
 def main():
+    
+    sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding='utf-8')
+
     driver = install_chrome_driver()
     df = pd.read_csv('torrent.csv')
     hrefs = df['href'].to_list()
@@ -120,7 +125,7 @@ def main():
                     EC.presence_of_element_located((By.ID, 'description_container'))
             )
             soup =  BeautifulSoup(driver.page_source, 'html.parser')
-            print(soup.prettify())
+            # print(soup.prettify())
             div_desc = soup.find('div', id='description_container')
             if div_desc:
                 label = div_desc.find('label', id='d')
