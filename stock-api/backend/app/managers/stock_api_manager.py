@@ -37,7 +37,6 @@ class StockApiManager:
         key = (user_id, acctno, stk_abbr)
         if key in self._cache:
             stock_api =  self._cache[key]
-            # TODO cache에 있는것이 만약 ACCESS_KEY가 만료되었으면 다시 초기화
             access_token_time = stock_api.get_access_token_time()
             if access_token_time is not None:
                 if (datetime.now() - access_token_time) > timedelta(hours=12):
