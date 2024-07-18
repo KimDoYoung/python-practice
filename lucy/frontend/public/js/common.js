@@ -516,7 +516,7 @@ async function postFetch(url, data) {
  * @param {Object} data - 요청에 포함할 데이터
  * @returns {Promise<Object>} - 응답 데이터
  */
-async function putData(url, data) {
+async function putFetch(url, data) {
     return callLucyApi(url, 'PUT', data);
 }
 
@@ -527,6 +527,6 @@ async function putData(url, data) {
  * @param {Object} data - 요청에 포함할 데이터
  * @returns {Promise<Object>} - 응답 데이터
  */
-async function deleteData(url, data) {
+async function deleteFetch(url, data) {
     return callLucyApi(url, 'DELETE', data);
 }

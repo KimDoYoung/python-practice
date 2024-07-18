@@ -219,7 +219,7 @@
                 }else if(configData.db_action == 'update') {
 
                     const data = JuliaUtil.removeElement(configData, 'db_action')
-                    response = await putData('/api/v1/config/'+data.key,data);
+                    response = await putFetch('/api/v1/config/'+data.key,data);
                 }
                 console.log('응답 데이터:', response);
                 window.location.reload();
@@ -230,7 +230,7 @@
         }
         async function deleteConfig(key) {
             try {
-                const response = await deleteData('/api/v1/config/'+key);
+                const response = await deleteFetch('/api/v1/config/'+key);
                 console.log('응답 데이터:', response);
                 window.location.reload();
             } catch (error) {

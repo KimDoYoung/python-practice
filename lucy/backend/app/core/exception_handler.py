@@ -9,6 +9,7 @@
 작성일: 03
 버전: 1.0
 """
+from datetime import datetime
 from fastapi import HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import HTMLResponse, JSONResponse
