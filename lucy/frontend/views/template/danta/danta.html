@@ -36,7 +36,7 @@
     const DANTA_START = 'Danta Start';
     const DANTA_STOP = 'Danta Stop';
     function initialize() {
-        fetchData('/api/v1/danta/status')
+        getFetch('/api/v1/danta/status')
         .then(data => {
             const status = data.status;
             const message = data.message;
@@ -77,7 +77,7 @@
             const text = $('#btnDantaStartStop').text();
             debugger;
             if(text == DANTA_STOP){
-                fetchData('/api/v1/danta/stop')
+                getFetch('/api/v1/danta/stop')
                 .then(data => {
                     $('#status-danta').text(data.message);
                     $('#btnDantaStartStop').text(DANTA_START);
@@ -87,7 +87,7 @@
                     console.error(error); 
                 });
             } else {
-                fetchData('/api/v1/danta/start')
+                getFetch('/api/v1/danta/start')
                 .then(data => {
                     $('#status-danta').text(data.message);
                     $('#btnDantaStartStop').text(DANTA_STOP);

@@ -67,7 +67,7 @@
     $( document ).ready(function() {
         console.log('scheduler list.... ');
         async function initialize() {
-            await fetchData('/api/v1/scheduler').then(data => {
+            getFetch('/api/v1/scheduler').then(data => {
                 console.log(data);
                 var source = $('#scheduler-table').html();
                 var template = Handlebars.compile(source);

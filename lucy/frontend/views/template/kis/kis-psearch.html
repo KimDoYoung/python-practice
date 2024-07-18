@@ -102,7 +102,7 @@
     }
     $( document ).ready(function() {
         const stk_code = $('#stk_code').val();
-        fetchData('/api/v1/kis/psearch/title')
+        getFetch('/api/v1/kis/psearch/title')
         .then(data => { 
             console.log(data);
             let template = Handlebars.compile(document.getElementById('psearch-table-template').innerHTML); 
@@ -115,7 +115,7 @@
         //조건식 결과 조회
         $('#psearch-table-area').on("click", ".btnPsearchResult", function() {
             const seq = $(this).data('seq');
-            fetchData('/api/v1/kis/psearch/result/'+seq)
+            getFetch('/api/v1/kis/psearch/result/'+seq)
             .then(data => { 
                 console.log(data);
                 make_result_html(data)

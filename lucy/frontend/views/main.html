@@ -96,7 +96,7 @@
             e.preventDefault();
             debugger;
             const stk_code = $(this).data('stk-code');
-            fetchData("/api/v1/kis/current-cost/" + stk_code)
+            getFetch("/api/v1/kis/current-cost/" + stk_code)
             .then(data => {
                 console.log(data);
                 const cost = JuliaUtil.displayMoney(data.cost)
@@ -121,7 +121,7 @@
                 "stk_code": stk_code,
                 "stk_types": ["관심"]
             }
-            postData("/api/v1/mystock/add", data)
+            postFetch("/api/v1/mystock/add", data)
             .then(data => {
                 display_mystocks();
                 $input.val('');

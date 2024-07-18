@@ -1,3 +1,14 @@
+# template_engine.py
+"""
+모듈 설명: 
+    - jinja2 템플릿 엔진을 사용하여 HTML 템플릿을 렌더링하는 모듈 
+주요 기능:
+    - render_template: 템플릿 파일을 렌더링하여 HTML 문자열을 반환
+
+작성자: 김도영
+작성일: 2024-07-18
+버전: 1.0
+"""
 import os
 import re
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -28,6 +39,8 @@ def get_template_html(template_name):
     template_str = template.render()  # 템플릿을 문자열로 렌더링
 
     # 정규 표현식을 사용하여 <body> 태그 안의 내용 추출
-    body_content = re.search(r'<body[^>]*>(.*?)</body>', template_str, re.DOTALL).group(1)
-
-    return body_content
+    if template_str.find('<body') != -1:
+        body_content = re.search(r'<body[^>]*>(.*?)</body>', template_str, re.DOTALL).group(1)
+    else:
+        body_content = template_str
+    return body_content.strip()

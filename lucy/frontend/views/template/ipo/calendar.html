@@ -34,10 +34,8 @@
             const [startYmd, endYmd] = CalendarMaker.startEndYmd(yyyy, mm);
 
             const [holidays,ipoDays] = await Promise.all([
-                // fetchData('/eventdays/' + yyyymm ),
-                // fetchData('/ipo/days/' + yyyymm),
-                fetchData('/api/v1/eventdays/calendar/' + startYmd + '/' + endYmd),
-                fetchData('/api/v1/ipo/calendar/' + startYmd + '/' + endYmd)
+                getFetch('/api/v1/eventdays/calendar/' + startYmd + '/' + endYmd),
+                getFetch('/api/v1/ipo/calendar/' + startYmd + '/' + endYmd)
             ]);
             
             console.log(holidays);

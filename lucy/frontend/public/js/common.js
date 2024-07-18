@@ -440,12 +440,15 @@ function removeCookie(name) {
  * status와 detail을 저장하는 Error클래스
  */
 class LucyError extends Error {
-    constructor(status, detail) {
+    constructor(status, detail, server_time) {
         super(detail);
         this.status = status;
+        this.server_time =server_time;
     }
+    toString() {
+        return `Error ${this.status}: ${this.message} (Server Time: ${this.server_time})`;
+    }    
 }
-
 /**
  * 공통 fetch 함수
  * 
@@ -491,7 +494,7 @@ async function callLucyApi(url, method, data = null) {
  * @param {string} url - 요청할 URL
  * @returns {Promise<Object>} - 응답 데이터
  */
-async function fetchData(url) {
+async function getFetch(url) {
     return callLucyApi(url, 'GET');
 }
 
@@ -502,7 +505,7 @@ async function fetchData(url) {
  * @param {Object} data - 요청에 포함할 데이터
  * @returns {Promise<Object>} - 응답 데이터
  */
-async function postData(url, data) {
+async function postFetch(url, data) {
     return callLucyApi(url, 'POST', data);
 }
 

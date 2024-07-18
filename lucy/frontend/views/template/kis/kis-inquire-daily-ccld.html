@@ -113,7 +113,7 @@
                 ord_dvsn_cd: $(this).data('ord-dvsn-cd'),
                 ord_unpr: String($(this).data('ord-unpr'))
             }
-            postData(url, data)
+            postFetch(url, data)
             .then(response => { 
                 console.log(response);
                 if(response.result == 'success'){
@@ -136,7 +136,7 @@
                 inqr_strt_dt: $('#inqr_strt_dt').val().replace(/-/g, ''),
                 inqr_end_dt: $('#inqr_end_dt').val().replace(/-/g, '')
             }
-            postData(url, data)
+            postFetch(url, data)
             .then(response => { 
                 console.log(response);
                 const output2 = response.output2;

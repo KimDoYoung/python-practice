@@ -1,0 +1,33 @@
+{% raw %}
+<table class="table">
+    <thead>
+        <tr>
+            <th>종목코드</th>
+            <th>종목명</th>
+            <th class="text-end">현재가</th>
+            <th>전일대비구분</th>
+            <th class="text-end">전일대비</th>
+            <th class="text-end">등락율</th>
+            <th class="text-end">누적거래량</th>
+            <th class="text-end">회전율</th>
+            <th class="text-end">누적거래대금</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each list}}
+        <tr>
+            <td>{{shcode}}</td>
+            <td>{{hname}}</td>
+            <td class="text-end">{{price}}</td>
+            <td>{{sign}}</td>
+            <td class="text-end">{{change}}</td>
+            <td class="text-end">{{diff}}</td>
+            <td class="text-end">{{volume}}</td>
+            <td class="text-end">{{vol}}</td>
+            <td class="text-end">{{value}}</td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+
+{% endraw %}

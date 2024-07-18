@@ -35,7 +35,7 @@
             "\t- ${2:  기능을 넣으시오}",
             "",
             "작성자: 김도영",
-            "작성일: $CURRENT_DATE",
+            "작성일: $CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE",
             "버전: 1.0",
             "\"\"\"",
         ]

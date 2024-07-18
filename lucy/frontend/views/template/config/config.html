@@ -151,7 +151,7 @@
         console.log('config list.... ');
         async function initialize() {
             //모든 config 정보를 가져와서 테이블에 표시
-            await fetchData('/api/v1/config').then(data => {
+            await getFetch('/api/v1/config').then(data => {
                 console.log(data);
                 var source = $('#table1-template').html();
                 var template = Handlebars.compile(source);
@@ -164,7 +164,7 @@
                 showToastError(error);
             });
             //스케줄러 정보를 가져와서 테이블에 표시
-            await fetchData('/api/v1/scheduler').then(data => {
+            await getFetch('/api/v1/scheduler').then(data => {
                 console.log(data);
                 var source = $('#scheduler-table').html();
                 var template = Handlebars.compile(source);
@@ -177,7 +177,7 @@
         // config key로 조회
         async function getConfigFromDb(key) {
             try{
-                const data = await fetchData('/api/v1/config/'+key);
+                const data = await getFetch('/api/v1/config/'+key);
                 $('#db_action').val('update');
                 if (data.mode == 'System') $('#modeSystem').prop('checked', true);
                 else $('#modeUser').prop('checked', true);
@@ -196,7 +196,7 @@
         // scheduler job_id로  조회
         async function getSchedulerFromDb(job_id) {
             try{
-                const data = await fetchData('/api/v1/scheduler/'+job_id);
+                const data = await getFetch('/api/v1/scheduler/'+job_id);
                 $('#job_id').val(data.job_id);
                 $('#run_type').val(data.run_type);
                 $('#args').val(data.args);
@@ -215,7 +215,7 @@
                 let response;
                 if(configData.db_action == 'insert') {
                     const data = JuliaUtil.removeElement(configData, 'db_action')
-                    response = await postData('/api/v1/config', data);
+                    response = await postFetch('/api/v1/config', data);
                 }else if(configData.db_action == 'update') {
 
                     const data = JuliaUtil.removeElement(configData, 'db_action')
@@ -242,7 +242,7 @@
         async function upsertScheduler(data) {
 
             try {
-                response = await postData('/api/v1/scheduler/edit/'+data.key, data);
+                response = await postFetch('/api/v1/scheduler/edit/'+data.key, data);
                 console.log('응답 데이터:', response);
                 window.location.reload();
             } catch (error) {

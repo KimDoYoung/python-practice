@@ -1,0 +1,53 @@
+{% raw %}
+<table>
+    <thead>
+        <tr>
+            <th>한글명</th>
+            <th>현재가</th>
+            <th>전일대비구분</th>
+            <th>전일대비</th>
+            <th>등락율</th>
+            <th>누적거래량</th>
+            <th>매도잔량</th>
+            <th>매도호가</th>
+            <th>매수호가</th>
+            <th>매수잔량</th>
+            <th>연속</th>
+            <th>전일등락율</th>
+            <th>종목코드</th>
+            <th>시가</th>
+            <th>고가</th>
+            <th>저가</th>
+            <th>거래량대비율</th>
+            <th>거래대금</th>
+            <th>시가총액</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each list}}
+        <tr>
+            <td>{{hname}}</td>
+            <td class="text-end">{{price}}</td>
+            <td>{{sign}}</td>
+            <td class="text-end">{{change}}</td>
+            <td class="text-end">{{diff}}</td>
+            <td class="text-end">{{volume}}</td>
+            <td class="text-end">{{offerrem1}}</td>
+            <td class="text-end">{{offerho1}}</td>
+            <td class="text-end">{{bidho1}}</td>
+            <td class="text-end">{{bidrem1}}</td>
+            <td class="text-end">{{updaycnt}}</td>
+            <td class="text-end">{{jnildiff}}</td>
+            <td class="text-end">{{shcode}}</td>
+            <td class="text-end">{{open}}</td>
+            <td class="text-end">{{high}}</td>
+            <td class="text-end">{{low}}</td>
+            <td class="text-end">{{voldiff}}</td>
+            <td class="text-end">{{value}}</td>
+            <td class="text-end">{{total}}</td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+
+{% endraw %}

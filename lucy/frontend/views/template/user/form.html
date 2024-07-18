@@ -90,7 +90,7 @@
         const user_id = $('#logout').data('user-id');
         const url = '/api/v1/user/'+user_id;
 
-        const data =  fetchData(url).then(function(data) {
+        const data =  getFetch(url).then(function(data) {
             $('#user_id').val(data.user_id);
             $('#user_name').val(data.user_name);
             $('#email').val(data.email);

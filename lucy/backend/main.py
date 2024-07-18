@@ -76,7 +76,6 @@ async def startup_event():
     scheduler_service =  get_scheduler_job_service()
     await scheduler_service.register_system_jobs()
     # TODO 아주 처음 생성시에 사용자 id를 어떻게 넣어야할까?
-    # TODO 다듬기 가능?
 
     # 자동매매 시작
     await start_danta_machine()
@@ -144,3 +143,7 @@ if __name__ == "__main__":
     import uvicorn
     logger.info("Lucy 자동주식매매 서버 시작")
     uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+
+#TODO 1. 단타용 사용자id를 env에 넣기
+#TODO 2. rank를 가져오자
+#TODO 3. LS까지 포함하자. 

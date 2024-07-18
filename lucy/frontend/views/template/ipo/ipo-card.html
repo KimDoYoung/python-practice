@@ -192,7 +192,7 @@
         console.log('ipo list.... ');
         async function initialize() {
 
-            fetchData('/api/v1/ipo').then(data => {
+            getFetch('/api/v1/ipo').then(data => {
                 console.log(data);
 
                 let newList = data.map(item => {
@@ -222,7 +222,7 @@
 
                 // $('#table-area').html(html);
             });
-            await fetchData('/api/v1/config/38-scrapping-time').then(data => {
+            getFetch('/api/v1/config/38-scrapping-time').then(data => {
                 console.log(data);
                 const scrappingTime = formatDateString(data.value);
                 $('#38-scrapping-time').text(scrappingTime);

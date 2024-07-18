@@ -43,8 +43,8 @@ async def display_main(request: Request):
     return render_template("main.html", context)
 
 @router.get("/page", response_class=HTMLResponse, include_in_schema=False)
-async def page(request: Request, id: str = Query(..., description="The ID of the page")):
-    ''' id 페이지를 가져와서 보낸다. '''
+async def page(request: Request, path: str = Query(..., description="template폴더안의 html path")):
+    ''' path에 해당하는 페이지를 가져와서 보낸다. '''
     current_user = await get_current_user(request)
     
     if not current_user:
@@ -60,12 +60,26 @@ async def page(request: Request, id: str = Query(..., description="The ID of the
         "stk_code" : stk_code
     }
     # id = ipo_calendar 와 같은 형식이고 이를 분리한다.
-    path_array = id.split("_")
-    template_path = "/".join(path_array)
+    template_path = path.lstrip('/') 
     template_page = f"template/{template_path}.html"
     logger.debug(f"template_page 호출됨: {template_page}")
-
     return render_template(template_page, context)    
+
+@router.get("/template", response_class=JSONResponse, include_in_schema=False)
+async def handlebar_template(request: Request, path: str = Query(..., description="handlebar-template path")):
+    ''' path에 해당하는 html에서 body추출해서 jinja2처리한 JSON을 리턴 '''
+    today = get_today()
+    context = {
+        "request": request, 
+        "today" : today
+    }
+    handlebar_html_filename =  f"handlebar/{path.lstrip('/')}.html"
+
+    handlebar_html =  render_template(handlebar_html_filename, context)
+    data = {
+        "template": handlebar_html
+    }
+    return JSONResponse(content=data)
 
 @router.get("/login", response_class=HTMLResponse)
 async def login(request: Request):

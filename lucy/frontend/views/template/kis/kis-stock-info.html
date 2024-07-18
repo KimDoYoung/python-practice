@@ -72,12 +72,12 @@
     }
     $( document ).ready(function() {
         const stk_code = $('#stk_code').val();
-        fetchData('/api/v1/kis/stock-info/' + stk_code)
-          .then(data => { 
+        getFetch('/api/v1/kis/stock-info/' + stk_code)
+        .then(data => { 
             console.log(data); 
             make_stock_info(data)
-          })
-          .catch(error=> { console.error(error); })
+        })
+        .catch(error=> { console.error(error); })
     });
     </script>	    
 {% endraw %}
