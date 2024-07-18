@@ -180,7 +180,7 @@ async def chk_workingday(user_id:str, acctno:str, ymd:str ):
     response = kis_api.chk_workingday(ymd)
     return response
 
-@router.get("/quote-balance/{user_id}/{acctno}",response_model=QuoteBalance_Response)
+@router.post("/quote-balance/{user_id}/{acctno}",response_model=QuoteBalance_Response)
 async def quote_balance(user_id:str, acctno:str, rank_req: Rank_Request):
     ''' 호가잔량순위 '''
     api_manager = StockApiManager()
@@ -189,7 +189,7 @@ async def quote_balance(user_id:str, acctno:str, rank_req: Rank_Request):
     response = kis_api.quote_balance(qb_req)
     return response
 
-@router.get("/after-hour-balance/{user_id}/{acctno}",response_model=AfterHourBalance_Response)
+@router.post("/after-hour-balance/{user_id}/{acctno}",response_model=AfterHourBalance_Response)
 async def after_hour_balance(user_id:str, acctno:str, rank_req: Rank_Request):
     ''' 시간외호가잔량순위 '''
     api_manager = StockApiManager()

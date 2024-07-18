@@ -1,0 +1,40 @@
+{% raw %}
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>유가증권 단축 종목코드</th>
+            <th>데이터 순위</th>
+            <th>HTS 한글 종목명</th>
+            <th>주식 현재가</th>
+            <th>전일 대비</th>
+            <th>전일 대비 부호</th>
+            <th>전일 대비율</th>
+            <th>누적 거래량</th>
+            <th>총 매도호가 잔량</th>
+            <th>총 매수호가 잔량</th>
+            <th>총 순 매수호가 잔량</th>
+            <th>매수 잔량 비율</th>
+            <th>매도 잔량 비율</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each list}}
+        <tr>
+            <td class="text-start">{{mksc_shrn_iscd}}</td>
+            <td class="text-start">{{data_rank}}</td>
+            <td class="text-start">{{hts_kor_isnm}}</td>
+            <td class="text-end">{{stck_prpr}}</td>
+            <td class="text-end">{{prdy_vrss}}</td>
+            <td class="text-end">{{prdy_vrss_sign}}</td>
+            <td class="text-end">{{prdy_ctrt}}</td>
+            <td class="text-end">{{acml_vol}}</td>
+            <td class="text-end">{{total_askp_rsqn}}</td>
+            <td class="text-end">{{total_bidp_rsqn}}</td>
+            <td class="text-end">{{total_ntsl_bidp_rsqn}}</td>
+            <td class="text-end">{{shnu_rsqn_rate}}</td>
+            <td class="text-end">{{seln_rsqn_rate}}</td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+{% endraw %}

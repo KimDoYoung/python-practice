@@ -548,7 +548,7 @@ class KisStockApi(StockApi):
         url = self._BASE_URL + "/uapi/domestic-stock/v1/ranking/after-hour-balance"
         params = {
             "fid_input_price_1":  req.fid_input_price_1, #입력 가격1 입력값 없을때 전체 (가격 ~)
-            "fid_cond_mrkt_div_code": req.fid_cond_scr_div_code, #"조건 시장 분류 코드 시장구분코드 (주식 J)",
+            "fid_cond_mrkt_div_code": req.fid_cond_mrkt_div_code, #"조건 시장 분류 코드 시장구분코드 (주식 J)",
             "fid_cond_scr_div_code": req.fid_cond_scr_div_code,  #"조건 화면 분류 코드 Unique key( 20176 )",
             "fid_rank_sort_cls_code": req.fid_rank_sort_cls_code, # "순위 정렬 구분 코드 1: 장전 시간외, 2: 장후 시간외, 3:매도잔량, 4:매수잔량",
             "fid_div_cls_code": req.fid_div_cls_code, # "분류 구분 코드 0 : 전체",

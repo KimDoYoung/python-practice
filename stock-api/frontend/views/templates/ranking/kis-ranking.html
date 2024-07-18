@@ -6,6 +6,19 @@
 <div class="bg-secondary m-2 p-2">
     user id: <input type="text" id="user_id" value="kdy987">
     account no : <input type="text" id="acct_no" value="6577792801">
+    market : <select name="market" id="market">
+        <option value="전체">전체</option>
+        <option value="코스피">코스피</option>
+        <option value="코스닥">코스닥</option>
+        <option value="코스피200">코스피200</option>
+    </select>
+    정렬 : <select name="rank_sort" id="ranksort">
+        <option value="순매수잔량순">순매수잔량순</option>
+        <option value="순매도잔량순">순매도잔량순</option>
+        <option value="매수비율순">매수비율순</option>
+        <option value="매도비율순">매도비율순</option>
+    </select>
+    볼륨 : <input type="text" name="vol_cnt" id="vol_cnt">
     <button id="btnClear" class="float-end">결과Clear</button>
 </div>
 <div>
@@ -25,11 +38,58 @@
 <script>
 $( document ).ready(function() {
     console.log( "ready!")
-    $('#btnTimeoutHogaJanrang').on('click',function(){
-
+    $('#btnTimeoutHogaJanrang').on('click',async function(){
+        const user_id = $('#user_id').val();
+        const acct_no = $('#acct_no').val();
+        const url = `/api/v1/kis/after-hour-balance/${user_id}/${acct_no}`;
+        const data = {
+            market: $('#market').val(),
+            rank_sort: $('#ranksort').val(),
+            vol_cnt: $('#vol_cnt').val()
+        }
+        
+        const template = await fetch_handlebar_and_compile('kis/after-hour-hogajanrang.html')
+        postFetch(url, data)
+            .then(data => {
+                console.log(data);
+                if (data.rt_cd != '0'){
+                    $('#result').html(data.msg1);
+                    return;
+                }                
+                const html = template({list: data.output});
+                $('#title').text('시간외호가잔량');
+                $('#result').html(html);
+            })
+            .catch(error => {
+                $('#result').html(error.message);
+            });
     })
-    $('#btnHogaJanrang').on('click',function(){
-
+    $('#btnHogaJanrang').on('click',async function(){
+        const user_id = $('#user_id').val();
+        const acct_no = $('#acct_no').val();
+        const url = `/api/v1/kis/quote-balance/${user_id}/${acct_no}`;
+        const data = {
+            market: $('#market').val(),
+            rank_sort: $('#ranksort').val(),
+            vol_cnt: $('#vol_cnt').val()
+        }
+        
+        const template = await fetch_handlebar_and_compile('kis/quote-balance.html')
+        postFetch(url, data)
+            .then(data => {
+                console.log(data);
+                debugger;
+                if (data.rt_cd != '0'){
+                    $('#result').html(data.msg1);
+                    return;
+                }
+                const html = template({list: data.output});
+                $('#title').text('호가잔량');
+                $('#result').html(html);
+            })
+            .catch(error => {
+                $('#result').html(error.message);
+            });
     })
 });
 </script>
