@@ -32,5 +32,4 @@ def get_template_html(template_name):
         body_content = re.search(r'<body[^>]*>(.*?)</body>', template_str, re.DOTALL).group(1)
     else:
         body_content = template_str
-
-    return body_content
+    return body_content.strip()
