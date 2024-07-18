@@ -173,7 +173,7 @@ def maker_header_code(df):
     s += "}\n"
     return s
 
-def maker_params_code(df):
+def maker_params_code(df, class_name):
     s = "{\n"
 
     for i in range(len(df)):
@@ -184,7 +184,21 @@ def maker_params_code(df):
         if required == 'Y':
             s += f'"{element_name}": "{han} {desc}",\n'
     s += "}\n"
+    # class Request 
+    s += f"class {class_name}_Request(StockApiBaseModel):\n"
+    for i in range(len(df)):
+        element_name = df.loc[i, 'Element']
+        required = df.loc[i, 'Required']
+        han = df.loc[i, '한글명']
+        desc = df.loc[i, 'Description']
+        _type = df.loc[i, 'Type']
+        pytype = 'str'
+        if _type != 'String':
+            pytype = 'int'
+        s += f'    {element_name}: {pytype} # {han} {desc}\n'
+
     return s
+
 def item_script(df, class_name, ele_name):
     s = f"class {class_name}Item(StockApiBaseModel):\n"
     start : bool = False
@@ -248,6 +262,7 @@ def main(main_menu:str, sub_menu:str):
     #파일에 write
     kis_path =  url.split('/')[-1]
     file_name = f"kis_{kis_path}.txt"
+    class_name = ''.join([word.capitalize() for word in kis_path.split('-')])
     with open(file_name, 'w', encoding='utf-8') as f:
         f.write(f"url: {url}\n")
         f.write("Request Header\n")
@@ -270,11 +285,11 @@ def main(main_menu:str, sub_menu:str):
         f.write("heaer = \n")
         f.write(s)
         
-        s = maker_params_code(request_query_df)
+        s = maker_params_code(request_query_df, class_name)
         f.write("params = \n")
         f.write(s)
 
-        class_name = ''.join([word.capitalize() for word in kis_path.split('-')])
+        
         s = make_pydantic_model(class_name, response_body_df)
         f.write("pydantic model = \n")
         f.write(s)
@@ -301,8 +316,8 @@ if __name__ == "__main__":
     # main_menu  = "[국내주식] 업종/기타"
     # sub_menu = "국내휴장일조회"
 
-    main_menu  = "[국내주식] 기본시세"
-    sub_menu = "주식현재가 시세"
+    main_menu  = "[국내주식] 순위분석"
+    sub_menu = "국내주식 시간외잔량 순위"
 
     main(main_menu, sub_menu)
     print("Done!")

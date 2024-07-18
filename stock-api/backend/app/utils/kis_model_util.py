@@ -9,10 +9,12 @@
 버전: 1.0
 """
 
+from backend.app.domains.stc.kis.model.kis_after_hour_balance_model import AfterHourBalance_Request
 from backend.app.domains.stc.kis.model.kis_inquire_daily_ccld_model import InquireDailyCcld_Request
 from backend.app.domains.stc.kis.model.kis_inquire_psble_order import InquirePsblOrder_Request
 from backend.app.domains.stc.kis.model.kis_order_cash_model import KisOrderRvsecncl_Request
-from backend.app.domains.stc.kis_interface_model import Buy_Max_Request, DailyCcld_Request, Modify_Order_Request
+from backend.app.domains.stc.kis.model.kis_quote_balance_model import QuoteBalance_Request
+from backend.app.domains.stc.kis_interface_model import Buy_Max_Request, DailyCcld_Request, Modify_Order_Request, Rank_Request
 from backend.app.utils.misc_util import only_number
 
 
@@ -56,4 +58,50 @@ def buy_max_to_InquirePsblOrder_Request(user_req: Buy_Max_Request) -> InquirePsb
         pdno=user_req.stk_code,
         ord_unpr=user_req.cost,
         ord_dvsn=ord_dvsn
+    )
+
+def rank_to_quote_balance_request(rank_req: Rank_Request) -> QuoteBalance_Request:
+    # 호가잔량 조회를 위한 market 매핑
+    market_mapping = {
+        '전체': '0000',
+        '코스피': '0001',
+        '코스닥': '1001',
+        '코스피200': '2001'
+    }
+
+    # rank_sort 매핑
+    rank_sort_mapping = {
+        '순매수잔량순': '0',
+        '순매도잔량순': '1',
+        '매수비율순': '2',
+        '매도비율순': '3'
+    }
+
+    return QuoteBalance_Request(
+        fid_vol_cnt=rank_req.vol_cnt,
+        fid_input_iscd=market_mapping[rank_req.market],
+        fid_rank_sort_cls_code=rank_sort_mapping[rank_req.rank_sort]
+    )
+
+def rank_to_after_hour_balance_request(rank_req: Rank_Request) -> AfterHourBalance_Request:
+    # market 매핑
+    market_mapping = {
+        '전체': '0000',
+        '코스피': '0001',
+        '코스닥': '1001',
+        '코스피200': '2001'
+    }
+
+    # rank_sort 매핑
+    rank_sort_mapping = {
+        '순매수잔량순': '1',
+        '순매도잔량순': '2',
+        '매수비율순': '3',
+        '매도비율순': '4'
+    }
+
+    return AfterHourBalance_Request(
+        fid_vol_cnt=rank_req.vol_cnt,
+        fid_input_iscd=market_mapping[rank_req.market],
+        fid_rank_sort_cls_code=rank_sort_mapping[rank_req.rank_sort]
     )

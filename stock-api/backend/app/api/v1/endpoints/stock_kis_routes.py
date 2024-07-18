@@ -11,6 +11,7 @@
 """
 from fastapi import APIRouter, Depends
 
+from backend.app.domains.stc.kis.model.kis_after_hour_balance_model import AfterHourBalance_Request, AfterHourBalance_Response
 from backend.app.domains.stc.kis.model.kis_chk_holiday_model import ChkWorkingDay_Response
 from backend.app.domains.stc.kis.model.kis_inquire_balance_model import KisInquireBalance_Response
 from backend.app.domains.stc.kis.model.kis_inquire_daily_ccld_model import InquireDailyCcld_Response
@@ -21,15 +22,16 @@ from backend.app.domains.stc.kis.model.kis_inquire_psble_order import InquirePsb
 from backend.app.domains.stc.kis.model.kis_order_cash_model import KisOrderCancel_Response, OrderCash_Request, KisOrderCash_Response
 from backend.app.domains.stc.kis.model.kis_psearch_result_model import PsearchResult_Response
 from backend.app.domains.stc.kis.model.kis_psearch_title_model import PsearchTitle_Result
+from backend.app.domains.stc.kis.model.kis_quote_balance_model import QuoteBalance_Request, QuoteBalance_Response
 from backend.app.domains.stc.kis.model.kis_search_stock_info_model import SearchStockInfo_Response
-from backend.app.domains.stc.kis_interface_model import Buy_Max_Request, DailyCcld_Request, Modify_Order_Request
+from backend.app.domains.stc.kis_interface_model import Buy_Max_Request, DailyCcld_Request, Modify_Order_Request, Rank_Request
 from backend.app.domains.user.user_service import UserService
 from backend.app.managers.client_ws_manager import ClientWsManager
 from backend.app.managers.stock_api_manager import StockApiManager
 from backend.app.core.dependency import get_user_service
 from backend.app.managers.stock_ws_manager import StockWsManager
 from backend.app.core.logger import get_logger
-from backend.app.utils.kis_model_util import buy_max_to_InquirePsblOrder_Request, daily_ccld_to_inquire_daily_ccld, modify_order_to_kisOrderRvsecncl_request
+from backend.app.utils.kis_model_util import buy_max_to_InquirePsblOrder_Request, daily_ccld_to_inquire_daily_ccld, modify_order_to_kisOrderRvsecncl_request, rank_to_after_hour_balance_request, rank_to_quote_balance_request
 from backend.app.utils.misc_util import only_number
 
 logger = get_logger(__name__)
@@ -176,4 +178,22 @@ async def chk_workingday(user_id:str, acctno:str, ymd:str ):
     kis_api = await api_manager.stock_api(user_id, acctno, 'KIS')
     ymd = only_number(ymd)
     response = kis_api.chk_workingday(ymd)
+    return response
+
+@router.get("/quote-balance/{user_id}/{acctno}",response_model=QuoteBalance_Response)
+async def quote_balance(user_id:str, acctno:str, rank_req: Rank_Request):
+    ''' 호가잔량순위 '''
+    api_manager = StockApiManager()
+    kis_api = await api_manager.stock_api(user_id, acctno, 'KIS')
+    qb_req = rank_to_quote_balance_request(rank_req)
+    response = kis_api.quote_balance(qb_req)
+    return response
+
+@router.get("/after-hour-balance/{user_id}/{acctno}",response_model=AfterHourBalance_Response)
+async def after_hour_balance(user_id:str, acctno:str, rank_req: Rank_Request):
+    ''' 시간외호가잔량순위 '''
+    api_manager = StockApiManager()
+    kis_api = await api_manager.stock_api(user_id, acctno, 'KIS')
+    ahb_req = rank_to_after_hour_balance_request(rank_req)
+    response = kis_api.after_hour_balance(ahb_req)
     return response

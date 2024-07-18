@@ -32,3 +32,9 @@ class Buy_Max_Request(StockApiBaseModel):
     ''' 매수가능 수량  '''
     stk_code : str
     cost : str = "0"
+
+class Rank_Request(StockApiBaseModel):
+    ''' 순위조회  '''
+    market: Literal['전체', '코스피', '코스닥', '코스피200']
+    rank_sort: Literal['순매수잔량순', '순매도잔량순', '매수비율순', '매도비율순']
+    vol_cnt: str = ""

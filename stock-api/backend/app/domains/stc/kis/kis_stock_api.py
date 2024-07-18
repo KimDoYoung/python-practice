@@ -31,6 +31,7 @@ from pydantic import ValidationError
 import requests
 
 from backend.app.core.logger import get_logger
+from backend.app.domains.stc.kis.model.kis_after_hour_balance_model import AfterHourBalance_Request, AfterHourBalance_Response
 from backend.app.domains.stc.kis.model.kis_chk_holiday_model import ChkWorkingDay_Response
 from backend.app.domains.stc.kis.model.kis_inquire_balance_model import KisInquireBalance_Response
 from backend.app.domains.stc.kis.model.kis_inquire_daily_ccld_model import InquireDailyCcld_Response, InquireDailyCcld_Request
@@ -40,6 +41,7 @@ from backend.app.domains.stc.kis.model.kis_inquire_psbl_sell_model import Inquir
 from backend.app.domains.stc.kis.model.kis_inquire_psble_order import InquirePsblOrder_Response, InquirePsblOrder_Request
 from backend.app.domains.stc.kis.model.kis_order_cash_model import KisOrderRvsecncl_Request, OrderCash_Request, KisOrderCash_Response, KisOrderCancel_Response
 from backend.app.domains.stc.kis.model.kis_psearch_result_model import PsearchResult_Response
+from backend.app.domains.stc.kis.model.kis_quote_balance_model import QuoteBalance_Request, QuoteBalance_Response
 from backend.app.domains.stc.kis.model.kis_search_stock_info_model import SearchStockInfo_Response
 from backend.app.domains.stc.kis.model.kis_psearch_title_model import PsearchTitle_Result
 from backend.app.domains.stc.stock_api import StockApi
@@ -533,5 +535,70 @@ class KisStockApi(StockApi):
         json_response = self.send_request('국내휴장일조회', 'GET', url, headers, params=params)
         try:
             return ChkWorkingDay_Response(**json_response)
+        except ValidationError as e:
+            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
+        
+    # -------------------------------------------------------------------------------
+    # 순위분석
+    # -------------------------------------------------------------------------------
+    def after_hour_balance(self, req:AfterHourBalance_Request) -> AfterHourBalance_Response:
+        '''시간외호가잔량순위 '''
+        logger.info(f"시간외호가잔량순위")
+
+        url = self._BASE_URL + "/uapi/domestic-stock/v1/ranking/after-hour-balance"
+        params = {
+            "fid_input_price_1":  req.fid_input_price_1, #입력 가격1 입력값 없을때 전체 (가격 ~)
+            "fid_cond_mrkt_div_code": req.fid_cond_scr_div_code, #"조건 시장 분류 코드 시장구분코드 (주식 J)",
+            "fid_cond_scr_div_code": req.fid_cond_scr_div_code,  #"조건 화면 분류 코드 Unique key( 20176 )",
+            "fid_rank_sort_cls_code": req.fid_rank_sort_cls_code, # "순위 정렬 구분 코드 1: 장전 시간외, 2: 장후 시간외, 3:매도잔량, 4:매수잔량",
+            "fid_div_cls_code": req.fid_div_cls_code, # "분류 구분 코드 0 : 전체",
+            "fid_input_iscd": req.fid_input_iscd,   #입력 종목코드 0000:전체, 0001:거래소, 1001:코스닥, 2001:코스피200",
+            "fid_trgt_exls_cls_code": req.fid_trgt_exls_cls_code, # "대상 제외 구분 코드 0 : 전체",
+            "fid_trgt_cls_code": req.fid_trgt_cls_code, # 대상 구분 코드 0 : 전체",
+            "fid_vol_cnt": req.fid_vol_cnt, # 거래량 수 입력값 없을때 전체 (거래량 ~)",
+            "fid_input_price_2": req.fid_input_price_2 #입력 가격2 입력값 없을때 전체 (~ 가격)",        
+        }    
+        headers ={
+                "content-type": "application/json; charset=utf-8",
+                "authorization": f"Bearer {self.ACCESS_TOKEN}",
+                "appkey": self.APP_KEY,
+                "appsecret": self.APP_SECRET,
+                "tr_id": "FHPST01760000",
+                "custtype":  "P" 
+        }    
+        json_response = self.send_request('시간외호가잔량순위', 'GET', url, headers, params=params)
+        try:
+            return AfterHourBalance_Response(**json_response)
+        except ValidationError as e:
+            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
+    
+    def quote_balance(self, req:QuoteBalance_Request) -> QuoteBalance_Response:
+        '''호가잔량순위 '''
+        logger.info(f"호가잔량순위")
+
+        url = self._BASE_URL + "/uapi/domestic-stock/v1/ranking/quote-balance"
+        params = {
+            "fid_vol_cnt": req.fid_vol_cnt, # "거래량 수 입력값 없을때 전체 (거래량 ~)",
+            "fid_cond_mrkt_div_code":req.fid_cond_mrkt_div_code, # 조건 시장 분류 코드 시장구분코드 (주식 J)",
+            "fid_cond_scr_div_code": req.fid_cond_scr_div_code,  #조건 화면 분류 코드 Unique key( 20172 )",
+            "fid_input_iscd": req.fid_input_iscd, #입력 종목코드 0000(전체) 코스피(0001), 코스닥(1001), 코스피200(2001)",
+            "fid_rank_sort_cls_code": req.fid_rank_sort_cls_code, #순위 정렬 구분 코드 0: 순매수잔량순, 1:순매도잔량순, 2:매수비율순, 3:매도비율순",
+            "fid_div_cls_code": req.fid_div_cls_code, #분류 구분 코드 0:전체",
+            "fid_trgt_cls_code": req.fid_trgt_cls_code, #대상 구분 코드 0:전체",
+            "fid_trgt_exls_cls_code": req.fid_trgt_exls_cls_code, #대상 제외 구분 코드 0:전체",
+            "fid_input_price_1": req.fid_input_price_1, #입력 가격1 입력값 없을때 전체 (가격 ~)",
+            "fid_input_price_2": req.fid_input_price_2, #입력 가격2 입력값 없을때 전체 (~ 가격)",      
+        }    
+        headers ={
+            "content-type": "application/json; charset=utf-8",
+            "authorization": f"Bearer {self.ACCESS_TOKEN}",
+            "appkey": self.APP_KEY,
+            "appsecret": self.APP_SECRET,
+            "tr_id": "FHPST01720000",
+            "custtype": "P" # 법인 P : 개인",
+        }    
+        json_response = self.send_request('호가잔량순위', 'GET', url, headers, params=params)
+        try:
+            return QuoteBalance_Response(**json_response)
         except ValidationError as e:
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
