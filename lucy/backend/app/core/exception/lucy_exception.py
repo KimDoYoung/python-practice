@@ -5,6 +5,11 @@ class LucyException(Exception):
 
 class KisException(LucyException):
     pass
+
+class KisApiException(LucyException):
+    pass
+
+
 class LsException(LucyException):
     pass
 
