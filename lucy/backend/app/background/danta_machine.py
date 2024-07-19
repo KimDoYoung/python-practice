@@ -53,5 +53,5 @@ async def danta_machine_main():
     '''' 단타 머신 메인 루프 '''
     while True:
         logger.debug("단타 머신 수행 중..." + str(time.time()))
-        await asyncio.sleep(5)  # 실제 작업을 대체하는 지연
+        await asyncio.sleep(60)  # 실제 작업을 대체하는 지연
         await broadcast_message("단타 머신 수행 중..." + str(time.time()))
