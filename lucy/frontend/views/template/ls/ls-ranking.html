@@ -1,74 +1,108 @@
-{% extends 'common/base_ls.html' %}
-{% block style %}
-{% endblock %}
-{% block content %}
-<h1>LS-Restful API Test</h1>
-<div class="row" style="background-color: #f2f1d4;">
-    <div class="col-4">
-        <div class="mb-3">
-            <label class="form-label">Market</label>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="market_gb" id="market_all" value="전체" checked>
-                <label class="form-check-label" for="market_all">
-                    전체
-                </label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="market_gb" id="market_kospi" value="코스피">
-                <label class="form-check-label" for="market_kospi">
-                    코스피
-                </label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="market_gb" id="market_kosdaq" value="코스닥">
-                <label class="form-check-label" for="market_kosdaq">
-                    코스닥
-                </label>
-            </div>
-        </div>
+{% extends 'common/base_ls.html' %} {% block style %} {% endblock %} {% block
+content %}
+<h2>상위종목</h2>
+<div class="row" style="background-color: #f2f1d4">
+  <div class="col-4">
+    <div class="mb-3">
+      <label class="form-label">Market</label>
+      <div class="form-check form-check-inline">
+        <input
+          class="form-check-input"
+          type="radio"
+          name="market_gb"
+          id="market_all"
+          value="전체"
+          checked
+        />
+        <label class="form-check-label" for="market_all"> 전체 </label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input
+          class="form-check-input"
+          type="radio"
+          name="market_gb"
+          id="market_kospi"
+          value="코스피"
+        />
+        <label class="form-check-label" for="market_kospi"> 코스피 </label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input
+          class="form-check-input"
+          type="radio"
+          name="market_gb"
+          id="market_kosdaq"
+          value="코스닥"
+        />
+        <label class="form-check-label" for="market_kosdaq"> 코스닥 </label>
+      </div>
     </div>
-    <div class="col-4">
-        <div class="mb-3">
-            <label class="form-label">Up/Down</label>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="updown_gb" id="up" value="상승" checked>
-                <label class="form-check-label" for="up">
-                    상승
-                </label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="updown_gb" id="down" value="하락">
-                <label class="form-check-label" for="down">
-                    하락
-                </label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="updown_gb" id="steady" value="보합">
-                <label class="form-check-label" for="steady">
-                    보합
-                </label>
-            </div>
-        </div>
+  </div>
+  <div class="col-4">
+    <div class="mb-3">
+      <label class="form-label">Up/Down</label>
+      <div class="form-check form-check-inline">
+        <input
+          class="form-check-input"
+          type="radio"
+          name="updown_gb"
+          id="up"
+          value="상승"
+          checked
+        />
+        <label class="form-check-label" for="up"> 상승 </label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input
+          class="form-check-input"
+          type="radio"
+          name="updown_gb"
+          id="down"
+          value="하락"
+        />
+        <label class="form-check-label" for="down"> 하락 </label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input
+          class="form-check-input"
+          type="radio"
+          name="updown_gb"
+          id="steady"
+          value="보합"
+        />
+        <label class="form-check-label" for="steady"> 보합 </label>
+      </div>
     </div>
-    <div class="col-4">
-        <div class="mb-3">
-            <label class="form-label">Yesterday/Today</label>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="yester_or_today" id="yesterday" value="전일" checked>
-                <label class="form-check-label" for="yesterday">
-                    전일
-                </label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="yester_or_today" id="today" value="금일">
-                <label class="form-check-label" for="today">
-                    금일
-                </label>
-            </div>
-        </div>
+  </div>
+  <div class="col-4">
+    <div class="mb-3">
+      <label class="form-label">Yesterday/Today</label>
+      <div class="form-check form-check-inline">
+        <input
+          class="form-check-input"
+          type="radio"
+          name="yester_or_today"
+          id="yesterday"
+          value="전일"
+          checked
+        />
+        <label class="form-check-label" for="yesterday"> 전일 </label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input
+          class="form-check-input"
+          type="radio"
+          name="yester_or_today"
+          id="today"
+          value="금일"
+        />
+        <label class="form-check-label" for="today"> 금일 </label>
+      </div>
     </div>
+  </div>
 </div>
-<div>
+<div class="row mt-1 p-2" style="background-color: #c1f0ef;">
+  <div class="col">
     <button id="btnRange">1.등락률</button>
     <button id="btnVolumn">2.거래량</button>
     <button id="btnRapidUp">3.전일동시간대비거래급증</button>
@@ -77,250 +111,254 @@
     <button id="btnExpectFilfull">6.예상체결량</button>
     <button id="btnExpectDanilgaRange">7.단일가예상등락율</button>
     <button id="btnPurchaseCost">8.거래대금</button>
+  </div>
 </div>
-<div id="list-area"></div>
+<div>
+    <h1 id="title"></h1>
+    <div id="list-area"></div>
+</div>
 {% raw %}
 <!--handlebar scripts-->
 
-{% endraw %}
-{% endblock %}
-{% block script %}
-{% raw %}
+{% endraw %} {% endblock %} {% block script %} {% raw %}
 <script>
-async function fetch_handlebar(hbs_file_path) {
-    const response = await fetch(`/template?path=${hbs_file_path}`);
-    if (!response.ok) {
-        throw new Error('Network response was not ok ' + response.statusText);
-    }
-    const data = await response.json();
-    return data.template;
-}
-async function fetch_handlebar_and_compile(path) {
-    const data = await fetch_handlebar(path);
-    return Handlebars.compile(data);
-}
-
-$( document ).ready(function() {
-    console.log( "ready!")
+  $(document).ready(function () {
+    console.log("ready!");
     //등락률
-    $('#btnRange').click(async function(){
-        const url = `/api/v1/ls/rank/range`
-        const market_gb = $('input[name=market_gb]:checked').val()
-        const updown_gb = $('input[name=updown_gb]:checked').val()
-        const yester_or_today = $('input[name=yester_or_today]:checked').val()
-
+    $("#btnRange").click(async function () {
+        $('#title').text('1.등락률');
+        const url = `/api/v1/ls/rank/range`;
+        const market_gb = $("input[name=market_gb]:checked").val();
+        const updown_gb = $("input[name=updown_gb]:checked").val();
+        const yester_or_today = $("input[name=yester_or_today]:checked").val();
         const data = {
-            market_gb : market_gb,
+            market_gb: market_gb,
             updown_gb: updown_gb,
-            yester_or_today : yester_or_today,
-        }
+            yester_or_today: yester_or_today,
+        };
         // debugger;
-        JuliaUtil.displayLoading(true)
-        const template = await fetch_handlebar_and_compile('ls/range.html')
+        JuliaUtil.displayLoading(true);
+        const template = await fetch_handlebar_and_compile("ls/range.html");
         postFetch(url, data)
-            .then(data => {
-                //TODO 코드에 따라서 처리해야함. 왜냐하면 잘못된 데이터가 올수 있음
-                JuliaUtil.displayLoading(false)
-                console.log(data);
-                const html = template({list: data.t1441OutBlock1});
-                $('#list-area').html(html);
-            })
-            .catch(error => {
-                JuliaUtil.displayLoading(false)
-                $('#list-area').html(error.message);
-            });
+        .then((data) => {
+            
+            JuliaUtil.displayLoading(false);
+            console.log(data);
+            const html = template({ list: data.t1441OutBlock1 });
+            $("#list-area").html(html);
+        })
+        .catch((error) => {
+            JuliaUtil.displayLoading(false);
+            $("#list-area").html(error.message);
+        });
     });
     //거래량
-    $('#btnVolumn').on('click', async function(){
-        const url = `/api/v1/ls/rank/volumn`
-        const market_gb = $('input[name=market_gb]:checked').val()
-        const updown_gb = $('input[name=updown_gb]:checked').val()
-        const yester_or_today = $('input[name=yester_or_today]:checked').val()
+    $("#btnVolumn").on("click", async function () {
+        $('#title').text('2.거래량');
+        const url = `/api/v1/ls/rank/volumn`;
+        const market_gb = $("input[name=market_gb]:checked").val();
+        const updown_gb = $("input[name=updown_gb]:checked").val();
+        const yester_or_today = $("input[name=yester_or_today]:checked").val();
 
         const data = {
-            market_gb : market_gb,
+            market_gb: market_gb,
             updown_gb: updown_gb,
-            yester_or_today : yester_or_today,
-        }
+            yester_or_today: yester_or_today,
+        };
         // debugger;
-        JuliaUtil.displayLoading(true)
-        const template = await fetch_handlebar_and_compile('ls/volumn.html')
+        JuliaUtil.displayLoading(true);
+        const template = await fetch_handlebar_and_compile("ls/volumn.html");
         postFetch(url, data)
-            .then(data => {
-                JuliaUtil.displayLoading(false)
-                console.log(data);
-                const html = template({list: data.t1452OutBlock1});
-                $('#list-area').html(html);
+            .then((data) => {
+            JuliaUtil.displayLoading(false);
+            console.log(data);
+            const html = template({ list: data.t1452OutBlock1 });
+            $("#list-area").html(html);
             })
-            .catch(error => {
-                JuliaUtil.displayLoading(false)
-                $('#list-area').html(error.message);
+            .catch((error) => {
+            JuliaUtil.displayLoading(false);
+            $("#list-area").html(error.message);
             });
-    })
+    });
     //3.전일대비거래급증
-    $('#btnRapidUp').on('click', async function(){
-        const url = `/api/v1/ls/rank/rapidup`
-        const market_gb = $('input[name=market_gb]:checked').val()
-        const updown_gb = $('input[name=updown_gb]:checked').val()
-        const yester_or_today = $('input[name=yester_or_today]:checked').val()
+    $("#btnRapidUp").on("click", async function () {
+        $('#title').text('3.전일동시간대비거래급증');
+        const url = `/api/v1/ls/rank/rapidup`;
+        const market_gb = $("input[name=market_gb]:checked").val();
+        const updown_gb = $("input[name=updown_gb]:checked").val();
+        const yester_or_today = $("input[name=yester_or_today]:checked").val();
 
         const data = {
-            market_gb : market_gb,
+            market_gb: market_gb,
             updown_gb: updown_gb,
-            yester_or_today : yester_or_today,
-        }
+            yester_or_today: yester_or_today,
+        };
         // debugger;
-        JuliaUtil.displayLoading(true)
-        const template = await fetch_handlebar_and_compile('ls/rapid_up.html')
+        JuliaUtil.displayLoading(true);
+        const template = await fetch_handlebar_and_compile("ls/rapid_up.html");
         postFetch(url, data)
-            .then(data => {
-                JuliaUtil.displayLoading(false)
-                console.log(data);
-                const html = template({list: data.t1466OutBlock1});
-                $('#list-area').html(html);
+            .then((data) => {
+            JuliaUtil.displayLoading(false);
+            console.log(data);
+            const html = template({ list: data.t1466OutBlock1 });
+            $("#list-area").html(html);
             })
-            .catch(error => {
-                JuliaUtil.displayLoading(false)
-                $('#list-area').html(error.message);
+            .catch((error) => {
+            JuliaUtil.displayLoading(false);
+            $("#list-area").html(error.message);
             });
     });
     //4.시간외등락율
-    $('#btnTimeoutRange').on('click', async function(){
-        const url = `/api/v1/ls/rank/timeout-range`
-        const market_gb = $('input[name=market_gb]:checked').val()
-        const updown_gb = $('input[name=updown_gb]:checked').val()
-        const yester_or_today = $('input[name=yester_or_today]:checked').val()
+    $("#btnTimeoutRange").on("click", async function () {
+        $('#title').text('4.시간외등락율');
+        const url = `/api/v1/ls/rank/timeout-range`;
+        const market_gb = $("input[name=market_gb]:checked").val();
+        const updown_gb = $("input[name=updown_gb]:checked").val();
+        const yester_or_today = $("input[name=yester_or_today]:checked").val();
 
         const data = {
-            market_gb : market_gb,
+            market_gb: market_gb,
             updown_gb: updown_gb,
-            yester_or_today : yester_or_today,
-        }
+            yester_or_today: yester_or_today,
+        };
         // debugger;
-        JuliaUtil.displayLoading(true)
-        const template = await fetch_handlebar_and_compile('ls/timeout_range.html')
+        JuliaUtil.displayLoading(true);
+        const template = await fetch_handlebar_and_compile(
+            "ls/timeout_range.html"
+        );
         postFetch(url, data)
-            .then(data => {
-                JuliaUtil.displayLoading(false)
-                console.log(data);
-                const html = template({list: data.t1481OutBlock1});
-                $('#list-area').html(html);
+            .then((data) => {
+            JuliaUtil.displayLoading(false);
+            console.log(data);
+            const html = template({ list: data.t1481OutBlock1 });
+            $("#list-area").html(html);
             })
-            .catch(error => {
-                JuliaUtil.displayLoading(false)
-                $('#list-area').html(error.message);
+            .catch((error) => {
+            JuliaUtil.displayLoading(false);
+            $("#list-area").html(error.message);
             });
     });
     //5.시간외거래량
-    $('#btnTimeoutVolume').on('click', async function(){
-        const url = `/api/v1/ls/rank/timeout-volume`
-        const market_gb = $('input[name=market_gb]:checked').val()
-        const updown_gb = $('input[name=updown_gb]:checked').val()
-        const yester_or_today = $('input[name=yester_or_today]:checked').val()
+    $("#btnTimeoutVolume").on("click", async function () {
+        $('#title').text('5.시간외거래량');
+        const url = `/api/v1/ls/rank/timeout-volume`;
+        const market_gb = $("input[name=market_gb]:checked").val();
+        const updown_gb = $("input[name=updown_gb]:checked").val();
+        const yester_or_today = $("input[name=yester_or_today]:checked").val();
 
         const data = {
-            market_gb : market_gb,
+            market_gb: market_gb,
             updown_gb: updown_gb,
-            yester_or_today : yester_or_today,
-        }
+            yester_or_today: yester_or_today,
+        };
         // debugger;
-        JuliaUtil.displayLoading(true)
-        const template = await fetch_handlebar_and_compile('ls/timeout_volume.html')
+        JuliaUtil.displayLoading(true);
+        const template = await fetch_handlebar_and_compile(
+            "ls/timeout_volume.html"
+        );
         postFetch(url, data)
-            .then(data => {
-                JuliaUtil.displayLoading(false)
-                console.log(data);
-                const html = template({list: data.t1482OutBlock1});
-                $('#list-area').html(html);
+            .then((data) => {
+            JuliaUtil.displayLoading(false);
+            console.log(data);
+            const html = template({ list: data.t1482OutBlock1 });
+            $("#list-area").html(html);
             })
-            .catch(error => {
-                JuliaUtil.displayLoading(false)
-                $('#list-area').html(error.message);
+            .catch((error) => {
+            JuliaUtil.displayLoading(false);
+            $("#list-area").html(error.message);
             });
     });
     //6.예상체결량
-    $('#btnExpectFilfull').on('click', async function(){
-        const url = `/api/v1/ls/rank/expect-fulfill`
-        const market_gb = $('input[name=market_gb]:checked').val()
-        const updown_gb = $('input[name=updown_gb]:checked').val()
-        const yester_or_today = $('input[name=yester_or_today]:checked').val()
+    $("#btnExpectFilfull").on("click", async function () {
+        $('#title').text('6.예상체결량');
+        const url = `/api/v1/ls/rank/expect-fulfill`;
+        const market_gb = $("input[name=market_gb]:checked").val();
+        const updown_gb = $("input[name=updown_gb]:checked").val();
+        const yester_or_today = $("input[name=yester_or_today]:checked").val();
 
         const data = {
-            market_gb : market_gb,
+            market_gb: market_gb,
             updown_gb: updown_gb,
-            yester_or_today : yester_or_today,
-        }
+            yester_or_today: yester_or_today,
+        };
         // debugger;
-        JuliaUtil.displayLoading(true)
-        const template = await fetch_handlebar_and_compile('ls/expect_fulfill.html')
+        JuliaUtil.displayLoading(true);
+        const template = await fetch_handlebar_and_compile(
+            "ls/expect_fulfill.html"
+        );
         postFetch(url, data)
-            .then(data => {
-                JuliaUtil.displayLoading(false)
-                console.log(data);
-                const html = template({list: data.t1489OutBlock1});
-                $('#list-area').html(html);
+            .then((data) => {
+            JuliaUtil.displayLoading(false);
+            console.log(data);
+            const html = template({ list: data.t1489OutBlock1 });
+            $("#list-area").html(html);
             })
-            .catch(error => {
-                JuliaUtil.displayLoading(false)
-                $('#list-area').html(error.message);
+            .catch((error) => {
+            JuliaUtil.displayLoading(false);
+            $("#list-area").html(error.message);
             });
     });
     //7.단일가예상등락율
-    $('#btnExpectDanilgaRange').on('click', async function(){
-        const url = `/api/v1/ls/rank/expect-danilga-range`
-        const market_gb = $('input[name=market_gb]:checked').val()
-        const updown_gb = $('input[name=updown_gb]:checked').val()
-        const yester_or_today = $('input[name=yester_or_today]:checked').val()
+    $("#btnExpectDanilgaRange").on("click", async function () {
+        $('#title').text('7.단일가예상등락율');
+        const url = `/api/v1/ls/rank/expect-danilga-range`;
+        const market_gb = $("input[name=market_gb]:checked").val();
+        const updown_gb = $("input[name=updown_gb]:checked").val();
+        const yester_or_today = $("input[name=yester_or_today]:checked").val();
 
         const data = {
-            market_gb : market_gb,
+            market_gb: market_gb,
             updown_gb: updown_gb,
-            yester_or_today : yester_or_today,
-        }
+            yester_or_today: yester_or_today,
+        };
         // debugger;
-        JuliaUtil.displayLoading(true)
-        const template = await fetch_handlebar_and_compile('ls/expect_danilga_range.html')
+        JuliaUtil.displayLoading(true);
+        const template = await fetch_handlebar_and_compile(
+            "ls/expect_danilga_range.html"
+        );
         postFetch(url, data)
-            .then(data => {
-                JuliaUtil.displayLoading(false)
-                console.log(data);
-                const html = template({list: data.t1492OutBlock1});
-                $('#list-area').html(html);
+            .then((data) => {
+            JuliaUtil.displayLoading(false);
+            console.log(data);
+            const html = template({ list: data.t1492OutBlock1 });
+            $("#list-area").html(html);
             })
-            .catch(error => {
-                JuliaUtil.displayLoading(false)
-                $('#list-area').html(error.message);
+            .catch((error) => {
+            JuliaUtil.displayLoading(false);
+            $("#list-area").html(error.message);
             });
     });
-    
+
     //8.거래대금
-    $('#btnPurchaseCost').on('click', async function(){
-        const url = `/api/v1/ls/rank/purchase-cost`
-        const market_gb = $('input[name=market_gb]:checked').val()
-        const updown_gb = $('input[name=updown_gb]:checked').val()
-        const yester_or_today = $('input[name=yester_or_today]:checked').val()
+    $("#btnPurchaseCost").on("click", async function () {
+        $('#title').text('8.거래대금');
+        const url = `/api/v1/ls/rank/purchase-cost`;
+        const market_gb = $("input[name=market_gb]:checked").val();
+        const updown_gb = $("input[name=updown_gb]:checked").val();
+        const yester_or_today = $("input[name=yester_or_today]:checked").val();
 
         const data = {
-            market_gb : market_gb,
+            market_gb: market_gb,
             updown_gb: updown_gb,
-            yester_or_today : yester_or_today,
-        }
+            yester_or_today: yester_or_today,
+        };
         // debugger;
-        JuliaUtil.displayLoading(true)
-        const template = await fetch_handlebar_and_compile('ls/purchase_cost.html')
+        JuliaUtil.displayLoading(true);
+        const template = await fetch_handlebar_and_compile(
+            "ls/purchase_cost.html"
+        );
         postFetch(url, data)
-            .then(data => {
-                JuliaUtil.displayLoading(false)
-                console.log(data);
-                const html = template({list: data.t1463OutBlock1});
-                $('#list-area').html(html);
+            .then((data) => {
+            JuliaUtil.displayLoading(false);
+            console.log(data);
+            const html = template({ list: data.t1463OutBlock1 });
+            $("#list-area").html(html);
             })
-            .catch(error => {
-                JuliaUtil.displayLoading(false)
-                $('#list-area').html(error.message);
-            });        
-    })
+            .catch((error) => {
+            JuliaUtil.displayLoading(false);
+            $("#list-area").html(error.message);
+            });
+    });
 });
 </script>
-{% endraw %}
-{% endblock %}
+{% endraw %} {% endblock %}

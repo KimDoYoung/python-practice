@@ -3,7 +3,28 @@
 모듈 설명: 
     - LS증권 API를 사용하는 API를 정의한다.
 주요 기능:
-    -   기능을 넣으시오
+    - /notice/start: websocket으로 Notice 연결 시작
+    - /notice/stop: websocket으로 Notice 연결 종료
+    - /current-cost/{stk_code}: 현재가
+    - /order: 현물주문
+    - /modify-order: 현물정정주문
+    - /cancel-order: 현물주문취소
+    - /acct-history: 계좌 주문내역
+    - /fulfill-list: 체결/미체결내역
+    - /fulfill-api-list: 현물계좌 주문체결내역 조회(API)
+    - /master-api: [주식] 시세-주식마스터조회API용
+    - /multi-current-cost: [주식] 시세-API용주식멀티현재가조회
+    - /jango2: [주식] 계좌-주식잔고2
+    - /bep_danga: [주식] 계좌-BEP단가조회
+    - /rank/range: [주식] 상위종목 : 등락률
+    - /rank/volumn: [주식] 상위종목-거래량상위
+    - /rank/rapidup: [주식] 상위종목-전일동시간대비거래급증
+    - /rank/timeout-range: [주식] 상위종목-시간외등락율상위
+    - /rank/timeout-volume: [주식] 상위종목-시간외거래량상위
+    - /rank/expect-fulfill: [주식] 상위종목-예상체결량상위조회
+    - /rank/expect-danilga-range: [주식] 상위종목-단일가예상등락율
+    - /rank/purchase-cost: [주식] 상위종목-거래대금상위
+    
 
 작성자: 김도영
 작성일: 2024-07-19
@@ -195,7 +216,7 @@ async def rank_range(user_req:HighItem_Request):
     ls_api = await StockApiManager().stock_api('LS')
     t1441_req = high_item_to_T1441_Request(user_req)
     list = []
-    for i in range(5):
+    for i in range(1):
         response = await ls_api.rank_range(t1441_req)
         await asyncio.sleep(1)
         list.extend(response.t1441OutBlock1)
@@ -220,7 +241,7 @@ async def rank_volumn(req:HighItem_Request):
 
     t1452_req = high_item_to_T1452_Request(req) 
     list = []
-    for i in range(5):
+    for i in range(1):
         response = await ls_api.rank_volumn(t1452_req)
         list.extend(response.t1452OutBlock1)
         if t1452_req.t1452InBlock.idx == response.t1452OutBlock.idx:
@@ -247,7 +268,7 @@ async def rank_rapidup(req:HighItem_Request):
     ls_api = await StockApiManager().stock_api('LS')
     t1466_req = high_item_to_T1466_Request(req) 
     list = []
-    for i in range(5):
+    for i in range(1):
         response = await ls_api.rank_rapidup(t1466_req)
         list.extend(response.t1466OutBlock1)
         if t1466_req.t1466InBlock.idx == response.t1466OutBlock.idx:
@@ -271,7 +292,7 @@ async def rank_timeout_range(req:HighItem_Request):
     ls_api = await StockApiManager().stock_api('LS')
     t1481_req = high_item_to_T1481_Request(req)
     list = []
-    for i in range(5):
+    for i in range(1):
         response = await ls_api.rank_timeout_range(t1481_req)
         list.extend(response.t1481OutBlock1)
         t1481_req.t1481InBlock.idx = response.t1481OutBlock.idx
@@ -294,7 +315,7 @@ async def rank_timeout_volume(req:HighItem_Request):
     ls_api = await StockApiManager().stock_api('LS')
     t1482_req = high_item_to_T1482_Request(req)
     list = []
-    for i in range(5):
+    for i in range(1):
         response = await ls_api.rank_timeout_volume(t1482_req)
         list.extend(response.t1482OutBlock1)
         t1482_req.t1482InBlock.idx = response.t1482OutBlock.idx
@@ -317,7 +338,7 @@ async def rank_expect_filfull(req:HighItem_Request):
     ls_api = await StockApiManager().stock_api('LS')
     t1489_req = high_item_to_T1489_Request(req) 
     list = []
-    for i in range(5):
+    for i in range(1):
         response = await ls_api.rank_expect_filfull(t1489_req)
         await asyncio.sleep(1)
         list.extend(response.t1489OutBlock1)
@@ -340,7 +361,7 @@ async def rank_expect_danilga_range(req:HighItem_Request):
     ls_api = await StockApiManager().stock_api('LS')
     t1492_req = high_item_to_T1492_Request(req) 
     list = []
-    for i in range(5):
+    for i in range(1):
         response = await ls_api.rank_expect_danilga_range(t1492_req)
         list.extend(response.t1492OutBlock1)
         t1492_req.t1492InBlock.idx = response.t1492OutBlock.idx
@@ -364,7 +385,7 @@ async def rank_purchase_cost(req:HighItem_Request):
     ls_api = await StockApiManager().stock_api('LS')
     t1463_req = high_item_to_T1463_Request(req) 
     list = []
-    for i in range(5):
+    for i in range(1):
         response = await ls_api.rank_purchase_cost(t1463_req)
         await asyncio.sleep(1)
         list.extend(response.t1463OutBlock1)

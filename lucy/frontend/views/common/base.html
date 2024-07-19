@@ -12,6 +12,7 @@
 {% block style %}{% endblock %}  
 </head>
 <body>
+    <!-- TODO base 를 두고 base_main으로 가면 어떨까? -->
 {% include "common/nav.html" %}    
 <div id="main-area" class="container mt-4">
     {% block content %}{% endblock %}
@@ -32,6 +33,7 @@
 
 
 <script src="/public/js/common.js"></script>
+<script src="/public/js/fetch-util.js"></script>
 <script src="/public/js/handlebar-helpers.js"></script>
 <script src="/public/js/lucy_main.js"></script>
 {% block script %}{% endblock %}

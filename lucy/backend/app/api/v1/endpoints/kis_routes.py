@@ -20,14 +20,18 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
 from backend.app.core.dependency import get_mystock_service, get_user_service
 # from backend.app.domains.stc.kis.kis_api import KoreaInvestmentApi
+from backend.app.domains.stc.kis.model.kis_after_hour_balance_model import AfterHourBalance_Response
 from backend.app.domains.stc.kis.model.kis_inquire_daily_ccld_model import InquireDailyCcld_Request
 from backend.app.domains.stc.kis.model.kis_order_cash_model import KisOrderCancel_Request, OrderCash_Request
+from backend.app.domains.stc.kis.model.kis_quote_balance_model import QuoteBalance_Response
+from backend.app.domains.stc.kis_interface_model import Rank_Request
 from backend.app.domains.system.mystock_model import MyStockDto
 from backend.app.domains.user.user_service import UserService
 
 from backend.app.core.logger import get_logger
 from backend.app.core.security import get_current_user
 from backend.app.managers.stock_api_manager import StockApiManager
+from backend.app.utils.kis_model_util import rank_to_after_hour_balance_request, rank_to_quote_balance_request
 
 logger = get_logger(__name__)
 
@@ -150,3 +154,19 @@ async def inquire_daily_ccld(request:Request, ccld: InquireDailyCcld_Request, us
     ccld_result = kis_api.inquire_daily_ccld(inquire_daily_ccld=ccld)
     logger.debug("주식일별주문체결조회:["+ccld_result.to_str()+"]")
     return ccld_result
+
+@router.post("/rank/quote-balance",response_model=QuoteBalance_Response)
+async def quote_balance(rank_req: Rank_Request):
+    ''' 호가잔량순위 '''
+    kis_api = await StockApiManager().kis_api()
+    qb_req = rank_to_quote_balance_request(rank_req)
+    response = kis_api.quote_balance(qb_req)
+    return response
+
+@router.post("/rank/after-hour-balance",response_model=AfterHourBalance_Response)
+async def after_hour_balance(rank_req: Rank_Request):
+    ''' 시간외호가잔량순위 '''
+    kis_api = await StockApiManager().kis_api()
+    ahb_req = rank_to_after_hour_balance_request(rank_req)
+    response = kis_api.after_hour_balance(ahb_req)
+    return response

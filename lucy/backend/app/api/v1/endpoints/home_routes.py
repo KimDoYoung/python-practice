@@ -78,8 +78,7 @@ async def handlebar_template(request: Request, path: str = Query(..., descriptio
         path = path.lstrip('/')
     
     # ".html"로 끝나면 ".html" 제거
-    if path.endswith('.html'):
-        path = path.rstrip('.html')
+    path = path.removesuffix('.html')
     
     handlebar_html_filename =  f"handlebar/{path}.html"
 

@@ -4,8 +4,6 @@
 {% block content %}
 <h1>KIS-Ranking</h1>
 <div class="m-2 p-2" style="background-color: rgb(203, 244, 217);">
-    <!-- user id: <input type="text" id="user_id" value="kdy987">
-    account no : <input type="text" id="acct_no" value="6577792801"> -->
     시장구분 : <select name="market" id="market">
         <option value="전체">전체</option>
         <option value="코스피">코스피</option>
@@ -38,9 +36,7 @@
 $( document ).ready(function() {
     console.log( "ready!")
     $('#btnTimeoutHogaJanrang').on('click',async function(){
-        const user_id = $('#user_id').val();
-        const acct_no = $('#acct_no').val();
-        const url = `/api/v1/kis/after-hour-balance/${user_id}/${acct_no}`;
+        const url = `/api/v1/kis/rank/after-hour-balance`;
         const data = {
             market: $('#market').val(),
             rank_sort: $('#ranksort').val(),
@@ -64,9 +60,7 @@ $( document ).ready(function() {
             });
     })
     $('#btnHogaJanrang').on('click',async function(){
-        const user_id = $('#user_id').val();
-        const acct_no = $('#acct_no').val();
-        const url = `/api/v1/kis/quote-balance/${user_id}/${acct_no}`;
+        const url = `/api/v1/kis/rank/quote-balance`;
         const data = {
             market: $('#market').val(),
             rank_sort: $('#ranksort').val(),
