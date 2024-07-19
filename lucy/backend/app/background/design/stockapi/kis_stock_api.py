@@ -31,7 +31,6 @@ import requests
 
 from backend.app.background.design.stockapi.stock_api import StockApi
 from backend.app.core.logger import get_logger
-from backend.app.domains.stc.kis.model.kis_chk_holiday_model import ChkHolidayDto
 from backend.app.domains.stc.kis.model.kis_inquire_balance_model import KisInquireBalance
 from backend.app.domains.stc.kis.model.kis_inquire_daily_ccld_model import InquireDailyCcldDto, InquireDailyCcldRequest
 from backend.app.domains.stc.kis.model.kis_inquire_psbl_rvsecncl_model import InquirePsblRvsecnclDto
@@ -42,7 +41,7 @@ from backend.app.domains.stc.kis.model.kis_psearch_result_model import PsearchRe
 from backend.app.domains.stc.kis.model.kis_search_stock_info_model import SearchStockInfoDto
 from backend.app.domains.stc.kis.model.kis_psearch_title_model import PsearchTitleDto
 from backend.app.domains.user.user_model import StkAccount, User
-from backend.app.core.exception.lucy_exception import KisAccessTokenExpireException, KisAccessTokenInvalidException
+from backend.app.core.exception.lucy_exception import AccessTokenExpireException, AccessTokenInvalidException
 logger = get_logger(__name__)
 
 class KisStockApi(StockApi):
@@ -75,7 +74,7 @@ class KisStockApi(StockApi):
         # 만료여부 체크
         try:
             cost = self.get_current_price("005930") # 삼성전자
-        except KisAccessTokenExpireException as e:
+        except AccessTokenExpireException as e:
             await self.set_access_token_from_kis()
 
         return True    
@@ -120,9 +119,9 @@ class KisStockApi(StockApi):
     def check_access_token(self, json:dict) -> None:
         ''' 토큰 만료 여부 확인 '''
         if json['rt_cd'] == '1' and json['msg_cd'] == 'EGW00123':
-            raise KisAccessTokenExpireException("KIS Access Token Expired(접속토큰이 만료됨)")
+            raise AccessTokenExpireException("KIS Access Token Expired(접속토큰이 만료됨)")
         if json['rt_cd'] == '1' and json['msg_cd'] == 'EGW00121':
-            raise KisAccessTokenInvalidException("KIS Access Token Invalid(접속토큰이 유효하지 않음)")
+            raise AccessTokenInvalidException("KIS Access Token Invalid(접속토큰이 유효하지 않음)")
 
         return None
 

@@ -5,9 +5,18 @@ class LucyException(Exception):
 
 class KisException(LucyException):
     pass
-
-class KisAccessTokenExpireException(KisException):
+class LsException(LucyException):
     pass
 
-class KisAccessTokenInvalidException(KisException):
+class AccessTokenExpireException(KisException):
     pass
+
+class AccessTokenInvalidException(KisException):
+    pass
+
+class LsApiException(LsException):
+    pass
+
+class InvalidResponseException(LucyException):
+    pass
+

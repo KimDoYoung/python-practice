@@ -94,6 +94,12 @@ class User(Document):
             if account.account_no == acctno:
                 return account
         return None
+    
+    def find_account_by_abbr(self, abbr: str):
+        for account in self.accounts:
+            if account.abbr == abbr:
+                return account
+        return None
 
     class Settings:
         name = "Users"

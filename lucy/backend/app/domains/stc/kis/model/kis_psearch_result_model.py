@@ -27,7 +27,7 @@ class PsearchResultItem(BaseModel):
     dnlmtprice: str # 하한가
     stotprice: str # 시가총액
 
-class PsearchResultDto(BaseModel):
+class PsearchResult_Response(BaseModel):
     '''조건식 목록 조회 결과'''
     rt_cd: str # 성공 실패 여부
     msg_cd: str # 응답코드

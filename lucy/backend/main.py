@@ -35,19 +35,55 @@ from backend.app.core.dependency import get_scheduler_job_service
 
 logger = get_logger(__name__)
 
+def create_app() -> FastAPI:
+    app = FastAPI(title="Lucy - 단타머신(개인용)", version="0.1.1")
+    add_middlewares(app)
+    add_routes(app)
+    add_event_handlers(app)
+    add_static_files(app)
+    add_exception_handlers(app)
+    return app
 
-app = FastAPI(title="Lucy - 단타머신(개인용)")
-# JWT 인증 미들웨어 등록
-app.add_middleware(JWTAuthMiddleware)
+def add_middlewares(app: FastAPI):
+    ''' 미들웨어 설정 '''
+    # JWT 인증 미들웨어 등록
+    app.add_middleware(JWTAuthMiddleware)
 
-# CORS 설정
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+    # CORS 설정
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+def add_routes(app: FastAPI):
+    # API 라우터 포함
+    app.include_router(home_router) # 화면
+    app.include_router(user_router, prefix="/api/v1/user", tags=["user"])
+    app.include_router(eventdays_router, prefix="/api/v1/eventdays", tags=["eventdays"])
+    app.include_router(ipo_router, prefix="/api/v1/ipo", tags=["ipo"])
+    app.include_router(scheduler_router, prefix="/api/v1/scheduler", tags=["scheduler"])
+    app.include_router(config_router, prefix="/api/v1/config", tags=["config"])
+    app.include_router(kis_router, prefix="/api/v1/kis", tags=["kis"])
+    app.include_router(mystock_router, prefix="/api/v1/mystock", tags=["mystock"])
+    app.include_router(danta_router, prefix="/api/v1/danta", tags=["danta"])
+    # WebSocket 라우터 포함
+    app.include_router(client_websocket_router)
+
+
+def add_event_handlers(app: FastAPI):
+    ''' 이벤트 핸들러 설정 '''
+    app.add_event_handler("startup", startup_event)
+    app.add_event_handler("shutdown", shutdown_event)
+
+def add_static_files(app: FastAPI):
+    ''' 정적 파일 설정 '''
+    # static
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    static_files_path = os.path.join(BASE_DIR, 'frontend', 'public')
+    app.mount("/public", StaticFiles(directory=static_files_path), name="public")
 
 async def startup_event():
     ''' Lucy application  시작 '''
@@ -112,32 +148,8 @@ async def shutdown_event():
     logger.info('---------------------------------')
     logger.info('Shutdown 프로세스 종료')
     logger.info('---------------------------------')
-    
 
-# Adding event handlers to the application lifecycle
-app.add_event_handler("startup", startup_event)
-app.add_event_handler("shutdown", shutdown_event)
-
-# static
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-static_files_path = os.path.join(BASE_DIR, 'frontend', 'public')
-app.mount("/public", StaticFiles(directory=static_files_path), name="public")
-
-# API 라우터 포함
-app.include_router(home_router) # 화면
-app.include_router(user_router, prefix="/api/v1/user", tags=["user"])
-app.include_router(eventdays_router, prefix="/api/v1/eventdays", tags=["eventdays"])
-app.include_router(ipo_router, prefix="/api/v1/ipo", tags=["ipo"])
-app.include_router(scheduler_router,prefix="/api/v1/scheduler", tags=["scheduler"])
-app.include_router(config_router,prefix="/api/v1/config", tags=["config"])
-app.include_router(kis_router,prefix="/api/v1/kis", tags=["kis"])
-app.include_router(mystock_router,prefix="/api/v1/mystock", tags=["mystock"])
-app.include_router(danta_router,prefix="/api/v1/danta", tags=["danta"])
-
-app.include_router(client_websocket_router)
-
-# Exception Handler 추가
-add_exception_handlers(app)
+app = create_app()
 
 if __name__ == "__main__":
     import uvicorn

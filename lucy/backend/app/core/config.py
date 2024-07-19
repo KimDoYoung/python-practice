@@ -4,6 +4,9 @@ class Config:
     def __init__(self):
         self.PROFILE_NAME = os.getenv('LUCY_MODE', 'local')
         load_dotenv(dotenv_path=f'.env.{self.PROFILE_NAME}')
+        
+        # 디폴트사용자
+        self.DEFAULT_USER_ID = os.getenv('DEFAULT_USER_ID', 'kdy987')
 
         # DB 설정
         self.DB_URL = os.getenv('DB_URL', 'mongodb://root:root@test.kfs.co.kr:27017/')

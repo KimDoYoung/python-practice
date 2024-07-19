@@ -1,8 +1,8 @@
 from typing import List, Optional
 
-from backend.app.domains.stc.kis.model.kis_base_model import KisBaseModel
+from backend.app.domains.stock_api_base_model import StockApiBaseModel
 
-class InquireBalanceItem1(KisBaseModel):
+class InquireBalanceItem1(StockApiBaseModel):
     pdno: str
     prdt_name: str
     trad_dvsn_name: str
@@ -30,7 +30,7 @@ class InquireBalanceItem1(KisBaseModel):
     sbst_pric: str
     stck_loan_unpr: str
 
-class InquireBalanceItem2(KisBaseModel):
+class InquireBalanceItem2(StockApiBaseModel):
     dnca_tot_amt: str
     nxdy_excc_amt: str
     prvs_rcdl_excc_amt: str
@@ -56,7 +56,7 @@ class InquireBalanceItem2(KisBaseModel):
     asst_icdc_amt: str
     asst_icdc_erng_rt: str
 
-class KisInquireBalance(KisBaseModel):
+class KisInquireBalance_Response(StockApiBaseModel):
     rt_cd: str
     msg_cd: str
     msg1: str
