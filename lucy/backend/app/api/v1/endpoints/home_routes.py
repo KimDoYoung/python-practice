@@ -73,7 +73,15 @@ async def handlebar_template(request: Request, path: str = Query(..., descriptio
         "request": request, 
         "today" : today
     }
-    handlebar_html_filename =  f"handlebar/{path.lstrip('/')}.html"
+    # '/'로 시작하면 '/' 제거
+    if path.startswith('/'):
+        path = path.lstrip('/')
+    
+    # ".html"로 끝나면 ".html" 제거
+    if path.endswith('.html'):
+        path = path.rstrip('.html')
+    
+    handlebar_html_filename =  f"handlebar/{path}.html"
 
     handlebar_html =  render_template(handlebar_html_filename, context)
     data = {

@@ -70,7 +70,7 @@ async def news_stop(user_id:str, acctno:str):
 async def current_cost(stk_code:str ):
     ''' 현재가 '''
     logger.info(f"current_cost 요청:  {stk_code}")
-    ls_api = await StockApiManager().api_manager.stock_api('LS')
+    ls_api = await StockApiManager().stock_api('LS')
     
     req = T1102_Request(stk_code=stk_code)
 
@@ -84,7 +84,7 @@ async def order_cash(req:Order_Request):
     
     cspat00601_Request = order_to_cspat00601_Request(req)
     
-    ls_api = await StockApiManager().api_manager.stock_api('LS')
+    ls_api = await StockApiManager().stock_api('LS')
     response = await ls_api.order(cspat00601_Request)
 
     return response
@@ -92,7 +92,7 @@ async def order_cash(req:Order_Request):
 @router.post("/modify-order",response_model=CSPAT00701_Response)
 async def modify_order(req:ModifyOrder_Request):
     ''' 현물정정주문 '''
-    ls_api = await StockApiManager().api_manager.stock_api('LS')
+    ls_api = await StockApiManager().stock_api('LS')
     capat00701_req = modify_order_to_cspat00701_Request(req)
     response = await ls_api.modify_cash(capat00701_req)
     logger.debug(f"modify_order 응답: [{response.to_str()}]")
@@ -101,7 +101,7 @@ async def modify_order(req:ModifyOrder_Request):
 @router.post("/cancel-order",response_model=CSPAT00801_Response)
 async def cancel_order(req:CancelOrder_Request):
     ''' 현물주문취소 '''
-    ls_api = await StockApiManager().api_manager.stock_api('LS')
+    ls_api = await StockApiManager().stock_api('LS')
     capat00801_req = cancel_order_to_cspat00801_Request(req)
     response = await ls_api.cancel_cash(capat00801_req)
     logger.debug(f"cancel_order 응답: [{response.to_str()}]")
@@ -110,7 +110,7 @@ async def cancel_order(req:CancelOrder_Request):
 @router.post("/acct-history",response_model=CDPCQ04700_Response)
 async def acct_history(req:AcctHistory_Request):
     ''' 계좌 주문내역 '''
-    ls_api = await StockApiManager().api_manager.stock_api('LS')
+    ls_api = await StockApiManager().stock_api('LS')
     
     CDPCQ04700_Req = acct_history_to_CDPCQ04700_Request(req)
     
@@ -122,7 +122,7 @@ async def acct_history(req:AcctHistory_Request):
 @router.post("/fulfill-list",response_model=T0425_Response)
 async def fulfill_list(req:Fulfill_Request):
     ''' 체결/미체결내역 '''
-    ls_api = await StockApiManager().api_manager.stock_api('LS')
+    ls_api = await StockApiManager().stock_api('LS')
     
     t042_Req = fulfill_to_t0425_Request(req)
     
@@ -134,7 +134,7 @@ async def fulfill_list(req:Fulfill_Request):
 @router.post("/fulfill-api-list",response_model=CSPAQ13700_Response)
 async def fulfill_api_list(req:Fulfill_Api_Request,):
     ''' 현물계좌 주문체결내역 조회(API) '''
-    ls_api = await StockApiManager().api_manager.stock_api('LS')
+    ls_api = await StockApiManager().stock_api('LS')
     
     cspaq13700_req = fulfill_api_to_cspaq13700_Request(req)
     
@@ -146,7 +146,7 @@ async def fulfill_api_list(req:Fulfill_Api_Request,):
 @router.get("/master-api",response_model=T9945_Response)
 async def master_api(user_id:str, acctno:str):
     ''' [주식] 시세-주식마스터조회API용 '''
-    ls_api = await StockApiManager().api_manager.stock_api('LS')
+    ls_api = await StockApiManager().stock_api('LS')
     
     response = await ls_api.master_api("1") # 1 코스피, 2 코스닥
 
@@ -156,7 +156,7 @@ async def master_api(user_id:str, acctno:str):
 @router.post("/multi-current-cost",response_model=T8407_Response)
 async def multi_current_cost(array_stk_codes: ArrayStkCodes):
     ''' [주식] 시세-API용주식멀티현재가조회 '''
-    ls_api = await StockApiManager().api_manager.stock_api('LS')
+    ls_api = await StockApiManager().stock_api('LS')
     length =  len(array_stk_codes.stk_codes)
     stk_code_str = ''.join(array_stk_codes.stk_codes)
     inBlock = T8407InBLOCK(nrec=length, shcode=stk_code_str)
@@ -169,7 +169,7 @@ async def multi_current_cost(array_stk_codes: ArrayStkCodes):
 @router.get("/jango2",response_model=T0424_Response)
 async def jango2(user_id:str, acctno:str):
     ''' [주식] 계좌-주식잔고2 '''
-    ls_api = await StockApiManager().api_manager.stock_api('LS')
+    ls_api = await StockApiManager().stock_api('LS')
     req = T0424_Request(t0424InBlock=T0424INBLOCK())
     response = await ls_api.jango2(req)
 
@@ -179,7 +179,7 @@ async def jango2(user_id:str, acctno:str):
 @router.get("/bep_danga",response_model=CSPAQ12300_Response)
 async def bep_danga(user_id:str, acctno:str):
     '''[주식] 계좌-BEP단가조회'''
-    ls_api = await StockApiManager().api_manager.stock_api('LS')
+    ls_api = await StockApiManager().stock_api('LS')
     req = CSPAQ12300_Request(CSPAQ12300InBlock1=CSPAQ12300InBlock1())
     response = await ls_api.bep_danga(req)
 
@@ -192,7 +192,7 @@ async def bep_danga(user_id:str, acctno:str):
 @router.post("/rank/range",response_model=T1441_Response)
 async def rank_range(user_req:HighItem_Request):
     '''[주식] 상위종목 : 등락률'''
-    ls_api = await StockApiManager().api_manager.stock_api('LS')
+    ls_api = await StockApiManager().stock_api('LS')
     t1441_req = high_item_to_T1441_Request(user_req)
     list = []
     for i in range(5):
@@ -216,7 +216,7 @@ async def rank_range(user_req:HighItem_Request):
 @router.post("/rank/volumn",response_model=T1452_Response)
 async def rank_volumn(req:HighItem_Request):
     '''[주식] 상위종목-거래량상위'''
-    ls_api = await StockApiManager().api_manager.stock_api('LS')
+    ls_api = await StockApiManager().stock_api('LS')
 
     t1452_req = high_item_to_T1452_Request(req) 
     list = []
@@ -244,7 +244,7 @@ async def rank_volumn(req:HighItem_Request):
 @router.post("/rank/rapidup",response_model=T1466_Response)
 async def rank_rapidup(req:HighItem_Request):
     '''[주식] 상위종목-전일동시간대비거래급증 '''
-    ls_api = await StockApiManager().api_manager.stock_api('LS')
+    ls_api = await StockApiManager().stock_api('LS')
     t1466_req = high_item_to_T1466_Request(req) 
     list = []
     for i in range(5):
@@ -268,7 +268,7 @@ async def rank_rapidup(req:HighItem_Request):
 @router.post("/rank/timeout-range",response_model=T1481_Response)
 async def rank_timeout_range(req:HighItem_Request):
     '''[주식] 상위종목-시간외등락율상위 '''
-    ls_api = await StockApiManager().api_manager.stock_api('LS')
+    ls_api = await StockApiManager().stock_api('LS')
     t1481_req = high_item_to_T1481_Request(req)
     list = []
     for i in range(5):
@@ -291,7 +291,7 @@ async def rank_timeout_range(req:HighItem_Request):
 @router.post("/rank/timeout-volume",response_model=T1482_Response)
 async def rank_timeout_volume(req:HighItem_Request):
     '''[주식] 상위종목-시간외거래량상위 '''
-    ls_api = await StockApiManager().api_manager.stock_api('LS')
+    ls_api = await StockApiManager().stock_api('LS')
     t1482_req = high_item_to_T1482_Request(req)
     list = []
     for i in range(5):
@@ -314,7 +314,7 @@ async def rank_timeout_volume(req:HighItem_Request):
 @router.post("/rank/expect-fulfill",response_model=T1489_Response)
 async def rank_expect_filfull(req:HighItem_Request):
     '''[주식]  상위종목-예상체결량상위조회 '''
-    ls_api = await StockApiManager().api_manager.stock_api('LS')
+    ls_api = await StockApiManager().stock_api('LS')
     t1489_req = high_item_to_T1489_Request(req) 
     list = []
     for i in range(5):
@@ -337,7 +337,7 @@ async def rank_expect_filfull(req:HighItem_Request):
 @router.post("/rank/expect-danilga-range",response_model=T1492_Response)
 async def rank_expect_danilga_range(req:HighItem_Request):
     '''[주식]  상위종목-단일가예상등락율 '''
-    ls_api = await StockApiManager().api_manager.stock_api('LS')
+    ls_api = await StockApiManager().stock_api('LS')
     t1492_req = high_item_to_T1492_Request(req) 
     list = []
     for i in range(5):
@@ -361,7 +361,7 @@ async def rank_expect_danilga_range(req:HighItem_Request):
 @router.post("/rank/purchase-cost",response_model=T1463_Response)
 async def rank_purchase_cost(req:HighItem_Request):
     '''[주식]  상위종목-거래대금상위 '''
-    ls_api = await StockApiManager().api_manager.stock_api('LS')
+    ls_api = await StockApiManager().stock_api('LS')
     t1463_req = high_item_to_T1463_Request(req) 
     list = []
     for i in range(5):

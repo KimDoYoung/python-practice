@@ -102,7 +102,6 @@ var JuliaUtil = (function(){
     }
     
     var displayLoading = function(show) {
-		debugger;
 		const loading_div_id = '#julia-loading-div';
 		let loading_div_nm = loading_div_id.substring(1);
 		if( $(loading_div_id).length == 0 ){
@@ -110,16 +109,16 @@ var JuliaUtil = (function(){
 			var body = document.body;
 			var top = (doc.clientHeight / 2 ) + (doc.scrollTop + body.scrollTop)-190;
 			var left = (doc.clientWidth / 2 );
-			var path = contextPath();
+			var path = 'public'; //contextPath();
 			var div_html = `<div id='${loading_div_nm}' style='display:none;position:absolute;top:${top}px;left:${left}px'><img src='${path}/images/loading.gif'></div>`;
 			$("body").append(div_html);
 		} 
 		if( show ){
 			//$(loading_div_id).show();
-			$(loading_div_id).addClass('active');
+			$(loading_div_id).removeClass('d-none');
 		}else{
-			//$(loading_div_id).hide();
-			$(loading_div_id).removeClass('active');
+            // $(loading_div_id).hide();
+			$(loading_div_id).addClass('d-none');
 		}
 	}
     var displayComma = function (str){

@@ -104,9 +104,7 @@ $( document ).ready(function() {
     console.log( "ready!")
     //등락률
     $('#btnRange').click(async function(){
-        const user_id = $('#user_id').val()
-        const acct_no = $('#acctno').val()
-        const url = `/api/v1/ls/rank/range/${user_id}/${acct_no}`
+        const url = `/api/v1/ls/rank/range`
         const market_gb = $('input[name=market_gb]:checked').val()
         const updown_gb = $('input[name=updown_gb]:checked').val()
         const yester_or_today = $('input[name=yester_or_today]:checked').val()
@@ -134,9 +132,7 @@ $( document ).ready(function() {
     });
     //거래량
     $('#btnVolumn').on('click', async function(){
-        const user_id = $('#user_id').val()
-        const acct_no = $('#acctno').val()
-        const url = `/api/v1/ls/rank/volumn/${user_id}/${acct_no}`
+        const url = `/api/v1/ls/rank/volumn`
         const market_gb = $('input[name=market_gb]:checked').val()
         const updown_gb = $('input[name=updown_gb]:checked').val()
         const yester_or_today = $('input[name=yester_or_today]:checked').val()
@@ -163,9 +159,7 @@ $( document ).ready(function() {
     })
     //3.전일대비거래급증
     $('#btnRapidUp').on('click', async function(){
-        const user_id = $('#user_id').val()
-        const acct_no = $('#acctno').val()
-        const url = `/api/v1/ls/rank/rapidup/${user_id}/${acct_no}`
+        const url = `/api/v1/ls/rank/rapidup`
         const market_gb = $('input[name=market_gb]:checked').val()
         const updown_gb = $('input[name=updown_gb]:checked').val()
         const yester_or_today = $('input[name=yester_or_today]:checked').val()
@@ -192,9 +186,7 @@ $( document ).ready(function() {
     });
     //4.시간외등락율
     $('#btnTimeoutRange').on('click', async function(){
-        const user_id = $('#user_id').val()
-        const acct_no = $('#acctno').val()
-        const url = `/api/v1/ls/rank/timeout-range/${user_id}/${acct_no}`
+        const url = `/api/v1/ls/rank/timeout-range`
         const market_gb = $('input[name=market_gb]:checked').val()
         const updown_gb = $('input[name=updown_gb]:checked').val()
         const yester_or_today = $('input[name=yester_or_today]:checked').val()
@@ -221,9 +213,7 @@ $( document ).ready(function() {
     });
     //5.시간외거래량
     $('#btnTimeoutVolume').on('click', async function(){
-        const user_id = $('#user_id').val()
-        const acct_no = $('#acctno').val()
-        const url = `/api/v1/ls/rank/timeout-volume/${user_id}/${acct_no}`
+        const url = `/api/v1/ls/rank/timeout-volume`
         const market_gb = $('input[name=market_gb]:checked').val()
         const updown_gb = $('input[name=updown_gb]:checked').val()
         const yester_or_today = $('input[name=yester_or_today]:checked').val()
@@ -250,9 +240,7 @@ $( document ).ready(function() {
     });
     //6.예상체결량
     $('#btnExpectFilfull').on('click', async function(){
-        const user_id = $('#user_id').val()
-        const acct_no = $('#acctno').val()
-        const url = `/api/v1/ls/rank/expect-fulfill/${user_id}/${acct_no}`
+        const url = `/api/v1/ls/rank/expect-fulfill`
         const market_gb = $('input[name=market_gb]:checked').val()
         const updown_gb = $('input[name=updown_gb]:checked').val()
         const yester_or_today = $('input[name=yester_or_today]:checked').val()
@@ -279,9 +267,7 @@ $( document ).ready(function() {
     });
     //7.단일가예상등락율
     $('#btnExpectDanilgaRange').on('click', async function(){
-        const user_id = $('#user_id').val()
-        const acct_no = $('#acctno').val()
-        const url = `/api/v1/ls/rank/expect-danilga-range/${user_id}/${acct_no}`
+        const url = `/api/v1/ls/rank/expect-danilga-range`
         const market_gb = $('input[name=market_gb]:checked').val()
         const updown_gb = $('input[name=updown_gb]:checked').val()
         const yester_or_today = $('input[name=yester_or_today]:checked').val()
@@ -309,9 +295,7 @@ $( document ).ready(function() {
     
     //8.거래대금
     $('#btnPurchaseCost').on('click', async function(){
-        const user_id = $('#user_id').val()
-        const acct_no = $('#acctno').val()
-        const url = `/api/v1/ls/rank/purchase-cost/${user_id}/${acct_no}`
+        const url = `/api/v1/ls/rank/purchase-cost`
         const market_gb = $('input[name=market_gb]:checked').val()
         const updown_gb = $('input[name=updown_gb]:checked').val()
         const yester_or_today = $('input[name=yester_or_today]:checked').val()
