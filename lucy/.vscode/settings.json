@@ -16,6 +16,8 @@
         "./backend/app/core",
         "./backend/app/utils/scrap_"
     ],
+    "python.analysis.indexing": true,
+    "python.analysis.autoImportCompletions": true,
     //-------------------------------------------------//
     //pytest
     //-------------------------------------------------//
