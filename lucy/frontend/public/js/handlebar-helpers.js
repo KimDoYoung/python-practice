@@ -191,3 +191,20 @@
         const url = `https://finance.naver.com/item/coinfo.naver?code=${code}`;
         return new Handlebars.SafeString(`<a href="${url}" target="_blank" title="naver증권으로 이동" >${code}</a>`);
     });
+
+    Handlebars.registerHelper('displaySign', function(value) {
+        switch(parseInt(value, 10)) {
+            case 1:
+                return '상한';
+            case 2:
+                return '상승';
+            case 3:
+                return '보합';
+            case 4:
+                return '하한';
+            case 5:
+                return '하락';
+            default:
+                return 'Unknown';
+        }
+    });

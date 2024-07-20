@@ -33,6 +33,13 @@
 {% block script %}
 {% raw %}
 <script>
+Handlebars.registerHelper('addBgColor', function(value, className) {
+    if (value == "1" || value == "2") {
+        return className;
+    }
+    return '';
+});
+
 $( document ).ready(function() {
     console.log( "ready!")
     $('#btnTimeoutHogaJanrang').on('click',async function(){

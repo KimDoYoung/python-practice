@@ -1,29 +1,29 @@
 {% raw %}
-<table class="table table-bordered table-hover">
+<table class="table table-bordered table-hover table-sm">
     <thead>
         <tr>
-            <th>주식 단축 종목코드</th>
-            <th>데이터 순위</th>
-            <th>HTS 한글 종목명</th>
-            <th>주식 현재가</th>
-            <th>전일 대비</th>
-            <th>전일 대비 부호</th>
-            <th>전일 대비율</th>
-            <th>시간외 총 매도호가 잔량</th>
-            <th>시간외 총 매수호가 잔량</th>
-            <th>장개시전 시간외종가 거래량</th>
-            <th>장종료후 시간외종가 거래량</th>
+            <th class="align-middle">종목코드</th>
+            <th class="align-middle">순위</th>
+            <th class="align-middle">종목명</th>
+            <th class="align-middle">현재가</th>
+            <th class="align-middle">전일 대비</th>
+            <th class="align-middle">전일 대비 부호</th>
+            <th class="align-middle">전일 대비율</th>
+            <th class="align-middle">시간외 총 <br>매도호가 <br>잔량</th>
+            <th class="align-middle">시간외 총 <br>매수호가 <br>잔량</th>
+            <th class="align-middle">장개시전 <br>시간외종가 <br>거래량</th>
+            <th class="align-middle">장종료후 <br>시간외종가 <br>거래량</th>
         </tr>
     </thead>
     <tbody>
         {{#each list}}
-        <tr>
+        <tr class="{{addBgColor prdy_vrss_sign 'table-danger'}}">
             <td class="text-start">{{stck_shrn_iscd}}</td>
             <td class="text-start">{{data_rank}}</td>
             <td class="text-start">{{hts_kor_isnm}}</td>
             <td class="text-end">{{stck_prpr}}</td>
             <td class="text-end">{{prdy_vrss}}</td>
-            <td class="text-end">{{prdy_vrss_sign}}</td>
+            <td class="text-center">{{displaySign prdy_vrss_sign}}</td>
             <td class="text-end">{{prdy_ctrt}}</td>
             <td class="text-end">{{ovtm_total_askp_rsqn}}</td>
             <td class="text-end">{{ovtm_total_bidp_rsqn}}</td>

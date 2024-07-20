@@ -120,7 +120,17 @@ content %}
 {% raw %}
 <!--handlebar scripts-->
 
-{% endraw %} {% endblock %} {% block script %} {% raw %}
+{% endraw %} {% endblock %} 
+{% block script %} 
+<script>
+Handlebars.registerHelper('addBgColor', function(value, className) {
+    if (value === "1" || value === "2") {
+        return className;
+    }
+    return '';
+});
+</script>
+{% raw %}
 <script>
   $(document).ready(function () {
     console.log("ready!");
