@@ -47,3 +47,5 @@ async def get_calendar(startYmd:str, endYmd:str, ipo_service :IpoService=Depends
             ipo_day = IpoDays(company=ipo.name, name='상장일', ymd=ipo.days.상장일, title=ipo.title, scrap_url=ipo.scrap_url)
             days.append(ipo_day)
     return days
+
+#TODO : IPO data의 리스트 추가, 삭제, 수정 API 구현

@@ -53,6 +53,7 @@
                 <th class="text-end">주문단가</th>
                 <th class="text-end">체결수량</th>
                 <th class="text-end">잔여수량</th>
+                <th class="text-end">평균체결단가</th>
                 <th class="text-end">체결금액</th>
                 <th>Action</th>
             </tr>
@@ -73,6 +74,7 @@
                 <td class="text-end">{{displayWon this.ord_unpr}}</td>
                 <td class="text-end">{{displayWon this.tot_ccld_qty}}</td>
                 <td class="text-end">{{displayWon this.rmn_qty}}</td>
+                <td class="text-end">{{displayWon this.avg_prvs}}</td>
                 <td class="text-end">{{displayWon this.tot_ccld_amt}}</td>
                 <td>
                     {{#test "rmn_qty > 0"}}

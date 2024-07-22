@@ -9,10 +9,8 @@ from backend.app.core.logger import get_logger
 
 logger = get_logger(__name__)
 
+# TODO : Ipo_Data 컬렉션을 만들고 CRUD를 그리고 그것으로 계산하는 로직을 만들어야 한다.
 class IpoService:
-    # _instance = None
-    # def __init__(self, db_client: AsyncIOMotorClient):
-    #     self.db_client = db_client
 
     async def create(self, keyvalue: dict):
         ipo = Ipo(**keyvalue)
