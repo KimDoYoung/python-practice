@@ -10,7 +10,7 @@ from backend.app.background.telegram_bot import  initialize_telegram_bot, start_
 from backend.app.core.logger import get_logger
 from backend.app.domains.system.config_model import DbConfig
 from backend.app.domains.system.eventdays_model import EventDays
-from backend.app.domains.system.ipo_model import Ipo
+from backend.app.domains.ipo.ipo_model import Ipo
 from backend.app.domains.system.mystock_model import MyStock
 from backend.app.domains.system.scheduler_job_model import SchedulerJob
 from backend.app.domains.user.user_model import User

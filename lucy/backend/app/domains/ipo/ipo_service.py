@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional
 from beanie import PydanticObjectId
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from backend.app.domains.system.ipo_model import Ipo
+from backend.app.domains.ipo.ipo_model import Ipo
 
 from backend.app.core.logger import get_logger
 

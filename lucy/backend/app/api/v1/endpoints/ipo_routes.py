@@ -3,8 +3,8 @@ from typing import List
 
 from fastapi import APIRouter, Depends
 
-from backend.app.domains.system.ipo_model import Ipo, IpoDays
-from backend.app.domains.system.ipo_service import IpoService
+from backend.app.domains.ipo.ipo_model import Ipo, IpoDays
+from backend.app.domains.ipo.ipo_service import IpoService
 from backend.app.core.dependency import get_ipo_service
 from backend.app.core.logger import get_logger
 
