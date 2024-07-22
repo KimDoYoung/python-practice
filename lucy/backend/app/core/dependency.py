@@ -10,20 +10,24 @@ from backend.app.core.scheduler import Scheduler
 
 @lru_cache()
 def get_user_service() -> UserService:
-    return UserService(MongoDb.get_client()["stockdb"])
+    #return UserService(MongoDb.get_client()["stockdb"])
+    return UserService()
 
 @lru_cache()
 def get_eventdays_service() -> EventDaysService:
-    return EventDaysService(MongoDb.get_client()["stockdb"])
+    # return EventDaysService(MongoDb.get_client()["stockdb"])
+    return EventDaysService()
 
 @lru_cache()
 def get_ipo_service():
-    from backend.app.domains.system.ipo_service import IpoService
-    return IpoService(MongoDb.get_client()["stockdb"])
+    from backend.app.domains.ipo.ipo_service import IpoService
+    # return IpoService(MongoDb.get_client()["stockdb"])
+    return IpoService()
 
 @lru_cache()
 def get_config_service() -> DbConfigService:
-    return DbConfigService(MongoDb.get_client()["stockdb"])
+    # return DbConfigService(MongoDb.get_client()["stockdb"])
+    return DbConfigService()
 
 @lru_cache()
 def get_scheduler_job_service() -> SchedulerJobService:
@@ -34,3 +38,8 @@ def get_scheduler_job_service() -> SchedulerJobService:
 def get_mystock_service():
     from backend.app.domains.system.mystock_service import MyStockService
     return MyStockService()
+
+@lru_cache()
+def get_log_service():
+    from backend.app.domains.system.logs_service import LogsService
+    return LogsService()

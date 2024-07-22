@@ -11,8 +11,8 @@ logger = get_logger(__name__)
 
 class IpoService:
     # _instance = None
-    def __init__(self, db_client: AsyncIOMotorClient):
-        self.db_client = db_client
+    # def __init__(self, db_client: AsyncIOMotorClient):
+    #     self.db_client = db_client
 
     async def create(self, keyvalue: dict):
         ipo = Ipo(**keyvalue)

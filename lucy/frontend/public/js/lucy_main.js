@@ -68,6 +68,7 @@ $(document).ready(function() {
     });
     //매수/매도 API 호출
     function order_cash(data){
+        debugger;
         postFetch('/api/v1/kis/order-cash', data)
             .then(data => {
                 console.log(data);

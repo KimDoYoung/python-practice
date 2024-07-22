@@ -110,7 +110,7 @@ async def order_cash(request:Request, order_cash: OrderCash_Request, user_servic
     '''주식매수, 주식매도 주문'''
     
     kis_api = await StockApiManager().kis_api()
-    kis_order_cash =   kis_api.order_cash(order_cash)
+    kis_order_cash =   kis_api.order(order_cash)
     if order_cash.buy_sell_gb == "매수":
         logger.debug(f"주식매수 : {kis_order_cash}")
     else:

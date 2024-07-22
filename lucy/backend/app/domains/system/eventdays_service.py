@@ -1,7 +1,5 @@
 from typing import Any, Dict, List, Optional
 from beanie import PydanticObjectId
-from motor.motor_asyncio import AsyncIOMotorClient
-from backend.app.domains.system.config_model import DbConfig
 
 from backend.app.domains.system.eventdays_model import EventDays
 from backend.app.core.logger import get_logger
@@ -11,8 +9,8 @@ logger = get_logger(__name__)
 
 class EventDaysService:
     # _instance = None
-    def __init__(self, db_client: AsyncIOMotorClient):
-        self.db_client = db_client
+    # def __init__(self, db_client: AsyncIOMotorClient):
+    #     self.db_client = db_client
 
     async def create(self, keyvalue: dict):
         eventday = EventDays(**keyvalue)

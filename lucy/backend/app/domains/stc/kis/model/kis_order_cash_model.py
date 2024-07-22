@@ -8,8 +8,8 @@ from backend.app.domains.stock_api_base_model import StockApiBaseModel
 class OrderCash_Request(BaseModel):
     ''' 주문 요청 '''
     buy_sell_gb: Literal['매수', '매도']
-    user_id: str # 사용자 ID
-    acctno: str # 계좌번호
+    user_id: Optional[str] = '' # 사용자 ID
+    acctno: Optional[str] = '' # 계좌번호
     stk_code: str
     qty: int
     cost: int = 0 # cost가 0이면 시장가로 주문

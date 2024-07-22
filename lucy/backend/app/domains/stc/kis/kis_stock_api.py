@@ -237,29 +237,6 @@ class KisStockApi(StockApi):
         except ValidationError as e:
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
         
-    def search_stock_info(self, stk_code:str) -> SearchStockInfo_Response:
-        ''' 국내 상품정보 '''
-        logger.info(f"상품정보 : {stk_code}")
-        url = self._BASE_URL + "/uapi/domestic-stock/v1/quotations/search-stock-info"
-        headers ={
-            "content-type": "application/json; charset=utf-8",
-            'Accept': 'application/json',
-            "authorization": f"Bearer {self.ACCESS_TOKEN}",
-            "appkey": self.APP_KEY,
-            "appsecret": self.APP_SECRET,
-            "tr_id": "CTPF1002R",
-            "custtype": "P" # B : 법인 P : 개인",
-        }        
-        params = {
-            "PRDT_TYPE_CD": "300", #300 주식, ETF, ETN, ELW 301 : 선물옵션 302 : 채권 306 : ELS'",
-            "PDNO" : stk_code
-        }
-        json_response = self.send_request('국내 상품정보', 'GET', url, headers, params=params)
-        try:
-            return SearchStockInfo_Response(**json_response)
-        except ValidationError as e:
-            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
-
     def order_cancel(self, org_order_no: str) -> KisOrderCancel_Response:
         '''주식 주문 취소 '''
         logger.info(f"주식 주문 취소")
@@ -315,6 +292,29 @@ class KisStockApi(StockApi):
         except ValidationError as e:
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
 
+    def search_stock_info(self, stk_code:str) -> SearchStockInfo_Response:
+        ''' 국내 상품정보 '''
+        logger.info(f"상품정보 : {stk_code}")
+        url = self._BASE_URL + "/uapi/domestic-stock/v1/quotations/search-stock-info"
+        headers ={
+            "content-type": "application/json; charset=utf-8",
+            'Accept': 'application/json',
+            "authorization": f"Bearer {self.ACCESS_TOKEN}",
+            "appkey": self.APP_KEY,
+            "appsecret": self.APP_SECRET,
+            "tr_id": "CTPF1002R",
+            "custtype": "P" # B : 법인 P : 개인",
+        }        
+        params = {
+            "PRDT_TYPE_CD": "300", #300 주식, ETF, ETN, ELW 301 : 선물옵션 302 : 채권 306 : ELS'",
+            "PDNO" : stk_code
+        }
+        json_response = self.send_request('국내 상품정보', 'GET', url, headers, params=params)
+        try:
+            return SearchStockInfo_Response(**json_response)
+        except ValidationError as e:
+            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
+        
     def inquire_balance(self) ->KisInquireBalance_Response:
         ''' 주식 잔고 조회 '''
         url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/inquire-balance"

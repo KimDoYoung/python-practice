@@ -1,6 +1,5 @@
 from typing import List
 from fastapi import HTTPException
-from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import ValidationError
 from backend.app.domains.user.user_model import User
 from backend.app.core.logger import get_logger
@@ -9,8 +8,8 @@ logger = get_logger(__name__)
 
 class UserService:
     # _instance = None
-    def __init__(self, db_client: AsyncIOMotorClient):
-        self.db_client = db_client
+    # def __init__(self, db_client: AsyncIOMotorClient):
+    #     self.db_client = db_client
 
     async def create_user(self, user_data: dict):
         user = User(**user_data)
