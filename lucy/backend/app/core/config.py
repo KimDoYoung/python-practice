@@ -7,6 +7,7 @@ class Config:
         
         # 디폴트사용자
         self.DEFAULT_USER_ID = os.getenv('DEFAULT_USER_ID', 'kdy987')
+        self.DEFAULT_STOCK_ABBR = os.getenv('DEFAULT_STOCK_ABBR','KIS')
 
         # DB 설정
         self.DB_URL = os.getenv('DB_URL', 'mongodb://root:root@test.kfs.co.kr:27017/')

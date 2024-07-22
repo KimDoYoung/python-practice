@@ -515,13 +515,13 @@ class KisStockApi(StockApi):
     # 영업일, 거래일, 개장일, 결제일 여부를 조회할 수 있습니다.
     # 주문을 넣을 수 있는지 확인하고자 하실 경우 개장일여부(opnd_yn)을 사용하시면 됩니다.
     ##############################################################################################
-    def chk_workingday(self, base_dt:str) -> ChkWorkingDay_Response:
+    def chk_workingday(self, ymd:str) -> ChkWorkingDay_Response:
         '''국내휴장일조회 '''
         logger.info(f"국내휴장일조회")
 
         url = self._BASE_URL + "/uapi/domestic-stock/v1/quotations/chk-holiday"
         params = {
-            "BASS_DT": base_dt, #"기준일자 기준일자(YYYYMMDD)",
+            "BASS_DT": ymd, #"기준일자 기준일자(YYYYMMDD)",
             "CTX_AREA_NK": "",  # 연속조회키 공백으로 입력",
             "CTX_AREA_FK": "",  # 연속조회검색조건 공백으로 입력",
         }    
