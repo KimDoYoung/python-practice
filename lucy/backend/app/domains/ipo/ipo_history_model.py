@@ -9,10 +9,12 @@
 작성일: 2024-07-22
 버전: 1.0
 """
+from dataclasses import Field
 from beanie import Document
+from bson import ObjectId
 
 
-class IpoData(Document):
+class IpoHistory(Document):
     Company: str  # 회사명
     StkCode: str  # 종목코드
     FinalOfferingPrice: int  # 확정공모가
@@ -22,6 +24,7 @@ class IpoData(Document):
     NetIncome: float  # 순이익
     MaxValue: int  # 최고체결가
     MultipleVariable: float = Field(default=0.0)  # 곱하기변수
+    Notes: str  # 비고
 
     def calculate_multiple_variable(self):
         if self.FinalOfferingPrice != 0:
@@ -34,4 +37,6 @@ class IpoData(Document):
         await super().save(*args, **kwargs)
     
     class Settings:
-        collection = "Ipo_Data"
+        collection = "Ipo_History"
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}

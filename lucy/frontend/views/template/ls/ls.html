@@ -7,9 +7,14 @@
 
 {% block content %}
 <section id="list-section" class="container">
-    <h3>LS증권 계좌조회</h3>
-    <div id="message-area"></div> 
-    <div id="jango2"></div>
+    <div>
+        <h5>LS증권 계좌조회</h5>
+        <div class="row">
+            <div  id="summary-area" class="col-6 mt-3"></div>
+            <div class="col-6"></div>
+        </div>
+        <div id="jango2-area"></div>
+    </div> 
     <div>
         <h5>오늘의 미체결</h5>
         <div id="ccld-result-area" class="mt-3"></div>
@@ -17,37 +22,50 @@
 </section>
 
 {% raw %} 
+<script id="summary-table-template" type="text/x-handlebars-template">
+    <table class="table table-sm">
+        <tr>
+            <th class="text-end">추정순자산</th><td class="text-end">{{displayWon item.sunamt}}</td>
+            <th class="text-end">실현손익</th><td class="text-end">{{displayWon item.dtsunik}}</td>
+            <th class="text-end">매입금액</th><td class="text-end">{{displayWon item.mamt}}</td>
+        </tr>
+        <tr>
+            <th class="text-end">추정D2예수금</th><td class="text-end"><strong>{{displayWon item.sunamt}}</strong></td>
+            <th class="text-end">평가손익</th><td class="text-end">{{displayWon item.tdtsunik}}</td>
+            <th class="text-end">평가금액</th><td class="text-end">{{displayWon item.sunamt}}</td>
+        </tr>
+    </table>
+</script>
 <script id="jango2-table-template" type="text/x-handlebars-template">
     <h4>잔고</h4>
     <table class="table table-bordered table-hover">
         <thead>
-            <tr>
-                
+            <tr class="table-primary">
                 <th>종목명</th>
-                <th>종목번호</th>
-                <th>매도가능수량</th>
-                <th>평균단가</th>
-                <th>매입금액</th>
-                <th>평가금액</th>
-                <th>평가손익</th>
-                <th>수익율</th>
-                <th>수수료</th>
-                <th>제세금</th>
+                <th class="text-end">종목번호</th>
+                <th class="text-end">매도가능수량</th>
+                <th class="text-end">평균단가</th>
+                <th class="text-end">매입금액</th>
+                <th class="text-end">평가금액</th>
+                <th class="text-end">평가손익</th>
+                <th class="text-end">수익율</th>
+                <th class="text-end">수수료</th>
+                <th class="text-end">제세금</th>
             </tr>
         </thead>
         <tbody id="table-body">
             {{#each list}}
             <tr>
-                <td>{{hname}}</td>
-                <td>{{expcode}}</td>
-                <td>{{mdposqt}}</td>
-                <td>{{pamt}}</td>
-                <td>{{mamt}}</td>
-                <td>{{appamt}}</td>
-                <td>{{dtsunik}}</td>
-                <td>{{sunikrt}}</td>
-                <td>{{fee}}</td>
-                <td>{{tax}}</td>
+                <td class="">{{hname}}</td>
+                <td class="text-center">{{expcode}}</td>
+                <td class="text-end">{{displayWon mdposqt}}</td>
+                <td class="text-end">{{displayWon pamt}}</td>
+                <td class="text-end">{{displayWon mamt}}</td>
+                <td class="text-end">{{displayWon appamt}}</td>
+                <td class="text-end">{{displayWon dtsunik}}</td>
+                <td class="text-end">{{sunikrt}}</td>
+                <td class="text-end">{{displayWon fee}}</td>
+                <td class="text-end">{{displayWon tax}}</td>
             </tr>
             {{/each}}                
         </tbody>
@@ -61,22 +79,24 @@
 <script>
     function initalize() {
         //계좌조회
-        $('#jango2').click(function() {
-            const url = '/api/v1/ls/jango2'
-            getFetch(url).then(data => {
-                console.log(data)
-                const template = $('#jango2-table-template').html();
-                const templateScript = Handlebars.compile(template);
-                const html = templateScript({list: data.t0424OutBlock});
-                $('#jango2').html(html);
-            }).catch(error => {
-                console.error(error)
-            });
-            }).catch(error => {
-                console.error(error)
-            });
-        });        
-    }
+        const url = '/api/v1/ls/jango2'
+        getFetch(url).then(data => {
+            console.log(data)
+            const template = $('#jango2-table-template').html();
+            const templateScript = Handlebars.compile(template);
+            const html = templateScript({list: data.t0424OutBlock1});
+            $('#jango2-area').html(html);
+            const template1 = $('#summary-table-template').html();
+            const templateScript1 = Handlebars.compile(template1);
+            const html1 = templateScript1({item: data.t0424OutBlock});
+            $('#summary-area').html(html1);
+            
+        }).catch(error => {
+            console.error(error.message)
+        })        
+
+    };        
+    
     $( document ).ready(function() {
         console.log('ready.... ');
 

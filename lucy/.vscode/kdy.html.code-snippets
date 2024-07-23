@@ -23,9 +23,9 @@
             ],
     },
     "fetchData 전형적인것" : {
-        "prefix": "myfetchData",
+        "prefix": "myGetFetch",
         "body" :[
-            "fetchData('${1: url}')",
+            "getFetch('${1: url}')",
             "  .then(data => {\n console.log(data); \n})",
             "  .catch(error=> {\n console.error(error.message); \n});"
         ]

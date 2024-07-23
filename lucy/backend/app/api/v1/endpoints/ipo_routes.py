@@ -3,9 +3,11 @@ from typing import List
 
 from fastapi import APIRouter, Depends
 
+from backend.app.domains.ipo.ipo_history_model import IpoHistory
+from backend.app.domains.ipo.ipo_history_service import IpoHistoryService
 from backend.app.domains.ipo.ipo_model import Ipo, IpoDays
 from backend.app.domains.ipo.ipo_service import IpoService
-from backend.app.core.dependency import get_ipo_service
+from backend.app.core.dependency import get_ipo_service, get_ipohistory_service
 from backend.app.core.logger import get_logger
 
 logger = get_logger(__name__)
@@ -48,4 +50,30 @@ async def get_calendar(startYmd:str, endYmd:str, ipo_service :IpoService=Depends
             days.append(ipo_day)
     return days
 
-#TODO : IPO data의 리스트 추가, 삭제, 수정 API 구현
+#---------- Ipo History  
+@router.get("/ipo/history", response_model=List[IpoHistory])
+async def get_ipo_datas(service :IpoHistoryService=Depends(get_ipohistory_service)):
+    ''' 공모주 데이터 조회'''
+    history_list = service.get_all()
+    for history in history_list:
+        history["_id"] = str(history["_id"])
+    return history_list
+
+@router.post("/ipo/history", response_model=dict)
+async def create_ipo_history(history: IpoHistory):
+    ''' 공모주 데이터 생성'''
+    ipo_history = await IpoHistory.create(**history.dump_model())
+    return {"_id": str(ipo_history.id)}
+
+@router.delete("/ipo/history/{ipo_id}", response_model=dict)
+def delete_ipo_history(ipo_id: str, service :IpoHistoryService=Depends(get_ipohistory_service)):
+    ''' 공모주 데이터 삭제 '''
+    service.delete_1(ipo_id)
+
+    return {"result": 'OK'}
+
+@router.put("/ipo/history/{ipo_id}", response_model=IpoHistory)
+def update_ipo_history(ipo_id: str, history: IpoHistory,service :IpoHistoryService=Depends(get_ipohistory_service)):
+    ''' 공모주 history 데이터 수정'''
+    service.update_1(history)
+    return {"result": 'OK'}

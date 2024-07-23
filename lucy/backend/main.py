@@ -8,6 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from backend.app.background.danta_machine import start_danta_machine, stop_danta_machine
 from backend.app.background.telegram_bot import  initialize_telegram_bot, start_telegram_bot, stop_telegram_bot
 from backend.app.core.logger import get_logger
+from backend.app.domains.ipo.ipo_history_model import IpoHistory
 from backend.app.domains.system.config_model import DbConfig
 from backend.app.domains.system.eventdays_model import EventDays
 from backend.app.domains.ipo.ipo_model import Ipo
@@ -104,6 +105,7 @@ async def startup_event():
     await init_beanie(database=db, document_models=[User])
     await init_beanie(database=db, document_models=[EventDays])
     await init_beanie(database=db, document_models=[Ipo])
+    await init_beanie(database=db, document_models=[IpoHistory])
     await init_beanie(database=db, document_models=[DbConfig])
     await init_beanie(database=db, document_models=[SchedulerJob])
     await init_beanie(database=db, document_models=[MyStock])
