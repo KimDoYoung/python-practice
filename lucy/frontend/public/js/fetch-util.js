@@ -40,6 +40,7 @@ async function callLucyApi(url, method, data = null) {
         const response = await fetch(url, options);
 
         if (!response.ok) {
+            console.error('에러 발생:', response);
             const errorData = await response.json();
             throw new LucyError(response.status, errorData.detail);
         }

@@ -12,7 +12,7 @@
 """
 
 import json
-import requests
+import aiohttp
 from datetime import datetime, timedelta
 
 from backend.app.core.logger import get_logger
@@ -84,21 +84,24 @@ class LsStockApi(StockApi):
             "appsecretkey": self.APP_SECRET,
             "scope": "oob"
         }        
-        request = requests.post(URL, verify=False, headers=headers, params=params)
-        if request.status_code != 200:
-            logger.error(f"LS API Access Token 발급 실패 : {request.json()}")
-            raise Exception(f"LS API Access Token 발급 실패 : {request.json()}")
-        ACCESS_TOKEN = request.json()["access_token"]
-        self.ACCESS_TOKEN = ACCESS_TOKEN
-        
-        logger.debug("----------------------------------------------")
-        logger.debug(f"ACCESS_TOKEN : [{ACCESS_TOKEN}]")
-        logger.debug("----------------------------------------------")
+        async with aiohttp.ClientSession() as session:
+            async with session.post(URL, headers=headers, data=params, ssl=False) as request:
+                if request.status != 200:
+                    response_json = await request.json()
+                    logger.error(f"LS API Access Token 발급 실패 : {response_json}")
+                    raise Exception(f"LS API Access Token 발급 실패 : {response_json}")
+                response_json = await request.json()
+                ACCESS_TOKEN = response_json["access_token"]
+                self.ACCESS_TOKEN = ACCESS_TOKEN
 
-        self.account.set_value('LS_ACCESS_TOKEN', ACCESS_TOKEN)
-        self.account.set_value('LS_ACCESS_TOKEN_TIME', datetime.now().strftime("%Y-%m-%d %H:%M:%S")) # 하루로 설정
-        await self.user_service.update_user(self.user.user_id, self.user)
-        return ACCESS_TOKEN
+                logger.debug("----------------------------------------------")
+                logger.debug(f"ACCESS_TOKEN : [{ACCESS_TOKEN}]")
+                logger.debug("----------------------------------------------")
+
+                self.account.set_value('LS_ACCESS_TOKEN', ACCESS_TOKEN)
+                self.account.set_value('LS_ACCESS_TOKEN_TIME', datetime.now().strftime("%Y-%m-%d %H:%M:%S")) # 하루로 설정
+                await self.user_service.update_user(self.user.user_id, self.user)
+                return ACCESS_TOKEN
 
     async def send_request(self, request_dict: dict):
         ''' LS증권으로 요청을 보내고 응답을 받는다.'''
@@ -107,29 +110,29 @@ class LsStockApi(StockApi):
             "Content-Type": "application/json; charset=utf-8",
             "Authorization": "Bearer " + self.ACCESS_TOKEN,
             "tr_cd": request_dict["tr_cd"],
-            "tr_cont": request_dict.get("tr_cont","N"),
-            "tr_cont_key":request_dict.get("tr_cont_key",""),
-            "mac_address": request_dict.get("mac_address","")
+            "tr_cont": request_dict.get("tr_cont", "N"),
+            "tr_cont_key": request_dict.get("tr_cont_key", ""),
+            "mac_address": request_dict.get("mac_address", "")
         }
         data = request_dict["data"]
         logger.debug(f"-------------------------------------------------------------")
         logger.debug(f"API 요청 : URL=[{url}], Headers=[{headers}], Data=[{data}]")
         logger.debug(f"-------------------------------------------------------------")
-        try:
-            response = requests.post(url, verify=False, headers=headers, data=json.dumps(data))
-            response.raise_for_status()
-            response_data = response.json()
-            logger.debug(f"-------------------------------------------------------------")
-            logger.debug(f"API 응답 {request_dict["tr_cd"]} : [{response_data}]")
-            logger.debug(f"-------------------------------------------------------------")
-        except requests.exceptions.RequestException as e:
-            logger.error(f"API 요청 실패: {e}")
-            raise LsApiException(f"API 요청 실패: {e}")
-        except json.JSONDecodeError:
-            logger.error("응답이 JSON 형식이 아닙니다.")
-            raise InvalidResponseException("응답이 JSON 형식이 아닙니다.")
-
-        return response_data
+        async with aiohttp.ClientSession() as session:
+            try:
+                async with session.post(url, headers=headers, data=json.dumps(data), ssl=False) as response:
+                    response.raise_for_status()
+                    response_data = await response.json()
+                    logger.debug(f"-------------------------------------------------------------")
+                    logger.debug(f"API 응답 {request_dict['tr_cd']} : [{response_data}]")
+                    logger.debug(f"-------------------------------------------------------------")
+                    return response_data
+            except aiohttp.ClientError as e:
+                logger.error(f"API 요청 실패: {e}")
+                raise LsApiException(f"API 요청 실패: {e}")
+            except json.JSONDecodeError:
+                logger.error("응답이 JSON 형식이 아닙니다.")
+                raise InvalidResponseException("응답이 JSON 형식이 아닙니다.")
 
     async def current_cost(self, req: T1102_Request) -> T1102_Response:
         ''' 현재가 조회 : [주식] 시세-주식현재가(시세)조회 t'''

@@ -26,9 +26,9 @@
 """
 from datetime import datetime
 import json
+import aiohttp
 from fastapi import HTTPException
 from pydantic import ValidationError
-import requests
 
 from backend.app.core.logger import get_logger
 from backend.app.domains.stc.kis.model.kis_after_hour_balance_model import AfterHourBalance_Request, AfterHourBalance_Response
@@ -85,7 +85,7 @@ class KisStockApi(StockApi):
 
         # 만료여부 체크
         try:
-            cost = self.get_current_price("005930") # 삼성전자
+            cost = await self.get_current_price("005930") # 삼성전자
         except AccessTokenExpireException as e:
             await self.set_access_token_from_kis()
 
@@ -101,21 +101,24 @@ class KisStockApi(StockApi):
         body = {"grant_type":"client_credentials",
                 "appkey":self.APP_KEY, 
                 "appsecret":self.APP_SECRET}
-        res = requests.post(url, headers=headers, data=json.dumps(body))
-        
-        ACCESS_TOKEN = res.json()["access_token"]
-        
-        self.ACCESS_TOKEN = ACCESS_TOKEN
-        
-        logger.debug("----------------------------------------------")
-        logger.debug(f"ACCESS_TOKEN : [{ACCESS_TOKEN}]")
-        logger.debug("----------------------------------------------")
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, headers=headers, data=json.dumps(body)) as res:
+                if res.status != 200:
+                    response_json = await res.json()
+                    logger.error(f"KIS API Access Token 발급 실패 : {response_json}")
+                    raise KisApiException(f"KIS API Access Token 발급 실패 : {response_json}")
+            response_json = await res.json()
+            self.ACCESS_TOKEN = response_json['access_token']
+            
+            logger.debug("----------------------------------------------")
+            logger.debug(f"ACCESS_TOKEN : [{self.ACCESS_TOKEN}]")
+            logger.debug("----------------------------------------------")
 
-        self.account.set_value('KIS_ACCESS_TOKEN', ACCESS_TOKEN)
-        await self.user_service.update_user(self.user.user_id, self.user)
-        return ACCESS_TOKEN
+            self.account.set_value('KIS_ACCESS_TOKEN', self.ACCESS_TOKEN)
+            await self.user_service.update_user(self.user.user_id, self.user)
+            return self.ACCESS_TOKEN
     
-    def hashkey(self, datas):
+    async def hashkey(self, datas):
         """암호화"""
         url = self.BASE_URL + "/uapi/hashkey" #self._PATHS['암호화']
         headers = {
@@ -123,10 +126,12 @@ class KisStockApi(StockApi):
         'appKey' : self.APP_KEY,
         'appSecret' : self.APP_SECRET
         }
-        res = requests.post(url, headers=headers, data=json.dumps(datas))
-        hashkey = res.json()["HASH"]
-        return hashkey
-
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, headers=headers, json=datas) as res:
+                response_json = await res.json()
+                hashkey = response_json["HASH"]
+                return hashkey
+            
     def check_access_token(self, json:dict) -> None:
         ''' 토큰 만료 여부 확인 '''
         if json['rt_cd'] == '1' and json['msg_cd'] == 'EGW00123':
@@ -136,25 +141,25 @@ class KisStockApi(StockApi):
 
         return None
 
-    def send_request(self, title, method, url, headers, params=None, data=None):
+    async def send_request(self, title, method, url, headers, params=None, data=None):
         try:
-            if method == 'GET':
-                response = requests.get(url, headers=headers, params=params)
-            elif method == 'POST':
-                response = requests.post(url, headers=headers, data=data)
-            response.raise_for_status()
-            return response.json()
-        except requests.exceptions.HTTPError as e:
+            async with aiohttp.ClientSession() as session:
+                if method == 'GET':
+                    async with session.get(url, headers=headers, params=params) as response:
+                        response.raise_for_status()
+                        return await response.json()
+                elif method == 'POST':
+                    async with session.post(url, headers=headers, data=data) as response:
+                        response.raise_for_status()
+                        return await response.json()
+        except aiohttp.ClientError as e:
             logger.error(f"HTTP 오류 ({title}): {e}")
-            raise KisApiException(status_code=500, detail=f"HTTP 오류 ({title}): {e}")
-        except requests.exceptions.RequestException as e:
-            logger.error(f"Error occurred: {e}")
-            raise KisApiException(status_code=500, detail=f"Error occurred ({title}): {e}")
+            raise KisApiException(status_code=500, detail=f"HTTP 오류 ({title}): {e}")                    
         except json.JSONDecodeError as e:
             logger.error(f"Response is not in JSON format.{title}")
-            raise InvalidResponseException(f"Response is not in JSON format.({title})")
+            raise InvalidResponseException(f"응답 내용이 JSON형식이 아닙니다 ({title})")
 
-    def current_cost(self, stk_code:str) -> InquirePrice_Response:
+    async def current_cost(self, stk_code:str) -> InquirePrice_Response:
         ''' 현재가 조회 '''
         url = self._BASE_URL +  '/uapi/domestic-stock/v1/quotations/inquire-price' 
         headers = {"Content-Type":"application/json", 
@@ -166,7 +171,7 @@ class KisStockApi(StockApi):
             "fid_cond_mrkt_div_code":"J",
             "fid_input_iscd":stk_code,
         }
-        json_response = self.send_request('현재가 조회', 'GET', url, headers, params=params)
+        json_response = await self.send_request('현재가 조회', 'GET', url, headers, params=params)
         self.check_access_token(json_response)
         logger.debug(f"현재가: {stk_code} : {json_response['output']['stck_prpr']}")
         try:
@@ -175,7 +180,7 @@ class KisStockApi(StockApi):
             raise HTTPException(status_code=500, detail=f"받은 json 파싱 오류: {e}")        
 
 
-    def get_current_price(self, stk_code:str ) ->int:
+    async def get_current_price(self, stk_code:str ) ->int:
         ''' 현재가 조회 '''
         url = self._BASE_URL + '/uapi/domestic-stock/v1/quotations/inquire-price' 
         headers = {"Content-Type":"application/json", 
@@ -187,18 +192,14 @@ class KisStockApi(StockApi):
             "fid_cond_mrkt_div_code":"J",
             "fid_input_iscd":stk_code,
         }
-        response = requests.get(url, headers=headers, params=params)
-        json = response.json()
-        
-        self.check_access_token(json)  
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers=headers, params=params) as response:
+                json_response = await response.json()
+                self.check_access_token(json_response)
+                logger.debug(f"현재가: {stk_code} : {json_response['output']['stck_prpr']}")
+                return int(json_response['output']['stck_prpr'])        
 
-        logger.debug(f"response : {json}")        
-        logger.debug(f"현재가: {stk_code} : {json['output']['stck_prpr']}")
-
-        return int(json['output']['stck_prpr'])
-        
-
-    def order(self, order_cash : OrderCash_Request ) -> KisOrderCash_Response:
+    async def order(self, order_cash : OrderCash_Request ) -> KisOrderCash_Response:
         ''' 현금 매수/매도 '''
         logger.info(f"현금 매수 매도(order_cash) : {order_cash}")
 
@@ -230,14 +231,13 @@ class KisStockApi(StockApi):
                 "ORD_QTY" : str(order_cash.qty), 
                 "ORD_UNPR" : str(order_cash.cost)
             }
-        
-        json_response = self.send_request('현금 매수/매도', 'POST', url, headers, data=json.dumps(data))
+        json_response = await self.send_request('현금 매수/매도', 'POST', url, headers, data=json.dumps(data))
         try:
             return KisOrderCash_Response(**json_response)
         except ValidationError as e:
-            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
-        
-    def order_cancel(self, org_order_no: str) -> KisOrderCancel_Response:
+            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")        
+
+    async def order_cancel(self, org_order_no: str) -> KisOrderCancel_Response:
         '''주식 주문 취소 '''
         logger.info(f"주식 주문 취소")
         url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/order-rvsecncl"
@@ -258,13 +258,13 @@ class KisStockApi(StockApi):
             "appsecret": self.APP_SECRET,
             "tr_id": "TTTC0803U" #[실전투자] TTTC0803U : 주식 정정 취소 주문 [모의투자] VTTC0803U : 주식 정정 취소 주문",                        
         }        
-        json_response = self.send_request('주식 주문취소', 'POST', url, headers, data=json.dumps(body))
+        json_response = await self.send_request('주식 주문취소', 'POST', url, headers, data=json.dumps(body))
         try:
             return KisOrderCancel_Response(**json_response)
         except ValidationError as e:
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
 
-    def order_modify(self, req: KisOrderRvsecncl_Request) -> KisOrderCancel_Response:
+    async def order_modify(self, req: KisOrderRvsecncl_Request) -> KisOrderCancel_Response:
         '''주식 주문 정정 '''
         logger.info(f"주식 주문 정정")
         url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/order-rvsecncl"
@@ -286,13 +286,13 @@ class KisStockApi(StockApi):
             "tr_id": "TTTC0803U" #[실전투자] TTTC0803U : 주식 정정 취소 주문 [모의투자] VTTC0803U : 주식 정정 취소 주문",                        
         }        
 
-        json_response = self.send_request('주식 주문 정정','POST', url, headers, data=json.dumps(body))
+        json_response = await self.send_request('주식 주문 정정','POST', url, headers, data=json.dumps(body))
         try:
             return KisOrderCancel_Response(**json_response)
         except ValidationError as e:
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
 
-    def search_stock_info(self, stk_code:str) -> SearchStockInfo_Response:
+    async def search_stock_info(self, stk_code:str) -> SearchStockInfo_Response:
         ''' 국내 상품정보 '''
         logger.info(f"상품정보 : {stk_code}")
         url = self._BASE_URL + "/uapi/domestic-stock/v1/quotations/search-stock-info"
@@ -309,13 +309,13 @@ class KisStockApi(StockApi):
             "PRDT_TYPE_CD": "300", #300 주식, ETF, ETN, ELW 301 : 선물옵션 302 : 채권 306 : ELS'",
             "PDNO" : stk_code
         }
-        json_response = self.send_request('국내 상품정보', 'GET', url, headers, params=params)
+        json_response = await self.send_request('국내 상품정보', 'GET', url, headers, params=params)
         try:
             return SearchStockInfo_Response(**json_response)
         except ValidationError as e:
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
         
-    def inquire_balance(self) ->KisInquireBalance_Response:
+    async def inquire_balance(self) ->KisInquireBalance_Response:
         ''' 주식 잔고 조회 '''
         url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/inquire-balance"
         headers = {
@@ -340,13 +340,13 @@ class KisStockApi(StockApi):
             "CTX_AREA_FK100": "",
             "CTX_AREA_NK100": ""
         }
-        json_response = self.send_request('주식 잔고 조회', 'GET', url, headers, params=params)
+        json_response = await self.send_request('주식 잔고 조회', 'GET', url, headers, params=params)
         try:
             return KisInquireBalance_Response(**json_response)
         except ValidationError as e:
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
 
-    def psearch_title(self) -> PsearchTitle_Result:
+    async def psearch_title(self) -> PsearchTitle_Result:
         ''' 조건식 목록 조회 '''
         logger.info(f"조건식 목록 조회 ")
         url = self._BASE_URL + "/uapi/domestic-stock/v1/quotations/psearch-title"
@@ -362,13 +362,13 @@ class KisStockApi(StockApi):
             "custtype": "P", # B : 법인 P : 개인",
             "tr_cont" : ""
         }        
-        json_response = self.send_request('조건식 목록 조회', 'GET', url, headers, params=params)
+        json_response = await self.send_request('조건식 목록 조회', 'GET', url, headers, params=params)
         try:
             return PsearchTitle_Result(**json_response)
         except ValidationError as e:
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
     
-    def psearch_result(self, seq: str) -> PsearchResult_Response:
+    async def psearch_result(self, seq: str) -> PsearchResult_Response:
         ''' 조건식 결과 리스트  '''
         logger.info(f"조건식 결과 리스트 조회 ")
         url = self._BASE_URL + "/uapi/domestic-stock/v1/quotations/psearch-result"
@@ -384,13 +384,13 @@ class KisStockApi(StockApi):
             "tr_id": "HHKST03900400",
             "custtype": "P"
         }        
-        json_response = self.send_request('조건식 결과 리스트', 'GET', url, headers, params=params)
+        json_response = await self.send_request('조건식 결과 리스트', 'GET', url, headers, params=params)
         try:
             return PsearchResult_Response(**json_response)
         except ValidationError as e:
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
 
-    def inquire_daily_ccld(self, inquire_daily_ccld: InquireDailyCcld_Request) -> InquireDailyCcld_Response:
+    async def inquire_daily_ccld(self, inquire_daily_ccld: InquireDailyCcld_Request) -> InquireDailyCcld_Response:
         '''주식일별주문체결조회 '''
         logger.info(f"주식일별주문체결조회")
         url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/inquire-daily-ccld"
@@ -416,7 +416,7 @@ class KisStockApi(StockApi):
             "appsecret": self.APP_SECRET,
             "tr_id": "TTTC8001R" # TTTC8001R: 주식 일별 주문 체결 조회(3개월이내) CTSC9115R : 주식 일별 주문 체결 조회(3개월이전)
         }        
-        json_response = self.send_request('주식일별주문체결조회','GET', url, headers, params=params)
+        json_response = await self.send_request('주식일별주문체결조회','GET', url, headers, params=params)
         try:
             return InquireDailyCcld_Response(**json_response)
         except ValidationError as e:
@@ -427,7 +427,7 @@ class KisStockApi(StockApi):
     ##############################################################################################
     #주식주문(정정취소) 호출 전에 반드시 주식정정취소가능주문조회 호출을 통해 
     #정정취소가능수량(output > psbl_qty)을 확인하신 후 정정취소주문 내시기 바랍니다.
-    def inquire_psbl_rvsecncl(self) -> InquirePsblRvsecncl_Response:
+    async def inquire_psbl_rvsecncl(self) -> InquirePsblRvsecncl_Response:
         '''정정취소 가능수량 조회 '''
         logger.info(f"정정취소 가능수량 조회")
         url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/inquire-psbl-rvsecncl"
@@ -445,7 +445,7 @@ class KisStockApi(StockApi):
             "appsecret": self.APP_SECRET,
             "tr_id":  "TTTC8036R" #모의투자 사용 불가", 
         }
-        json_response = self.send_request('정정취소 가능수량 조회', 'GET', url, headers, params=params)
+        json_response = await self.send_request('정정취소 가능수량 조회', 'GET', url, headers, params=params)
         try:
             return InquirePsblRvsecncl_Response(**json_response)
         except ValidationError as e:
@@ -454,7 +454,7 @@ class KisStockApi(StockApi):
     ##############################################################################################
     # [국내주식] 주문/계좌 > 매수가능조회
     #############################################################################################
-    def inquire_psbl_order(self, ipo_req :InquirePsblOrder_Request ) -> InquirePsblOrder_Response:
+    async def inquire_psbl_order(self, ipo_req :InquirePsblOrder_Request ) -> InquirePsblOrder_Response:
         '''매수가능조회 '''
         logger.info(f"매수가능조회")
         url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/inquire-psbl-order"
@@ -473,7 +473,7 @@ class KisStockApi(StockApi):
             "appsecret": self.APP_SECRET,
             "tr_id":  "TTTC8908R" #매수가능조회
         }
-        json_response = self.send_request('매수가능조회', 'GET', url, headers, params=params)
+        json_response = await self.send_request('매수가능조회', 'GET', url, headers, params=params)
         try:
             return InquirePsblOrder_Response(**json_response)
         except ValidationError as e:
@@ -484,7 +484,7 @@ class KisStockApi(StockApi):
     # [0971] 주식 매도 화면에서 종목코드 입력 후 "가능" 클릭 시 매도가능수량이 확인되는 기능을 API로 개발한 사항
     # output > ord_psbl_qty(주문가능수량) 확인하실 수 있습니다.
     ##############################################################################################
-    def inquire_psbl_sell(self, stk_code:str) -> InquirePsblSell_Response:
+    async def inquire_psbl_sell(self, stk_code:str) -> InquirePsblSell_Response:
         '''매도가능수량 조회 '''
         logger.info(f"매도가능수량 조회")
 
@@ -503,7 +503,7 @@ class KisStockApi(StockApi):
             "tr_id": "TTTC8408R",
             "custtype": "P",
         }
-        json_response = self.send_request('매도가능수량', 'GET', url, headers, params=params)
+        json_response = await self.send_request('매도가능수량', 'GET', url, headers, params=params)
         try:
             return InquirePsblSell_Response(**json_response)
         except ValidationError as e:
@@ -515,7 +515,7 @@ class KisStockApi(StockApi):
     # 영업일, 거래일, 개장일, 결제일 여부를 조회할 수 있습니다.
     # 주문을 넣을 수 있는지 확인하고자 하실 경우 개장일여부(opnd_yn)을 사용하시면 됩니다.
     ##############################################################################################
-    def chk_workingday(self, ymd:str) -> ChkWorkingDay_Response:
+    async def chk_workingday(self, ymd:str) -> ChkWorkingDay_Response:
         '''국내휴장일조회 '''
         logger.info(f"국내휴장일조회")
 
@@ -533,7 +533,7 @@ class KisStockApi(StockApi):
             "tr_id": "CTCA0903R",
             "custtype": "P"
         }    
-        json_response = self.send_request('국내휴장일조회', 'GET', url, headers, params=params)
+        json_response = await self.send_request('국내휴장일조회', 'GET', url, headers, params=params)
         try:
             return ChkWorkingDay_Response(**json_response)
         except ValidationError as e:
@@ -542,7 +542,7 @@ class KisStockApi(StockApi):
     # -------------------------------------------------------------------------------
     # 순위분석
     # -------------------------------------------------------------------------------
-    def after_hour_balance(self, req:AfterHourBalance_Request) -> AfterHourBalance_Response:
+    async def after_hour_balance(self, req:AfterHourBalance_Request) -> AfterHourBalance_Response:
         '''시간외호가잔량순위 '''
         logger.info(f"시간외호가잔량순위")
 
@@ -567,13 +567,13 @@ class KisStockApi(StockApi):
                 "tr_id": "FHPST01760000",
                 "custtype":  "P" 
         }    
-        json_response = self.send_request('시간외호가잔량순위', 'GET', url, headers, params=params)
+        json_response = await self.send_request('시간외호가잔량순위', 'GET', url, headers, params=params)
         try:
             return AfterHourBalance_Response(**json_response)
         except ValidationError as e:
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
     
-    def quote_balance(self, req:QuoteBalance_Request) -> QuoteBalance_Response:
+    async def quote_balance(self, req:QuoteBalance_Request) -> QuoteBalance_Response:
         '''호가잔량순위 '''
         logger.info(f"호가잔량순위")
 
@@ -598,7 +598,7 @@ class KisStockApi(StockApi):
             "tr_id": "FHPST01720000",
             "custtype": "P" # 법인 P : 개인",
         }    
-        json_response = self.send_request('호가잔량순위', 'GET', url, headers, params=params)
+        json_response = await self.send_request('호가잔량순위', 'GET', url, headers, params=params)
         try:
             return QuoteBalance_Response(**json_response)
         except ValidationError as e:

@@ -8,16 +8,16 @@ class LogsService:
         log = Logs(gubun=gubun, level=level, title=title, detail=detail)
         await log.create()
 
-    async def danta_info(self, title: str, detail: str):
+    async def danta_info(self, title: str, detail: str = ''):
         await self.create_log(gubun="Danta", level="Info", title=title, detail=detail)
 
-    async def danta_error(self, title: str, detail: str):
+    async def danta_error(self, title: str, detail: str = ''):
         await self.create_log(gubun="Danta", level="Error", title=title, detail=detail)
 
-    async def cron_info(self, title: str, detail: str):
+    async def cron_info(self, title: str, detail: str = ''):
         await self.create_log(gubun="Cron", level="Info", title=title, detail=detail)
 
-    async def cron_error(self, title: str, detail: str):
+    async def cron_error(self, title: str, detail: str = ''):
         await self.create_log(gubun="Cron", level="Error", title=title, detail=detail)
 
     async def get_all(self):

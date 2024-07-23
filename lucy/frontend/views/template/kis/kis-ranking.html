@@ -3,25 +3,40 @@
 {% endblock %}
 {% block content %}
 <h1>KIS-Ranking</h1>
-<div class="m-2 p-2" style="background-color: rgb(203, 244, 217);">
-    시장구분 : <select name="market" id="market">
-        <option value="전체">전체</option>
-        <option value="코스피">코스피</option>
-        <option value="코스닥">코스닥</option>
-        <option value="코스피200">코스피200</option>
-    </select>
-    정렬 : <select name="rank_sort" id="ranksort">
-        <option value="순매수잔량순">순매수잔량순</option>
-        <option value="순매도잔량순">순매도잔량순</option>
-        <option value="매수비율순">매수비율순</option>
-        <option value="매도비율순">매도비율순</option>
-    </select>
-    볼륨 : <input type="text" name="vol_cnt" id="vol_cnt">
-    <button id="btnTimeoutHogaJanrang">시간외호가잔량</button>
-    <button id="btnHogaJanrang">호가잔량</button>
-
-    <button id="btnClear" class="float-end">결과Clear</button>
+<div class="m-2 p-2 d-flex align-items-center flex-wrap" style="background-color: rgb(203, 244, 217);">
+    <div class="me-2">
+        시장구분 : 
+        <select name="market" id="market" class="form-select d-inline w-auto">
+            <option value="전체">전체</option>
+            <option value="코스피">코스피</option>
+            <option value="코스닥">코스닥</option>
+            <option value="코스피200">코스피200</option>
+        </select>
+    </div>
+    <div class="me-2">
+        정렬 : 
+        <select name="rank_sort" id="ranksort" class="form-select d-inline w-auto">
+            <option value="순매수잔량순">순매수잔량순</option>
+            <option value="순매도잔량순">순매도잔량순</option>
+            <option value="매수비율순">매수비율순</option>
+            <option value="매도비율순">매도비율순</option>
+        </select>
+    </div>
+    <div class="me-2">
+        볼륨 : 
+        <input type="text" name="vol_cnt" id="vol_cnt" class="form-control d-inline w-auto">
+    </div>
+    <div class="me-2">
+        <button class="btn btn-primary" id="btnTimeoutHogaJanrang">시간외호가잔량</button>
+    </div>
+    <div class="me-2">
+        <button class="btn btn-primary" id="btnHogaJanrang">호가잔량</button>
+    </div>
+    <div class="ms-auto">
+        <button id="btnClear" class="btn btn-secondary">결과Clear</button>
+    </div>
 </div>
+
 <div  class="m-2 p-2" id="result-area">
     <h1 id="title"></h1>
     <div id="result"></div>
