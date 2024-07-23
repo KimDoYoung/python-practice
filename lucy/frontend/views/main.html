@@ -73,7 +73,9 @@
         input.value = ''
         event.preventDefault()
     }
-
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
     function display_mystocks() {
         fetch("/api/v1/mystock")
         .then(response => response.json())
@@ -90,6 +92,7 @@
         $('#allCost').on('click', function(){
             $('#list-area').find('.btnCurrentCost').each(function(){
                 $(this).trigger('click');
+                sleep(100)
             });
         });
         //현재가 조회

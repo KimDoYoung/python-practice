@@ -77,7 +77,7 @@ async def info(request:Request, user_service :UserService=Depends(get_user_servi
 
     kis_api = await StockApiManager().kis_api()
 
-    kis_inquire_balance =  kis_api.inquire_balance()
+    kis_inquire_balance =  await kis_api.inquire_balance()
     mystock_service = get_mystock_service()
     output1 = kis_inquire_balance.output1
     for item in output1:
@@ -93,14 +93,14 @@ async def info(request:Request, user_service :UserService=Depends(get_user_servi
     return kis_inquire_balance
 
 
-@router.get("/current-cost/{stk_cost}", response_class=JSONResponse)
-async def current_cost(request:Request, stk_cost:str, user_service :UserService=Depends(get_user_service)):
+@router.get("/current-cost/{stk_code}", response_class=JSONResponse)
+async def current_cost(request:Request, stk_code:str, user_service :UserService=Depends(get_user_service)):
     ''' 
         현재가 조회
     '''
     kis_api = await StockApiManager().kis_api()
-    cost = kis_api.get_current_price(stk_cost) # 삼성전자
-    logger.debug(f"{stk_cost} 현재가 : {cost}")
+    cost = await kis_api.get_current_price(stk_code) # 삼성전자
+    logger.debug(f"{stk_code} 현재가 : {cost}")
     return {"cost": cost}
 
 
@@ -110,7 +110,7 @@ async def order_cash(request:Request, order_cash: OrderCash_Request, user_servic
     '''주식매수, 주식매도 주문'''
     
     kis_api = await StockApiManager().kis_api()
-    kis_order_cash =   kis_api.order(order_cash)
+    kis_order_cash =  await  kis_api.order(order_cash)
     if order_cash.buy_sell_gb == "매수":
         logger.debug(f"주식매수 : {kis_order_cash}")
     else:
@@ -121,7 +121,7 @@ async def order_cash(request:Request, order_cash: OrderCash_Request, user_servic
 async def order_cancel(request:Request, order_cancel: KisOrderCancel_Request, user_service :UserService=Depends(get_user_service)):
     '''주식매수, 주식매도 취소'''
     kis_api = await StockApiManager().kis_api()
-    cancel_response =   kis_api.order_cancel(order_cancel)
+    cancel_response =  await kis_api.order_cancel(order_cancel)
     logger.debug(f"주식매수,매도 취소 : {cancel_response.to_str()}")
     return cancel_response
 
@@ -129,21 +129,21 @@ async def order_cancel(request:Request, order_cancel: KisOrderCancel_Request, us
 async def stock_info(request:Request, stk_code:str,  user_service :UserService=Depends(get_user_service)):
     '''주식정보 조회'''
     kis_api = await StockApiManager().kis_api()
-    kis_stock_info = kis_api.search_stock_info(stk_code)
+    kis_stock_info = await kis_api.search_stock_info(stk_code)
     return kis_stock_info
 
 @router.get("/psearch/title", response_class=JSONResponse)
 async def psearch_title(request:Request, user_service :UserService=Depends(get_user_service)):
     '''조건식 타이틀 조회'''    
     kis_api = await StockApiManager().kis_api()
-    kis_psearch_title = kis_api.psearch_title()
+    kis_psearch_title = await kis_api.psearch_title()
     return kis_psearch_title
 
 @router.get("/psearch/result/{seq}", response_class=JSONResponse)
 async def psearch_result(request:Request,  seq:str, user_service :UserService=Depends(get_user_service)):
     '''seq에 해당하는 조건식 조회 '''
     kis_api = await StockApiManager().kis_api()
-    kis_psearch_result = kis_api.psearch_result(seq)
+    kis_psearch_result = await kis_api.psearch_result(seq)
     return kis_psearch_result
 
 
@@ -151,7 +151,7 @@ async def psearch_result(request:Request,  seq:str, user_service :UserService=De
 async def inquire_daily_ccld(request:Request, ccld: InquireDailyCcld_Request, user_service :UserService=Depends(get_user_service)):
     '''주식일별주문체결조회 '''
     kis_api = await StockApiManager().kis_api()
-    ccld_result = kis_api.inquire_daily_ccld(inquire_daily_ccld=ccld)
+    ccld_result = await kis_api.inquire_daily_ccld(inquire_daily_ccld=ccld)
     logger.debug("주식일별주문체결조회:["+ccld_result.to_str()+"]")
     return ccld_result
 
@@ -160,7 +160,7 @@ async def quote_balance(rank_req: Rank_Request):
     ''' 호가잔량순위 '''
     kis_api = await StockApiManager().kis_api()
     qb_req = rank_to_quote_balance_request(rank_req)
-    response = kis_api.quote_balance(qb_req)
+    response = await kis_api.quote_balance(qb_req)
     return response
 
 @router.post("/rank/after-hour-balance",response_model=AfterHourBalance_Response)
@@ -168,5 +168,5 @@ async def after_hour_balance(rank_req: Rank_Request):
     ''' 시간외호가잔량순위 '''
     kis_api = await StockApiManager().kis_api()
     ahb_req = rank_to_after_hour_balance_request(rank_req)
-    response = kis_api.after_hour_balance(ahb_req)
+    response = await  kis_api.after_hour_balance(ahb_req)
     return response

@@ -105,7 +105,7 @@ class LsStockApi(StockApi):
 
     async def send_request(self, request_dict: dict):
         ''' LS증권으로 요청을 보내고 응답을 받는다.'''
-        url = f'{self._BASE_URL}/{request_dict["path"]}'
+        url = f'{self._BASE_URL}{request_dict["path"]}'
         headers = {
             "Content-Type": "application/json; charset=utf-8",
             "Authorization": "Bearer " + self.ACCESS_TOKEN,

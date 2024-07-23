@@ -180,24 +180,50 @@ class KisStockApi(StockApi):
             raise HTTPException(status_code=500, detail=f"받은 json 파싱 오류: {e}")        
 
 
-    async def get_current_price(self, stk_code:str ) ->int:
+    async def get_current_price(self, stk_code: str) -> int:
         ''' 현재가 조회 '''
-        url = self._BASE_URL + '/uapi/domestic-stock/v1/quotations/inquire-price' 
-        headers = {"Content-Type":"application/json", 
-                "authorization": f"Bearer {self.ACCESS_TOKEN}",
-                "appKey":self.APP_KEY,
-                "appSecret":self.APP_SECRET,
-                "tr_id":"FHKST01010100"}
-        params = {
-            "fid_cond_mrkt_div_code":"J",
-            "fid_input_iscd":stk_code,
+        url = self._BASE_URL + '/uapi/domestic-stock/v1/quotations/inquire-price'
+        headers = {
+            "Content-Type": "application/json",
+            "authorization": f"Bearer {self.ACCESS_TOKEN}",
+            "appKey": self.APP_KEY,
+            "appSecret": self.APP_SECRET,
+            "tr_id": "FHKST01010100"
         }
+        params = {
+            "fid_cond_mrkt_div_code": "J",
+            "fid_input_iscd": stk_code,
+        }
+
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers, params=params) as response:
-                json_response = await response.json()
+                try:
+                    json_response = await response.json()
+                except aiohttp.ClientError as e:
+                    logger.error(f"API 요청 실패: {e}")
+                    raise KisApiException(f"API 요청 실패: {e}")
+                except json.JSONDecodeError:
+                    logger.error("응답이 JSON 형식이 아닙니다.")
+                    raise InvalidResponseException("응답이 JSON 형식이 아닙니다.")
+
+                # Access token 체크
                 self.check_access_token(json_response)
-                logger.debug(f"현재가: {stk_code} : {json_response['output']['stck_prpr']}")
-                return int(json_response['output']['stck_prpr'])        
+
+                # 'output' 키가 있는지 확인
+                if 'output' not in json_response:
+                    logger.error(f"응답에 'output' 키가 없습니다: {json_response}")
+                    raise InvalidResponseException("응답에 'output' 키가 없습니다.")
+
+                try:
+                    current_price = int(json_response['output']['stck_prpr'])
+                    logger.debug(f"현재가: {stk_code} : {current_price}")
+                    return current_price
+                except KeyError:
+                    logger.error(f"응답에 'stck_prpr' 키가 없습니다: {json_response}")
+                    raise InvalidResponseException("응답에 'stck_prpr' 키가 없습니다.")
+                except ValueError:
+                    logger.error(f"'stck_prpr' 값을 정수로 변환할 수 없습니다: {json_response['output']['stck_prpr']}")
+                    raise InvalidResponseException("'stck_prpr' 값을 정수로 변환할 수 없습니다.")
 
     async def order(self, order_cash : OrderCash_Request ) -> KisOrderCash_Response:
         ''' 현금 매수/매도 '''
