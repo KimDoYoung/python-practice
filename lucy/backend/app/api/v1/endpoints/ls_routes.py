@@ -188,7 +188,7 @@ async def multi_current_cost(array_stk_codes: ArrayStkCodes):
     return response
 
 @router.get("/jango2",response_model=T0424_Response)
-async def jango2(user_id:str, acctno:str):
+async def jango2():
     ''' [주식] 계좌-주식잔고2 '''
     ls_api = await StockApiManager().stock_api('LS')
     req = T0424_Request(t0424InBlock=T0424INBLOCK())

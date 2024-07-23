@@ -1,0 +1,34 @@
+{% extends 'common/base_ls.html' %}
+{% block style %}
+<style>
+
+</style>
+{% endblock %}
+
+{% block content %}
+<section id="list-section" class="container">
+    <h3>TEST1</h3>
+    <button id="jango2">잔고2</button>
+    <div id="result-area"></div>
+</section>
+{% raw %} 
+
+{% endraw %}
+{% endblock %}
+
+{% block script %}
+{% raw %}
+<script>
+    $(document).ready(function() {
+        $('#jango2').click(function() {
+            const url = '/api/v1/ls/jango2'
+            getFetch(url).then(data => {
+                console.log(data)
+            }).catch(error => {
+                console.error(error)
+            });
+        });
+    });
+</script>	    
+{% endraw %}
+{% endblock %}
