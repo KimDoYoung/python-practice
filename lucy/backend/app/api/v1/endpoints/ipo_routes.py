@@ -79,5 +79,6 @@ async def delete_ipo_history(ipo_id: str, service :IpoHistoryService=Depends(get
 @router.put("/history/{ipo_id}", response_model=IpoHistory)
 async def update_ipo_history(ipo_id: str, history: IpoHistory,service :IpoHistoryService=Depends(get_ipohistory_service)):
     ''' 공모주 history 데이터 수정'''
-    await service.update_1(history)
-    return {"result": 'OK'}
+    await service.update_1(ipo_id, history)
+    updated_history = await service.get_1(ipo_id)
+    return updated_history

@@ -2,50 +2,59 @@
 {% block style %}
 {% endblock %}
 {% block content %}
-<h2>IPO 과거데이터 기록</h2>
-<button type="button" class="btn btn-primary" id="btnDisplayEdit">추가</button>
+<h2 class="text-center">
+    IPO 과거데이터 기록 <button type="button" class="btn btn-primary" id="btnDisplayEdit"><i class="bi bi-bag-plus"></i> 추가</button>
+</h2>
+
 <div id="table-list-area" class="m-3 p-3 d-none"></div>
 <div id="edit-area" class="m-3 p-3 d-none">
     <form id="formEdit">
-        <div class="mb-3">
-          <label for="Company" class="form-label">회사명</label>
-          <input type="text" class="form-control" id="Company" name="Company" required>
-        </div>
-        <div class="mb-3">
-          <label for="StkCode" class="form-label">종목코드</label>
-          <input type="text" class="form-control" id="StkCode" name="StkCode" required>
-        </div>
-        <div class="mb-3">
-          <label for="FinalOfferingPrice" class="form-label">확정공모가</label>
-          <input type="number" class="form-control" id="FinalOfferingPrice" name="FinalOfferingPrice" required>
-        </div>
-        <div class="mb-3">
-          <label for="Revenue" class="form-label">매출액</label>
-          <input type="number" class="form-control" id="Revenue" name="Revenue" required>
-        </div>
-        <div class="mb-3">
-          <label for="InstitutionalSubscriptionRatio" class="form-label">기관경쟁률</label>
-          <input type="number" step="0.01" class="form-control" id="InstitutionalSubscriptionRatio" name="InstitutionalSubscriptionRatio" required>
-        </div>
-        <div class="mb-3">
-          <label for="LockupAgreement" class="form-label">의무보유확약</label>
-          <input type="number" step="0.01" class="form-control" id="LockupAgreement" name="LockupAgreement" required>
-        </div>
-        <div class="mb-3">
-          <label for="NetIncome" class="form-label">순이익</label>
-          <input type="number" step="0.01" class="form-control" id="NetIncome" name="NetIncome" required>
-        </div>
-        <div class="mb-3">
-          <label for="MaxValue" class="form-label">최고체결가</label>
-          <input type="number" class="form-control" id="MaxValue" name="MaxValue" required>
-        </div>
-        <div class="mb-3">
-          <label for="Notes" class="form-label">비고</label>
-          <input type="text" class="form-control" id="Notes" name="Notes">
+        <div class="row">
+            <div class="col-6">
+                <div class="mb-2">
+                    <label for="Company" class="form-label">회사명</label>
+                    <input type="text" class="form-control" id="Company" name="Company" required>
+                  </div>
+                  <div class="mb-2">
+                    <label for="StkCode" class="form-label">종목코드</label>
+                    <input type="text" class="form-control" id="StkCode" name="StkCode" required>
+                  </div>
+                  <div class="mb-2">
+                    <label for="FinalOfferingPrice" class="form-label">확정공모가</label>
+                    <input type="number" class="form-control" id="FinalOfferingPrice" name="FinalOfferingPrice" required>
+                  </div>
+                  <div class="mb-2">
+                    <label for="Revenue" class="form-label">매출액</label>
+                    <input type="number" class="form-control" id="Revenue" name="Revenue" required>
+                  </div>
+                  <div class="mb-2">
+                    <label for="InstitutionalSubscriptionRatio" class="form-label">기관경쟁률</label>
+                    <input type="number" step="0.01" class="form-control" id="InstitutionalSubscriptionRatio" name="InstitutionalSubscriptionRatio" required>
+                  </div>          
+            </div>
+            <div class="col-6">
+                <div class="mb-2">
+                    <label for="LockupAgreement" class="form-label">의무보유확약</label>
+                    <input type="number" step="0.01" class="form-control" id="LockupAgreement" name="LockupAgreement" required>
+                  </div>
+                  <div class="mb-2">
+                    <label for="NetIncome" class="form-label">순이익</label>
+                    <input type="number" step="0.01" class="form-control" id="NetIncome" name="NetIncome" required>
+                  </div>
+                  <div class="mb-2">
+                    <label for="MaxValue" class="form-label">최고체결가</label>
+                    <input type="number" class="form-control" id="MaxValue" name="MaxValue" required>
+                  </div>
+                  <div class="mb-2">
+                    <label for="Notes" class="form-label">비고</label>
+                    <textarea class="form-control" name="Notes" id="Notes" cols="50" rows="4"></textarea>
+                  </div>          
+            </div>
         </div>
         <input type="hidden" id="editId" name="id">
+        <input type="hidden" id="editMode" name="editMode" value="insert">     
         <button type="submit" class="btn btn-primary">저장</button>
-        <button type="button" class="btn btn-secondary">취소</button>
+        <button type="button" class="btn btn-secondary" id="btnCancel">취소</button>
       </form>
 </div>
 
@@ -57,13 +66,13 @@
             <tr>
                 <th>회사명</th>
                 <th>종목코드</th>
-                <th>확정공모가</th>
-                <th>매출액</th>
-                <th>기관경쟁률</th>
-                <th>의무보유확약</th>
-                <th>순이익</th>
-                <th>최고체결가</th>
-                <th>곱하기변수</th>
+                <th class="text-end">확정공모가</th>
+                <th class="text-end">매출액</th>
+                <th class="text-end">기관경쟁률</th>
+                <th class="text-end">의무보유확약</th>
+                <th class="text-end">순이익</th>
+                <th class="text-end">최고체결가</th>
+                <th class="text-end">곱하기변수</th>
                 <th>비고</th>
                 <th>Action</th>
             </tr>
@@ -73,17 +82,17 @@
             <tr>
                 <td>{{Company}}</td>
                 <td>{{StkCode}}</td>
-                <td>{{FinalOfferingPrice}}</td>
-                <td>{{Revenue}}</td>
-                <td>{{InstitutionalSubscriptionRatio}}</td>
-                <td>{{LockupAgreement}}</td>
-                <td>{{NetIncome}}</td>
-                <td>{{MaxValue}}</td>
-                <td>{{MultipleVariable}}</td>
+                <td class="text-end">{{FinalOfferingPrice}}</td>
+                <td class="text-end">{{Revenue}}</td>
+                <td class="text-end">{{InstitutionalSubscriptionRatio}}</td>
+                <td class="text-end">{{LockupAgreement}}</td>
+                <td class="text-end">{{NetIncome}}</td>
+                <td class="text-end">{{MaxValue}}</td>
+                <td class="text-end">{{MultipleVariable}}</td>
                 <td>{{Notes}}</td>
                 <td>
-                    <button type="button" class="btn btn-primary edit-btn" data-bs-toggle="modal" data-bs-target="#editModal" data-id="{{id}}">수정</button>
-                    <button type="button" class="btn btn-danger delete-btn" data-id="{{_id}}">삭제</button>
+                    <button type="button" class="btn btn-primary modify-btn" data-id="{{_id}}"><i class="bi bi-pencil-square"></i></button>
+                    <button type="button" class="btn btn-danger delete-btn" data-id="{{_id}}"><i class="bi bi-trash3"></i></button>
                 </td>
             </tr>
             {{/each}}
@@ -135,36 +144,97 @@
             alert(error.message); 
         });
     }
+    function do_insert(){
+        const url = '/api/v1/ipo/history';
+        const data = {
+            Company: document.getElementById('Company').value,
+            StkCode: document.getElementById('StkCode').value,
+            FinalOfferingPrice: parseInt(document.getElementById('FinalOfferingPrice').value, 10),
+            Revenue: parseInt(document.getElementById('Revenue').value, 10),
+            InstitutionalSubscriptionRatio: parseFloat(document.getElementById('InstitutionalSubscriptionRatio').value),
+            LockupAgreement: parseFloat(document.getElementById('LockupAgreement').value),
+            NetIncome: parseFloat(document.getElementById('NetIncome').value),
+            MaxValue: parseInt(document.getElementById('MaxValue').value, 10),
+            Notes: document.getElementById('Notes').value
+        };
+        console.log(data);
+        postFetch(url, data).then(data => {
+            displayList();
+            initalize();                    
+        }).catch(error=> {
+            console.error(error.message);
+        });
+    }
+    function do_update(){
+        const id = document.getElementById('editId').value;
+        const url = '/api/v1/ipo/history/' + id;
+        const data = {
+            Company: document.getElementById('Company').value,
+            StkCode: document.getElementById('StkCode').value,
+            FinalOfferingPrice: parseInt(document.getElementById('FinalOfferingPrice').value, 10),
+            Revenue: parseInt(document.getElementById('Revenue').value, 10),
+            InstitutionalSubscriptionRatio: parseFloat(document.getElementById('InstitutionalSubscriptionRatio').value),
+            LockupAgreement: parseFloat(document.getElementById('LockupAgreement').value),
+            NetIncome: parseFloat(document.getElementById('NetIncome').value),
+            MaxValue: parseInt(document.getElementById('MaxValue').value, 10),
+            Notes: document.getElementById('Notes').value
+        };
+        console.log(data);
+        putFetch(url, data).then(data => {
+            displayList();
+            initalize();                    
+        }).catch(error=> {
+            console.error(error.message);
+        });
+
+    }
     $(document).ready(function() {
         console.log('ready');
-      
+        //Edit의 취소버튼
+        $('#btnCancel').click(function(){
+            displayList();
+        });
+        //추가버튼
         $('#btnDisplayEdit').click(function(){
             clearForm();
+            $('#editMode').val('insert');
             $('#edit-area').removeClass('d-none');
             $('#table-list-area').addClass('d-none');
         });
+        //Edit 추가 및 수정
         $('#formEdit').on('submit', function(event) {
             event.preventDefault();
-            const url = '/api/v1/ipo/history';
-            const data = {
-                Company: document.getElementById('Company').value,
-                StkCode: document.getElementById('StkCode').value,
-                FinalOfferingPrice: parseInt(document.getElementById('FinalOfferingPrice').value, 10),
-                Revenue: parseInt(document.getElementById('Revenue').value, 10),
-                InstitutionalSubscriptionRatio: parseFloat(document.getElementById('InstitutionalSubscriptionRatio').value),
-                LockupAgreement: parseFloat(document.getElementById('LockupAgreement').value),
-                NetIncome: parseFloat(document.getElementById('NetIncome').value),
-                MaxValue: parseInt(document.getElementById('MaxValue').value, 10),
-                Notes: document.getElementById('Notes').value
-            };
-            console.log(data);
-            postFetch(url, data).then(data => {
-                displayList();
-                initalize();                    
+            const mode = document.getElementById('editMode').value;
+            if (mode == 'insert') {
+                do_insert();
+            }else{
+                do_update();
+            }
+            
+        });
+        //수정버튼
+        $('#table-list-area').on("click", ".modify-btn", function(e) {
+            e.stopPropagation();
+            const id = $(this).data('id');
+            const url = '/api/v1/ipo/history/' + id;
+            $('#editId').val(id);
+            $('#editMode').val('update');
+            getFetch(url).then(data => {
+                console.log(data);
+                displayEdit();
+                $('#Company').val(data.Company);
+                $('#StkCode').val(data.StkCode);
+                $('#FinalOfferingPrice').val(data.FinalOfferingPrice);
+                $('#Revenue').val(data.Revenue);
+                $('#InstitutionalSubscriptionRatio').val(data.InstitutionalSubscriptionRatio);
+                $('#LockupAgreement').val(data.LockupAgreement);
+                $('#NetIncome').val(data.NetIncome);
+                $('#MaxValue').val(data.MaxValue);
+                $('#Notes').val(data.Notes);
+                $('#editId').val(data._id);
             }).catch(error=> {
                 console.error(error.message);
             });
-            
         });
         $('#table-list-area').on("click", ".delete-btn", function(e) {
             e.stopPropagation();

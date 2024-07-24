@@ -29,8 +29,13 @@ class IpoHistoryService:
         else:
             return None
     
-    async def update_1(self, ipo_history: IpoHistory):
-        await ipo_history.save()
-        return ipo_history
+    async def update_1(self, ipo_id:str,  ipo_history: IpoHistory):
+        history = await self.get_1(ipo_id)
+        if history:
+            ipo_history.id = history.id
+            await ipo_history.save()
+            return ipo_history
+        else:
+            return None
     
     #TODO : 체결예상가를 만드는 수식을 만들어서 저장해야한다.
