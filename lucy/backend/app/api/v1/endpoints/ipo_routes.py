@@ -51,29 +51,33 @@ async def get_calendar(startYmd:str, endYmd:str, ipo_service :IpoService=Depends
     return days
 
 #---------- Ipo History  
-@router.get("/ipo/history", response_model=List[IpoHistory])
+@router.get("/history", response_model=List[IpoHistory])
 async def get_ipo_datas(service :IpoHistoryService=Depends(get_ipohistory_service)):
-    ''' 공모주 데이터 조회'''
-    history_list = service.get_all()
-    for history in history_list:
-        history["_id"] = str(history["_id"])
+    ''' 공모주 데이터 모두 조회'''
+    history_list = await service.get_all()
     return history_list
 
-@router.post("/ipo/history", response_model=dict)
-async def create_ipo_history(history: IpoHistory):
-    ''' 공모주 데이터 생성'''
-    ipo_history = await IpoHistory.create(**history.dump_model())
-    return {"_id": str(ipo_history.id)}
+@router.get("/history/{ipo_id}", response_model=IpoHistory)
+async def get_ipo_datas(ipo_id:str, service :IpoHistoryService=Depends(get_ipohistory_service)):
+    ''' 공모주 데이터  1 개 조회'''
+    history = await service.get_1(ipo_id)
+    return history
 
-@router.delete("/ipo/history/{ipo_id}", response_model=dict)
-def delete_ipo_history(ipo_id: str, service :IpoHistoryService=Depends(get_ipohistory_service)):
+@router.post("/history", response_model=dict)
+async def create_ipo_history(history: IpoHistory, service :IpoHistoryService=Depends(get_ipohistory_service)):
+    ''' 공모주 데이터 생성'''
+    history = await service.create(history.model_dump())
+    return {"result": 'OK', "_id": str(history.id)}
+
+@router.delete("/history/{ipo_id}", response_model=dict)
+async def delete_ipo_history(ipo_id: str, service :IpoHistoryService=Depends(get_ipohistory_service)):
     ''' 공모주 데이터 삭제 '''
-    service.delete_1(ipo_id)
+    await service.delete_1(ipo_id)
 
     return {"result": 'OK'}
 
-@router.put("/ipo/history/{ipo_id}", response_model=IpoHistory)
-def update_ipo_history(ipo_id: str, history: IpoHistory,service :IpoHistoryService=Depends(get_ipohistory_service)):
+@router.put("/history/{ipo_id}", response_model=IpoHistory)
+async def update_ipo_history(ipo_id: str, history: IpoHistory,service :IpoHistoryService=Depends(get_ipohistory_service)):
     ''' 공모주 history 데이터 수정'''
-    service.update_1(history)
+    await service.update_1(history)
     return {"result": 'OK'}

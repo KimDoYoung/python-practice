@@ -9,9 +9,9 @@
 작성일: 2024-07-22
 버전: 1.0
 """
+from typing import Optional
 from beanie import Document
 from bson import ObjectId
-from pydantic import Field
 
 
 class IpoHistory(Document):
@@ -23,14 +23,14 @@ class IpoHistory(Document):
     LockupAgreement: float  # 의무보유확약
     NetIncome: float  # 순이익
     MaxValue: int  # 최고체결가
-    MultipleVariable: float = Field(default=0.0)  # 곱하기변수
-    Notes: str  # 비고
+    MultipleVariable: Optional[float] = 2.0  # 곱하기변수
+    Notes: Optional[str]=''  # 비고
 
     def calculate_multiple_variable(self):
         if self.FinalOfferingPrice != 0:
             self.MultipleVariable = self.MaxValue / self.FinalOfferingPrice
         else:
-            self.MultipleVariable = 2
+            self.MultipleVariable = 2.0
 
     async def save(self, *args, **kwargs):
         self.calculate_multiple_variable()

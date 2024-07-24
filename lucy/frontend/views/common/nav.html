@@ -6,8 +6,15 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/page?path=ipo/ipo-card">공모주</a>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        공모주
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="nav-link" href="/page?path=ipo/ipo-card">공모주-상세</a></li>
+                        <li><a class="nav-link" href="/page?path=ipo/calendar">공모주-달력</a></li>
+                        <li><a class="nav-link" href="/page?path=ipo/history">공모주-기록</a></li>
+                    </ul>                    
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/page?path=danta/danta">단타머신</a> 

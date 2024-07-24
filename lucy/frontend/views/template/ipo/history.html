@@ -2,22 +2,189 @@
 {% block style %}
 {% endblock %}
 {% block content %}
-<h1>IPO Data(history)</h1>
-<h2>과거데이터기록</h2>
-<!-- TODO 과거데이터리스트, 검색, 필터링, 정렬 -->
-{% endblock %}
+<h2>IPO 과거데이터 기록</h2>
+<button type="button" class="btn btn-primary" id="btnDisplayEdit">추가</button>
+<div id="table-list-area" class="m-3 p-3 d-none"></div>
+<div id="edit-area" class="m-3 p-3 d-none">
+    <form id="formEdit">
+        <div class="mb-3">
+          <label for="Company" class="form-label">회사명</label>
+          <input type="text" class="form-control" id="Company" name="Company" required>
+        </div>
+        <div class="mb-3">
+          <label for="StkCode" class="form-label">종목코드</label>
+          <input type="text" class="form-control" id="StkCode" name="StkCode" required>
+        </div>
+        <div class="mb-3">
+          <label for="FinalOfferingPrice" class="form-label">확정공모가</label>
+          <input type="number" class="form-control" id="FinalOfferingPrice" name="FinalOfferingPrice" required>
+        </div>
+        <div class="mb-3">
+          <label for="Revenue" class="form-label">매출액</label>
+          <input type="number" class="form-control" id="Revenue" name="Revenue" required>
+        </div>
+        <div class="mb-3">
+          <label for="InstitutionalSubscriptionRatio" class="form-label">기관경쟁률</label>
+          <input type="number" step="0.01" class="form-control" id="InstitutionalSubscriptionRatio" name="InstitutionalSubscriptionRatio" required>
+        </div>
+        <div class="mb-3">
+          <label for="LockupAgreement" class="form-label">의무보유확약</label>
+          <input type="number" step="0.01" class="form-control" id="LockupAgreement" name="LockupAgreement" required>
+        </div>
+        <div class="mb-3">
+          <label for="NetIncome" class="form-label">순이익</label>
+          <input type="number" step="0.01" class="form-control" id="NetIncome" name="NetIncome" required>
+        </div>
+        <div class="mb-3">
+          <label for="MaxValue" class="form-label">최고체결가</label>
+          <input type="number" class="form-control" id="MaxValue" name="MaxValue" required>
+        </div>
+        <div class="mb-3">
+          <label for="Notes" class="form-label">비고</label>
+          <input type="text" class="form-control" id="Notes" name="Notes">
+        </div>
+        <input type="hidden" id="editId" name="id">
+        <button type="submit" class="btn btn-primary">저장</button>
+        <button type="button" class="btn btn-secondary">취소</button>
+      </form>
+</div>
 
 {% raw %}
 <!--handlebar scripts-->
-{% endraw %}
-
-
-{% block script %}
-{% raw %}
-<script>
-$( document ).ready(function() {
-    console.log( "ready!")
-});
+<script id="list-template" type="text/x-handlebars-template">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>회사명</th>
+                <th>종목코드</th>
+                <th>확정공모가</th>
+                <th>매출액</th>
+                <th>기관경쟁률</th>
+                <th>의무보유확약</th>
+                <th>순이익</th>
+                <th>최고체결가</th>
+                <th>곱하기변수</th>
+                <th>비고</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each list}}
+            <tr>
+                <td>{{Company}}</td>
+                <td>{{StkCode}}</td>
+                <td>{{FinalOfferingPrice}}</td>
+                <td>{{Revenue}}</td>
+                <td>{{InstitutionalSubscriptionRatio}}</td>
+                <td>{{LockupAgreement}}</td>
+                <td>{{NetIncome}}</td>
+                <td>{{MaxValue}}</td>
+                <td>{{MultipleVariable}}</td>
+                <td>{{Notes}}</td>
+                <td>
+                    <button type="button" class="btn btn-primary edit-btn" data-bs-toggle="modal" data-bs-target="#editModal" data-id="{{id}}">수정</button>
+                    <button type="button" class="btn btn-danger delete-btn" data-id="{{_id}}">삭제</button>
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
 </script>
 {% endraw %}
+{% endblock %}
+{% block script %}
+<script>
+    function displayList(){
+        $('#edit-area').addClass('d-none');
+        $('#table-list-area').removeClass('d-none');
+    }
+    function displayEdit(){            
+        $('#edit-area').removeClass('d-none');
+        $('#table-list-area').addClass('d-none');
+    }
+    function clearForm() {
+        $('#Company').val('');
+        $('#StkCode').val('');
+        $('#FinalOfferingPrice').val('');
+        $('#Revenue').val('');
+        $('#InstitutionalSubscriptionRatio').val('');
+        $('#LockupAgreement').val('');
+        $('#NetIncome').val('');
+        $('#MaxValue').val('');
+        $('#Notes').val('');
+    }      
+    function initalize(){
+        const url = '/api/v1/ipo/history';
+        getFetch(url).then(data => {
+            // debugger;
+            console.log(data);
+            displayList();
+            if(data.length === 0){
+                var html1 = '<div class="alert alert-warning" role="alert">데이터가 없습니다.</div>';
+                document.getElementById('table-list-area').innerHTML = html1;
+                return;
+            }
+            const source = document.getElementById('list-template').innerHTML;
+            const template = Handlebars.compile(source);
+            const html = template({list: data});
+            document.getElementById('table-list-area').innerHTML = html;
+            
+            
+        }).catch(error=> {
+            console.error(error.message);
+            alert(error.message); 
+        });
+    }
+    $(document).ready(function() {
+        console.log('ready');
+      
+        $('#btnDisplayEdit').click(function(){
+            clearForm();
+            $('#edit-area').removeClass('d-none');
+            $('#table-list-area').addClass('d-none');
+        });
+        $('#formEdit').on('submit', function(event) {
+            event.preventDefault();
+            const url = '/api/v1/ipo/history';
+            const data = {
+                Company: document.getElementById('Company').value,
+                StkCode: document.getElementById('StkCode').value,
+                FinalOfferingPrice: parseInt(document.getElementById('FinalOfferingPrice').value, 10),
+                Revenue: parseInt(document.getElementById('Revenue').value, 10),
+                InstitutionalSubscriptionRatio: parseFloat(document.getElementById('InstitutionalSubscriptionRatio').value),
+                LockupAgreement: parseFloat(document.getElementById('LockupAgreement').value),
+                NetIncome: parseFloat(document.getElementById('NetIncome').value),
+                MaxValue: parseInt(document.getElementById('MaxValue').value, 10),
+                Notes: document.getElementById('Notes').value
+            };
+            console.log(data);
+            postFetch(url, data).then(data => {
+                displayList();
+                initalize();                    
+            }).catch(error=> {
+                console.error(error.message);
+            });
+            
+        });
+        $('#table-list-area').on("click", ".delete-btn", function(e) {
+            e.stopPropagation();
+            if (!confirm('삭제하시겠습니까?')) {
+                return;
+            }
+            debugger;
+            const id = $(this).data('id');
+            const url = '/api/v1/ipo/history/' + id;
+            deleteFetch(url).then(data => {
+                console.log(data);
+                initalize(); 
+            }).catch(error=> {
+                console.error(error.message); 
+            });
+
+        });
+
+
+        initalize();
+    });
+</script>
 {% endblock %}
