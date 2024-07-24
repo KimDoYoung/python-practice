@@ -42,7 +42,7 @@
         <thead>
             <tr class="table-primary">
                 <th>종목명</th>
-                <th class="text-end">종목번호</th>
+                <th class="text-center">종목번호</th>
                 <th class="text-end">매도가능수량</th>
                 <th class="text-end">평균단가</th>
                 <th class="text-end">매입금액</th>
@@ -51,6 +51,7 @@
                 <th class="text-end">수익율</th>
                 <th class="text-end">수수료</th>
                 <th class="text-end">제세금</th>
+                <th class="text-center">동작</th>
             </tr>
         </thead>
         <tbody id="table-body">
@@ -66,6 +67,10 @@
                 <td class="text-end">{{sunikrt}}</td>
                 <td class="text-end">{{displayWon fee}}</td>
                 <td class="text-end">{{displayWon tax}}</td>
+                <td class="text-center">
+                    <button class="btn btn-sm btn-danger btnShowBuyCanvas" data-stk-code="{{expcode}}" data-stk-name="{{hname}}">매수</button>
+                    <button class="btn btn-sm btn-primary btnShowSellCanvas"  data-stk-code="{{expcode}}" data-stk-name="{{hname}}" data-qty="{{mdposqt}}">매도</button>
+                </td>
             </tr>
             {{/each}}                
         </tbody>
@@ -99,7 +104,24 @@
     
     $( document ).ready(function() {
         console.log('ready.... ');
-
+        //매수 버튼
+        $('#jango2-area').on('click', '.btnShowBuyCanvas', function(e) {
+            e.preventDefault();
+            console.log('btnBuySellCanvas click.... ');
+            const stk_code = $(this).data('stk-code');
+            const stk_name = $(this).data('stk-name');
+            const qty = $(this).data('qty');
+            showBuySellCanvas('LS',stk_code, stk_name, "매수", qty, 0);
+        });
+        //매도 버튼
+        $('#jango2-area').on('click', '.btnShowSellCanvas', function(e) {
+            e.preventDefault();
+            console.log('btnShowSellCanvas click.... ');
+            const stk_code = $(this).data('stk-code');
+            const stk_name = $(this).data('stk-name');
+            const qty = $(this).data('qty');
+            showBuySellCanvas('LS',stk_code, stk_name, "매도", qty, 0);
+        });
 
         initalize();
 

@@ -5,11 +5,30 @@ $(document).ready(function() {
             // backdrop: 'static',
             // keyboard: false
     });
-
-    function showBuySellCanvas(stk_code, stk_name, which, qty, cost){
+    //offcanvas가 보여질때 증권사를 선택
+    $('#offcanvasBuySell').on('shown.bs.offcanvas', function(){
+        const stk_abbr = $('#page_path').val() ;
+        const stk_company = String(stk_abbr);
+        if(stk_company.startsWith('kis')){
+            $('#kisorls1').prop('checked', true);
+        }else if(stk_company.startsWith('ls')){
+            $('#kisorls2').prop('checked', true);
+        }
+    })
+    //offcanvas를 보이게 하는 함수
+    function showBuySellCanvas(stk_company, stk_code, stk_name, which, qty, cost){
         if(qty === undefined) qty = 1;
         if(cost === undefined) cost = 0;
         console.log('btnTest clicked');
+        debugger;
+        if(stk_company == 'KIS'){
+            $('#kisorls1').prop('checked', true);
+        }else if(stk_company == 'LS'){
+            $('#kisorls2').prop('checked', true);
+        }else{
+            $('#kisorls1').prop('checked', false);
+            $('#kisorls2').prop('checked', false);
+        }
         $('#buy-form').find('input[name="pdno"]').val(stk_code);
         $('#buy-form').find('input[name="pdnm"]').val(stk_name);
         $('#buy-form').find('input[name="qty"]').val(qty);
@@ -67,13 +86,25 @@ $(document).ready(function() {
         $form.find('input').val('');
     });
     //매수/매도 API 호출
-    function order_cash(data){
-        debugger;
-        postFetch('/api/v1/kis/order-cash', data)
+    function order_cash(stk_company,data){
+        var url = '';
+        if(stk_company === 'KIS'){
+            url = '/api/v1/kis/order-cash';
+        }else if(stk_company === 'LS'){
+            url = '/api/v1/ls/order';
+        }else{
+            alert('증권사를 선택해주세요.');
+            return;
+        }
+
+        postFetch(url, data)
             .then(data => {
                 console.log(data);
-                alert(data.msg1)
-                window.location.href = '/main';
+                if(data.msg1){
+                    alert(data.msg1);
+                }
+                var page_path = $('#page_path').val();
+                window.location.href = `/page?path=${page_path}`;
             }).catch(error => {
                 console.error(error);
                 $('#buy-sell-message-area').html(error)
@@ -84,6 +115,12 @@ $(document).ready(function() {
     $('#buy-form').on('submit', function(e){
         e.preventDefault();
         console.log('click 매수.... ');
+        const stk_company = $('input[name="kisorls"]:checked').val();
+        if(!stk_company){
+            alert('증권사를 선택해주세요.');
+            return;
+        }
+
         const stk_code = $('#buy-form input[name=pdno]').val();
         const qty = $('#buy-form input[name=qty]').val();
         const cost = $('#buy-form input[name=cost]').val();
@@ -101,12 +138,17 @@ $(document).ready(function() {
             qty: Number(qty),
             cost: Number(cost)
         }
-        order_cash(data);
+        order_cash(stk_company, data);
     });
     //매도 Form Submit
     $('#sell-form').on('submit', function(e){
         e.preventDefault();
         console.log('click 매도.... ');
+        const stk_company = $('input[name="kisorls"]:checked').val();
+        if(!stk_company){
+            alert('증권사를 선택해주세요.');
+            return;
+        }
         
         const stk_code = $('#sell-form input[name=pdno]').val();
         const qty = $('#sell-form input[name=qty]').val();
@@ -124,6 +166,7 @@ $(document).ready(function() {
             qty: Number(qty),
             cost: Number(cost)
         }
-        order_cash(data);
+        
+        order_cash(stk_company, data);
     })        
 });

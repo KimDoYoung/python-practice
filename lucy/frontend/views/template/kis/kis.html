@@ -196,7 +196,7 @@
             const stk_code = $(this).data('stk-code');
             const stk_name = $(this).data('stk-name');
             const qty = $(this).data('qty');
-            showBuySellCanvas(stk_code, stk_name, "매수", qty, 0);
+            showBuySellCanvas('KIS', stk_code, stk_name, "매수", qty, 0);
         });
         //매도 버튼
         $('#inquire-balance-area').on('click', '.btnShowSellCanvas', function(e) {
@@ -205,7 +205,7 @@
             const stk_code = $(this).data('stk-code');
             const stk_name = $(this).data('stk-name');
             const qty = $(this).data('qty');
-            showBuySellCanvas(stk_code, stk_name, "매도", qty, 0);
+            showBuySellCanvas('KIS', stk_code, stk_name, "매도", qty, 0);
         });
         
         //테스트 토큰

@@ -54,7 +54,7 @@ async def page(request: Request, path: str = Query(..., description="template폴
     context = {
         "request": request, 
         "today" : today,
-        "page-id": id, 
+        "page_path": path, 
         "user_id": current_user["user_id"], 
         "user_name": current_user["user_name"],
         "stk_code" : stk_code
