@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from backend.app.background.danta_machine import start_danta_machine, stop_danta_machine
+from backend.app.background.danta_machine import stop_danta_machine
 from backend.app.background.telegram_bot import  initialize_telegram_bot, start_telegram_bot, stop_telegram_bot
 from backend.app.core.logger import get_logger
 from backend.app.domains.ipo.ipo_history_model import IpoHistory
@@ -117,10 +117,9 @@ async def startup_event():
     scheduler.start()
     scheduler_service =  get_scheduler_job_service()
     await scheduler_service.register_system_jobs()
-    # TODO 아주 처음 생성시에 사용자 id를 어떻게 넣어야할까?
 
     # 자동매매 시작
-    await start_danta_machine()
+    # await start_danta_machine()
     # Telegram Bot 시작
     telegram_token, telegram_userid = await initialize_telegram_bot()
     if telegram_token is not None:

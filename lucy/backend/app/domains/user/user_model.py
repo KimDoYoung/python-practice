@@ -39,6 +39,13 @@ class StkAccount(BaseModel):
             if kv.key == key:
                 return kv.value
         return None
+    
+    def get_created_at(self, key:str)->Optional[str]:
+        for kv in self.key_values:
+            if kv.key == key:
+                return kv.created_at.strftime("%Y-%m-%d %H:%M:%S")
+        return None
+
 
 #TODO upsert addtion을 빼는 것이 좋지 않을까?
 class User(Document):

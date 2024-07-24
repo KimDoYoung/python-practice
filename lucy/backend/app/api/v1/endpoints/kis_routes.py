@@ -49,27 +49,6 @@ async def validate_user(request: Request, user_service: UserService):
     
     return user
 
-# async def get_kis_api(request: Request, user_service: UserService) -> KoreaInvestmentApi:
-#     ''' 
-#         토큰이 유효한지 체크해서 유효하지 않으면 새로 발급받아서 User DB에 저장한다. 
-#         그런 후 KoreaInvestmentApi 인스턴스를 반환한다.
-#     '''
-#     user = await validate_user(request, user_service)
-#     kis_api = KoreaInvestmentApi(user)
-    
-#     try:
-#         cost = kis_api.get_current_price("005930") # 삼성전자
-#         logger.debug(f"현재 ACCESS_TOKEN OK, 삼성전자 현재가 : {cost}")
-#         return  kis_api
-#     except KisAccessTokenExpireException as e:
-#         logger.warning(f"현재 ACCESS_TOKEN은  만료되었습니다.")
-#         new_access_token=await kis_api.set_access_token_from_kis()
-#         logger.debug(f"새로운 ACCESS_TOKEN을 발급받음: [{new_access_token}]")
-#         return kis_api
-#     except KisAccessTokenInvalidException as e:
-#         logger.error(f"현재 ACCESS_TOKEN이 유효하지 않습니다.")
-#         new_access_token=await kis_api.set_access_token_from_kis()
-#         return kis_api
 
 @router.get("/", response_class=JSONResponse, response_model=None)
 async def info(request:Request, user_service :UserService=Depends(get_user_service)):

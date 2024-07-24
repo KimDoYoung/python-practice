@@ -24,10 +24,12 @@
 작성일: 07
 버전: 1.0
 """
-from datetime import datetime
+import asyncio
+from datetime import datetime, timedelta
 import json
 import aiohttp
 from fastapi import HTTPException
+import requests
 from pydantic import ValidationError
 
 from backend.app.core.logger import get_logger
@@ -51,14 +53,12 @@ from backend.app.core.exception.lucy_exception import AccessTokenExpireException
 logger = get_logger(__name__)
 
 class KisStockApi(StockApi):
-
-    _BASE_URL = 'https://openapi.koreainvestment.com:9443'
     
     def __init__(self, user:User, account: StkAccount):
         super().__init__(user.user_id, account.account_no)
         self.user = user
         self.account = account
-        
+        self.BASE_URL ='https://openapi.koreainvestment.com:9443'
         self.HTS_USER_ID = account.get_value('KIS_HTS_USER_ID')
         self.APP_KEY = account.get_value('KIS_APP_KEY')
         self.APP_SECRET = account.get_value('KIS_APP_SECRET')
@@ -69,6 +69,7 @@ class KisStockApi(StockApi):
         if access_token:
             self.ACCESS_TOKEN = access_token
             self.ACCESS_TOKEN_TIME = account.get_value('KIS_ACCESS_TOKEN_TIME')
+        self.last_request_time = None    
 
     def get_access_token_time(self)->datetime:
         if self.ACCESS_TOKEN_TIME:
@@ -76,61 +77,83 @@ class KisStockApi(StockApi):
         else:
             return None
         
+    def is_token_expired(self) -> bool:
+        token_time = self.get_access_token_time()
+        if token_time and datetime.now() > token_time + timedelta(hours=23):
+            return True
+        return False        
+        
     async def initialize(self) -> bool:
         ''' Access Token 존재여부 및  만료 여부 확인 '''
 
-        # 존재여부 체크
-        if self.ACCESS_TOKEN is None:
+        # 토큰이 없거나 만료되었는지 확인
+        if self.ACCESS_TOKEN is None or self.is_token_expired():
+            logger.info("KIS API Access Token이 없거나 만료되었습니다. 새로 발급합니다.")
             await self.set_access_token_from_kis()
 
         # 만료여부 체크
         try:
             cost = await self.get_current_price("005930") # 삼성전자
         except AccessTokenExpireException as e:
+            logger.info("KIS API Access Token이 유효하지 않습니다. 새로 발급합니다.")
             await self.set_access_token_from_kis()
 
         return True    
 
     async def set_access_token_from_kis(self)->str:
-        ''' Access Token 발급을 kis 서버로부터 받아서 self에 채우고 users db에 넣는다. '''
-        url = f'{self._BASE_URL}/oauth2/tokenP'
+        ''' 동기 방식으로 Access Token 발급을 KIS 서버로부터 받아서 self에 채우고 users db에 넣는다. '''
+        # 1분 제한 체크
+        if self.last_request_time and datetime.now() - self.last_request_time < timedelta(minutes=1):
+            time_to_sleep = 60 - (datetime.now() - self.last_request_time).seconds
+            logger.debug(f"Sleeping for {time_to_sleep} seconds due to rate limiting")
+            asyncio.sleep(time_to_sleep)
+
+        self.last_request_time = datetime.now()
+
+        url = f'{self.BASE_URL}/oauth2/tokenP'
         headers = {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         }
-        body = {"grant_type":"client_credentials",
-                "appkey":self.APP_KEY, 
-                "appsecret":self.APP_SECRET}
-        async with aiohttp.ClientSession() as session:
-            async with session.post(url, headers=headers, data=json.dumps(body)) as res:
-                if res.status != 200:
-                    response_json = await res.json()
-                    logger.error(f"KIS API Access Token 발급 실패 : {response_json}")
-                    raise KisApiException(f"KIS API Access Token 발급 실패 : {response_json}")
-            response_json = await res.json()
+        body = { 
+            "grant_type": "client_credentials",
+            "appkey": self.APP_KEY,
+            "appsecret": self.APP_SECRET
+        }
+
+        try:
+            response = requests.post(url, headers=headers, data=json.dumps(body))
+            response.raise_for_status()  # HTTP 에러가 발생하면 예외 발생
+
+            response_json = response.json()
+
             self.ACCESS_TOKEN = response_json['access_token']
-            
+            self.ACCESS_TOKEN_TIME = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
             logger.debug("----------------------------------------------")
             logger.debug(f"ACCESS_TOKEN : [{self.ACCESS_TOKEN}]")
             logger.debug("----------------------------------------------")
 
             self.account.set_value('KIS_ACCESS_TOKEN', self.ACCESS_TOKEN)
+            self.account.set_value('KIS_ACCESS_TOKEN_TIME', self.ACCESS_TOKEN_TIME)
             await self.user_service.update_user(self.user.user_id, self.user)
             return self.ACCESS_TOKEN
+        except requests.exceptions.RequestException as e:
+            logger.error(f"KIS API Access Token 발급 실패: {str(e)}")
+            raise KisApiException(f"KIS API Access Token 발급 실패: {str(e)}")
     
     async def hashkey(self, datas):
-        """암호화"""
-        url = self.BASE_URL + "/uapi/hashkey" #self._PATHS['암호화']
+        """암호화 (동기 함수)"""
+        url = self.BASE_URL + "/uapi/hashkey"
         headers = {
-        'content-Type' : 'application/json',
-        'appKey' : self.APP_KEY,
-        'appSecret' : self.APP_SECRET
+            'Content-Type': 'application/json',
+            'appKey': self.APP_KEY,
+            'appSecret': self.APP_SECRET
         }
-        async with aiohttp.ClientSession() as session:
-            async with session.post(url, headers=headers, json=datas) as res:
-                response_json = await res.json()
-                hashkey = response_json["HASH"]
-                return hashkey
+        response = requests.post(url, headers=headers, json=datas)
+        response_json = response.json()
+        hashkey = response_json["HASH"]
+        return hashkey
             
     def check_access_token(self, json:dict) -> None:
         ''' 토큰 만료 여부 확인 '''
@@ -161,7 +184,7 @@ class KisStockApi(StockApi):
 
     async def current_cost(self, stk_code:str) -> InquirePrice_Response:
         ''' 현재가 조회 '''
-        url = self._BASE_URL +  '/uapi/domestic-stock/v1/quotations/inquire-price' 
+        url = self.BASE_URL +  '/uapi/domestic-stock/v1/quotations/inquire-price' 
         headers = {"Content-Type":"application/json", 
                 "authorization": f"Bearer {self.ACCESS_TOKEN}",
                 "appKey":self.APP_KEY,
@@ -182,7 +205,7 @@ class KisStockApi(StockApi):
 
     async def get_current_price(self, stk_code: str) -> int:
         ''' 현재가 조회 '''
-        url = self._BASE_URL + '/uapi/domestic-stock/v1/quotations/inquire-price'
+        url = self.BASE_URL + '/uapi/domestic-stock/v1/quotations/inquire-price'
         headers = {
             "Content-Type": "application/json",
             "authorization": f"Bearer {self.ACCESS_TOKEN}",
@@ -229,7 +252,7 @@ class KisStockApi(StockApi):
         ''' 현금 매수/매도 '''
         logger.info(f"현금 매수 매도(order_cash) : {order_cash}")
 
-        url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/order-cash"
+        url = self.BASE_URL + "/uapi/domestic-stock/v1/trading/order-cash"
         tr_id = "TTTC0802U" if order_cash.buy_sell_gb == "매수" else "TTTC0801U"
         headers = {
             "Content-Type":"application/json", 
@@ -266,7 +289,7 @@ class KisStockApi(StockApi):
     async def order_cancel(self, org_order_no: str) -> KisOrderCancel_Response:
         '''주식 주문 취소 '''
         logger.info(f"주식 주문 취소")
-        url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/order-rvsecncl"
+        url = self.BASE_URL + "/uapi/domestic-stock/v1/trading/order-rvsecncl"
         body =  {
             "CANO": self.ACCTNO[0:8],
             "ACNT_PRDT_CD": self.ACCTNO[8:10],
@@ -293,7 +316,7 @@ class KisStockApi(StockApi):
     async def order_modify(self, req: KisOrderRvsecncl_Request) -> KisOrderCancel_Response:
         '''주식 주문 정정 '''
         logger.info(f"주식 주문 정정")
-        url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/order-rvsecncl"
+        url = self.BASE_URL + "/uapi/domestic-stock/v1/trading/order-rvsecncl"
         body =  {
             "CANO": self.ACCTNO[0:8],
             "ACNT_PRDT_CD": self.ACCTNO[8:10],
@@ -321,7 +344,7 @@ class KisStockApi(StockApi):
     async def search_stock_info(self, stk_code:str) -> SearchStockInfo_Response:
         ''' 국내 상품정보 '''
         logger.info(f"상품정보 : {stk_code}")
-        url = self._BASE_URL + "/uapi/domestic-stock/v1/quotations/search-stock-info"
+        url = self.BASE_URL + "/uapi/domestic-stock/v1/quotations/search-stock-info"
         headers ={
             "content-type": "application/json; charset=utf-8",
             'Accept': 'application/json',
@@ -343,7 +366,7 @@ class KisStockApi(StockApi):
         
     async def inquire_balance(self) ->KisInquireBalance_Response:
         ''' 주식 잔고 조회 '''
-        url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/inquire-balance"
+        url = self.BASE_URL + "/uapi/domestic-stock/v1/trading/inquire-balance"
         headers = {
             "Content-Type":"application/json", 
             "authorization":f"Bearer {self.ACCESS_TOKEN}",
@@ -375,7 +398,7 @@ class KisStockApi(StockApi):
     async def psearch_title(self) -> PsearchTitle_Result:
         ''' 조건식 목록 조회 '''
         logger.info(f"조건식 목록 조회 ")
-        url = self._BASE_URL + "/uapi/domestic-stock/v1/quotations/psearch-title"
+        url = self.BASE_URL + "/uapi/domestic-stock/v1/quotations/psearch-title"
         params = {
             "user_id": self.HTS_USER_ID
         }        
@@ -397,7 +420,7 @@ class KisStockApi(StockApi):
     async def psearch_result(self, seq: str) -> PsearchResult_Response:
         ''' 조건식 결과 리스트  '''
         logger.info(f"조건식 결과 리스트 조회 ")
-        url = self._BASE_URL + "/uapi/domestic-stock/v1/quotations/psearch-result"
+        url = self.BASE_URL + "/uapi/domestic-stock/v1/quotations/psearch-result"
         params = {
             "user_id": self.HTS_USER_ID,
             "seq" : seq
@@ -419,7 +442,7 @@ class KisStockApi(StockApi):
     async def inquire_daily_ccld(self, inquire_daily_ccld: InquireDailyCcld_Request) -> InquireDailyCcld_Response:
         '''주식일별주문체결조회 '''
         logger.info(f"주식일별주문체결조회")
-        url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/inquire-daily-ccld"
+        url = self.BASE_URL + "/uapi/domestic-stock/v1/trading/inquire-daily-ccld"
         params =  {
             "cano": self.ACCTNO[0:8],
             "acnt_prdt_cd": self.ACCTNO[8:10],
@@ -456,7 +479,7 @@ class KisStockApi(StockApi):
     async def inquire_psbl_rvsecncl(self) -> InquirePsblRvsecncl_Response:
         '''정정취소 가능수량 조회 '''
         logger.info(f"정정취소 가능수량 조회")
-        url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/inquire-psbl-rvsecncl"
+        url = self.BASE_URL + "/uapi/domestic-stock/v1/trading/inquire-psbl-rvsecncl"
         params = {
             "CANO": self.ACCTNO[0:8],
             "ACNT_PRDT_CD": self.ACCTNO[8:10],
@@ -483,7 +506,7 @@ class KisStockApi(StockApi):
     async def inquire_psbl_order(self, ipo_req :InquirePsblOrder_Request ) -> InquirePsblOrder_Response:
         '''매수가능조회 '''
         logger.info(f"매수가능조회")
-        url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/inquire-psbl-order"
+        url = self.BASE_URL + "/uapi/domestic-stock/v1/trading/inquire-psbl-order"
         params = {
             "CANO": self.ACCTNO[0:8],
             "ACNT_PRDT_CD": self.ACCTNO[8:10],
@@ -514,7 +537,7 @@ class KisStockApi(StockApi):
         '''매도가능수량 조회 '''
         logger.info(f"매도가능수량 조회")
 
-        url = self._BASE_URL + "/uapi/domestic-stock/v1/trading/inquire-psbl-sell"
+        url = self.BASE_URL + "/uapi/domestic-stock/v1/trading/inquire-psbl-sell"
 
         params = {
             "CANO": self.ACCTNO[0:8],
@@ -545,7 +568,7 @@ class KisStockApi(StockApi):
         '''국내휴장일조회 '''
         logger.info(f"국내휴장일조회")
 
-        url = self._BASE_URL + "/uapi/domestic-stock/v1/quotations/chk-holiday"
+        url = self.BASE_URL + "/uapi/domestic-stock/v1/quotations/chk-holiday"
         params = {
             "BASS_DT": ymd, #"기준일자 기준일자(YYYYMMDD)",
             "CTX_AREA_NK": "",  # 연속조회키 공백으로 입력",
@@ -572,7 +595,7 @@ class KisStockApi(StockApi):
         '''시간외호가잔량순위 '''
         logger.info(f"시간외호가잔량순위")
 
-        url = self._BASE_URL + "/uapi/domestic-stock/v1/ranking/after-hour-balance"
+        url = self.BASE_URL + "/uapi/domestic-stock/v1/ranking/after-hour-balance"
         params = {
             "fid_input_price_1":  req.fid_input_price_1, #입력 가격1 입력값 없을때 전체 (가격 ~)
             "fid_cond_mrkt_div_code": req.fid_cond_mrkt_div_code, #"조건 시장 분류 코드 시장구분코드 (주식 J)",
@@ -603,7 +626,7 @@ class KisStockApi(StockApi):
         '''호가잔량순위 '''
         logger.info(f"호가잔량순위")
 
-        url = self._BASE_URL + "/uapi/domestic-stock/v1/ranking/quote-balance"
+        url = self.BASE_URL + "/uapi/domestic-stock/v1/ranking/quote-balance"
         params = {
             "fid_vol_cnt": req.fid_vol_cnt, # "거래량 수 입력값 없을때 전체 (거래량 ~)",
             "fid_cond_mrkt_div_code":req.fid_cond_mrkt_div_code, # 조건 시장 분류 코드 시장구분코드 (주식 J)",

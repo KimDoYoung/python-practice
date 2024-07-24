@@ -9,9 +9,9 @@
 작성일: 2024-07-22
 버전: 1.0
 """
-from dataclasses import Field
 from beanie import Document
 from bson import ObjectId
+from pydantic import Field
 
 
 class IpoHistory(Document):
@@ -30,7 +30,7 @@ class IpoHistory(Document):
         if self.FinalOfferingPrice != 0:
             self.MultipleVariable = self.MaxValue / self.FinalOfferingPrice
         else:
-            self.MultipleVariable = 0
+            self.MultipleVariable = 2
 
     async def save(self, *args, **kwargs):
         self.calculate_multiple_variable()
