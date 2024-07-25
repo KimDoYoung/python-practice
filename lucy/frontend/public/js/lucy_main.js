@@ -88,6 +88,7 @@ $(document).ready(function() {
     //매수/매도 API 호출
     function order_cash(stk_company,data){
         var url = '';
+        debugger;
         if(stk_company === 'KIS'){
             url = '/api/v1/kis/order-cash';
         }else if(stk_company === 'LS'){
@@ -103,8 +104,13 @@ $(document).ready(function() {
                 if(data.msg1){
                     alert(data.msg1);
                 }
+                debugger;
                 var page_path = $('#page_path').val();
-                window.location.href = `/page?path=${page_path}`;
+                if(page_path === '/main'){
+                    window.location.href = '/main'
+                }else{
+                    window.location.href = `/page?path=${page_path}`;
+                }
             }).catch(error => {
                 console.error(error);
                 $('#buy-sell-message-area').html(error)

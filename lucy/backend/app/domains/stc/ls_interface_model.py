@@ -45,18 +45,18 @@ class AcctHistory_Request(StockApiBaseModel):
 
 class Fulfill_Request(StockApiBaseModel):
     ''' 체결/미체결 조회 요청 '''
-    stk_code: str
-    fullfill_type: Literal['전체', '체결', '미체결']
-    buy_sell_gb: Literal['전체', '매수', '매도']
+    stk_code: Optional[str] = ''
+    fullfill_type: Literal['전체', '체결', '미체결'] ='전체'
+    buy_sell_gb: Literal['전체', '매수', '매도'] = '전체'
 
 class Fulfill_Api_Request(StockApiBaseModel):
     '''현물계좌 주문체결내역 조회(API) 요청'''
-    market_gb: Literal['전체', '거래소', '코스닥', '프리보드']
-    buy_sell_gb: Literal['전체', '매수', '매도']
-    stk_code: str
-    fullfill_type: Literal['전체', '체결', '미체결']
+    market_gb: Literal['전체', '거래소', '코스닥', '프리보드'] = '전체'
+    buy_sell_gb: Literal['전체', '매수', '매도'] = '전체'
+    stk_code: Optional[str] = ''
+    fullfill_type: Literal['전체', '체결', '미체결'] = '전체'
     order_dt: str
-    ord_ptn_code: Literal['전체', '매도전체', '매수전체', '현금매도', '현금매수'] #, '저축매도', '저축매수', '상품매도', '상품매수', '융자매도', '융자매수', '대주매도', '대주매수', '선물대용매도', '현금매도(프)', '현금매수(프)', '대출', '대출상환']
+    ord_ptn_code: Literal['전체', '매도전체', '매수전체', '현금매도', '현금매수'] = '전체' #, '저축매도', '저축매수', '상품매도', '상품매수', '융자매도', '융자매수', '대주매도', '대주매수', '선물대용매도', '현금매도(프)', '현금매수(프)', '대출', '대출상환']
 
 
 class HighItem_Request(StockApiBaseModel):

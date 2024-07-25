@@ -16,8 +16,7 @@
         <div id="jango2-area"></div>
     </div> 
     <div>
-        <h5>오늘의 미체결</h5>
-        <div id="ccld-result-area" class="mt-3"></div>
+        <div id="fulfill-table-area" class="mt-3"></div>
     </div>
 </section>
 
@@ -30,7 +29,7 @@
             <th class="text-end">매입금액</th><td class="text-end">{{displayWon item.mamt}}</td>
         </tr>
         <tr>
-            <th class="text-end">추정D2예수금</th><td class="text-end"><strong>{{displayWon item.sunamt}}</strong></td>
+            <th class="text-end">추정D2예수금</th><td class="text-end"><strong>{{displayWon item.sunamt1}}</strong></td>
             <th class="text-end">평가손익</th><td class="text-end">{{displayWon item.tdtsunik}}</td>
             <th class="text-end">평가금액</th><td class="text-end">{{displayWon item.sunamt}}</td>
         </tr>
@@ -76,6 +75,49 @@
         </tbody>
     </table>
 </script>
+<script id="fulfill-table-template" type="text/x-handlebars-template">
+    <h4>미체결</h4>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>주문번호</th>
+                <th>종목번호</th>
+                <th>구분</th>
+                <th>주문수량</th>
+                <th>주문가격</th>
+                <th>체결수량</th>
+                <th>체결가격</th>
+                <th>미체결잔량</th>
+                <th>확인수량</th>
+                <th>상태</th>
+                <th>원주문번호</th>
+                <th>유형</th>
+                <th>주문시간</th>
+                <th>현재가</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each list}}
+            <tr>
+                <td>{{ordno}}</td>
+                <td>{{expcode}}</td>
+                <td>{{medosu}}</td>
+                <td>{{qty}}</td>
+                <td>{{price}}</td>
+                <td>{{cheqty}}</td>
+                <td>{{cheprice}}</td>
+                <td>{{ordrem}}</td>
+                <td>{{cfmqty}}</td>
+                <td>{{status}}</td>
+                <td>{{orgordno}}</td>
+                <td>{{ordgb}}</td>
+                <td>{{ordtime}}</td>
+                <td>{{price1}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</script>
 {% endraw %}
 {% endblock %}
 
@@ -98,7 +140,26 @@
             
         }).catch(error => {
             console.error(error.message)
-        })        
+        });
+        // const url2 = '/api/v1/ls/fulfill-api-list';
+        const url2 = '/api/v1/ls/fulfill-list';
+        const today = JuliaUtil.dateFormat('yyyyMMdd', new Date())
+        const data = {
+        //    order_dt : today   
+        }
+
+        postFetch(url2, data).then(data => {
+            console.log(data);
+            const template = $('#fulfill-table-template').html();
+            const templateScript = Handlebars.compile(template);
+            var list = data.t0425OutBlock1;
+            list = list.filter(item => item.status === '접수');
+
+            const html = templateScript({list: list});
+            $('#fulfill-table-area').html(html);
+        }).catch(error=> {
+            console.error(error.message);
+        });
 
     };        
     

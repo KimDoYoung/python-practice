@@ -158,7 +158,7 @@ async def fulfill_api_list(req:Fulfill_Api_Request,):
     ls_api = await StockApiManager().stock_api('LS')
     
     cspaq13700_req = fulfill_api_to_cspaq13700_Request(req)
-    
+    logger.debug(f"fulfill-api-list 요청: [{cspaq13700_req.to_str()}]")
     response = await ls_api.fulfill_api_list(cspaq13700_req)
 
     logger.debug(f"fulfill-api-list 응답: [{response.to_str()}]")

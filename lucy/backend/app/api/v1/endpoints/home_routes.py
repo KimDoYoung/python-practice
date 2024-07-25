@@ -36,6 +36,7 @@ async def display_main(request: Request):
     logger.debug(f"****************today_str in /main: {today_str}")
     stk_code = request.cookies.get("stk_code")
     context = { "request": request,  
+                "page_path": '/main',
                 "user_id":  current_user["user_id"], 
                 "user_name": current_user["user_name"], 
                 "today": today_str,
