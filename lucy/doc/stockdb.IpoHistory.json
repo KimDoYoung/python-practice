@@ -1,0 +1,120 @@
+[{
+  "_id": {
+    "$oid": "66a2376260e0d3e7cc5e645c"
+  },
+  "Company": "노브랜드",
+  "FinalOfferingPrice": 14000,
+  "InstitutionalSubscriptionRatio": 1075.61,
+  "LockupAgreement": 4.51,
+  "MaxValue": 67800,
+  "MultipleVariable": 4.8428571428571425,
+  "NetIncome": 293.46,
+  "Notes": "매출액이 5천억이상이며 순이이익 300억 규모로 상장할 만한 회사이다. 2일에 걸쳐서 상승했다.",
+  "Revenue": 5529,
+  "StkCode": "145170"
+},
+{
+  "_id": {
+    "$oid": "66a239bb60e0d3e7cc5e645d"
+  },
+  "Company": "그리드위즈",
+  "FinalOfferingPrice": 40000,
+  "InstitutionalSubscriptionRatio": 124.6,
+  "LockupAgreement": 0.95,
+  "MaxValue": 82000,
+  "MultipleVariable": 2.05,
+  "NetIncome": -0.3,
+  "Notes": "",
+  "Revenue": 1321,
+  "StkCode": "453450"
+},
+{
+  "_id": {
+    "$oid": "66a23a4b60e0d3e7cc5e645e"
+  },
+  "Company": "라메디텍",
+  "FinalOfferingPrice": 16000,
+  "InstitutionalSubscriptionRatio": 1115.44,
+  "LockupAgreement": 9.93,
+  "MaxValue": 54000,
+  "MultipleVariable": 3.375,
+  "NetIncome": -33.4,
+  "Notes": "상장일 초반에 급격히 오르다가 바로 폭포수처럼 떨어졌다.",
+  "Revenue": 20,
+  "StkCode": "462510"
+},
+{
+  "_id": {
+    "$oid": "66a23afe60e0d3e7cc5e645f"
+  },
+  "Company": "씨어스테크놀로지",
+  "FinalOfferingPrice": 17000,
+  "InstitutionalSubscriptionRatio": 1084.39,
+  "LockupAgreement": 2.06,
+  "MaxValue": 34000,
+  "MultipleVariable": 2,
+  "NetIncome": -79.88,
+  "Notes": "매출액에 11억인데, 순이익은 -80억 거의 쓰레기 회사인데 상장을 시킨다. 한번도 오르지 못하고 바로 계속 떨어짐.",
+  "Revenue": 11,
+  "StkCode": "458870"
+},
+{
+  "_id": {
+    "$oid": "66a23b7e60e0d3e7cc5e6460"
+  },
+  "Company": "한중엔시에스",
+  "FinalOfferingPrice": 30000,
+  "InstitutionalSubscriptionRatio": 725.94,
+  "LockupAgreement": 12.44,
+  "MaxValue": 54000,
+  "MultipleVariable": 1.8,
+  "NetIncome": -202.64,
+  "Notes": "장시작 직후 조금 오르다가 급격히 떨어지기 시작.",
+  "Revenue": 885,
+  "StkCode": "107640"
+},
+{
+  "_id": {
+    "$oid": "66a23bf360e0d3e7cc5e6461"
+  },
+  "Company": "하이젠알앤엠",
+  "FinalOfferingPrice": 7000,
+  "InstitutionalSubscriptionRatio": 1099.21,
+  "LockupAgreement": 11.8,
+  "MaxValue": 18940,
+  "MultipleVariable": 2.7057142857142855,
+  "NetIncome": 377,
+  "Notes": "",
+  "Revenue": 870,
+  "StkCode": "160190"
+},
+{
+  "_id": {
+    "$oid": "66a23c3160e0d3e7cc5e6462"
+  },
+  "Company": "에이치브이엠",
+  "FinalOfferingPrice": 18000,
+  "InstitutionalSubscriptionRatio": 837.2,
+  "LockupAgreement": 0,
+  "MaxValue": 31750,
+  "MultipleVariable": 1.7638888888888888,
+  "NetIncome": -4.26,
+  "Notes": "계속 떨어지다.",
+  "Revenue": 354,
+  "StkCode": "295310"
+},
+{
+  "_id": {
+    "$oid": "66a23c7460e0d3e7cc5e6463"
+  },
+  "Company": "에스오에스랩",
+  "FinalOfferingPrice": 11500,
+  "InstitutionalSubscriptionRatio": 1072.3,
+  "LockupAgreement": 4.19,
+  "MaxValue": 21100,
+  "MultipleVariable": 1.8347826086956522,
+  "NetIncome": -203.14,
+  "Notes": "",
+  "Revenue": 23,
+  "StkCode": "464080"
+}]

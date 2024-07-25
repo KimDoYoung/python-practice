@@ -18,7 +18,7 @@ class IpoHistory(Document):
     Company: str  # 회사명
     StkCode: str  # 종목코드
     FinalOfferingPrice: int  # 확정공모가
-    Revenue: int  # 매출액
+    Revenue: float  # 매출액
     InstitutionalSubscriptionRatio: float  # 기관경쟁률
     LockupAgreement: float  # 의무보유확약
     NetIncome: float  # 순이익
