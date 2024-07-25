@@ -1,0 +1,128 @@
+{% extends 'common/base_ls.html' %} 
+{% block style %}
+{% endblock %}
+{% block content %}
+<section id="list" class="container">
+    <h2>LS증권 日별 주문체결</h2>
+    <div id="ccld-search-area">
+        <form id="form1">
+            <div class="row g-3">
+                <div class="col-md-3">
+                <label for="stockCode" class="form-label">종목코드</label>
+                <input type="text" class="form-control" id="stk_code" placeholder="종목코드를 입력하세요">
+                </div>
+                <div class="col-md-3">
+                    <label for="startDate" class="form-label">날짜</label>
+                    <input type="date" class="form-control" id="start_ymd" required>
+                </div>
+                <div class="col-md-3">
+                    <label for="startDate" class="form-label">날짜</label>
+                    <input type="date" class="form-control" id="end_ymd" required>
+                </div>
+                <div class="col-md-3">
+                    <br>
+                    <button type="submit" class="btn btn-primary">조회</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div id="error-area" class="alert alert-danger d-none" role="alert"></div>
+    <div id="ccld-result-area" class="mt-3"></div>
+</section>
+
+
+{% raw %}
+<!--handlebar scripts-->
+<script id="fulfill-table" type="text/x-handlebars-template">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>계좌번호</th>
+                <th>거래일자</th>
+                <th>거래번호</th>
+                <th>구분코드명</th>
+                <th>취소구분</th>
+                <th>거래수량</th>
+                <th>거래세</th>
+                <th>정산금액</th>
+                <th>거래매체명</th>
+                <th>원거래번호</th>
+                <th>종목명</th>
+                <th>거래단가</th>
+                <th>수수료</th>
+                <th>종목번호</th>
+                <th>거래금액</th>
+                <th>평가금액</th>
+                <th>매매손익금액</th>
+                <th>소득세</th>
+                <th>주민세</th>
+                <th>주문일자</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each list}}
+            <tr>
+                <td>{{AcntNo}}</td>
+                <td>{{TrdDt}}</td>
+                <td>{{TrdNo}}</td>
+                <td>{{TpCodeNm}}</td>
+                <td>{{CancTpNm}}</td>
+                <td>{{TrdQty}}</td>
+                <td>{{Trtax}}</td>
+                <td>{{AdjstAmt}}</td>
+                <td>{{TrdmdaNm}}</td>
+                <td>{{OrgTrdNo}}</td>
+                <td>{{IsuNm}}</td>
+                <td>{{TrdUprc}}</td>
+                <td>{{CmsnAmt}}</td>
+                <td>{{IsuNo}}</td>
+                <td>{{TrdAmt}}</td>
+                <td>{{EvalAmt}}</td>
+                <td>{{BnsplAmt}}</td>
+                <td>{{Ictax}}</td>
+                <td>{{Ihtax}}</td>
+                <td>{{OrdDt}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</script>
+{% endraw %}
+{% endblock %}
+
+{% block script %}
+{% raw %}
+<script>
+    function initialize() {
+        $('#start_ymd').val(new Date().toISOString().slice(0, 10));
+        $('#end_ymd').val(new Date().toISOString().slice(0, 10));
+        //$('#form1').submit();
+    }
+    $(document).ready(function() {
+        $('#form1').submit(function(e) {
+            e.preventDefault();
+            var start_ymd = $('#start_ymd').val().replace(/-/g, '');
+            var end_ymd = $('#end_ymd').val().replace(/-/g, '');
+            // var url = '/api/v1/ls/fulfill-api-list';
+            var url = '/api/v1/ls/acct-history';
+            const data = {
+                from_ymd: start_ymd,
+                to_ymd: end_ymd
+            }
+            postFetch(url, data).then(data => {
+                console.log(data);
+                const template = $('#fulfill-table').html();
+                const templateScript = Handlebars.compile(template);
+                const html = templateScript({list: data.CDPCQ04700OutBlock3});
+                $('#ccld-result-area').html(html);
+
+            }).catch(error=> {
+                console.error(error.message);
+                $('#error-area').text(error.message).removeClass('d-none');
+            });
+        });
+        initialize();
+    });
+</script>
+{% endraw %} 
+{% endblock %} 

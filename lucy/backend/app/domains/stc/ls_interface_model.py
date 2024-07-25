@@ -37,11 +37,11 @@ class CancelOrder_Request(StockApiBaseModel):
 
 class AcctHistory_Request(StockApiBaseModel):
     ''' 계좌별 거래내역 조회 요청 '''
-    acctno: str
+    acctno: Optional[str] = ''
     from_ymd: str
     to_ymd: str
-    stk_code: str = ''
-    start_no: int = 0
+    stk_code: Optional[str] = ''
+    start_no: Optional[int] = 0
 
 class Fulfill_Request(StockApiBaseModel):
     ''' 체결/미체결 조회 요청 '''

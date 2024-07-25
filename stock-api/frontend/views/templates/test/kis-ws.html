@@ -161,7 +161,7 @@ $( document ).ready(function() {
             "qty": qty,
             "cost": cost
         }
-        const url = `/api/v1/${stk_abbr.toLowerCase()}/order-cash/${user_id}/${acct_no}`
+        const url = `/api/v1/${stk_abbr.toLowerCase()}/order/${user_id}/${acct_no}`
         postFetch(url, data)
         .then(response => {
             console.log(response);
@@ -187,7 +187,7 @@ $( document ).ready(function() {
             "qty": qty,
             "cost": cost
         }
-        const url = `/api/v1/${stk_abbr.toLowerCase()}/order-cash/${user_id}/${acct_no}`
+        const url = `/api/v1/${stk_abbr.toLowerCase()}/order/${user_id}/${acct_no}`
         postFetch(url, data)
         .then(response => {
             console.log(response);

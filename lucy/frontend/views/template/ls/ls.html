@@ -80,39 +80,39 @@
     <table class="table table-striped">
         <thead>
             <tr>
+                <th>상태</th>
+                <th>주문시간</th>
                 <th>주문번호</th>
                 <th>종목번호</th>
                 <th>구분</th>
-                <th>주문수량</th>
-                <th>주문가격</th>
-                <th>체결수량</th>
-                <th>체결가격</th>
-                <th>미체결잔량</th>
-                <th>확인수량</th>
-                <th>상태</th>
-                <th>원주문번호</th>
-                <th>유형</th>
-                <th>주문시간</th>
-                <th>현재가</th>
+                <th class="text-end">주문수량</th>
+                <th class="text-end">주문가격</th>
+                <th class="text-end">현재가</th>
+                <th class="text-end">체결수량</th>
+                <th class="text-end">체결가격</th>
+                <th class="text-end">미체결잔량</th>
+                <th class="text-end">확인수량</th>
+                <th class="text-center">동작</th>
             </tr>
         </thead>
         <tbody>
             {{#each list}}
             <tr>
+                <td>{{status}}</td>
+                <td>{{ordtime}}</td>
                 <td>{{ordno}}</td>
                 <td>{{expcode}}</td>
                 <td>{{medosu}}</td>
-                <td>{{qty}}</td>
-                <td>{{price}}</td>
-                <td>{{cheqty}}</td>
-                <td>{{cheprice}}</td>
-                <td>{{ordrem}}</td>
-                <td>{{cfmqty}}</td>
-                <td>{{status}}</td>
-                <td>{{orgordno}}</td>
-                <td>{{ordgb}}</td>
-                <td>{{ordtime}}</td>
-                <td>{{price1}}</td>
+                <td class="text-end">{{displayWon qty}}</td>
+                <td class="text-end">{{displayWon price}}</td>
+                <td class="text-end">{{displayWon price1}}</td>
+                <td class="text-end">{{displayWon cheqty}}</td>
+                <td class="text-end">{{displayWon cheprice}}</td>
+                <td class="text-end">{{displayWon ordrem}}</td>
+                <td class="text-end">{{displayWon cfmqty}}</td>
+                <td>
+                    <button class="btn btn-sm btn-secondary btnOrderCancel">전량취소</button>
+                </td>
             </tr>
             {{/each}}
         </tbody>
@@ -182,6 +182,10 @@
             const stk_name = $(this).data('stk-name');
             const qty = $(this).data('qty');
             showBuySellCanvas('LS',stk_code, stk_name, "매도", qty, 0);
+        });
+
+        $('#fulfill-table-area').on("click", ".btnOrderCancel", function() {
+            alert("두 번째 버튼을 클릭했습니다.");
         });
 
         initalize();

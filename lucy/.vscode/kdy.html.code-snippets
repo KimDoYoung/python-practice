@@ -35,9 +35,12 @@
         "body" :[
             "const url = '${1: url}';",
             "const data = { abc : 'abc', def : 'def'};",
-            "postFetch(url, data)",
-            "  .then(data => {\nconsole.log(data);\n})",
-            "  .catch(error=> {\n console.error(error.message);\n });"
+            "postFetch(url, data).then(data => {",
+            "\tconsole.log(data);",
+            "}).catch(error=> {",
+            "\tconsole.error(error.message);",
+            "});",
+
         ]
     },
     "html페이지" : {
