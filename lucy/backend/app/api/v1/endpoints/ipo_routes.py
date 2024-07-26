@@ -3,11 +3,12 @@ from typing import List
 
 from fastapi import APIRouter, Depends
 
+
 from backend.app.domains.ipo.ipo_history_model import IpoHistory
 from backend.app.domains.ipo.ipo_history_service import IpoHistoryService
 from backend.app.domains.ipo.ipo_model import Ipo, IpoDays
 from backend.app.domains.ipo.ipo_service import IpoService
-from backend.app.core.dependency import get_ipo_service, get_ipohistory_service
+from backend.app.core.dependency import get_config_service, get_ipo_service, get_ipohistory_service
 from backend.app.core.logger import get_logger
 
 logger = get_logger(__name__)
@@ -82,3 +83,19 @@ async def update_ipo_history(ipo_id: str, history: IpoHistory,service :IpoHistor
     await service.update_1(ipo_id, history)
     updated_history = await service.get_1(ipo_id)
     return updated_history
+
+
+
+@router.get("/make-formula", response_model=dict)
+async def update_ipo_history(service :IpoHistoryService=Depends(get_ipohistory_service)):
+    '''데이터로 곱하기변수를 계산하는 공식을 만든다'''
+    formula = await service.make_formula()
+    config_service = get_config_service()
+    dbconfig = await config_service.get_1('ipo_expected_cost_express')
+    if dbconfig:
+        dbconfig.value = formula
+        await dbconfig.save()
+    else:
+        dbconfig = await config_service.create({'key': 'ipo_expected_cost_express', 'value': formula})
+    logger.debug(f'Formula: {formula}')
+    return {'formula': formula}

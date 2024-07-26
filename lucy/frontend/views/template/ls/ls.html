@@ -18,6 +18,9 @@
     <div>
         <div id="fulfill-table-area" class="mt-3"></div>
     </div>
+    <div>
+        <div id="fulfill-table-area2" class="mt-3"></div>
+    </div>    
 </section>
 
 {% raw %} 
@@ -76,7 +79,7 @@
     </table>
 </script>
 <script id="fulfill-table-template" type="text/x-handlebars-template">
-    <h4>미체결</h4>
+    <h4>{{title}}</h4>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -111,7 +114,9 @@
                 <td class="text-end">{{displayWon ordrem}}</td>
                 <td class="text-end">{{displayWon cfmqty}}</td>
                 <td>
+                    {{#test 'status =="접수"'}}
                     <button class="btn btn-sm btn-secondary btnOrderCancel">전량취소</button>
+                    {{/test}}
                 </td>
             </tr>
             {{/each}}
@@ -153,10 +158,15 @@
             const template = $('#fulfill-table-template').html();
             const templateScript = Handlebars.compile(template);
             var list = data.t0425OutBlock1;
-            list = list.filter(item => item.status === '접수');
-
-            const html = templateScript({list: list});
+            var list1 = list.filter(item => item.status === '접수');
+            const html = templateScript({list: list1, title: '미체결'});
             $('#fulfill-table-area').html(html);
+
+            list2 = list.filter(item => item.status !== '접수');
+            const html2 = templateScript({list: list2, title: '체결'});
+            $('#fulfill-table-area2').html(html2);
+
+            
         }).catch(error=> {
             console.error(error.message);
         });

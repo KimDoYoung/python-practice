@@ -44,6 +44,7 @@ class Ipo(Document):
     stk_name: str
     days: Days
     name: str
+    category: Optional[str] = None
     offering: Offering
     processed_time: datetime
     scrap_id: PydanticObjectId

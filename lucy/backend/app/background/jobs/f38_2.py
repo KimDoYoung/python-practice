@@ -155,6 +155,7 @@ async def work1(db, all_data=False):
         processed_entry = {
             'stk_name' : new_stk_name,  #doc['stk_name'],
             'name' : company_info['종목명'],
+            'category' : company_info['업종'],
             'title' : get_title(company_info),
             'days' : get_days(schedule_info),
             'offering' : get_offering(offering_info, expected_participation),

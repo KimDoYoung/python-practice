@@ -3,7 +3,9 @@
 {% endblock %}
 {% block content %}
 <h2 class="text-center">
-    IPO 과거데이터 기록 <button type="button" class="btn btn-primary" id="btnDisplayEdit"><i class="bi bi-bag-plus"></i> 추가</button>
+    IPO 과거데이터 기록 
+    <button type="button" class="btn btn-primary" id="btnDisplayEdit"><i class="bi bi-bag-plus"></i> 추가</button>
+    <button type="button" class="btn btn-warning" id="btnMakeFormula"><i class="bi bi-calculator"></i> 수식만들기</button>
 </h2>
 
 <div id="table-list-area" class="m-3 p-3 d-none"></div>
@@ -68,12 +70,11 @@
                 <th>종목코드</th>
                 <th class="text-end">확정공모가</th>
                 <th class="text-end">매출액</th>
+                <th class="text-end">순이익</th>
                 <th class="text-end">기관경쟁률</th>
                 <th class="text-end">의무보유확약</th>
-                <th class="text-end">순이익</th>
                 <th class="text-end">최고체결가</th>
                 <th class="text-end">곱하기변수</th>
-                <th>비고</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -81,15 +82,14 @@
             {{#each list}}
             <tr>
                 <td>{{Company}}</td>
-                <td>{{StkCode}}</td>
+                <td>{{goNaver StkCode}}</td>
                 <td class="text-end">{{FinalOfferingPrice}}</td>
-                <td class="text-end">{{Revenue}}</td>
+                <td class="text-end">{{toFixed Revenue 2}}</td>
+                <td class="text-end">{{toFixed NetIncome 2}}</td>
                 <td class="text-end">{{InstitutionalSubscriptionRatio}}</td>
-                <td class="text-end">{{LockupAgreement}}</td>
-                <td class="text-end">{{NetIncome}}</td>
+                <td class="text-end">{{toFixed LockupAgreement 2}}</td>
                 <td class="text-end">{{MaxValue}}</td>
                 <td class="text-end">{{toFixed MultipleVariable 2}}</td>
-                <td>{{Notes}}</td>
                 <td>
                     <button type="button" class="btn btn-primary modify-btn" data-id="{{_id}}"><i class="bi bi-pencil-square"></i></button>
                     <button type="button" class="btn btn-danger delete-btn" data-id="{{_id}}"><i class="bi bi-trash3"></i></button>
@@ -153,7 +153,7 @@ Handlebars.registerHelper('toFixed', function (number, digits) {
             Company: document.getElementById('Company').value,
             StkCode: document.getElementById('StkCode').value,
             FinalOfferingPrice: parseInt(document.getElementById('FinalOfferingPrice').value, 10),
-            Revenue: parseInt(document.getElementById('Revenue').value, 10),
+            Revenue: parseFloat(document.getElementById('Revenue').value),
             InstitutionalSubscriptionRatio: parseFloat(document.getElementById('InstitutionalSubscriptionRatio').value),
             LockupAgreement: parseFloat(document.getElementById('LockupAgreement').value),
             NetIncome: parseFloat(document.getElementById('NetIncome').value),
@@ -175,7 +175,7 @@ Handlebars.registerHelper('toFixed', function (number, digits) {
             Company: document.getElementById('Company').value,
             StkCode: document.getElementById('StkCode').value,
             FinalOfferingPrice: parseInt(document.getElementById('FinalOfferingPrice').value, 10),
-            Revenue: parseInt(document.getElementById('Revenue').value, 10),
+            Revenue: parseFloat(document.getElementById('Revenue').value),
             InstitutionalSubscriptionRatio: parseFloat(document.getElementById('InstitutionalSubscriptionRatio').value),
             LockupAgreement: parseFloat(document.getElementById('LockupAgreement').value),
             NetIncome: parseFloat(document.getElementById('NetIncome').value),
@@ -193,6 +193,15 @@ Handlebars.registerHelper('toFixed', function (number, digits) {
     }
     $(document).ready(function() {
         console.log('ready');
+        //수식만들기버튼
+        $('#btnMakeFormula').click(function(){
+            getFetch('/api/v1/ipo/make-formula').then(data => {
+                console.log(data); 
+                alert(data.formula)
+            }).catch(error=> {
+                console.error(error.message); 
+            });
+        });
         //Edit의 취소버튼
         $('#btnCancel').click(function(){
             displayList();

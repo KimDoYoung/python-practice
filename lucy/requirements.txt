@@ -24,3 +24,4 @@ sympy
 pycryptodome
 websocket-client
 aiohttp
+scikit-learn
