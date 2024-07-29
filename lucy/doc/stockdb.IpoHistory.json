@@ -117,4 +117,64 @@
   "Notes": "",
   "Revenue": 23,
   "StkCode": "464080"
+},
+{
+  "_id": {
+    "$oid": "66a2f9fd3722f6851ba8208d"
+  },
+  "Company": "이노스페이스",
+  "FinalOfferingPrice": 43300,
+  "InstitutionalSubscriptionRatio": 598.87,
+  "LockupAgreement": 1.99,
+  "MaxValue": 46050,
+  "MultipleVariable": 1.0635103926096998,
+  "NetIncome": -243.42,
+  "Notes": "",
+  "Revenue": 2,
+  "StkCode": "462350"
+},
+{
+  "_id": {
+    "$oid": "66a2fa263722f6851ba8208e"
+  },
+  "Company": "하스",
+  "FinalOfferingPrice": 16000,
+  "InstitutionalSubscriptionRatio": 946.4,
+  "LockupAgreement": 6.36,
+  "MaxValue": 29550,
+  "MultipleVariable": 1.846875,
+  "NetIncome": 26.43,
+  "Notes": "",
+  "Revenue": 149,
+  "StkCode": "450330"
+},
+{
+  "_id": {
+    "$oid": "66a2fa4d3722f6851ba8208f"
+  },
+  "Company": "시프트업",
+  "FinalOfferingPrice": 60000,
+  "InstitutionalSubscriptionRatio": 225.94,
+  "LockupAgreement": 32.98,
+  "MaxValue": 89500,
+  "MultipleVariable": 1.4916666666666667,
+  "NetIncome": -71.33,
+  "Notes": "",
+  "Revenue": 660,
+  "StkCode": "462870"
+},
+{
+  "_id": {
+    "$oid": "66a2fa813722f6851ba82090"
+  },
+  "Company": "엑셀세라퓨틱스",
+  "FinalOfferingPrice": 10000,
+  "InstitutionalSubscriptionRatio": 1233.8,
+  "LockupAgreement": 4.5,
+  "MaxValue": 12900,
+  "MultipleVariable": 1.29,
+  "NetIncome": -83.42,
+  "Notes": "",
+  "Revenue": 10,
+  "StkCode": "373110"
 }]

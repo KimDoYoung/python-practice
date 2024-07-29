@@ -1,0 +1,27 @@
+[{
+  "_id": {
+    "$oid": "6678dd685bcdbf7c077f0876"
+  },
+  "job_id": "site38_work",
+  "run_type": "cron",
+  "args": "커뮤니케이션38 스크랩",
+  "cron_str": "01 10 * * *"
+},
+{
+  "_id": {
+    "$oid": "6678dd785bcdbf7c077f0878"
+  },
+  "job_id": "holiday_godata",
+  "run_type": "cron",
+  "args": "휴일정보(GODATA)",
+  "cron_str": "0 0 1 * *"
+},
+{
+  "_id": {
+    "$oid": "66a737e50ac95b81d130da3d"
+  },
+  "job_id": "fill_ls_stk_info",
+  "run_type": "cron",
+  "args": "LS stk_info채우기",
+  "cron_str": "53 15 * * *"
+}]

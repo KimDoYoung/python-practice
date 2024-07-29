@@ -19,11 +19,15 @@ from backend.app.core.config import config
 from backend.app.domains.system.stk_info_model import StkInfo
 from backend.app.domains.user.user_model import User
 from backend.app.managers.stock_api_manager import StockApiManager
+
 from backend.app.core.dependency import get_stkinfo_service
 
 logger = get_logger(__name__)
 
-async def call_master_api_fill_ls_stk_info():
+async def call_master_api_fill_ls_stk_info(arg):
+    logger.info("--------------------------------------------------------------")
+    logger.info(f" call_master_api_fill_ls_stk_info 시작: {arg}")
+    logger.info("--------------------------------------------------------------")
     ls_api = await StockApiManager().stock_api('LS')
     
     response = await ls_api.master_api("1") # 1 코스피, 2 코스닥
@@ -43,7 +47,7 @@ async def call_master_api_fill_ls_stk_info():
             
 
     response = await ls_api.master_api("2") # 1 코스피, 2 코스닥
-    logger.debug(f"master_api 응답 코스닥: [{response.to_str()}]")
+    #logger.debug(f"master_api 응답 코스닥: [{response.to_str()}]")
 
     if response.rsp_cd == '00000':
         for item in response.t9945OutBlock:
@@ -63,13 +67,16 @@ async def call_master_api_fill_ls_stk_info():
     for stk_info in list:
         await service.create(stk_info)
 
-
+    logger.info("--------------------------------------------------------------")
+    logger.info(f"DONE!: {arg}")
+    logger.info("--------------------------------------------------------------")
+    
 async def main():
     await MongoDb.initialize(config.DB_URL)
     db = MongoDb.get_client()[config.DB_NAME]
     await init_beanie(database=db, document_models=[User])
     await init_beanie(database=db, document_models=[StkInfo])
-    await call_master_api_fill_ls_stk_info()
+    await call_master_api_fill_ls_stk_info("LS stk info 채우기")
     await MongoDb.close()
     print("DONE!")
 

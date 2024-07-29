@@ -1,18 +1,13 @@
 from functools import lru_cache
-from backend.app.domains.system.config_service import DbConfigService
-from backend.app.domains.system.eventdays_service import EventDaysService
-# from backend.app.domains.system.ipo_service import IpoService
-# from backend.app.domains.system.mystock_service import MyStockService
-from backend.app.domains.system.scheduler_job_service import SchedulerJobService
-from backend.app.domains.user.user_service import UserService
-from backend.app.core.scheduler import Scheduler
 
 @lru_cache()
-def get_user_service() -> UserService:
+def get_user_service():
+    from backend.app.domains.user.user_service import UserService
     return UserService()
 
 @lru_cache()
-def get_eventdays_service() -> EventDaysService:
+def get_eventdays_service():
+    from backend.app.domains.system.eventdays_service import EventDaysService
     return EventDaysService()
 
 @lru_cache()
@@ -26,11 +21,14 @@ def get_ipohistory_service():
     return IpoHistoryService()
 
 @lru_cache()
-def get_config_service() -> DbConfigService:
+def get_config_service():
+    from backend.app.domains.system.config_service import DbConfigService
     return DbConfigService()
 
 @lru_cache()
-def get_scheduler_job_service() -> SchedulerJobService:
+def get_scheduler_job_service():
+    from backend.app.domains.system.scheduler_job_service import SchedulerJobService
+    from backend.app.core.scheduler import Scheduler
     scheduler = Scheduler.get_instance() 
     return SchedulerJobService(scheduler=scheduler)
 
