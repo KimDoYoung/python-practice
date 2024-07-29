@@ -20,11 +20,11 @@ class T9945_Request(StockApiBaseModel):
 	t9945InBlock: T9945INBLOCK
 
 class T9945OUTBLOCK(StockApiBaseModel):
-	hname: str # 종목명 
-	shcode: str # 단축코드 
-	expcode: str # 확장코드 
-	etfchk: str # ETF구분 
-	filler: str # filler 
+	hname: Optional[str]='' # 종목명 
+	shcode: Optional[str]='' # 단축코드 
+	expcode: Optional[str]='' # 확장코드 
+	etfchk: Optional[str]='' # ETF구분 
+	filler: Optional[str]='' # filler 
 
 class T9945_Response(StockApiBaseModel):
 	rsp_cd: str

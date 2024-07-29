@@ -43,3 +43,8 @@ def get_mystock_service():
 def get_log_service():
     from backend.app.domains.system.logs_service import LogsService
     return LogsService()
+
+@lru_cache()
+def get_stkinfo_service():
+    from backend.app.domains.system.stk_info_service import StockInfoService
+    return StockInfoService()

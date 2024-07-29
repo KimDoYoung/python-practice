@@ -165,7 +165,7 @@ async def fulfill_api_list(req:Fulfill_Api_Request,):
     return response
 
 @router.get("/master-api",response_model=T9945_Response)
-async def master_api(user_id:str, acctno:str):
+async def master_api():
     ''' [주식] 시세-주식마스터조회API용 '''
     ls_api = await StockApiManager().stock_api('LS')
     
