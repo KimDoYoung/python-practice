@@ -27,6 +27,8 @@ class DantaService:
         self.stk_abbr = stock_abbr
         self.user_service = get_user_service()
         self.log = get_log_service()
+        self.cache = {} # 캐시
+        self.cache['holiday'] = {} # 휴일 캐시
         
 
     async def initialize(self):
@@ -38,10 +40,17 @@ class DantaService:
     async def is_market_open_day(self, now: datetime):
         ''' 오늘이 개장일이면 True 아니면 False '''
         now_ymd = now.strftime("%Y%m%d")
-        resp = self.kisapi.chk_workingday(now_ymd)        
+        # cache에서 먼저 찾는다.
+        result_in_cache = self.cache['holiday'].get(now_ymd)
+        if result_in_cache is not None:
+            return result_in_cache
+        
+        resp = await self.kisapi.chk_workingday(now_ymd)        
         for item in resp.output:
             if item.opnd_yn == 'Y' and item.bass_dt == now_ymd:
+                self.cache['holiday'][now_ymd] = True
                 return True
+        self.cache['holiday'][now_ymd] = False
         return False
     
     async def get_current_price(self, stk_code:str):

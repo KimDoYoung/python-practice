@@ -55,6 +55,8 @@ def danta_machine_status() -> str:
 #TODO : 매수/매도를 해 볼것
 async def danta_machine_main():
     '''' 단타 머신 메인 루프 '''
+    one_min = 60
+    one_hour = 60 * one_min
     service = DantaService(config.DEFAULT_USER_ID, config.DEFAULT_STOCK_ABBR)
     await service.initialize()
     
@@ -73,8 +75,17 @@ async def danta_machine_main():
         market_close_time = not market_open_time
         
         # 주식 시장이 열리는 날이 아니거나 장시간이 지났다면 1시간쉬고 다시 시작
-        if market_close_day or market_close_time:
-            await asyncio.sleep(60 * 60 * 60) 
+        if market_close_day:
+            await asyncio.sleep(one_hour * 6) 
+            continue
+        
+        if market_open_day and market_close_time:
+            if time(0, 0 ) <= now.time() <= time(8,30):
+                await asyncio.sleep(one_hour) 
+            elif time(16, 00) <= now.time() <= time(23,59):
+                await asyncio.sleep(one_hour) 
+            else:
+                await asyncio.sleep(one_min * 5)
             continue
         
         # 단타매매할 주식을 고른다.
