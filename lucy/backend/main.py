@@ -14,6 +14,7 @@ from backend.app.domains.system.eventdays_model import EventDays
 from backend.app.domains.ipo.ipo_model import Ipo
 from backend.app.domains.system.mystock_model import MyStock
 from backend.app.domains.system.scheduler_job_model import SchedulerJob
+from backend.app.domains.system.stk_info_model import StkInfo
 from backend.app.domains.user.user_model import User
 from backend.app.core.mongodb import MongoDb
 from backend.app.core.config import config
@@ -109,6 +110,7 @@ async def startup_event():
     await init_beanie(database=db, document_models=[DbConfig])
     await init_beanie(database=db, document_models=[SchedulerJob])
     await init_beanie(database=db, document_models=[MyStock])
+    await init_beanie(database=db, document_models=[StkInfo])
     
 
     # 스케줄러 시작

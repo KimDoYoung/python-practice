@@ -18,6 +18,7 @@ from beanie import init_beanie
 from backend.app.core.config import config
 from backend.app.core.logger import get_logger
 from backend.app.domains.system.danta_service import DantaService
+from backend.app.domains.system.logs_model import Logs
 from backend.app.domains.user.user_model import User
 
 logger = get_logger(__name__)
@@ -51,9 +52,24 @@ def danta_machine_status() -> str:
         return "stopped"
     else:
         return "running"
+async def danta_machine_main():
+    one_min = 60
+    one_hour = 60 * one_min
+    service = DantaService(config.DEFAULT_USER_ID, config.DEFAULT_STOCK_ABBR)
+    await service.initialize()
+    
+    danta_stocks = [] # 단타 매매할 주식 리스트
+    
+    while True:
+        # 현재시간을 구하면서 시작
+        now = datetime.now()
+        logger.debug(f"현재시간: {now}")
+        await asyncio.sleep(one_min) 
+        
 #TODO : Websocket을 어떻게 붙일 수 있을까?
 #TODO : 매수/매도를 해 볼것
-async def danta_machine_main():
+#TODO : 종가배팅이어야한다.
+async def danta_machine_main1():
     '''' 단타 머신 메인 루프 '''
     one_min = 60
     one_hour = 60 * one_min
@@ -89,19 +105,25 @@ async def danta_machine_main():
             continue
         
         # 단타매매할 주식을 고른다.
-        # if not stock_choice_done and market_open_time and now.hour == 9 and now.minute == 1:
         if not stock_choice_done and market_open_time: 
-            danta_stocks = await service.choice_danta_stocks() 
-            total_money = await service.get_available_money()
-            for stock in danta_stocks:
-                await service.buy_within_money(stock, int(total_money/len(danta_stocks)))
-            stock_choice_done = True    
+            try:
+                danta_stocks = await service.choice_danta_stocks() 
+                total_money = await service.get_available_money()
+                for stock in danta_stocks:
+                    money = int(total_money / len(danta_stocks))
+                    qty, current_cost = await service.get_available_qty_cost(stock.stk_code, money)
+                    await service.buy(stock, cost=current_cost, qty=qty)
+                stock_choice_done = True
+                logger.debug("오늘의 매수 주식을 선별해서 매수하였습니다.")
+            except Exception as e:
+                logger.error(f"선별 및 매수 중 오류: {e}")        
         
         # 단타매매할 주식이 있고 장 끝날 시간이면 모두 매도한다.    
-        if stock_choice_done and now.hour == 15 and  now.minute > 25:
+        if stock_choice_done and now.hour > 14 and  now.minute > 18:
             # 3:25까지 매도하지 않은게 있다면 모두 매도
             for stock in danta_stocks:
-                await service.sell(stock)
+                current_cost = await service.get_current_price(stock.stk_code)
+                await service.sell(stock, sell_price=current_cost)
             danta_stocks = []
             stock_choice_done = False
         
@@ -111,10 +133,15 @@ async def danta_machine_main():
             for stock in danta_stocks:
                 decision = await service.sell_decision(stock)
                 if decision == '손절' or decision == '익절':
-                    await service.sell(stock)
+                    current_cost = await service.get_current_price(stock.stk_code)
+                    await service.sell(stock, sell_price=current_cost)
                     danta_stocks.remove(stock)        
-
-        await asyncio.sleep(60*3) # 3분마다 현재 시간 체크        
+        
+        stock_choice_done = len(danta_stocks) > 0 # 주식을 모두 팔았다면 
+        if not stock_choice_done:
+            # 종료한다.
+            break
+        await asyncio.sleep(one_min*3) # 3분마다 현재 시간 체크        
 
 async def db_init():
     from backend.app.core.mongodb import MongoDb
@@ -125,6 +152,7 @@ async def db_init():
     
     db = MongoDb.get_client()[db_name]
     await init_beanie(database=db, document_models=[User])
+    await init_beanie(database=db, document_models=[Logs])
         
 
 async def main():
@@ -133,6 +161,8 @@ async def main():
         await danta_machine_main()
     except Exception as e:
         logger.error(f"An error occurred: {e}")
+    finally:
+        await asyncio.sleep(0.1)  # 모든 비동기 작업이 완료되도록 약간의 시간을 둠        
 
 if __name__ == "__main__":
     asyncio.run(main())

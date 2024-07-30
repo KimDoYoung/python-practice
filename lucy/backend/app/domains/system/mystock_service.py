@@ -54,6 +54,7 @@ class MyStockService:
             return True
         else:
             return False
+        
     async def get_1(self, stk_code:str) -> MyStock:
         mystock = await MyStock.find_one(MyStock.stk_code == stk_code)
         return mystock

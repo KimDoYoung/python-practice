@@ -54,22 +54,23 @@ class DantaService:
         return False
     
     async def get_current_price(self, stk_code:str):
-        cost = self.kisapi.get_current_price(stk_code)
+        ''' stk_code의 현재가격 '''
+        cost = await self.kisapi.get_current_price(stk_code)
         return cost
 
-    async def get_available_qty(self, stk_code:str, money:int) -> int:
+    async def get_available_qty_cost(self, stk_code:str, money:int):
         ''' money의 범위 내에서 매수가능수량 '''
         current_cost = await self.get_current_price(stk_code)
         # current_cost * x + (current_cost * x * 0.04)  = money
-        x = int(money // (current_cost * 1.04))
+        x = int(money / (current_cost * 1.04))
         if (x > 1):
             x = x - 1
-        return x
+        return x, current_cost
     
     async def choice_danta_stocks(self) -> List[DantaStock]:
         ''' 단타 주식 선택 '''
         stocks = []
-        stock = DantaStock(stk_code='257720', stk_name='실리콘투')
+        stock = DantaStock(stk_code='004090', stk_name='한국석유')
         stocks.append(stock)
         stock = DantaStock(stk_code='032820', stk_name='우리기술')
         stocks.append(stock)
@@ -78,10 +79,10 @@ class DantaService:
         return stocks
     
     async def get_available_money(self):
-        return 200000
+        return 120000
     
     async def sell_decision(self, stock: DantaStock):
-        current_price = await self.get_current_price(stock)
+        current_price = await self.get_current_price(stock.stk_code)
         # 손절 또는 익절 조건을 판단 (예시)
         if current_price > (stock.buy_price * 1.03):  # 예: 5% 이상 상승 시 익절
             return '익절'
@@ -89,10 +90,8 @@ class DantaService:
             return '손절'
         return '보유'
     
-    async def buy_within_money(self, stock: DantaStock, money:int):
-        ''' money의 범위 내에서 stock을 매수'''
-        # money 가 1000이면 1000원 이하에서 가능한 주식수를 계산해서 구매
-        qty = await self.get_available_qty(stock.stk_code, money)
+    async def buy(self, stock: DantaStock, cost:int, qty:int):
+        ''' stock을  cost가격에 qty만큼 매수 '''
         if self.stk_abbr == 'LS':
             #LS API를 이용해서 주식을 매수
             order_req = Order_Request(buy_sell_gb="매수", stk_code=stock.stk_code, qty=qty, price=0) 
@@ -100,6 +99,7 @@ class DantaService:
             resp = await self.lsapi.order(req)
             if resp.rsp_cd.startswith('00'):
                 stock.buy_qty = qty
+                stock.buy_price = cost # TODO: 체결가격은 아니고 현재가
                 stock.buy_ordno = resp.CSPAT00601OutBlock2.OrdNo
                 stock.buy_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 title = f'매수주문 성공: {stock.stk_name} {stock.buy_qty}주, 주문번호: {stock.buy_ordno}'
@@ -110,41 +110,45 @@ class DantaService:
         elif self.stk_abbr == 'KIS':
             # KIS API를 이용해서 주식을 매수
             order_req = OrderCash_Request(buy_sell_gb="매수", stk_code=stock.stk_code, qty=qty, price=0)
-            resp = self.kisapi.order(order_req)
+            resp = await  self.kisapi.order(order_req)
             if resp.rt_cd.startswith('0'):
-                stock.buy_qty = resp.qty
+                await self.log.danta_info(f'매수주문 성공: {stock.stk_name} {qty}주, 주문번호: {resp.output.KRX_FWDG_ORD_ORGNO}')
+                stock.buy_qty = qty
+                stock.buy_price = cost # TODO: 체결가격은 아니고 현재가
                 stock.buy_ordno = resp.output.KRX_FWDG_ORD_ORGNO
                 stock.buy_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 title = f'매수주문 성공: {stock.stk_name} {stock.buy_qty}주, 주문번호: {stock.buy_ordno}'
-                self.log.danta_info(title=title)
+                await self.log.danta_info(title=title)
             else:
                 title = f'매수주문 실패: {stock.stk_name}, {resp.msg1}'
-                self.log.danta_error(title=title)
+                await self.log.danta_error(title=title)
     
-    async def sell(self, stock:DantaStock):
+    async def sell(self, stock:DantaStock, sell_price=0):
         qty = stock.buy_qty
         if self.stk_abbr == 'LS':            
             order_req = Order_Request(buy_sell_gb="매도", stk_code=stock.stk_code, qty=qty) 
             req = order_to_cspat00601_Request(order_req)
             resp  = await self.lsapi.order(req)
             if resp.rsp_cd.startswith('00'):
-                stock.buy_qty = qty
-                stock.buy_ordno = resp.CSPAT00601OutBlock2.OrdNo
-                stock.buy_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                stock.sell_qty = qty
+                stock.sell_price = sell_price # TODO: 체결가격은 아니고 현재가
+                stock.sell_ordno = resp.CSPAT00601OutBlock2.OrdNo
+                stock.sell_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 title = f'매도주문 성공: {stock.stk_name} {stock.buy_qty}주, 주문번호: {stock.buy_ordno}'
-                self.log.danta_info(title=title)
+                await self.log.danta_info(title=title)
             else:
                 title = f'매도주문 실패: {stock.stk_name}, {resp.msg1}'
-                self.log.danta_error(title=title)                            
+                await self.log.danta_error(title=title)                            
         else:
             order_req = OrderCash_Request(buy_sell_gb="매도", stk_code=stock.stk_code, qty=qty)
             resp = await self.kisapi.order(order_req)
             if resp.rt_cd.startswith('0'):
-                stock.sell_qty = resp.qty
+                stock.sell_qty = qty
+                stock.sell_price = sell_price # TODO: 체결가격은 아니고 현재가
                 stock.sell_ordno = resp.output.KRX_FWDG_ORD_ORGNO
                 stock.sell_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 title = f'매도주문 성공: {stock.stk_name} {stock.sell_qty}주, 주문번호: {stock.sell_ordno}'
-                self.log.danta_info(title=title)
+                await self.log.danta_info(title=title)
             else:
                 title = f'매도주문 실패: {stock.stk_name}, {resp.msg1}'
-                self.log.danta_error(title=title)
+                await self.log.danta_error(title=title)
