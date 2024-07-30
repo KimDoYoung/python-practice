@@ -32,10 +32,31 @@ async def delete_mystock(id: str, mystock_service :MyStockService=Depends(get_my
 @router.post("/add")
 async def add_mystock(mystock_dto:MyStockDto, mystock_service :MyStockService=Depends(get_mystock_service)):
     ''' 나의 주식 추가 '''
-
     try:
         await mystock_service.upsert(mystock_dto)
         return {"message": "MyStock added successfully"}
     except Exception as e:
         logger.error(f"Failed to add mystock: {e}")
         raise HTTPException(status_code=400, detail="Failed to add mystock")
+
+@router.get("/danta", response_model=dict)
+async def danta(mystock_service :MyStockService=Depends(get_mystock_service)):
+    ''' 단타 머신에서 쓰는 service '''
+    mystock_dto = MyStockDto(stk_code="005930", stk_name="삼성전자")
+    mystock_dto.buy_ordno = "1234"
+    mystock_dto.buy_qty = 10
+    mystock_dto.buy_price = 1000
+    mystock_dto.buy_time = "2021-07-01 10:00:00"
+    mystock_dto.stk_types = ["단타"]
+    await mystock_service.upsert(mystock_dto)
+    danta_list = await  mystock_service.get_all_by_type('단타')
+    for danta in danta_list:
+        logger.debug(danta)
+    mystock_dto.sell_ordno = "5678"
+    mystock_dto.sell_qty = 10
+    mystock_dto.sell_price = 2000
+    mystock_dto.sell_time = "2021-07-01 10:30:00"
+    await mystock_service.upsert(mystock_dto)
+    #mystock_service.delete_all_by_type('단타')
+    return {"message": "Danta success"}
+    

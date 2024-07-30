@@ -54,6 +54,17 @@ class MyStockService:
             return True
         else:
             return False
+    
+    async def get_all_by_type(self, stk_type:str) -> List[MyStock]:
+        # mystocks = await MyStock.find(MyStock.stk_types.in_(['단타'])).to_list()
+        # return mystocks
+        mystocks = await MyStock.find({"stk_types": {"$in": [stk_type]}}).to_list()
+        return mystocks        
+    
+    async def delete_all_by_type(self, stk_type:str):
+        mystocks = await MyStock.find({"stk_types": {"$in": [stk_type]}}).to_list()
+        for mystock in mystocks:
+            await mystock.delete()
         
     async def get_1(self, stk_code:str) -> MyStock:
         mystock = await MyStock.find_one(MyStock.stk_code == stk_code)
