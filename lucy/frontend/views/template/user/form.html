@@ -136,7 +136,6 @@
                 }else{
                     return response.json().then(function(errorData) {
                         $('#error-area').html('수정에 실패했습니다. 다시 시도해 주세요. 오류: ' + errorData.detail);
-                        //throw new Error('HTTP error! status: ' + response.status);
                     });                    
                 }
             }).catch(function(error) {
