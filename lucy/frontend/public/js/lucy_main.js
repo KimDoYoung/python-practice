@@ -1,3 +1,4 @@
+
 $(document).ready(function() {
 
     let canvasElm = document.getElementById('offcanvasBuySell');
@@ -55,7 +56,7 @@ $(document).ready(function() {
     //toast 에러메세지 표시
     function showToastError(error) {
         const statusCode = error.status;
-        const detail = error.detail;
+        const detail = error.detail || error.message;
         $('#toastError').find('#error-status-code').text(statusCode);
         $('#toastError').find('#error-detail').text(detail);
         var toast = new bootstrap.Toast(document.getElementById('toastError'));
@@ -104,13 +105,13 @@ $(document).ready(function() {
                 if(data.msg1){
                     alert(data.msg1);
                 }
-                debugger;
-                var page_path = $('#page_path').val();
-                if(page_path === '/main'){
-                    window.location.href = '/main'
-                }else{
-                    window.location.href = `/page?path=${page_path}`;
-                }
+                // debugger;
+                // var page_path = $('#page_path').val();
+                // if(page_path === '/main'){
+                //     window.location.href = '/main'
+                // }else{
+                //     window.location.href = `/page?path=${page_path}`;
+                // }
             }).catch(error => {
                 console.error(error);
                 $('#buy-sell-message-area').html(error)
@@ -176,3 +177,4 @@ $(document).ready(function() {
         order_cash(stk_company, data);
     })        
 });
+// TODO 주기적으로 router를 호출하여 세션을 체크하고, 만료되면 로그아웃 처리

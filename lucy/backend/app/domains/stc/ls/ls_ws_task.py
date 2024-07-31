@@ -146,9 +146,13 @@ class LSTask(StockTask):
         senddata = await self.subscribe(LS_WSReq.주식주문체결)
         await asyncio.sleep(0.5)
 
+    async def make_message(self, message:str):
+        now_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        return  f"{now_time}|{self.user_id}|{self.acctno}|{self.abbr}|{message}"
+
     async def broadcast(self, message: str):
-        #msg = await self.make_message(message)
-        msg = message
+        msg = await self.make_message(message)
+        # msg = message
         logger.debug(msg)
         await self.client_ws_manager.send_to_client(msg, self.user_id)
 

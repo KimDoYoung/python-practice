@@ -45,6 +45,9 @@
                 <button id="clearButton" class="clear-button" title="DEL - 지우기">&times;</button>
             </div>
             <div class="col-auto">
+                <select name="under-writer" id="under-writer" class="form-select"></select>
+            </div>
+            <div class="col-auto">
                 <a href="/page?path=ipo/history" class="btn btn-warning" title="IPO 과거데이터">IPO 과거데이터</a>
             </div>
         </div>
@@ -178,19 +181,50 @@
         // 원하는 형식으로 문자열을 구성
         return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     }
-    function drawCards(filterKey){
+    function drawCards(filterKey, filterUnderwriter) {
         let list = gList;
+
         if (filterKey) {
+            $('#under-writer').val('')
             list = gList.filter(item => {
                 return item.company.includes(filterKey);
             });
+        }else if (filterUnderwriter) {
+            $('#searchInput').val('')
+            list = gList.filter(item => {
+                return item.offering.주간사_리스트.some(underwriter => {
+                    return underwriter.주간사 === filterUnderwriter;
+                });
+            });
         }
+
         var source = $('#ipo-card').html();
         var template = Handlebars.compile(source);
 
         var html = template({list: list});
 
         $('#table-area').html(html);
+    }
+    function fill_Underwriter() {
+        const list = gList;
+        const uniqueUnderwriters = new Set();
+
+        list.forEach(item => {
+            item.offering.주간사_리스트.forEach(underwriter => {
+                uniqueUnderwriters.add(underwriter.주간사);
+            });
+        }); 
+        const underwriterArray = Array.from(uniqueUnderwriters);
+        underwriterArray.sort();
+
+        const $underwriterSelect = $('#under-writer');
+        const $option = $('<option>').val('').text('전체');
+        $underwriterSelect.append($option);
+        underwriterArray.forEach(underwriter => {
+            const $option = $('<option>').val(underwriter).text(underwriter);
+            $underwriterSelect.append($option);
+        });        
+
     }
     $( document ).ready(function() {
         console.log('ipo list.... ');
@@ -217,14 +251,9 @@
 
                 console.log(newList);
                 gList = newList;
+                fill_Underwriter();
                 drawCards();
                 $('#searchInput').focus();
-                // var source = $('#ipo-card').html();
-                // var template = Handlebars.compile(source);
-
-                // var html = template({list: newList});
-
-                // $('#table-area').html(html);
             });
             getFetch('/api/v1/config/38-scrapping-time').then(data => {
                 console.log(data);
@@ -232,6 +261,10 @@
                 $('#38-scrapping-time').text(scrappingTime);
             });
         }
+        $('#under-writer').on('change', function() {
+            const underwriter = $(this).val();
+            drawCards(null, underwriter);
+        });
         $('#searchInput').on('input', function() {
             const query = $(this).val().toLowerCase();
             drawCards(query);

@@ -12,9 +12,10 @@
 {% block style %}{% endblock %}  
 </head>
 <body>
-    <!-- TODO base 를 두고 base_main으로 가면 어떨까? -->
+<!-- TODO base 를 두고 base_main으로 가면 어떨까? -->
 {% include "common/nav.html" %}    
 <div id="main-area" class="container mt-4">
+    <div id="alert-container"></div> <!-- 웹소켓으로 받은 체결정보를 여기서 보여준다.-->
     {% block content %}{% endblock %}
 </div>
 
@@ -36,6 +37,7 @@
 <script src="/public/js/fetch-util.js"></script>
 <script src="/public/js/handlebar-helpers.js"></script>
 <script src="/public/js/lucy_main.js"></script>
+<script src="/public/js/lucy_websocket.js"></script>
 {% block script %}{% endblock %}
 
 </body>

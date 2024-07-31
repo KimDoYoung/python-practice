@@ -24,6 +24,7 @@ logger = get_logger(__name__)
 class MyStockService:
 
     async def create(self, data: MyStockDto) -> MyStock:
+        ''' MyStock Collection에 document를 추가한다.'''
         mystock = MyStock(**data.model_dump())
         await mystock.create()
         return mystock
@@ -38,6 +39,7 @@ class MyStockService:
             raise e
 
     async def delete_by_id(self, id: str) -> bool:
+        ''' id에 해당하는 document를 삭제한다.'''
         if not ObjectId.is_valid(id):   
             raise HTTPException(status_code=400, detail="Invalid ID format")
         mystock = await MyStock.get(id)        
@@ -48,6 +50,7 @@ class MyStockService:
             return False
 
     async def delete(self, stk_code: str) -> bool:
+        ''' stk_code에 해당하는 document를 삭제한다.'''
         mystock = await MyStock.find_one(MyStock.stk_code == stk_code)
         if mystock:
             await mystock.delete()
@@ -56,21 +59,23 @@ class MyStockService:
             return False
     
     async def get_all_by_type(self, stk_type:str) -> List[MyStock]:
-        # mystocks = await MyStock.find(MyStock.stk_types.in_(['단타'])).to_list()
-        # return mystocks
+        ''' stk_type에 해당하는 모든 리스트'''
         mystocks = await MyStock.find({"stk_types": {"$in": [stk_type]}}).to_list()
         return mystocks        
     
     async def delete_all_by_type(self, stk_type:str):
+        ''' stk_type에 해당하는 모든 document를 삭제한다.'''
         mystocks = await MyStock.find({"stk_types": {"$in": [stk_type]}}).to_list()
         for mystock in mystocks:
             await mystock.delete()
         
     async def get_1(self, stk_code:str) -> MyStock:
+        ''' stk_code에 해당하는 document를 가져온다.'''
         mystock = await MyStock.find_one(MyStock.stk_code == stk_code)
         return mystock
         
     async def upsert(self, mystock_dto: MyStockDto):
+        ''' MyStock Collection에 document를 추가하거나 업데이트한다. 업데이트는 stk_code를 기준으로 한다'''
         stk_code = mystock_dto.stk_code
         stk_types = mystock_dto.stk_types
         stk_name = mystock_dto.stk_name

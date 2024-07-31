@@ -33,8 +33,14 @@ class ClientWsManager:
         if user_id not in self.active_connections:
             self.active_connections[user_id] = []
             logger.debug(f"새 사용자 연결 생성: {user_id}")
-        self.active_connections[user_id].append(websocket)
-        msg =f"사용자 {user_id}의 WebSocket 연결 추가: 현재 연결 수 {len(self.active_connections[user_id])}"
+        
+        # WebSocket이 이미 리스트에 있는지 확인
+        if websocket not in self.active_connections[user_id]:
+            self.active_connections[user_id].append(websocket)
+            msg = f"사용자 {user_id}의 WebSocket 연결 추가: 현재 연결 수 {len(self.active_connections[user_id])}"
+        else:
+            msg = f"사용자 {user_id}의 WebSocket 연결은 이미 존재함: 현재 연결 수 {len(self.active_connections[user_id])}"
+        
         await self.send_to_client(msg, user_id)
         return msg
 

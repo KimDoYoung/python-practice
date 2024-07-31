@@ -42,7 +42,7 @@ async def add_mystock(mystock_dto:MyStockDto, mystock_service :MyStockService=De
 @router.get("/danta", response_model=dict)
 async def danta(mystock_service :MyStockService=Depends(get_mystock_service)):
     ''' 단타 머신에서 쓰는 service '''
-    mystock_dto = MyStockDto(stk_code="005930", stk_name="삼성전자")
+    mystock_dto = MyStockDto(stk_code="005931", stk_name="AAA")
     mystock_dto.buy_ordno = "1234"
     mystock_dto.buy_qty = 10
     mystock_dto.buy_price = 1000
@@ -57,6 +57,6 @@ async def danta(mystock_service :MyStockService=Depends(get_mystock_service)):
     mystock_dto.sell_price = 2000
     mystock_dto.sell_time = "2021-07-01 10:30:00"
     await mystock_service.upsert(mystock_dto)
-    #mystock_service.delete_all_by_type('단타')
+    await mystock_service.delete_all_by_type('단타')
     return {"message": "Danta success"}
     
