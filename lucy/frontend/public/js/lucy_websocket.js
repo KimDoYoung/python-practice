@@ -73,7 +73,7 @@ window.ws.onmessage = function(event) {
 };
 
 function formatTime(timeStr) {
-    if (timeStr.length !== 6) {
+    if (timeStr.length < 6) {
         throw new Error("Invalid time string length");
     }
     const hours = timeStr.substring(0, 2);
@@ -87,7 +87,7 @@ function formatWon(numberStr){
     const number = parseInt(numberStr, 10);
     return number.toLocaleString();
 }
-function buySellType(s){
+function buySellTypeKis(s){
     if(s == '01'){
         return '매도체결';
     }else if(s == '02'){
@@ -96,17 +96,28 @@ function buySellType(s){
         return "";
     }
 }
-function displayLSInfo(data) {
+function buySellTypeLs(s){
+    if(s == '1'){
+        return '매도체결';
+    }else if(s == '2'){
+        return '매수체결';
+    }else{
+        return "";
+    }
+}
+function displayLSInfo(response) {
+    var data = response.body;
     var $alertContainer = $('#alert-container');
     
-    let html = '<table class="mx-1 px-2"><tr>';
-    html += '<th>체결시간</th><td>' + formatTime(data.STCK_CNTG_HOUR) + '</td>';
-    html += '<th>주문번호</th><td>' + parseInt(data.ODER_NO, 10) + '</td>';
-    html += '<th>계좌번호</th><td>' + data.ACNT_NO + '</td>';
-    html += '<th>주문구분</th><td class="text-danger">' + buySellType(data.SELN_BYOV_CLS) + '</td>';
-    html += '<th>종목코드</th><td>' + data.STCK_SHRN_ISCD + '</td>';
-    html += '<th>체결수량</th><td>' + formatWon(data.CNTG_QTY) + '</td>';
-    html += '<th>체결가</th><td>' + formatWon(data.CNTG_UNPR) + '</td>';
+    let html = '<table class="table"><tr>';
+    html += '<th>증권사</th><td>LS증권</td>';
+    html += '<th>체결시간</th><td>' + formatTime(data.exectime) + '</td>';
+    html += '<th>주문번호</th><td>' + data.ordno + '</td>';
+    html += '<th>계좌번호</th><td>' + data.accno + '</td>';
+    html += '<th>주문구분</th><td class="text-danger">' + buySellTypeLs(data.bnstp) + '</td>';
+    html += '<th>종목코드</th><td>' + `${data.Isunm}(${data.shtnIsuno.substring(1)})` + '</td>';
+    html += '<th>체결수량</th><td>' + formatWon(data.execqty) + '</td>';
+    html += '<th>체결가</th><td>' + formatWon(data.mnyexecamt) + '</td>';
     html += '</tr></table>'
     var $alert = $('<div class="alert alert-warning alert-dismissible fade show" role="alert">')
         .html(html)
@@ -116,11 +127,12 @@ function displayLSInfo(data) {
 function displayKISInfo(data) {
     var $alertContainer = $('#alert-container');
     
-    let html = '<table class="mx-1 px-2"><tr>';
+    let html = '<table class="table"><tr>';
+    html += '<th>증권사</th><td>한국투자증권(KIS)</td>';
     html += '<th>체결시간</th><td>' + formatTime(data.STCK_CNTG_HOUR) + '</td>';
     html += '<th>주문번호</th><td>' + parseInt(data.ODER_NO, 10) + '</td>';
     html += '<th>계좌번호</th><td>' + data.ACNT_NO + '</td>';
-    html += '<th>주문구분</th><td class="text-danger">' + buySellType(data.SELN_BYOV_CLS) + '</td>';
+    html += '<th>주문구분</th><td class="text-danger">' + buySellTypeKis(data.SELN_BYOV_CLS) + '</td>';
     html += '<th>종목코드</th><td>' + data.STCK_SHRN_ISCD + '</td>';
     html += '<th>체결수량</th><td>' + formatWon(data.CNTG_QTY) + '</td>';
     html += '<th>체결가</th><td>' + formatWon(data.CNTG_UNPR) + '</td>';
