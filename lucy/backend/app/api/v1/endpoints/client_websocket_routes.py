@@ -47,22 +47,25 @@ async def websocket_endpoint(websocket: WebSocket):
     user_id = config.DEFAULT_USER_ID
     user = await user_service.get_1(user_id)
     
+    #KIS  WebSocket 연결
     account = user.find_account_by_abbr('KIS')
     kis_acctno = account.account_no
     client_ws_manager = ClientWsManager()
     stock_ws_manager = StockWsManager(client_ws_manager)
-    if not stock_ws_manager.is_connected(user_id, kis_acctno):   
-        result = await stock_ws_manager.connect(user_id, kis_acctno)
-        client_ws_manager.broadcast(str(result))
-        logger.info(f"User {user_id} KIS 웹소켓 연결됨")
+    # if not stock_ws_manager.is_connected(user_id, kis_acctno):   
+    result = await stock_ws_manager.connect(user_id, kis_acctno)
+    client_ws_manager.broadcast(str(result))
+    logger.info(f"User {user_id} KIS 웹소켓 연결됨")
 
+    #LS  WebSocket 연결
     account = user.find_account_by_abbr('LS')
     ls_acctno = account.account_no
     client_ws_manager = ClientWsManager()
     stock_ws_manager = StockWsManager(client_ws_manager)
-    if not stock_ws_manager.is_connected(user_id, ls_acctno):
-        result = await stock_ws_manager.connect(user_id, ls_acctno)
-        client_ws_manager.broadcast(str(result))
+    # if not stock_ws_manager.is_connected(user_id, ls_acctno):
+    result = await stock_ws_manager.connect(user_id, ls_acctno)
+    client_ws_manager.broadcast(str(result))
+    logger.info(f"User {user_id} LS 웹소켓 연결됨")
 
     try:
         while True:
