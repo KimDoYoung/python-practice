@@ -18,7 +18,8 @@ class IpoHistoryService:
         return history
     
     async def get_all(self):
-        return await IpoHistory.all().to_list()
+        list =  await IpoHistory.all().to_list()
+        return list
     
     async def get_1(self, ipo_id: str):
         object_id = PydanticObjectId(ipo_id)

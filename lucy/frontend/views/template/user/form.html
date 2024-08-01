@@ -6,7 +6,7 @@
 
 {% block content %}
 <section id="list" class="container">
-    <h2>사용자정보</h2>
+    <h2 class="fw-bold">사용자정보</h2>
     <form id="user-form">
         <div class="row">
             <div class="col-md-4">
@@ -38,7 +38,6 @@
         </div> 
         <div id="error-area" class="text-danger p-3 mt-3"></div>       
         <button type="submit" class="btn btn-primary">Submit</button>
-        <button type="button" class="btn btn-secondary" id="add-attribute">Add Key&Value</button>
     </form>    
 </section>
 {% raw %} 
@@ -61,14 +60,27 @@
     {{/each}}
 </script>
 <script id="accounts-template" type="text/x-handlebars-template">
-    <h4>키-값</h4>
-    {{#each list}}
-    
-    <div class="mb-1">
-        <label for="{{key}}" class="form-label fw-bold">{{key}}<label>
-        <input type="text" class="form-control ms-2" data-key="{{key}}" id="{{key}}" name="{{key}}" value="{{value}}" required>
+    <div id="account-{{abbr}}" data-abbr="{{abbr}}" class="account-div">
+        <h4>{{abbr}}</h4>
+        <div class="mb-1">
+            <label for="{{abbr}}_account_no" class="form-label fw-bold">Account No<label>
+            <input type="text" class="form-control ms-2"  id="{{abbr}}_account_no"  value="{{account_no}}" required>
+        </div>
+        <div class="mb-1">
+            <label for="{{abbr}}_account_pw" class="form-label fw-bold">Account Pw<label>
+            <input type="text" class="form-control ms-2"  id="{{abbr}}_account_pw"  value="{{account_pw}}" required>
+        </div>
+        <div class="mb-1">
+            <label for="{{abbr}}_hts_id" class="form-label fw-bold">HTS Id<label>
+            <input type="text" class="form-control ms-2"  id="{{abbr}}_hts_id"  value="{{hts_id}}" required>
+        </div>
+        {{#each key_values}}
+        <div class="mb-1">
+            <label for="{{key}}" class="form-label fw-bold">{{key}}<label>
+            <input type="text" class="form-control ms-2 account-key-value" data-key="{{key}}" id="{{key}}" name="{{key}}" value="{{value}}" required>
+        </div>
+        {{/each}}
     </div>
-    {{/each}}
 </script>
 {% endraw %}
 {% endblock %}
@@ -89,8 +101,7 @@
         console.log('ready.... ');
         const user_id = $('#logout').data('user-id');
         const url = '/api/v1/user/'+user_id;
-
-        const data =  getFetch(url).then(function(data) {
+        getFetch(url).then(data => {
             $('#user_id').val(data.user_id);
             $('#user_name').val(data.user_name);
             $('#email').val(data.email);
@@ -100,6 +111,20 @@
             const template = Handlebars.compile(source);
             const html = template({list: data.key_values});
             $('#additional-attributes').html(html);
+            debugger;
+            const accounts = data.accounts;
+            const accounts_source = $('#accounts-template').html();
+            const accounts_template = Handlebars.compile(accounts_source);
+            let accounts_html = '';
+            for (let i = 0; i < accounts.length; i++) {
+                const account = accounts[i];
+                const html = accounts_template(account);
+                accounts_html += html;
+            }
+            $('#accounts').html(accounts_html);
+
+        }).catch(error=> {
+            console.error(error.message); 
         });
     
         $('#user-form').submit(function(e) {
@@ -114,45 +139,38 @@
                 const value = $(this).val();
                 key_values.push({key: key, value: value});
             });
+            let accounts = [];
+            $('#accounts div.account-div').each(function() {
+                const abbr = $(this).data('abbr');
+                const account_no = $('#'+abbr+'_account_no').val();
+                const account_pw = $('#'+abbr+'_account_pw').val();
+                const hts_id = $('#'+abbr+'_hts_id').val();
+                const key_values = [];
+                $(this).find('input.account-key-value').each(function() {
+                    const key = $(this).data('key');
+                    const value = $(this).val();
+                    key_values.push({key: key, value: value});
+                });
+                accounts.push({abbr: abbr, account_no: account_no, account_pw: account_pw, hts_id: hts_id, key_values: key_values});
+            });
             const data = {
                 user_id: user_id,
                 user_name: user_name,
                 email: email,
                 password: password,
-                key_values: key_values
+                key_values: key_values,
+                accounts: accounts
             };
+            debugger;
             console.log(data);
             const url = '/api/v1/user/'+user_id;
-            fetch(url, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            }).then(function(response) {
-                if (response.ok) {
-                    alert('수정되었습니다.');
-                    window.location.href = 'page?path=user/form';
-                }else{
-                    return response.json().then(function(errorData) {
-                        $('#error-area').html('수정에 실패했습니다. 다시 시도해 주세요. 오류: ' + errorData.detail);
-                        //throw new Error('HTTP error! status: ' + response.status);
-                    });                    
-                }
-            }).catch(function(error) {
-                console.error('Error:', error);
-                $('#error-area').html('수정에 실패했습니다. 다시 시도해 주세요.' + error);
+            putFetch(url, data).then(response => {
+                alert('수정되었습니다.');
+                window.location.href = 'page?path=user/form';
+            }).catch(error=> {
+                console.error('Error:', error.message);
+                $('#error-area').html('수정에 실패했습니다. 다시 시도해 주세요.' + error.message);
             });
-        });
-        $('#add-attribute').click(function() {
-            const source = $('#keyvalue-list-template').html();
-            const template = Handlebars.compile(source);
-            list = [{
-                key: '',
-                value: ''
-            }]
-            const html = template({list: data.key_values});
-            $('#additional-attributes').append(html);
         });
 });
     </script>	    

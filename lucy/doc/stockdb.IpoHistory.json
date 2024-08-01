@@ -177,4 +177,34 @@
   "Notes": "",
   "Revenue": 10,
   "StkCode": "373110"
+},
+{
+  "_id": {
+    "$oid": "66a73f4e6b64a5dcfe262855"
+  },
+  "Company": "산일전기",
+  "FinalOfferingPrice": 35000,
+  "InstitutionalSubscriptionRatio": 413.86,
+  "LockupAgreement": 42.37,
+  "MaxValue": 61300,
+  "MultipleVariable": 1.7514285714285713,
+  "NetIncome": 390.51,
+  "Notes": "",
+  "Revenue": 2145.38,
+  "StkCode": "062040"
+},
+{
+  "_id": {
+    "$oid": "66a9ec66f19376ad8a4737e3"
+  },
+  "Company": "피앤에스미캐닉스",
+  "FinalOfferingPrice": 22000,
+  "InstitutionalSubscriptionRatio": 986.08,
+  "LockupAgreement": 5.6,
+  "MaxValue": 32750,
+  "MultipleVariable": 1.4886363636363635,
+  "NetIncome": 15.03,
+  "Notes": "",
+  "Revenue": 52.15,
+  "StkCode": "460940"
 }]
