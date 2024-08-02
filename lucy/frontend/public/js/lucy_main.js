@@ -104,6 +104,8 @@ $(document).ready(function() {
                 console.log(data);
                 if(data.msg1){
                     alert(data.msg1);
+                }else if(data.rsp_msg){
+                    alert(data.rsp_msg);
                 }
                 // debugger;
                 // var page_path = $('#page_path').val();

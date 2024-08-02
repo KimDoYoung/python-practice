@@ -20,6 +20,9 @@ from backend.app.core.logger import get_logger
 from backend.app.domains.system.danta_service import DantaService
 from backend.app.domains.system.logs_model import Logs
 from backend.app.domains.user.user_model import User
+from backend.app.core.dependency import get_user_service
+from backend.app.managers.client_ws_manager import ClientWsManager
+from backend.app.managers.stock_ws_manager import StockWsManager
 
 logger = get_logger(__name__)
 # 단타 머신 Task
@@ -52,19 +55,62 @@ def danta_machine_status() -> str:
         return "stopped"
     else:
         return "running"
+    
 async def danta_machine_main():
+    
     one_min = 60
     one_hour = 60 * one_min
     service = DantaService(config.DEFAULT_USER_ID, config.DEFAULT_STOCK_ABBR)
     await service.initialize()
     
     danta_stocks = [] # 단타 매매할 주식 리스트
+    user_service = get_user_service()
+    user = user_service.get_1( config.DEFAULT_USER_ID)
+    account = user.find_account_by_abbr(config.DEFAULT_STOCK_ABBR)
+    acctno = account.account_no
+
+    client_ws_manager = ClientWsManager()
+    client_ws_manager.connect(websocket, acctno)
+    
+    stock_ws_manager = StockWsManager(client_ws_manager)
+    stock_ws_manager.connect(config.DEFAULT_USER_ID, acctno)
     
     while True:
         # 현재시간을 구하면서 시작
         now = datetime.now()
         logger.debug(f"현재시간: {now}")
-        await asyncio.sleep(one_min) 
+
+        # 변수들 셋팅
+        stock_choice_done = len(danta_stocks) > 0 # 주식 선택이 완료되었는지 여부
+        market_open_day = await service.is_market_open_day(now) # 주식 시장이 열려있는 날인지 여부
+        market_open_time = False # 주식 시장이 열려있는 시간인지 여부
+        if market_open_day and ( time(9, 0) <= now.time() <= time(15, 30)):
+            market_open_time = True
+        market_close_day = not market_open_day
+        market_close_time = not market_open_time
+        
+        if market_close_day:
+            await asyncio.sleep(one_hour * 6) 
+            continue
+        
+        if market_close_time:
+            await asyncio.sleep(one_min)
+            continue
+        
+        # 단타매매할 주식을 고른다.
+        if not stock_choice_done and market_open_time: 
+            try:
+                danta_stocks = await service.choice_danta_stocks() 
+                total_money = await service.get_available_money()
+                for stock in danta_stocks:
+                    money = int(total_money / len(danta_stocks))
+                    qty, current_cost = await service.get_available_qty_cost(stock.stk_code, money)
+                    await service.buy(stock, cost=current_cost, qty=qty)
+                stock_choice_done = True
+                logger.debug("오늘의 매수 주식을 선별해서 매수하였습니다.")
+            except Exception as e:
+                logger.error(f"선별 및 매수 중 오류: {e}")
+        
         
 #TODO : Websocket을 어떻게 붙일 수 있을까?
 #TODO : 매수/매도를 해 볼것

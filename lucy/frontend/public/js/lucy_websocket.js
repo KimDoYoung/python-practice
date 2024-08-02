@@ -109,7 +109,7 @@ function displayLSInfo(response) {
     var data = response.body;
     var $alertContainer = $('#alert-container');
     
-    let html = '<table class="table"><tr>';
+    let html = '<table class="table table-sm"><tr>';
     html += '<th>증권사</th><td>LS증권</td>';
     html += '<th>체결시간</th><td>' + formatTime(data.exectime) + '</td>';
     html += '<th>주문번호</th><td>' + data.ordno + '</td>';
@@ -127,7 +127,7 @@ function displayLSInfo(response) {
 function displayKISInfo(data) {
     var $alertContainer = $('#alert-container');
     
-    let html = '<table class="table"><tr>';
+    let html = '<table class="table table-sm"><tr>';
     html += '<th>증권사</th><td>한국투자증권(KIS)</td>';
     html += '<th>체결시간</th><td>' + formatTime(data.STCK_CNTG_HOUR) + '</td>';
     html += '<th>주문번호</th><td>' + parseInt(data.ODER_NO, 10) + '</td>';

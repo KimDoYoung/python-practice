@@ -61,8 +61,8 @@ class CSPAT00601OUTBLOCK2(StockApiBaseModel):
 class CSPAT00601_Response(StockApiBaseModel):
 	rsp_cd: str
 	rsp_msg: str
-	CSPAT00601OutBlock1: CSPAT00601OUTBLOCK1
-	CSPAT00601OutBlock2: CSPAT00601OUTBLOCK2
+	CSPAT00601OutBlock1: Optional[CSPAT00601OUTBLOCK1]=None
+	CSPAT00601OutBlock2: Optional[CSPAT00601OUTBLOCK2]=None
 
 
 class CSPAT00601InBlock1(StockApiBaseModel):
