@@ -57,7 +57,7 @@ def danta_machine_status() -> str:
     else:
         return "running"
     
-async def danta_machine_main():
+async def danta_machine_main(event_queue: asyncio.Queue):
     
     one_min = 60
     one_hour = 60 * one_min
@@ -70,7 +70,9 @@ async def danta_machine_main():
     account =  user.find_account_by_abbr(config.DEFAULT_STOCK_ABBR)
     acctno = account.account_no
 
-    client_ws_manager = DantaWsManager()
+    client_ws_manager = DantaWsManager(event_queue)
+    # client_ws_manager.setEventQueue(event_queue)
+    
     client_ws_manager.connect(None, config.DEFAULT_USER_ID)
     kis_task = KISTask(config.DEFAULT_USER_ID, acctno, client_ws_manager)
     await kis_task.initialize()
@@ -98,7 +100,7 @@ async def danta_machine_main():
             await asyncio.sleep(one_min) 
             continue
         
-        #1. 오전에 단타매매할 주식을  MyStocks에서 가져온다
+        #1. 오전에 단타매매할 주식을  MyStocks에서 가져온 후 호가등록을 한다
         if  not danta_stock_exists and market_open_time:
             
             today_danta_stocks = await service.choice_danta_stocks()
@@ -106,6 +108,20 @@ async def danta_machine_main():
             for stock in today_danta_stocks:
                 await kis_task.subscribe(KIS_WSReq.BID_ASK, stock.stk_code)
                 
+        # 이벤트 큐에서 메시지 읽기
+        try:
+            event = await event_queue.get()
+            # 이벤트 처리 로직
+            if event.get('type') == 'SELL_SIGNAL':
+                stock_to_sell = event.get('data')
+                stk_code = stock_to_sell['stk_code']
+                cost = stock_to_sell['cost']
+                logger.debug(f"매도할 주식: {stk_code} / 매도가: {cost}")
+                # await service.sell(stock_to_sell, sell_price=cost)
+                # today_danta_stocks = [stock for stock in today_danta_stocks if stock['stk_code'] != stock_to_sell['stk_code']]
+        except asyncio.QueueEmpty:
+            logger.debug('이벤트 큐가 비어있음')
+            pass        
         
         await asyncio.sleep(one_min)
         
@@ -220,9 +236,10 @@ async def db_init():
         
 
 async def main():
+    event_queue = asyncio.Queue()
     try:
         await db_init()
-        await danta_machine_main()
+        await danta_machine_main(event_queue)
     except Exception as e:
         logger.error(f"An error occurred: {e}")
     finally:

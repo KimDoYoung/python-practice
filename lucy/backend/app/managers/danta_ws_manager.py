@@ -20,17 +20,26 @@ logger = get_logger(__name__)
 class DantaWsManager(WsManager):
     _instance = None
 
+    # def __new__(cls, *args, **kwargs):
+    #     if cls._instance is None:
+    #         cls._instance = super(DantaWsManager, cls).__new__(cls, *args, **kwargs)
+    #     return cls._instance
+    
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
-            cls._instance = super(DantaWsManager, cls).__new__(cls, *args, **kwargs)
-        return cls._instance
+            cls._instance = super(DantaWsManager, cls).__new__(cls)
+        return cls._instance    
 
-    def __init__(self):
+    def __init__(self, event_queue=None):
         if not hasattr(self, 'initialized'):
             self.active_connections: Dict[str, List[WebSocket]] = {}
             self.custom_data: Dict[str, Dict] = {}
+            self.event_queue = event_queue
             logger.debug("DantaWsManager 초기화 완료")
             self.initialized = True
+
+    def setEventQueue(self, event_queue):
+            self.event_queue = event_queue
 
     async def connect(self, websocket: WebSocket, user_id: str):
         # await websocket.accept()
@@ -68,6 +77,19 @@ class DantaWsManager(WsManager):
         logger.debug("---------------------------------------------------------")
         logger.debug(f"단타 웹소켓 데이터 : {message}")
         logger.debug("---------------------------------------------------------")
+        if self.event_queue:
+            data = {
+                "type" : "SELL_SIGNAL",
+                "data" : {
+                    "stk_code" : "005930",
+                    "stk_name" : "삼성전자",
+                    "cost" : 100000,
+                }
+            }
+            self.event_queue.put_nowait(data)
+            logger.debug("★★★★★★★★★★★★")
+            logger.debug(f"이벤트 큐에 데이터 추가 : {data}")
+            logger.debug("★★★★★★★★★★★★")
         # if user_id in self.active_connections:
         #     for websocket in self.active_connections[user_id][:]:
         #         try:
