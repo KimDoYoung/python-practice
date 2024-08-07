@@ -16,15 +16,15 @@ import json
 
 import websockets
 from backend.app.domains.stc.stock_task import StockTask
-from backend.app.managers.client_ws_manager import ClientWsManager
 from backend.app.core.logger import get_logger
 from backend.app.domains.stc.kis.model.kis_websocket_model import KisWsResponse
+from backend.app.managers.ws_manager import WsManager
 from backend.app.utils.kis_ws_util import KIS_WSReq, get_ws_approval_key, is_real_data, kis_ws_real_data_parsing, new_kis_ws_request
 
 logger = get_logger(__name__)
 
 class KISTask(StockTask):
-    def __init__(self, user_id: str, acctno: str, client_ws_manager: ClientWsManager):
+    def __init__(self, user_id: str, acctno: str, client_ws_manager: WsManager):
         super().__init__(user_id, acctno, client_ws_manager, "ws://ops.koreainvestment.com:21000", "KIS")
 
     async def initialize(self) -> dict:
@@ -79,25 +79,46 @@ class KISTask(StockTask):
         
         return senddata
 
-    async def subscribe(self, tr_id, stock_code):
+    async def subscribe_data(self, tr_id, stock_code):
 
         if tr_id in [KIS_WSReq.BID_ASK, KIS_WSReq.CONTRACT]:
             return await self.create_kis_ws_request(tr_id, '1', stock_code)
         elif tr_id == KIS_WSReq.NOTICE:
             return await self.create_kis_ws_request(tr_id, '1', self.HTS_USER_ID)
 
-    async def unsubscribe(self, tr_id, stock_code):
+    async def unsubscribe_data(self, tr_id, stock_code):
 
         if tr_id in [KIS_WSReq.BID_ASK, KIS_WSReq.CONTRACT]:
             return await self.create_kis_ws_request(tr_id, '2', stock_code)
         elif tr_id == KIS_WSReq.NOTICE:
             return await self.create_kis_ws_request(tr_id, '2', self.HTS_USER_ID)
         
+    async def subscribe(self, tr_id, stock_code):
+        
+        websocket = self.stk_websocket
+        try:
+            data = await self.subscribe_data(tr_id, stock_code)
+            await websocket.send(data)
+            logger.debug(f"{self.user_id}/{self.acctno}/{self.abbr} {tr_id} 등록 senddata: [{data}]")
+        except Exception as e:
+            logger.error(f"subscription 중 오류 발생: {e}")
+        await asyncio.sleep(0.5)
+        
+    async def unsubscribe(self, tr_id, stock_code):
+        websocket = self.stk_websocket
+        try:
+            senddata = await self.unsubscribe_data(tr_id=tr_id, stock_code=stock_code)
+            await websocket.send(senddata)
+            logger.debug(f"{self.user_id}/{self.acctno}/{self.abbr} {tr_id} 등록 senddata: [{data}]")
+        except Exception as e:
+            logger.error(f"unsubscription 중 오류 발생: {e}")
+        await asyncio.sleep(0.5)    
+        
     async def on_open(self):
 
         #고객체결발생통보 등록
         websocket = self.stk_websocket
-        senddata = await self.subscribe(KIS_WSReq.NOTICE, None)
+        senddata = await self.subscribe_data(KIS_WSReq.NOTICE, None)
         
         await websocket.send(senddata)
         logger.debug(f"{self.user_id}/{self.acctno}/{self.abbr} 체결통보 등록 senddata: [{senddata}]")

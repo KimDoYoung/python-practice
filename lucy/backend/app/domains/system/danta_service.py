@@ -33,10 +33,14 @@ class DantaService:
 
     async def initialize(self):
         self.user = await self.user_service.get_1(self.user_id)
-        self.defaultApi = await StockApiManager().stock_api(self.stk_abbr)
         self.lsapi = await StockApiManager().stock_api('LS')
         self.kisapi = await StockApiManager().stock_api('KIS')
-        
+        if self.stk_abbr == 'LS':
+            self.defaultApi = self.lsapi
+        elif self.stk_abbr == 'KIS':
+            self.defaultApi = self.kisapi
+        await self.log.danta_info(f'{self.user_id}의 단타서비스 초기화 완료')
+                
     async def is_market_open_day(self, now: datetime):
         ''' 오늘이 개장일이면 True 아니면 False '''
         now_ymd = now.strftime("%Y%m%d")

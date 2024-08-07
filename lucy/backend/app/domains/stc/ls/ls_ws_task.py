@@ -168,7 +168,7 @@ class LSTask(StockTask):
                 while True:
                     try:
                         received_text = await websocket.recv()
-                        logger.info("웹소켓(KIS로부터 받은데이터) : [" + received_text + "]")
+                        logger.info("웹소켓(KIS로부터 받은데이터)  : [" + received_text + "]")
 
                         real_model = ls_ws_response_factory(received_text)
                         real_data_dict = real_model.data_for_client_ws()
