@@ -78,6 +78,7 @@ async def danta_machine_main(event_queue: asyncio.Queue):
     await kis_task.initialize()
     # kis_task.run()을 별도의 비동기 작업으로 실행
     asyncio.create_task(kis_task.run())
+    
     while True:
         # 현재시간을 구하면서 시작
         now = datetime.now()
@@ -114,11 +115,10 @@ async def danta_machine_main(event_queue: asyncio.Queue):
             # 이벤트 처리 로직
             if event.get('type') == 'SELL_SIGNAL':
                 stock_to_sell = event.get('data')
-                stk_code = stock_to_sell['stk_code']
-                cost = stock_to_sell['cost']
-                logger.debug(f"매도할 주식: {stk_code} / 매도가: {cost}")
-                # await service.sell(stock_to_sell, sell_price=cost)
-                # today_danta_stocks = [stock for stock in today_danta_stocks if stock['stk_code'] != stock_to_sell['stk_code']]
+                stk_codes = stock_to_sell['stk_codes']
+                for stk_code in stk_codes:
+                    danta_stock = today_danta_stocks.find(lambda x: x.stk_code == stk_code)
+                    await service.sell(danta_stock, sell_price=0)
         except asyncio.QueueEmpty:
             logger.debug('이벤트 큐가 비어있음')
             pass        

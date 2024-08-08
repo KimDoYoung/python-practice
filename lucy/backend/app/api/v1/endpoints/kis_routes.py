@@ -100,7 +100,7 @@ async def order_cash(request:Request, order_cash: OrderCash_Request, user_servic
 async def order_cancel(request:Request, order_cancel: KisOrderCancel_Request, user_service :UserService=Depends(get_user_service)):
     '''주식매수, 주식매도 취소'''
     kis_api = await StockApiManager().kis_api()
-    cancel_response =  await kis_api.order_cancel(order_cancel)
+    cancel_response =  await kis_api.order_cancel(order_cancel.orgn_odno)
     logger.debug(f"주식매수,매도 취소 : {cancel_response.to_str()}")
     return cancel_response
 

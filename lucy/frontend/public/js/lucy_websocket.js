@@ -20,7 +20,7 @@ class StkRealDataParser {
             try {
                 const data = JSON.parse(jsonPart);
                 
-                if (type === 'KIS' && data.ODER_KIND === '00') {
+                if (type === 'KIS' && data.CNTG_YN === '2') {
                     this.type = 'KIS-체결정보';
                     this.parsedData = data;
                 } else if (type === 'LS' && data.header.tr_cd === 'SC1') {

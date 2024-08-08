@@ -307,7 +307,7 @@ class KisStockApi(StockApi):
             "appsecret": self.APP_SECRET,
             "tr_id": "TTTC0803U" #[실전투자] TTTC0803U : 주식 정정 취소 주문 [모의투자] VTTC0803U : 주식 정정 취소 주문",                        
         }        
-        json_response = await self.send_request('주식 주문취소', 'POST', url, headers, data=json.dumps(body))
+        json_response = await self.send_request('주식 주문취소', 'POST', url, headers=headers, data=json.dumps(body))
         try:
             return KisOrderCancel_Response(**json_response)
         except ValidationError as e:

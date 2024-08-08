@@ -45,7 +45,7 @@
             <tr class="table-primary">
                 <th>종목명</th>
                 <th class="text-center">종목번호</th>
-                <th class="text-end">매도가능수량</th>
+                <th class="text-end">보유수량</th>
                 <th class="text-end">평균단가</th>
                 <th class="text-end">매입금액</th>
                 <th class="text-end">평가금액</th>
@@ -115,7 +115,7 @@
                 <td class="text-end">{{displayWon cfmqty}}</td>
                 <td>
                     {{#test 'status =="접수"'}}
-                    <button class="btn btn-sm btn-secondary btnOrderCancel">전량취소</button>
+                    <button class="btn btn-sm btn-secondary btnOrderCancel" data-org-ord-no="{{ordno}}" data-stk-code="{{expcode}}" data-qty="{{qty}}">전량취소</button>
                     {{/test}}
                 </td>
             </tr>
@@ -195,7 +195,30 @@
         });
 
         $('#fulfill-table-area').on("click", ".btnOrderCancel", function() {
-            alert("두 번째 버튼을 클릭했습니다.");
+            const confirmCancel = confirm("미체결 주문을 취소하시겠습니까?");
+            if (!confirmCancel) {
+                return;
+            } 
+            debugger;
+            const url = '/api/v1/ls/cancel-order';
+            const org_ord_no = $(this).data('org-ord-no');
+            const stk_code = $(this).data('stk-code');
+            const qty = $(this).data('qty');
+
+            const data = { 
+                org_ord_no: String(org_ord_no),
+                stk_code : String(stk_code),
+                qty: parseInt(qty,10)
+            };
+            postFetch(url, data).then(data => {
+                console.log(data);
+                alert(data.rsp_msg);
+                location.reload();
+            }).catch(error=> {
+                console.error(error.message);
+                showToastError(error.message);
+                
+            });
         });
 
         initalize();

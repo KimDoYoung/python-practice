@@ -107,6 +107,7 @@ $(document).ready(function() {
                 }else if(data.rsp_msg){
                     alert(data.rsp_msg);
                 }
+                offcanvasBuySell.toggle();
                 // debugger;
                 // var page_path = $('#page_path').val();
                 // if(page_path === '/main'){

@@ -12,6 +12,7 @@
 # danta_ws_manager.py
 from typing import Dict, List
 from fastapi import WebSocket
+from backend.app.background.hoga_datas import HogaDatas
 from backend.app.core.logger import get_logger
 from .ws_manager import WsManager
 
@@ -37,6 +38,7 @@ class DantaWsManager(WsManager):
             self.event_queue = event_queue
             logger.debug("DantaWsManager 초기화 완료")
             self.initialized = True
+            self.hogaDatas = HogaDatas() # 호가데이터 클래스 생성
 
     def setEventQueue(self, event_queue):
             self.event_queue = event_queue
@@ -73,31 +75,31 @@ class DantaWsManager(WsManager):
         #     del self.custom_data[user_id]
         #     logger.debug(f"사용자 {user_id}의 추가 데이터 제거")
 
+    def is_hoga_data(self, message: str):
+        ''' 호가데이터인지 판별 '''
+        if "H0STASP0" in message:
+            return True
+        return False
+        
     async def send_to_client(self, message: str, user_id: str):
         logger.debug("---------------------------------------------------------")
         logger.debug(f"단타 웹소켓 데이터 : {message}")
         logger.debug("---------------------------------------------------------")
-        if self.event_queue:
-            data = {
-                "type" : "SELL_SIGNAL",
-                "data" : {
-                    "stk_code" : "005930",
-                    "stk_name" : "삼성전자",
-                    "cost" : 100000,
+        if self.is_hoga_data(message):
+            self.hogaDatas.append(message)
+            sell_stk_codes = self.hogaDatas.get_sell_stk_codes()
+            if self.event_queue and sell_stk_codes:
+                data = {
+                    "type" : "SELL_SIGNAL",
+                    "data" : {
+                        "stk_codes" : sell_stk_codes
+                    }
                 }
-            }
-            self.event_queue.put_nowait(data)
-            logger.debug("★★★★★★★★★★★★")
-            logger.debug(f"이벤트 큐에 데이터 추가 : {data}")
-            logger.debug("★★★★★★★★★★★★")
-        # if user_id in self.active_connections:
-        #     for websocket in self.active_connections[user_id][:]:
-        #         try:
-        #             await websocket.send_text(message)
-        #             logger.debug(f"사용자 {user_id}에게 메시지 전송 성공: {message}")
-        #         except Exception as e:
-        #             self.disconnect(user_id, websocket)
-        #             logger.debug(f"사용자 {user_id}에게 메시지 전송 실패, 연결 제거: {e}")
+                self.event_queue.put_nowait(data)
+                logger.debug("★★★★★★★★★★★★")
+                logger.debug(f"이벤트 큐에 데이터 추가 : {data}")
+                logger.debug("★★★★★★★★★★★★")
+        
 
     async def broadcast(self, message: str):
         logger.debug("---------------------------------------------------------")

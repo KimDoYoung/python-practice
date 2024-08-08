@@ -25,3 +25,5 @@ pycryptodome
 websocket-client
 aiohttp
 scikit-learn
+pandas 
+openpyxl

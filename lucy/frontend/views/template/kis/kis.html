@@ -228,6 +228,31 @@
             window.location.href = '/page?path=kis/kis-inquire-daily-ccld';
 
         });
+        $('#ccld-result-area').on("click", ".btnOrderCancel", function() {
+            if (confirm('미체결주문을 전부 취소하시겠습니까?')){
+                const ord_gno_brno = $(this).data('ord-gno-brno');
+                const orgn_odno = $(this).data('orgn-odno');
+                const ord_dvsn_cd = $(this).data('ord-dvsn-cd');
+                const ord_unpr = $(this).data('ord-unpr');
+                const data = {
+                    orgn_odno: orgn_odno,
+                    ord_dvsn_cd: ord_dvsn_cd,
+                    ord_unpr: String(ord_unpr)
+                }
+                debugger;
+                postFetch('/api/v1/kis/order-cancel', data)
+                .then(response => {
+                    debugger;
+                    console.log(response);
+                    alert(response.msg1);
+                    window.location.reload();
+                })
+                .catch(error=> { 
+                    console.error(error); 
+                    $('#message-area').html(error)
+                });
+            }
+        });
 
         initalize();
 
