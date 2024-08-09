@@ -41,7 +41,7 @@ class HogaDatas:
             print(f"Error parsing message: {e}")
 
     def get_sell_stk_codes(self):
-        SOME_THRESHOLD = 1000
+        SOME_THRESHOLD = 100000000
         # 매도 기준에 적합한 종목 코드 배열 반환
         sell_stk_codes = []
         for stk_code, df in self.data.items():

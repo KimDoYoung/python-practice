@@ -493,7 +493,7 @@ class H0STCNI0(KisWsRealModelBase):
             "CNTG_UNPR": self.체결단가,
             "STCK_CNTG_HOUR": self.주식_체결_시간,
             "RFUS_YN": self.거부여부,
-            "CNTG_YN": self.체결여부,
+            "CNTG_YN": self.체결여부,  # 2인경우만 체결
             "ACPT_YN": self.접수여부,
             "BRNC_NO": self.지점번호,
             "ODER_QTY": self.주문수량,

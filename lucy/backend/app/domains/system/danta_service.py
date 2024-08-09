@@ -6,8 +6,11 @@ from pydantic import BaseModel
 from backend.app.domains.stc.kis.model.kis_order_cash_model import OrderCash_Request
 from backend.app.domains.stc.ls_interface_model import Order_Request
 from backend.app.managers.stock_api_manager import StockApiManager
-from backend.app.core.dependency import get_log_service, get_user_service
+from backend.app.core.dependency import get_log_service, get_mystock_service, get_user_service
 from backend.app.utils.ls_model_util import order_to_cspat00601_Request
+
+from backend.app.core.logger import get_logger
+logger = get_logger(__name__)
 
 class DantaStock(BaseModel):
     stk_code: str # 종목코드
@@ -27,6 +30,7 @@ class DantaService:
         self.stk_abbr = stock_abbr
         self.user_service = get_user_service()
         self.log = get_log_service()
+        self.mystock_service = get_mystock_service()
         self.cache = {} # 캐시
         self.cache['holiday'] = {} # 휴일 캐시
         
@@ -82,7 +86,33 @@ class DantaService:
         stocks.append(stock)
         return stocks
     
+    async def choice_for_danta_condition(self)-> List[DantaStock]:
+        ''' 조건식리스트를 1. 조회해서 2. 그것을 수행해서 3. 종목을 3개 골라서 mystock collection에 넣는다.'''
+        # 1. 조건식리스트를 조회
+        seq = await self.get_seq_of_danta_condition('단타종가')
+        if seq is None:
+            seq = '0'
+        psearch_result = await self.kisapi.psearch_result(seq)
+        list = psearch_result.output2
+        
+        # 2. mystock collection에서 단타종류를 모두 삭제 후 추가
+        #await self.mystock_service.delete_all_by_type('단타')
+        i = 0
+        choice_stocks = []
+        for item in list:
+            stk_code = item.code
+            stk_name = item.name
+            price = item.price
+            danta_stock = DantaStock(stk_code=stk_code, stk_name=stk_name, buy_price=price)
+            choice_stocks.append(danta_stock)
+            i = i + 1
+            if i >= 3:
+                break
+        
+        return choice_stocks
+    
     async def get_available_money(self):
+        ''' 단타머신이 사용할 최대 금액 '''
         return 120000
     
     async def sell_decision(self, stock: DantaStock):
@@ -128,6 +158,7 @@ class DantaService:
                 await self.log.danta_error(title=title)
     
     async def sell(self, stock:DantaStock, sell_price=0):
+        '''sell_price에 매도, sellprice가 0이면 현재가로 매도'''
         qty = stock.buy_qty
         if self.stk_abbr == 'LS':            
             order_req = Order_Request(buy_sell_gb="매도", stk_code=stock.stk_code, qty=qty) 
@@ -156,3 +187,14 @@ class DantaService:
             else:
                 title = f'매도주문 실패: {stock.stk_name}, {resp.msg1}'
                 await self.log.danta_error(title=title)
+    
+    async def get_seq_of_danta_condition(self, condition_nm:str):
+        title_result = await self.kisapi.psearch_title()
+        rt_cd = title_result.rt_cd
+        if rt_cd == '0':
+            list = title_result.output2
+            for item in list:
+                if item.condition_nm == condition_nm:
+                    return item.seq
+        return None
+    

@@ -23,7 +23,6 @@ from backend.app.domains.system.logs_model import Logs
 from backend.app.domains.user.user_model import User
 from backend.app.core.dependency import get_user_service
 from backend.app.managers.danta_ws_manager import DantaWsManager
-from backend.app.utils.kis_ws_util import KIS_WSReq
 
 logger = get_logger(__name__)
 # 단타 머신 Task
@@ -102,14 +101,35 @@ async def danta_machine_main(event_queue: asyncio.Queue):
             continue
         
         #1. 오전에 단타매매할 주식을  MyStocks에서 가져온 후 호가등록을 한다
-        if  not danta_stock_exists and market_open_time:
+        # if not danta_stock_exists and market_open_time:
             
-            today_danta_stocks = await service.choice_danta_stocks()
-            # 호가등록
-            for stock in today_danta_stocks:
-                await kis_task.subscribe(KIS_WSReq.BID_ASK, stock.stk_code)
+        #     today_danta_stocks = await service.choice_danta_stocks()
+        #     # 호가등록
+        #     for stock in today_danta_stocks:
+        #         await kis_task.subscribe(KIS_WSReq.BID_ASK, stock.stk_code)
                 
-        # 이벤트 큐에서 메시지 읽기
+        
+        #3. 3:25분이 되면 모두 매도한다.
+        if len(today_danta_stocks) > 0 and now.hour == 15 and now.minute > 25:
+            for stock in today_danta_stocks:
+                await service.sell(stock, sell_price=0)
+            today_danta_stocks = []
+            danta_stock_exists = False
+            logger.debug("3:25분이 되어 모두 매도하였습니다.")
+        
+        #4. 3:25이 넘었고 today_danta_stocks가 비어있다면 내일의 단타매매할 주식을 매수한다.
+        # if len(today_danta_stocks) == 0 and now.hour == 15 and now.minute > 25:
+        if True:
+            total_money = await service.get_available_money()
+            list = await service.choice_for_danta_condition()
+            
+            for danta_stock in list:
+                money = int(total_money / len(list))
+                qty, current_cost = await service.get_available_qty_cost(danta_stock.stk_code, money)
+                await service.buy(danta_stock, cost=current_cost, qty=qty)
+        
+        
+        #2. 이벤트 큐에서 팔아야할 주식을 가져와서 매도한다.
         try:
             event = await event_queue.get()
             # 이벤트 처리 로직
@@ -118,17 +138,15 @@ async def danta_machine_main(event_queue: asyncio.Queue):
                 stk_codes = stock_to_sell['stk_codes']
                 for stk_code in stk_codes:
                     danta_stock = today_danta_stocks.find(lambda x: x.stk_code == stk_code)
-                    await service.sell(danta_stock, sell_price=0)
+                    if danta_stock:
+                        await service.sell(danta_stock, sell_price=0)
         except asyncio.QueueEmpty:
             logger.debug('이벤트 큐가 비어있음')
-            pass        
-        
+            pass  
+                
         await asyncio.sleep(one_min)
         
-        #2. 가져온 주식에 대해서 WebSocket을 통해 실시간 호가 및 체결가를 가져온다.
-        
-        #3. 가져온 호가 및 체결가를 분석하여 매수/매도를 한다.
-        
+
         #4. 시간이 되면 모두 매도한다.
         
         #5. 매수할 조건의 주식을 선별한다.

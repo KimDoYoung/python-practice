@@ -10,21 +10,18 @@
 버전: 1.0
 """
 # danta_ws_manager.py
+import json
 from typing import Dict, List
 from fastapi import WebSocket
 from backend.app.background.hoga_datas import HogaDatas
 from backend.app.core.logger import get_logger
+from backend.app.core.dependency import get_log_service, get_mystock_service
 from .ws_manager import WsManager
 
 logger = get_logger(__name__)
 
 class DantaWsManager(WsManager):
     _instance = None
-
-    # def __new__(cls, *args, **kwargs):
-    #     if cls._instance is None:
-    #         cls._instance = super(DantaWsManager, cls).__new__(cls, *args, **kwargs)
-    #     return cls._instance
     
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
@@ -39,6 +36,8 @@ class DantaWsManager(WsManager):
             logger.debug("DantaWsManager 초기화 완료")
             self.initialized = True
             self.hogaDatas = HogaDatas() # 호가데이터 클래스 생성
+            self.log = get_log_service()
+            self.mystock_service = get_mystock_service()
 
     def setEventQueue(self, event_queue):
             self.event_queue = event_queue
@@ -78,9 +77,16 @@ class DantaWsManager(WsManager):
     def is_hoga_data(self, message: str):
         ''' 호가데이터인지 판별 '''
         if "H0STASP0" in message:
-            return True
+            if len(message.split("|")) > 3:
+                return True
         return False
-        
+    def is_buy_ok_notice(self, message: str):
+        ''' 매수알림인지 판별 '''
+        if "H0STCNI0" in message and "CNTG_YN" in message:
+            if len(message.split("|")) > 3:
+                return True
+        return False
+    
     async def send_to_client(self, message: str, user_id: str):
         logger.debug("---------------------------------------------------------")
         logger.debug(f"단타 웹소켓 데이터 : {message}")
@@ -99,7 +105,17 @@ class DantaWsManager(WsManager):
                 logger.debug("★★★★★★★★★★★★")
                 logger.debug(f"이벤트 큐에 데이터 추가 : {data}")
                 logger.debug("★★★★★★★★★★★★")
-        
+        elif self.is_buy_ok_notice(message):
+            data = message.split("|")[-1]
+            h0stcni0 = json.loads(data)
+            if h0stcni0.CNTG_YN == '2':
+                buy_stk_code = h0stcni0.STK_CODE
+                buy_qty = h0stcni0.CNTG_QTY
+                buy_price = h0stcni0.CNTG_UNPR
+                stk_name = h0stcni0.CNTG_ISNM
+                MyStockDto = MyStockDto(stk_code=buy_stk_code, stk_types=['단타'], stk_name=stk_name)
+                await self.mystock_service.upsert(MyStockDto)
+                await self.log.danta_info(f"{buy_stk_code} {stk_name} {buy_qty}주 {buy_price}원 매수완료")
 
     async def broadcast(self, message: str):
         logger.debug("---------------------------------------------------------")

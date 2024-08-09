@@ -21,7 +21,7 @@ from fastapi.responses import JSONResponse
 from backend.app.core.dependency import get_mystock_service, get_user_service
 # from backend.app.domains.stc.kis.kis_api import KoreaInvestmentApi
 from backend.app.domains.stc.kis.model.kis_after_hour_balance_model import AfterHourBalance_Response
-from backend.app.domains.stc.kis.model.kis_inquire_daily_ccld_model import InquireDailyCcld_Request
+from backend.app.domains.stc.kis.model.kis_inquire_daily_ccld_model import InquireDailyCcld_Request, InquireDailyCcld_Response
 from backend.app.domains.stc.kis.model.kis_order_cash_model import KisOrderCancel_Request, OrderCash_Request
 from backend.app.domains.stc.kis.model.kis_quote_balance_model import QuoteBalance_Response
 from backend.app.domains.stc.kis_interface_model import Rank_Request
@@ -126,8 +126,8 @@ async def psearch_result(request:Request,  seq:str, user_service :UserService=De
     return kis_psearch_result
 
 
-@router.post("/inquire-daily-ccld", response_class=JSONResponse)
-async def inquire_daily_ccld(request:Request, ccld: InquireDailyCcld_Request, user_service :UserService=Depends(get_user_service)):
+@router.post("/inquire-daily-ccld", response_class=InquireDailyCcld_Response)
+async def inquire_daily_ccld(request:Request, ccld: InquireDailyCcld_Request):
     '''주식일별주문체결조회 '''
     kis_api = await StockApiManager().kis_api()
     ccld_result = await kis_api.inquire_daily_ccld(inquire_daily_ccld=ccld)
