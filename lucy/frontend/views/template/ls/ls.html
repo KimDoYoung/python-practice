@@ -47,6 +47,7 @@
                 <th class="text-center">종목번호</th>
                 <th class="text-end">보유수량</th>
                 <th class="text-end">평균단가</th>
+                <th class="text-end">현재가</th>
                 <th class="text-end">매입금액</th>
                 <th class="text-end">평가금액</th>
                 <th class="text-end">평가손익</th>
@@ -63,10 +64,17 @@
                 <td class="text-center">{{expcode}}</td>
                 <td class="text-end">{{displayWon mdposqt}}</td>
                 <td class="text-end">{{displayWon pamt}}</td>
+                <td class="text-end">{{displayWon price}}</td>
                 <td class="text-end">{{displayWon mamt}}</td>
                 <td class="text-end">{{displayWon appamt}}</td>
-                <td class="text-end">{{displayWon dtsunik}}</td>
-                <td class="text-end">{{sunikrt}}</td>
+                {{#test "dtsunik>0"}}
+                <td class="text-end text-danger">{{displayWon dtsunik}}</td>
+                <td class="text-end text-danger">{{sunikrt}}</td>
+                {{else}}
+                <td class="text-end text-primary">{{displayWon dtsunik}}</td>
+                <td class="text-end text-primary">{{sunikrt}}</td>
+                {{/test}}
+
                 <td class="text-end">{{displayWon fee}}</td>
                 <td class="text-end">{{displayWon tax}}</td>
                 <td class="text-center">
