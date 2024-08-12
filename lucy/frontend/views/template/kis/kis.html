@@ -23,8 +23,10 @@
 
 {% raw %} 
 <script id="inquire-balance-table-template" type="text/x-handlebars-template">
-    <h4>예수금총액 : {{displayWon output2.dnca_tot_amt}} D+1: {{displayWon output2.nxdy_excc_amt}} D+2: {{displayWon output2.prvs_rcdl_excc_amt}}</h4>
-    <table class="table table-sm">
+    <h4>
+        예수금총액 : {{displayWon output2.dnca_tot_amt}} D1: {{displayWon output2.nxdy_excc_amt}} D2: {{displayWon output2.prvs_rcdl_excc_amt}} 현금주문가능금액: {{displayWon stck_cash_ord_psbl_amt}}
+    </h4>
+    <table class="table table-sm table-hover">
         <thead>
             <tr>
                 <th>상품번호</th>
@@ -132,10 +134,13 @@
                 $('#message-area').html(data.msg1)
                 return;
             }
-            let output1 = data.output1;
-            let output2 = data.output2[0];
+            //debugger;
+            let output1 = data.balance.output1;
+            let output2 = data.balance.output2[0];
+            let stck_cash_ord_psbl_amt = data.margin.output.stck_cash_ord_psbl_amt //현금주문가능금액
+
             let template = Handlebars.compile(document.getElementById('inquire-balance-table-template').innerHTML);
-            let html = template({list : output1, output2: output2});
+            let html = template({list : output1, output2: output2, stck_cash_ord_psbl_amt: stck_cash_ord_psbl_amt});
             $('#inquire-balance-area').html(html)
             console.log(data); 
         })
@@ -148,7 +153,7 @@
         const url ='/api/v1/kis/inquire-daily-ccld';
         const today = JuliaUtil.dateFormat('yyyyMMdd', new Date());
         const data = {
-            pdno: $('#pdno').val(),
+            pdno: "",
             inqr_strt_dt: today,
             inqr_end_dt: today
         }
@@ -161,7 +166,6 @@
                 let html = template({data : response});
                 $('#ccld-result-area').html(html)
             }else{
-            debugger;
                 let template = Handlebars.compile(document.getElementById('ccld-table-template').innerHTML); 
                 let html = template({data : response});
                 $('#ccld-result-area').html(html)

@@ -1,8 +1,8 @@
 from typing import List, Optional
-from pydantic import BaseModel, field_validator
+from pydantic import  field_validator
 
 from backend.app.domains.stock_api_base_model import StockApiBaseModel
-from pydantic import BaseModel
+
 
 class InquireDailyCcld_Request(StockApiBaseModel):
     inqr_strt_dt:str
@@ -20,7 +20,7 @@ class InquireDailyCcld_Request(StockApiBaseModel):
     def remove_hyphens(cls, value):
         return value.replace('[^0-9]', '')
 
-class InquireDailyCcldItem1(BaseModel):
+class InquireDailyCcldItem1(StockApiBaseModel):
     ord_dt: str  # 주문일자
     ord_gno_brno: str  # 주문채번지점번호
     odno: str  # 주문번호
@@ -49,7 +49,7 @@ class InquireDailyCcldItem1(BaseModel):
     excg_dvsn_cd: str  # 거래소구분코드
 
 
-class InquireDailyCcldItem2(BaseModel):
+class InquireDailyCcldItem2(StockApiBaseModel):
     tot_ord_qty: str # 총주문수량 미체결주문수량 + 체결수량 (취소주문제외)
     tot_ccld_qty: str # 총체결수량 
     pchs_avg_pric: str # 매입평균가격 총체결금액 / 총체결수량
@@ -62,8 +62,8 @@ class InquireDailyCcld_Response(StockApiBaseModel):
     msg1: str # 응답메세지 응답메세지
     ctx_area_fk100: str # 연속조회검색조건100 
     ctx_area_nk100: str # 연속조회키100 
-    output1: Optional[List[InquireDailyCcldItem1]]
-    output2: InquireDailyCcldItem2
+    output1: Optional[List[InquireDailyCcldItem1]] = None
+    output2: Optional[InquireDailyCcldItem2]=None
 
 
 

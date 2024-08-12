@@ -22,6 +22,7 @@ from backend.app.core.dependency import get_mystock_service, get_user_service
 # from backend.app.domains.stc.kis.kis_api import KoreaInvestmentApi
 from backend.app.domains.stc.kis.model.kis_after_hour_balance_model import AfterHourBalance_Response
 from backend.app.domains.stc.kis.model.kis_inquire_daily_ccld_model import InquireDailyCcld_Request, InquireDailyCcld_Response
+from backend.app.domains.stc.kis.model.kis_intgr_margin_model import IntgrMargin_Request
 from backend.app.domains.stc.kis.model.kis_order_cash_model import KisOrderCancel_Request, OrderCash_Request
 from backend.app.domains.stc.kis.model.kis_quote_balance_model import QuoteBalance_Response
 from backend.app.domains.stc.kis_interface_model import Rank_Request
@@ -51,7 +52,7 @@ async def validate_user(request: Request, user_service: UserService):
 
 
 @router.get("/", response_class=JSONResponse, response_model=None)
-async def info(request:Request, user_service :UserService=Depends(get_user_service)):
+async def info(request:Request):
     '''1.주식잔고조회, 2. 보유주식을 mystock에 등록'''
 
     kis_api = await StockApiManager().kis_api()
@@ -69,7 +70,12 @@ async def info(request:Request, user_service :UserService=Depends(get_user_servi
         await mystock_service.upsert(mystock_dto)
 
     logger.debug(f"주식잔고 조회 : {kis_inquire_balance}")
-    return kis_inquire_balance
+    
+    #주식통합증거금
+    intgr_margin = await kis_api.intgr_margin(IntgrMargin_Request())
+    logger.debug(f"주식통합증거금 현황 : {intgr_margin}")    
+    
+    return {"balance":kis_inquire_balance, "margin" : intgr_margin}
 
 
 @router.get("/current-cost/{stk_code}", response_class=JSONResponse)

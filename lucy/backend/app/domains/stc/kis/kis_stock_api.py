@@ -17,6 +17,8 @@
 /uapi/domestic-stock/v1/trading/inquire-psbl-order #매수가능조회
 /uapi/domestic-stock/v1/trading/inquire-psbl-sell  #매도가능조회
 /uapi/domestic-stock/v1/quotations/chk-holiday
+/uapi/domestic-stock/v1/trading/intgr-margin
+
 에러 :
     -  Access Token은 하루 단위로 만료되므로, 만료되면 다시 발급해야 한다.
     - {'rt_cd': '1', 'msg_cd': 'EGW00123', 'msg1': '기간이 만료된 token 입니다.'}
@@ -41,6 +43,7 @@ from backend.app.domains.stc.kis.model.kis_inquire_price import InquirePrice_Res
 from backend.app.domains.stc.kis.model.kis_inquire_psbl_rvsecncl_model import InquirePsblRvsecncl_Response
 from backend.app.domains.stc.kis.model.kis_inquire_psbl_sell_model import InquirePsblSell_Response
 from backend.app.domains.stc.kis.model.kis_inquire_psble_order import InquirePsblOrder_Response, InquirePsblOrder_Request
+from backend.app.domains.stc.kis.model.kis_intgr_margin_model import IntgrMargin_Request, IntgrMargin_Response
 from backend.app.domains.stc.kis.model.kis_order_cash_model import KisOrderRvsecncl_Request, OrderCash_Request, KisOrderCash_Response, KisOrderCancel_Response
 from backend.app.domains.stc.kis.model.kis_psearch_result_model import PsearchResult_Response
 from backend.app.domains.stc.kis.model.kis_quote_balance_model import QuoteBalance_Request, QuoteBalance_Response
@@ -652,3 +655,28 @@ class KisStockApi(StockApi):
             return QuoteBalance_Response(**json_response)
         except ValidationError as e:
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
+    
+    async def intgr_margin(self, req:IntgrMargin_Request)-> IntgrMargin_Response:
+        '''주식통합증거금 현황 '''
+        logger.info(f"주식통합증거금 현황")
+        url = self.BASE_URL + "/uapi/domestic-stock/v1/trading/intgr-margin"
+        params = {
+            "CANO": self.ACCTNO[0:8],
+            "ACNT_PRDT_CD": self.ACCTNO[8:10],
+            "CMA_EVLU_AMT_ICLD_YN": req.CMA_EVLU_AMT_ICLD_YN,
+            "WCRC_FRCR_DVSN_CD": req.WCRC_FRCR_DVSN_CD,
+            "FWEX_CTRT_FRCR_DVSN_CD": req.FWEX_CTRT_FRCR_DVSN_CD  
+        }    
+        headers ={
+            "content-type": "application/json; charset=utf-8",
+            "authorization": f"Bearer {self.ACCESS_TOKEN}",
+            "appkey": self.APP_KEY,
+            "appsecret": self.APP_SECRET,
+            "tr_id": "TTTC0869R",
+            "custtype": "P" #  "B : 법인 P : 개인",
+        }    
+        json_response = await self.send_request('주식통합증거금현황', 'GET', url, headers, params=params)
+        try:
+            return IntgrMargin_Response(**json_response)
+        except ValidationError as e:
+            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")        

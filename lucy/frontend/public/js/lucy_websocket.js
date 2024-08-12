@@ -18,6 +18,7 @@ class StkRealDataParser {
             // JSON 부분 추출
             const jsonPart = parts.pop();
             try {
+                console.log("웹소켓: ", jsonPart);
                 const data = JSON.parse(jsonPart);
                 
                 if (type === 'KIS' && data.CNTG_YN === '2') {
