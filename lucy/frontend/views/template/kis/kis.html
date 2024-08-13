@@ -36,7 +36,7 @@
                 <th class="text-end">보유수량</th>
                 <th class="text-end">매입금액</th>
                 <th class="text-end">평가금액</th>
-                <th class="text-end">평가손익율</th>
+                <th class="text-end">평가손익</th>
                 <th class="text-center">동작</th>
             </tr>
         </thead>
@@ -51,7 +51,11 @@
                 <td class="text-end">{{hldg_qty}}</td>
                 <td class="text-end">{{displayWon pchs_amt}}</td>
                 <td class="text-end">{{displayWon evlu_amt}}</td>
-                <td class="text-end">{{displayWon evlu_pfls_amt}}</td>
+                {{#test "evlu_pfls_amt > 0"}}
+                <td class="text-end text-danger">{{displayWon evlu_pfls_amt}}</td>
+                {{else}}
+                <td class="text-end text-primary">{{displayWon evlu_pfls_amt}}</td>
+                {{/test}}
                 <td class="text-center">
                     <button class="btn btn-sm btn-danger btnShowBuyCanvas" data-stk-code="{{pdno}}" data-stk-name="{{prdt_name}}">매수</button>
                     <button class="btn btn-sm btn-primary btnShowSellCanvas"  data-stk-code="{{pdno}}" data-stk-name="{{prdt_name}}" data-qty="{{hldg_qty}}">매도</button>
@@ -166,13 +170,14 @@
                 let html = template({data : response});
                 $('#ccld-result-area').html(html)
             }else{
+                
                 let template = Handlebars.compile(document.getElementById('ccld-table-template').innerHTML); 
                 let html = template({data : response});
                 $('#ccld-result-area').html(html)
             }
         })
         .catch(error=> { 
-            $('#error-area').html(String(error)).show();
+            $('#error-area').html(String(error.message)).show();
         });
     }
     $( document ).ready(function() {

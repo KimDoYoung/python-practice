@@ -207,4 +207,19 @@
   "Notes": "",
   "Revenue": 52.15,
   "StkCode": "460940"
+},
+{
+  "_id": {
+    "$oid": "66babb1bf8507438dded4cd4"
+  },
+  "Company": "뱅크웨어글로벌",
+  "FinalOfferingPrice": 16000,
+  "InstitutionalSubscriptionRatio": 155.74,
+  "LockupAgreement": 1.52,
+  "MaxValue": 19800,
+  "MultipleVariable": 1.2375,
+  "NetIncome": -115.29,
+  "Notes": "",
+  "Revenue": 728.95,
+  "StkCode": "199480"
 }]
