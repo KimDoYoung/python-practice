@@ -38,6 +38,7 @@ class DantaWsManager(WsManager):
             self.hogaDatas = HogaDatas() # 호가데이터 클래스 생성
             self.log = get_log_service()
             self.mystock_service = get_mystock_service()
+            self.count = 0
 
     def setEventQueue(self, event_queue):
             self.event_queue = event_queue
@@ -93,6 +94,10 @@ class DantaWsManager(WsManager):
         logger.debug("---------------------------------------------------------")
         if self.is_hoga_data(message):
             self.hogaDatas.append(message)
+            self.count += 1
+            if self.count % 10 == 0:
+                self.hogaDatas.save_to_excel('c:/tmp/hoga_datas.xlsx')
+                
             sell_stk_codes = self.hogaDatas.get_sell_stk_codes()
             if self.event_queue and sell_stk_codes:
                 data = {

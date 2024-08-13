@@ -46,10 +46,11 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="card-title text-primary">{{this.name}}</h5>
                     <button class="btnBuy btn btn-danger" data-stk-code="{{this.code}}" data-stk-name="{{this.name}}">買</button>
+                    <button class="btnAddDanta btn btn-primary" data-stk-code="{{this.code}}" data-stk-name="{{this.name}}">+</button>
                 </div>
                 <div class="card-body">
                 <p class="card-text"><strong>종목코드:</strong> {{goNaver this.code}} ({{displayDaebi this.daebi}})</p>
-                <p class="card-text"><strong>현재가:</strong> {{displayWon this.price}}({{displayPercent this.chgrate}}%) </p>
+                <p class="card-text text-primary"><strong>현재가:</strong> {{displayWon this.price}}({{displayPercent this.chgrate}}%) </p>
                 <!-- <p class="card-text"><strong>등락율:</strong> {{displayPercent this.chgrate}}%</p> -->
                 <p class="card-text"><strong>거래량(금액):</strong> {{displayWon this.acml_vol}}({{displayWon this.trade_amt}})</p>
                 <p class="card-text"><strong>전일대비:</strong> {{displayWon this.change}}(<strong>체결강도:</strong> {{displayPercent this.cttr}})</p>
@@ -128,6 +129,24 @@
             const stk_name = $(this).data('stk-name');
             showBuySellCanvas('KIS', stk_code, stk_name, "매수", 1, 0);
         });
+        //단타 Add
+        $('#psearch-reuslt-area').on("click", ".btnAddDanta", function() {
+            const stk_code = $(this).data('stk-code');
+            const stk_name = $(this).data('stk-name');
+            const url = '/api/v1/mystock/add';
+            const data = {
+                stk_code: String(stk_code),
+                stk_name: stk_name,
+                stk_types: ['단타']
+            }
+            postFetch(url, data)
+            .then(data => { 
+                console.log(data);
+                alert(data.message)
+            }).catch(error=> { console.error(error.message); });
+        });
+
+
     });
     </script>	    
 {% endraw %}

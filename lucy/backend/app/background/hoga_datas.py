@@ -20,7 +20,7 @@ class HogaDatas:
         self.max_length = max_length  # 각 DataFrame의 최대 행 수
 
     def append(self, message: str):
-        # 로그에서 받은 문자열 message를 파싱하여 데이터 추가
+        ''' 로그에서 받은 문자열 message를 파싱하여 데이터 추가 '''
         try:
             # 필요한 데이터 추출
             parts = message.split('|')
@@ -34,13 +34,14 @@ class HogaDatas:
                 self.data[stk_code] = pd.concat([self.data[stk_code], df], ignore_index=True)
                 # 최대 길이를 초과하면 오래된 데이터 삭제
                 if len(self.data[stk_code]) > self.max_length:
-                    self.data[stk_code] = self.data[stk_code].iloc[-self.max_length:]
+                    self.data[stk_code] = self.data[stk_code].iloc[-self.max_length:]                    
             else:
                 self.data[stk_code] = df
         except Exception as e:
             print(f"Error parsing message: {e}")
 
     def get_sell_stk_codes(self):
+        ''' 매도 기준에 적합한 종목 코드 배열 반환 '''
         SOME_THRESHOLD = 100000000
         # 매도 기준에 적합한 종목 코드 배열 반환
         sell_stk_codes = []

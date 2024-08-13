@@ -29,7 +29,7 @@ class DantaService:
         self.user_id = user_id
         self.stk_abbr = stock_abbr
         self.user_service = get_user_service()
-        self.log = get_log_service()
+        self.log_service = get_log_service()
         self.mystock_service = get_mystock_service()
         self.cache = {} # 캐시
         self.cache['holiday'] = {} # 휴일 캐시
@@ -43,7 +43,7 @@ class DantaService:
             self.defaultApi = self.lsapi
         elif self.stk_abbr == 'KIS':
             self.defaultApi = self.kisapi
-        await self.log.danta_info(f'{self.user_id}의 단타서비스 초기화 완료')
+        await self.log_service.danta_info(f'{self.user_id}의 단타서비스 초기화 완료')
                 
     async def is_market_open_day(self, now: datetime):
         ''' 오늘이 개장일이면 True 아니면 False '''
@@ -75,6 +75,23 @@ class DantaService:
             x = x - 1
         return x, current_cost
     
+    async def load_danta_stock_from_db(self)-> List[DantaStock]:
+        ''' DB에서 단타 주식을 가져온다. 결국 파는 것인가? '''
+        danta_list = await self.mystock_service.get_all_by_type('단타')
+        inquire_balance = await self.kisapi.inquire_balance()
+        real_list = inquire_balance.output1
+        
+        list = []
+        for item in danta_list:
+            stock = DantaStock(stk_code=item.stk_code, stk_name=item.stk_name)
+            # for real in real_list:
+            #     if real.pdno == item.stk_code:
+            #         stock.buy_qty = real.hqty
+            #         stock.buy_price = real.pamt
+            #         break
+            list.append(stock)
+        return list
+        
     async def choice_danta_stocks(self) -> List[DantaStock]:
         ''' 단타 주식 선택 '''
         stocks = []
@@ -137,25 +154,25 @@ class DantaService:
                 stock.buy_ordno = resp.CSPAT00601OutBlock2.OrdNo
                 stock.buy_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 title = f'매수주문 성공: {stock.stk_name} {stock.buy_qty}주, 주문번호: {stock.buy_ordno}'
-                self.log.danta_info(title=title)
+                self.log_service.danta_info(title=title)
             else:
                 title = f'매수주문 실패: {stock.stk_name}, {resp.msg1}'
-                self.log.danta_error(title=title)                            
+                self.log_service.danta_error(title=title)                            
         elif self.stk_abbr == 'KIS':
             # KIS API를 이용해서 주식을 매수
             order_req = OrderCash_Request(buy_sell_gb="매수", stk_code=stock.stk_code, qty=qty, price=0)
             resp = await  self.kisapi.order(order_req)
             if resp.rt_cd.startswith('0'):
-                await self.log.danta_info(f'매수주문 성공: {stock.stk_name} {qty}주, 주문번호: {resp.output.KRX_FWDG_ORD_ORGNO}')
+                await self.log_service.danta_info(f'매수주문 성공: {stock.stk_name} {qty}주, 주문번호: {resp.output.KRX_FWDG_ORD_ORGNO}')
                 stock.buy_qty = qty
                 stock.buy_price = cost # TODO: 체결가격은 아니고 현재가
                 stock.buy_ordno = resp.output.KRX_FWDG_ORD_ORGNO
                 stock.buy_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 title = f'매수주문 성공: {stock.stk_name} {stock.buy_qty}주, 주문번호: {stock.buy_ordno}'
-                await self.log.danta_info(title=title)
+                await self.log_service.danta_info(title=title)
             else:
                 title = f'매수주문 실패: {stock.stk_name}, {resp.msg1}'
-                await self.log.danta_error(title=title)
+                await self.log_service.danta_error(title=title)
     
     async def sell(self, stock:DantaStock, sell_price=0):
         '''sell_price에 매도, sellprice가 0이면 현재가로 매도'''
@@ -170,10 +187,10 @@ class DantaService:
                 stock.sell_ordno = resp.CSPAT00601OutBlock2.OrdNo
                 stock.sell_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 title = f'매도주문 성공: {stock.stk_name} {stock.buy_qty}주, 주문번호: {stock.buy_ordno}'
-                await self.log.danta_info(title=title)
+                await self.log_service.danta_info(title=title)
             else:
                 title = f'매도주문 실패: {stock.stk_name}, {resp.msg1}'
-                await self.log.danta_error(title=title)                            
+                await self.log_service.danta_error(title=title)                            
         else:
             order_req = OrderCash_Request(buy_sell_gb="매도", stk_code=stock.stk_code, qty=qty)
             resp = await self.kisapi.order(order_req)
@@ -183,12 +200,13 @@ class DantaService:
                 stock.sell_ordno = resp.output.KRX_FWDG_ORD_ORGNO
                 stock.sell_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 title = f'매도주문 성공: {stock.stk_name} {stock.sell_qty}주, 주문번호: {stock.sell_ordno}'
-                await self.log.danta_info(title=title)
+                await self.log_service.danta_info(title=title)
             else:
                 title = f'매도주문 실패: {stock.stk_name}, {resp.msg1}'
-                await self.log.danta_error(title=title)
+                await self.log_service.danta_error(title=title)
     
     async def get_seq_of_danta_condition(self, condition_nm:str):
+        ''' 조건식리스트를 가져온다'''
         title_result = await self.kisapi.psearch_title()
         rt_cd = title_result.rt_cd
         if rt_cd == '0':
