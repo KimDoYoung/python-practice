@@ -13,10 +13,12 @@
 import json
 from typing import Dict, List
 from fastapi import WebSocket
+from backend.app.background.chegeolga_datas import CheGealGaDatas
 from backend.app.background.hoga_datas import HogaDatas
 from backend.app.core.logger import get_logger
 from backend.app.core.dependency import get_log_service, get_mystock_service
 from .ws_manager import WsManager
+from datetime import datetime
 
 logger = get_logger(__name__)
 
@@ -36,9 +38,12 @@ class DantaWsManager(WsManager):
             logger.debug("DantaWsManager 초기화 완료")
             self.initialized = True
             self.hogaDatas = HogaDatas() # 호가데이터 클래스 생성
+            self.chegeolDatas = CheGealGaDatas() # 체결가데이터 클래스 생성
+            
             self.log = get_log_service()
             self.mystock_service = get_mystock_service()
-            self.count = 0
+            self.hoga_count = 0
+            self.chegeol_count = 0
 
     def setEventQueue(self, event_queue):
             self.event_queue = event_queue
@@ -81,6 +86,12 @@ class DantaWsManager(WsManager):
             if len(message.split("|")) > 3:
                 return True
         return False
+    def is_chegeol_data(self, message: str):
+        ''' 체결가 데이터인지 판별 '''
+        if "H0STCNT0" in message and "MKSC_SHRN_ISCD" in message:
+            if len(message.split("|")) > 3:
+                return True
+        return False
     def is_buy_ok_notice(self, message: str):
         ''' 매수알림인지 판별 '''
         if "H0STCNI0" in message and "CNTG_YN" in message:
@@ -94,9 +105,11 @@ class DantaWsManager(WsManager):
         logger.debug("---------------------------------------------------------")
         if self.is_hoga_data(message):
             self.hogaDatas.append(message)
-            self.count += 1
-            if self.count % 10 == 0:
-                self.hogaDatas.save_to_excel('c:/tmp/hoga_datas.xlsx')
+            self.hoga_count += 1
+            if self.hoga_count % 10 == 0:
+                today = datetime.now()
+                ymd = today.strftime("%Y%m%d")
+                self.hogaDatas.save_to_excel(f'c:/tmp/hoga_datas_{ymd}.xlsx')
                 
             sell_stk_codes = self.hogaDatas.get_sell_stk_codes()
             if self.event_queue and sell_stk_codes:
@@ -110,6 +123,14 @@ class DantaWsManager(WsManager):
                 logger.debug("★★★★★★★★★★★★")
                 logger.debug(f"이벤트 큐에 데이터 추가 : {data}")
                 logger.debug("★★★★★★★★★★★★")
+        elif self.is_chegeol_data(message):
+            self.chegeolDatas.append(message)
+            self.chegeol_count += 1
+            if self.chegeol_count % 10 == 0:
+                today = datetime.now()
+                ymd = today.strftime("%Y%m%d")
+                self.chegeolDatas.save_to_excel(f'c:/tmp/chegeol_datas_{ymd}.xlsx')            
+                
         elif self.is_buy_ok_notice(message):
             data = message.split("|")[-1]
             h0stcni0 = json.loads(data)

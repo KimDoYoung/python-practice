@@ -108,13 +108,15 @@ async def danta_machine_main(event_queue: asyncio.Queue):
             today_danta_stocks = await service.load_danta_stock_from_db()
             # 호가등록
             for stock in today_danta_stocks:
-                await kis_task.subscribe(KIS_WSReq.BID_ASK, stock.stk_code)
+                #await kis_task.subscribe(KIS_WSReq.BID_ASK, stock.stk_code) # 호가등록
+                await kis_task.subscribe(KIS_WSReq.CONTRACT, stock.stk_code) # 체결가 등록
         
         
         #3. 3:25분이 되면 모두 매도한다.
         if len(today_danta_stocks) > 0 and now.hour == 15 and now.minute > 25:
             for stock in today_danta_stocks:
-                await service.sell(stock, sell_price=0)
+                pass
+                #await service.sell(stock, sell_price=0)
             today_danta_stocks = []
             danta_stock_exists = False
             logger.debug("3:25분이 되어 모두 매도하였습니다.")
