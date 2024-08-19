@@ -208,3 +208,18 @@
                 return 'Unknown';
         }
     });
+
+    // 주당차이 value1 평균매입가격, value2 현재가
+    Handlebars.registerHelper('judang_plus_minus', function(value1, value2) {
+        const diff = (value1) - (value2);
+        if (diff > 0) {
+            const diffInt = Math.floor(diff);
+            return "-" +  diffInt.toLocaleString();
+        }else{
+            const diffInt = Math.floor(diff*-1);
+            if(diffInt == 0){
+                return 0;
+            }
+            return diffInt.toLocaleString();
+        }
+    });

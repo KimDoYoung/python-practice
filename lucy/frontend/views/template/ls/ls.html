@@ -48,6 +48,7 @@
                 <th class="text-end">보유수량</th>
                 <th class="text-end">평균단가</th>
                 <th class="text-end">현재가</th>
+                <th class="text-end">1주당</th>
                 <th class="text-end">매입금액</th>
                 <th class="text-end">평가금액</th>
                 <th class="text-end">평가손익</th>
@@ -65,6 +66,11 @@
                 <td class="text-end">{{displayWon mdposqt}}</td>
                 <td class="text-end">{{displayWon pamt}}</td>
                 <td class="text-end">{{displayWon price}}</td>
+                {{#test "Number(pamt) > Number(price)"}}
+                <td class="text-end text-primary">{{judang_plus_minus pamt price}}</td>
+                {{else}}
+                <td class="text-end text-danger">{{judang_plus_minus pamt price}}</td>
+                {{/test}}
                 <td class="text-end">{{displayWon mamt}}</td>
                 <td class="text-end">{{displayWon appamt}}</td>
                 {{#test "dtsunik > 0"}}
