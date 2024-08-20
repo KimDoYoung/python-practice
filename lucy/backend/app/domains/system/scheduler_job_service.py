@@ -6,7 +6,7 @@
 주요 기능:
     - Lucy 시작할 때 DB에서 읽어서 스케줄러에 등록
     - Scheduler class와 Db 를 조합하여  정보를 가져오기
-    - SchedulerJob Collection을 변경해서 실행시간을 변경시키기
+    - SchedulerJob Collection을 변경해서 실행시간을 변경시킬 수 있다
 
 작성자: 김도영
 작성일: 24

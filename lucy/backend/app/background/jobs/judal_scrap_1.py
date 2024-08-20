@@ -294,7 +294,7 @@ def scrap_judal(config_service : DbConfigService=Depends(get_config_service)):
     logging.debug("Data scraping is done!")    
     config_service.remove_process_status("scrap_judal")
 
-async def main():
+async def judal_main(arg: str = None):
     await MongoDb.initialize(config.DB_URL)
     config_service = get_config_service()
     scrap_judal(config_service=config_service)
@@ -302,7 +302,7 @@ async def main():
 
 if __name__ == "__main__":
     try:
-        asyncio.run(main())
+        asyncio.run(judal_main())
     except Exception as e:
         logging.error(f"An error occurred: {e}")
     finally:
