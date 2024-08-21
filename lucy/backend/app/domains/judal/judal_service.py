@@ -25,7 +25,7 @@ logger = get_logger(__name__)
 class JudalService:
 
     async def get_my_filted_stocks(self, csv_files : list[str], query_condition: QueryCondition) -> pd.DataFrame:
-        '''csv_files 목록에서 내용을 모두 가져와서 붙인다.'''
+        '''csv_files 목록에서 내용을 모두 가져와서 붙인다. 그리고 조건에 맞는 것을 골라서  dataframe으로 리턴'''
         dataframes = [pd.read_csv(file, dtype={'종목코드': str}) for file in csv_files]
         df = pd.concat(dataframes, ignore_index=True)
 
@@ -63,7 +63,7 @@ class JudalService:
     async def filtered_query(self, query_condition: QueryCondition) -> pd.DataFrame:
         ''' 조건에 맞는 주식을 찾아서 반환한다. '''
         # 가장 최신 폴더
-        base_folder = self.get_last_scraped_folder()
+        base_folder = await self.get_last_scraped_folder()
 
         # 시작하려는 테마
         # themes = ['상승중인 테마', '기대수익률 높은 테마']
@@ -84,7 +84,7 @@ class JudalService:
             else:
                 raise JudalException(f"File {csv_file} does not exist.")
 
-        my_df = self.get_my_filted_stocks(csv_files, query_condition)
+        my_df = await self.get_my_filted_stocks(csv_files, query_condition)
         return my_df
 
     async def get_themes(self) -> List[JudalTheme]:
