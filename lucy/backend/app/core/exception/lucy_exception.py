@@ -25,3 +25,6 @@ class LsApiException(LsException):
 class InvalidResponseException(LucyException):
     pass
 
+
+class JudalException(LucyException):
+    pass

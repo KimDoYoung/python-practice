@@ -4,16 +4,84 @@
 {% block content %}
 <div>
     <h1>주달검색</h1>
+    <div id="search-area">
+        <div id="themes-area" class="d-flex flex-wrap"></div>
+        <div id="marget-area"> 
+            <div id="market-radio" class="btn-group" role="group" aria-label="Market Radio Buttons">
+                <input type="radio" class="btn-check" name="market" id="radio-all" autocomplete="off" checked>
+                <label class="btn btn-outline-primary" for="radio-all">전체</label>
+
+                <input type="radio" class="btn-check" name="market" id="radio-kosdaq" autocomplete="off">
+                <label class="btn btn-outline-primary" for="radio-kosdaq">코스닥</label>
+
+                <input type="radio" class="btn-check" name="market" id="radio-kospi" autocomplete="off">
+                <label class="btn btn-outline-primary" for="radio-kospi">코스피</label>
+            </div>
+        </div>
+        <div id="cost-area" class="d-flex flex-wrap">
+            <div>
+                <label for="total-cost">시가총액:</label>
+                <input type="number" id="total-cost" class="form-control" placeholder="5000">
+            </div>
+            <div>
+                <label for="current-cost-start">현재가:</label>
+                <input type="number" id="current-cost-start" class="form-control" placeholder="1000"> ~ <input type="number" id="current-cost-end" class="form-control" placeholder="250000">
+            </div>
+        </div>
+        <div id="search-button-area">
+            <button id="search-button" class="btn btn-primary">검색</button>
+        </div>
+    </div>
 </div>
 {% raw %}
 <!--handlebar scripts-->
+<script id="themes-template" type="text/x-handlebars-template">
+    {{#each themes}}
+    <div class="form-check me-2">
+        <input class="form-check-input theme" type="checkbox" value="{{name}}" id="theme-{{@index}}">
+        <label class="form-check-label" for="theme-{{@index}}">
+            {{name}}
+        </label>
+    </div>
+    {{/each}}
+</script>    
 {% endraw %}
 {% endblock %}
 {% block script %}
 {% raw %}
 <script>
-$( document ).ready(function() {
-    console.log( "ready!")
+function initialize(){
+    getFetch('/api/v1/judal/themes').then(data => {
+        console.log(data); 
+        //테마 체크박스 만들기
+        const source = document.getElementById("themes-template").innerHTML;
+        const template = Handlebars.compile(source);
+        const html = template({themes:data});
+        $('#themes-area').html(html);
+    }).catch(error=> {
+        console.error(error.message); 
+    });
+} 
+$(document).ready(function() {
+    console.log("Document is ready!");
+    $('#search-button').on('click', function(){
+        const url = '/api/v1/judal/search';
+
+        const data = {
+            themes: [],
+            market: '',
+            totalCost: $('#total-cost').val(),
+            currentCostStart: $('#current-cost-start').val(),
+            currentCostEnd: $('#current-cost-end').val()
+        };
+        postFetch(url, data).then(data => {
+            console.log(data);
+        }).catch(error=> {
+            console.error(error.message);
+        });
+    })
+    initialize();
+
 });
 </script>
 {% endraw %}

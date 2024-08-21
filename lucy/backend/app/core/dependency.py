@@ -46,3 +46,9 @@ def get_log_service():
 def get_stkinfo_service():
     from backend.app.domains.system.stk_info_service import StockInfoService
     return StockInfoService()
+
+
+@lru_cache()
+def get_judal_service():
+    from backend.app.domains.judal.judal_service import JudalService
+    return JudalService()

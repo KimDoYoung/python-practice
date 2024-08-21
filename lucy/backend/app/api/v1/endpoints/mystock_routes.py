@@ -1,4 +1,17 @@
-# APIRouter 인스턴스 생성
+# mystock_routes.py
+"""
+모듈 설명: 
+    - mystock 관련 API 라우터
+주요 기능:
+    - get_list : 나의 주식 목록 조회
+    - delete_mystock : 나의 주식 삭제
+    - add_mystock : 나의 주식 추가
+    - danta : 단타 머신에서 쓰는 service
+
+작성자: 김도영
+작성일: 2024-08-21
+버전: 1.0
+"""
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -59,4 +72,3 @@ async def danta(mystock_service :MyStockService=Depends(get_mystock_service)):
     await mystock_service.upsert(mystock_dto)
     await mystock_service.delete_all_by_type('단타')
     return {"message": "Danta success"}
-    

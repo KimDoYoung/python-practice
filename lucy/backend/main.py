@@ -28,6 +28,7 @@ from backend.app.api.v1.endpoints.config_routes import router as config_router
 from backend.app.api.v1.endpoints.kis_routes import router as kis_router
 from backend.app.api.v1.endpoints.ls_routes import router as ls_router
 from backend.app.api.v1.endpoints.mystock_routes import router as mystock_router
+from backend.app.api.v1.endpoints.judal_routes import router as judal_router
 from backend.app.api.v1.endpoints.client_websocket_routes import router as client_websocket_router
 from backend.app.api.v1.endpoints.danta_machine_routes import router as danta_router
 
@@ -70,7 +71,9 @@ def add_routes(app: FastAPI):
     app.include_router(scheduler_router, prefix="/api/v1/scheduler", tags=["scheduler"])
     app.include_router(config_router, prefix="/api/v1/config", tags=["config"])
     app.include_router(danta_router, prefix="/api/v1/danta", tags=["danta"])
+
     app.include_router(mystock_router, prefix="/api/v1/mystock", tags=["mystock"])
+    app.include_router(judal_router, prefix="/api/v1/judal", tags=["judal"])
     
     app.include_router(kis_router, prefix="/api/v1/kis", tags=["kis"])
     app.include_router(ls_router, prefix="/api/v1/ls", tags=["ls"])
