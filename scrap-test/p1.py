@@ -1,5 +1,7 @@
+import io
 import os
 import re
+import sys
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 import pandas as pd
@@ -58,6 +60,7 @@ def get_hrefs(url):
         row.append(href)
         data.append(row)
 
+    print(f"{url} : 갯수: ", len(data))
 
     # # 최대 열 수 찾기
     # max_columns = max(len(row) for row in data)
@@ -80,7 +83,9 @@ def get_hrefs(url):
     df = df.drop('type', axis=1)
     
     print(df['leech'].dtype)
-
+    print("------------------------------------------------")
+    print(df[['leech', 'name']])
+    print("------------------------------------------------")
     # 공백 제거
     df['leech'] = df['leech'].str.strip()
     # 특정 패턴의 문자열을 대체
@@ -100,6 +105,7 @@ def get_hrefs(url):
     return df
 
 def main():
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
     driver = install_chrome_driver()
     load_dotenv()
 
@@ -107,7 +113,7 @@ def main():
     baseUrl = os.getenv('P_URL')
 
     df_all = pd.DataFrame()
-    for i in range(0, 1):
+    for i in range(0, 2):
         url = f"{baseUrl}/search.php?q=user:Cristie65:{i}"
         new_df = get_hrefs(url)
         df_all = pd.concat([df_all, new_df], ignore_index=True)
