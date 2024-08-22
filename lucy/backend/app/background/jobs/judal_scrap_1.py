@@ -20,7 +20,6 @@ import os
 import random
 import shutil
 import time
-from fastapi import Depends
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -28,8 +27,6 @@ import re
 from  datetime import datetime, timedelta
 from backend.app.core.config import config
 from backend.app.core.logger import get_logger
-from backend.app.domains.system.config_service import DbConfigService
-from backend.app.core.dependency import get_config_service
 from backend.app.core.mongodb import MongoDb
 
 logging = get_logger(__name__)
@@ -110,7 +107,7 @@ def df_change(df):
             logging.error(f"Error extracting '52주 변동률': {e}")
 
         df['52주변동률최저'] = df['52주변동률최저'].astype(str).str.replace('%', '').astype(float)
-        df['52주변동률최저'] = df['52주변동률최저'].astype(str).str.replace('%', '').astype(float)
+        df['52주변동률최고'] = df['52주변동률최고'].astype(str).str.replace('%', '').astype(float)
         df.drop(columns=['52주 변동률'], inplace=True)
 
     if '3년 최고최저' in df.columns:
@@ -145,6 +142,16 @@ def df_change(df):
     
     if '기대수익률' in df.columns:
         df['기대수익률'] = df['기대수익률'].str.replace('%', '').str.replace(',','').astype(float)
+
+    if '3일합산' in df.columns:
+        df['3일합산'] = df['3일합산'].str.replace('%', '').str.replace(',','').astype(float)
+
+    if '전일비' in df.columns:
+        df['전일비'] = df['전일비'].str.replace('%', '').str.replace(',','').astype(float)
+
+    if '최근7일 거래량지수' in df.columns:
+        df['최근7일 거래량지수'] = df['최근7일 거래량지수'].str.replace('%', '').str.replace(',','').astype(float)
+
 
     if '버핏초이스' in df.columns:
         df['버핏초이스'] = df['버핏초이스'].astype(str).str.replace(' ', '').str.replace('위', '')
@@ -195,9 +202,9 @@ def remove_old_folders(base_folder):
 
     logging.info("오래된 폴더 삭제 작업 완료")
 
-def scrap_judal(config_service : DbConfigService=Depends(get_config_service)):
+def scrap_judal():
     
-    config_service.set_process_status({"key":"scrap_judal", "value":"running", 'note':'백그라운드 프로세스 scrap_judal is running'})
+    # config_service.set_process_status({"key":"scrap_judal", "value":"running", 'note':'백그라운드 프로세스 scrap_judal is running'})
 
     data_folder = config.DATA_FOLDER+"/judal"
 
@@ -292,12 +299,12 @@ def scrap_judal(config_service : DbConfigService=Depends(get_config_service)):
             logging.error(f"No table found for {name} at {url}")
 
     logging.debug("Data scraping is done!")    
-    config_service.remove_process_status("scrap_judal")
+    # config_service.remove_process_status("scrap_judal")
 
 async def judal_main(arg: str = None):
     await MongoDb.initialize(config.DB_URL)
-    config_service = get_config_service()
-    scrap_judal(config_service=config_service)
+    # config_service = get_config_service()
+    scrap_judal()
 
 
 if __name__ == "__main__":

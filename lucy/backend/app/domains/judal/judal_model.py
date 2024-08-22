@@ -15,7 +15,30 @@ class JudalStock(BaseModel):
     현재가: int
     시가총액: int
     시장종류: str
-    관련테마: Optional[str]  # 관련테마는 없을 수도 있으므로 Optional로 설정
+    관련테마: Optional[str] = Field(None, alias="관련테마")
+    전일비: float
+    삼일합산: Optional[float] = Field(None, alias="3일합산")
+    소외지수_52주: Optional[int] = Field(None, alias="52주 소외지수")
+    소외지수_3년: Optional[int] = Field(None, alias="3년 소외지수")
+    주가지수_3년: Optional[int] = Field(None, alias="3년 주가지수")
+    기대수익률: Optional[float] = None
+    PBR: Optional[float] = None
+    PER: Optional[float] = None
+    EPS: Optional[int] = None
+    거래량지수_당일: Optional[str] = Field(None, alias="당일 거래량지수")
+    거래량지수_최근7일: Optional[float] = Field(None, alias="최근7일 거래량지수")
+    등락가: Optional[int] = None
+    최고_52주: Optional[int] = Field(None, alias="52주최고")
+    최저_52주: Optional[int] = Field(None, alias="52주최저")
+    변동률최저_52주: Optional[float] = Field(None, alias="52주변동률최저")
+    변동률최고_52주: Optional[float] = Field(None, alias="52주변동률최고")
+    최고_3년: Optional[int] = Field(None, alias="3년최고")
+    최저_3년: Optional[int] = Field(None, alias="3년최저")
+    변동률최저_3년: Optional[float] = Field(None, alias="3년변동률최저")
+    변동률최고_3년: Optional[float] = Field(None, alias="3년변동률최고")
+
+    class Config:
+        allow_population_by_field_name = True
     
 class JudalTheme(BaseModel):
     name:str
