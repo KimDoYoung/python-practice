@@ -26,7 +26,8 @@ router = APIRouter()
 async def get_list(judal_service :JudalService=Depends(get_judal_service)) -> List[JudalTheme]:
     ''' 테마 목록을 리턴'''
     list = await judal_service.get_themes()
-    list = [theme for theme in list if theme.name != "전체 테마"]
+    list = [theme for theme in list if '테마' in theme.name and theme.name != "전체 테마"]
+    
     return list
 
 @router.post("/search", response_model=List[JudalStock])

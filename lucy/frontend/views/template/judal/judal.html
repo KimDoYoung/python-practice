@@ -2,38 +2,54 @@
 {% block style %}
 {% endblock %}
 {% block content %}
-<div>
-    <h1>주달검색</h1>
-    <div id="search-area">
-        <div id="themes-area" class="d-flex flex-wrap"></div>
-        <div id="marget-area"> 
-            <div id="market-radio" class="btn-group" role="group" aria-label="Market Radio Buttons">
-                <input type="radio" class="btn-check" name="market" id="radio-all" autocomplete="off" checked value="all">
-                <label class="btn btn-outline-primary" for="radio-all">전체</label>
-
-                <input type="radio" class="btn-check" name="market" id="radio-kosdaq" autocomplete="off" value="KOSDAQ">
-                <label class="btn btn-outline-primary" for="radio-kosdaq">코스닥</label>
-
-                <input type="radio" class="btn-check" name="market" id="radio-kospi" autocomplete="off" value="KOSPI">
-                <label class="btn btn-outline-primary" for="radio-kospi">코스피</label>
-            </div>
-        </div>
-        <div id="cost-area" class="d-flex flex-wrap">
-            <div>
-                <label for="total-cost">시가총액:</label>
-                <input type="number" id="total-cost" class="form-control" value="5000" required>
-            </div>
-            <div>
-                <label for="current-cost-start">현재가:</label>
-                <input type="number" id="current-cost-start" class="form-control" value="1000" required>
-                <input type="number" id="current-cost-end" class="form-control" value="250000" required>
-            </div>
-        </div>
-        <div id="search-button-area">
-            <button id="search-button" class="btn btn-primary">검색</button>
-        </div>
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="judal-search-tab" data-bs-toggle="tab"
+            data-bs-target="#judal-search-area" type="button" role="tab" aria-controls="userinfo"
+            aria-selected="true">주달검색</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="judal-theme-tab" data-bs-toggle="tab"
+            data-bs-target="#judal-theme-area" type="button" role="tab"
+            aria-controls="myreview" aria-selected="false">테마리스트</button>
+    </li>
+</ul>
+<div class="tab-content" id="myTabContent">
+    <div id="judal-theme-area" class="tab-pane fade">
+        <h1>주달테마리스트</h1>
     </div>
-    <div id="result-area"></div>
+    <div id="judal-search-area"  class="tab-pane fade show active">
+        <div id="search-area">
+            <div id="themes-area" class="d-flex flex-wrap"></div>
+            <div id="marget-area"> 
+                <div id="market-radio" class="btn-group" role="group" aria-label="Market Radio Buttons">
+                    <input type="radio" class="btn-check" name="market" id="radio-all" autocomplete="off" checked value="all">
+                    <label class="btn btn-outline-primary" for="radio-all">전체</label>
+
+                    <input type="radio" class="btn-check" name="market" id="radio-kosdaq" autocomplete="off" value="KOSDAQ">
+                    <label class="btn btn-outline-primary" for="radio-kosdaq">코스닥</label>
+
+                    <input type="radio" class="btn-check" name="market" id="radio-kospi" autocomplete="off" value="KOSPI">
+                    <label class="btn btn-outline-primary" for="radio-kospi">코스피</label>
+                </div>
+            </div>
+            <div id="cost-area" class="d-flex flex-wrap">
+                <div>
+                    <label for="total-cost">시가총액:</label>
+                    <input type="number" id="total-cost" class="form-control" value="5000" required>
+                </div>
+                <div>
+                    <label for="current-cost-start">현재가:</label>
+                    <input type="number" id="current-cost-start" class="form-control" value="1000" required>
+                    <input type="number" id="current-cost-end" class="form-control" value="250000" required>
+                </div>
+            </div>
+            <div id="search-button-area">
+                <button id="search-button" class="btn btn-primary">검색</button>
+            </div>
+        </div>
+        <div id="result-area"></div>
+    </div>
 </div>
 {% raw %}
 <!--handlebar scripts-->
@@ -48,24 +64,34 @@
     {{/each}}
 </script>    
 <script id="themes-result-template" type="text/x-handlebars-template">
-<table>
+<table class="table table-sm">
     <thead>
         <th>종목명</th>
         <th>종목코드</th>
-        <th>시가총액</th>
-        <th>현재가</th>
-        <th>시장</th>
-        <th>관련테마</th>
+        <th class="text-end">시가총액</th>
+        <th class="text-end">현재가</th>
+        <th class="text-end">PBR</th>
+        <th class="text-end">PER</th>
+        <th class="text-end">EPS</th>
+        <th class="text-end">전일비</th>
+        <th class="text-end">3일합산</th>
+        <th class="text-center">소외지수 52주</th>
+        <th>52주최저-최고</th>
     </thead>
     <tbody>
         {{#each stocks}}
         <tr>
             <td>{{종목명}}</td>
-            <td>{{종목코드}}</td>
-            <td>{{시가총액}}</td>
-            <td>{{현재가}}</td>
-            <td>{{시장종류}}</td>
-            <td>{{관련테마}}</td>
+            <td>{{goNaver 종목코드}}</td>
+            <td class="text-end">{{formatKoreanWon 시가총액}}</td>
+            <td class="text-end">{{displayWon 현재가}}</td>
+            <td class="text-end">{{PBR}}</td>
+            <td class="text-end">{{PER}}</td>
+            <td class="text-end">{{EPS}}</td>
+            <td class="text-end">{{전일비}}%</td>
+            <td class="text-end">{{3일합산}}%</td>
+            <td class="text-center">{{'52주 소외지수'}}</td>
+            <td>{{'52주최저'}}-{{'52주최고'}}</td>
         </tr>
         {{/each}}
     </tbody>
@@ -76,6 +102,20 @@
 {% block script %}
 {% raw %}
 <script>
+Handlebars.registerHelper('formatKoreanWon', function(number) {
+    if (number >= 10000) {
+        // 조 단위로 변환
+        const trillionPart = Math.floor(number / 10000);
+        const billionPart = number % 10000;
+        return trillionPart + '조 ' + billionPart + '억';
+    } else if (number >= 10000) {
+        // 억 단위로 변환
+        return number + '억';
+    } else {
+        // 1억 미만 숫자도 억 단위로 변환
+        return number + '억';
+    }
+});    
 function initialize(){
     getFetch('/api/v1/judal/themes').then(data => {
         console.log(data); 
@@ -134,6 +174,7 @@ $(document).ready(function() {
             $('#result-area').html(html);
         }).catch(error=> {
             console.error(error.message);
+            $('#result-area').html(error.message);
         });
     })
     initialize();

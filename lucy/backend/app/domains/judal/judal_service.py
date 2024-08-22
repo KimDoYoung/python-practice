@@ -11,6 +11,7 @@
 """
 from typing import List
 import pandas as pd
+import numpy as np
 import os
 
 from backend.app.domains.judal.judal_model import JudalCsvData, JudalStock, JudalTheme, QueryCondition
@@ -113,9 +114,37 @@ class JudalService:
     async def search(self, query_condition: QueryCondition) -> List[JudalStock]:
         
         df = await self.filtered_query(query_condition)
+        # NaN 값을 None으로 변환
+        df[['PBR', 'PER', 'EPS']] = df[['PBR', 'PER', 'EPS']].replace({np.nan: None})        
         
+        df_columns = df.columns.tolist()
+        logger.debug(df_columns)
         # pydantic 모델 리스트로 변환
-        stock_info_list = [JudalStock(**row) for _, row in df[['종목명', '종목코드', '현재가', '시가총액', '시장종류', '관련테마']].iterrows()]
+        # 
+        columns = [ '종목명', '종목코드', '현재가', '시가총액', '시장종류', '관련테마',
+                '전일비', 
+                '3일합산', 
+                '52주 소외지수', 
+                '3년 소외지수', 
+                '3년 주가지수', 
+                '기대수익률', 
+                'PBR', 
+                'PER', 
+                'EPS', 
+                '당일 거래량지수', 
+                '최근7일 거래량지수', 
+                '등락가', 
+                '52주최고', 
+                '52주최저', 
+                '52주변동률최저', 
+                '52주변동률최고', 
+                '3년최고', 
+                '3년최저', 
+                '3년변동률최저', 
+                '3년변동률최고'  ]
+        for _, row in df.iterrows():
+            logger.debug(row)
+        stock_info_list = [JudalStock(**row) for _, row in df[columns].iterrows()]
         # for stock in stock_info_list:
         #     print(stock)    
         return stock_info_list
