@@ -223,3 +223,56 @@
             return diffInt.toLocaleString();
         }
     });
+    /**
+        * 숫자를 특정 포맷에 맞게 출력
+        * <p>{{displayFmt 50000 "0,000" "-"}}</p>       <!-- 출력: 50,000 -->
+        * <p>{{displayFmt 50000 "0.00" "-"}}</p>        <!-- 출력: 50000.00 -->
+        * <p>{{displayFmt 50000 "0,000.00" "-"}}</p>    <!-- 출력: 50,000.00 -->
+        * <p>{{displayFmt null "0,000.00" "N/A"}}</p>   <!-- 출력: N/A -->
+        * <p>{{displayFmt 1234567.89 "0,000.00" "-"}}</p> <!-- 출력: 1,234,567.89 -->
+     */
+    Handlebars.registerHelper('numberFmt', function(value, format, defaultValue) {
+        if (value === undefined || value === null || isNaN(value)) {
+            return defaultValue || '-';
+        }
+    
+        // 1. 천단위 구분 (3자리마다 콤마)
+        if (format.includes(',')) {
+            value = Number(value).toLocaleString();
+        }
+    
+        // 2. 소수점 자리수 포맷
+        if (format.includes('.')) {
+            const decimals = format.split('.')[1].length;
+            value = Number(value).toFixed(decimals);
+        }
+    
+        // 3. 천단위 콤마와 소수점 자리수를 동시에 처리
+        if (format.includes(',') && format.includes('.')) {
+            const parts = format.split('.');
+            const decimals = parts[1].length;
+            value = Number(value).toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+        }
+    
+        return value;
+    });
+    /*
+    * 주당차이를 계산하여 표시
+    * <p>{{displayCha 10000 5000}}</p>  <!-- 출력: 5,000 -->
+    * <p>{{displayCha 1234567 765432}}</p>  <!-- 출력: 469,135 -->
+    * <p>{{displayCha 1000000 500000}}</p>  <!-- 출력: 500,000 -->
+    * <p>{{displayCha 100 200}}</p>  <!-- 출력: -100 -->
+    * <p>{{displayCha "abc" 500}}</p>  <!-- 출력: - (숫자가 아닐 경우) -->
+    */
+    Handlebars.registerHelper('displayCha', function(a, b) {
+        // a와 b가 숫자인지 확인
+        if (isNaN(a) || isNaN(b)) {
+            return '-';
+        }
+    
+        // a - b 계산
+        const result = a - b;
+    
+        // 결과를 3자리마다 콤마를 찍어서 문자열로 변환
+        return result.toLocaleString();
+    });

@@ -20,6 +20,7 @@ from backend.app.core.logger import get_logger
 from backend.app.domains.system.mystock_model import MyStock, MyStockDto
 from backend.app.domains.system.mystock_service import MyStockService
 from backend.app.core.dependency import  get_mystock_service
+from backend.app.utils.naver_util import get_stock_info
 
 logger = get_logger(__name__)
 
@@ -72,3 +73,9 @@ async def danta(mystock_service :MyStockService=Depends(get_mystock_service)):
     await mystock_service.upsert(mystock_dto)
     await mystock_service.delete_all_by_type('단타')
     return {"message": "Danta success"}
+
+@router.get("/naver-info/{stk_code}", response_model=dict)
+async def naver_info(stk_code: str):
+    ''' 네이버 주식 정보 조회 '''
+    stock_info = get_stock_info(stk_code)
+    return stock_info

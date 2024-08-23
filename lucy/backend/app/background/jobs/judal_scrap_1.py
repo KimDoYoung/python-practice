@@ -152,6 +152,9 @@ def df_change(df):
     if '최근7일 거래량지수' in df.columns:
         df['최근7일 거래량지수'] = df['최근7일 거래량지수'].str.replace('%', '').str.replace(',','').astype(float)
 
+    if '당일 거래량지수' in df.columns:
+        df['당일 거래량지수'] = df['당일 거래량지수'].str.replace('%', '').str.replace(',','').astype(float)
+
 
     if '버핏초이스' in df.columns:
         df['버핏초이스'] = df['버핏초이스'].astype(str).str.replace(' ', '').str.replace('위', '')

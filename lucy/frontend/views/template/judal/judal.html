@@ -46,9 +46,25 @@
             </div>
             <div id="search-button-area">
                 <button id="search-button" class="btn btn-primary">검색</button>
+                <button class="btn btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapseHelp" aria-expanded="false" aria-controls="collapseExample">
+                    <i class="bi bi-question-circle"></i>
+                </button>                
             </div>
         </div>
+        <div class="collapse" id="collapseHelp">
+            <div class="card card-body">
+                <ul>
+                    <li>52주 소외지수 : 52주 저점과 52주 고점 사이에서의 현재 주가의 위치를 백분율로 표시한 지수로 낮을 수록 많이 소외된 종목입니다</li>
+                    <li>PBR(주가 / 주당 순자산가치) : 낮을 수록 저평가된 회사입니다. 낮은 것을 선택하십시오</li>
+                    <li>PER(주가 / 주당 순이익) : 낮을 수록 좋습니다. 하지만 마이너스 종목은 적자회사를 의미합니다. 마이너스 종목은 가급적 배제하십시오</li>
+                    <li>EPS(당기순이익 / 주식수) : 높을 수록 좋습니다. 마이너스 종목은 적자회사를 의미합니다. 마이너스 종목은 가급적 배제하십시오</li>
+                    <li>당일 거래량지수 : 시가총액대비 당일 거래금액을 지수화한 수치입니다.</li>
+                    <li>7일 거래량지수 : 최근7일 거래량평균값을 최근90일거래량평균과 비교한 수치입니다.</li>
+                </ul>
+            </div>
+        </div>        
         <div id="result-area"></div>
+        <div id="naver-info" class="naver-info-box"></div>
     </div>
 </div>
 {% raw %}
@@ -64,34 +80,44 @@
     {{/each}}
 </script>    
 <script id="themes-result-template" type="text/x-handlebars-template">
-<table class="table table-sm">
+<table class="table table-sm table-hover">
     <thead>
         <th>종목명</th>
         <th>종목코드</th>
         <th class="text-end">시가총액</th>
+        <th class="text-end">52최저차이</th>
         <th class="text-end">현재가</th>
+        <th class="text-end">52최고차이</th>
+        <th class="text-center">소외지수 52주</th>
         <th class="text-end">PBR</th>
         <th class="text-end">PER</th>
         <th class="text-end">EPS</th>
         <th class="text-end">전일비</th>
         <th class="text-end">3일합산</th>
-        <th class="text-center">소외지수 52주</th>
-        <th>52주최저-최고</th>
+        <th class="text-end">당일거래량지수</th>
+        <th class="text-end">7일거래량지수</th>
+        <th class="text-center">동작</th>
     </thead>
     <tbody>
         {{#each stocks}}
         <tr>
-            <td>{{종목명}}</td>
+            <td><span class="naver-hover" data-stk-code="{{종목코드}}">{{종목명}}</span></td>
             <td>{{goNaver 종목코드}}</td>
             <td class="text-end">{{formatKoreanWon 시가총액}}</td>
-            <td class="text-end">{{displayWon 현재가}}</td>
-            <td class="text-end">{{PBR}}</td>
-            <td class="text-end">{{PER}}</td>
-            <td class="text-end">{{EPS}}</td>
-            <td class="text-end">{{전일비}}%</td>
-            <td class="text-end">{{3일합산}}%</td>
-            <td class="text-center">{{'52주 소외지수'}}</td>
-            <td>{{'52주최저'}}-{{'52주최고'}}</td>
+            <td class="text-end table-success">{{displayCha 현재가 52주최저}}</td>
+            <td class="text-end table-success fw-bold">{{displayWon 현재가}}</td>
+            <td class="text-end  table-success">{{displayCha 52주최고 현재가}}</td>
+            <td class="text-center table-success">{{'52주 소외지수'}}</td>
+            <td class="text-end table-secondary">{{numberFmt PBR '0.00' '-'}}</td>
+            <td class="text-end table-secondary">{{numberFmt PER '0.00' '-'}}</td>
+            <td class="text-end table-secondary">{{numberFmt EPS '0,000' '-'}}</td>
+            <td class="text-end table-warning">{{numberFmt 전일비 '0.00' '-'}}%</td>
+            <td class="text-end table-warning">{{numberFmt 3일합산 '0.00' '-'}}%</td>
+            <td class="text-end table-danger">{{'당일 거래량지수'}}</td>
+            <td class="text-end table-danger">{{'최근7일 거래량지수'}}%</td>
+            <td class="text-center">
+                <button class="btnAddDanta btn btn-light" data-stk-code="{{종목코드}}" data-stk-name="{{종목명}}"><i class="bi bi-plus-circle"></i></button>
+            </td>
         </tr>
         {{/each}}
     </tbody>
@@ -142,6 +168,36 @@ function themes2badgeshtml(themeString) {
 } 
 $(document).ready(function() {
     console.log("Document is ready!");
+    //관심추가
+    $('#myTabContent').on("click", ".btnAddDanta", function() {
+        const stkCode = $(this).data('stk-code');
+        const stkName = $(this).data('stk-name');
+        console.log(stkCode, stkName);
+    });
+    //네이버 정보
+    $('#result-area').on("mouseenter", ".naver-hover", function() {
+        const stkCode = $(this).data('stk-code');
+        const url = '/api/v1/mystock/naver-info/' + stkCode;
+        getFetch(url).then(data => {
+            console.log(data);
+            var offset = $(this).offset();
+            var html = "<h3>" + data.stk_name + "</h3>";
+                html += "<p>" + data.company_summary.replace(/\n/g, "<br>") + "</p>";
+            $('#naver-info').html(html)
+                         .css({
+                             display: 'block',
+                             top: offset.top + $(this).outerHeight() + 5,
+                             left: offset.left
+                         });             
+        }).catch(error=> {
+            console.error(error.message); 
+        });        
+    }); 
+    $('#result-area').on("mouseleave", ".naver-hover", function() {
+        $('#naver-info').css('display', 'none');
+    });
+
+    //검색버튼
     $('#search-button').on('click', function(){
         const url = '/api/v1/judal/search';
         const themes = $('#search-area').find('.theme:checked').map(function(){
@@ -170,7 +226,10 @@ $(document).ready(function() {
             console.log(data);
             const source = document.getElementById("themes-result-template").innerHTML;
             const template = Handlebars.compile(source);
-            const html = template({stocks:data});
+            const uniqueData = Array.from(
+                new Map(data.map(item => [item.종목코드, item])).values()
+            );            
+            const html = template({stocks:uniqueData});
             $('#result-area').html(html);
         }).catch(error=> {
             console.error(error.message);
