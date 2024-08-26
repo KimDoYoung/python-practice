@@ -1,0 +1,36 @@
+mr.py(movie_review)를 작성하려고 함.
+1. mysql table movie_review 테이블은 다음과 같음
+```
+-- kalpadb.movie_review definition
+
+CREATE TABLE `movie_review` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '일련번호',
+  `title` varchar(200) NOT NULL COMMENT '제목',
+  `nara` varchar(30) DEFAULT NULL COMMENT '제작국가',
+  `year` char(4) DEFAULT NULL COMMENT '제작년도',
+  `lvl` int(11) DEFAULT NULL COMMENT '총평점수',
+  `ymd` varchar(8) DEFAULT NULL COMMENT '본일자',
+  `content` text DEFAULT NULL COMMENT '감상',
+  `lastmodify_dt` datetime DEFAULT NULL COMMENT '최종수정일시',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=350 DEFAULT CHARSET=utf8;
+```
+2. db url은 다음과 같음.
+jdbc:mariadb://jskn.iptime.org:3306/kalpadb
+
+3. 인자로 2개를 받은 start_ymd, end_ymd
+즉 다음과 같이 command line에서 수행함.
+review_movie 20210101 20211231
+
+4. 동작
+4-1. start_ymd와 end_ymd 로 ymd를 조건으로 함.
+즉 select * from moview_review where ymd between start_ymd and end_ymd order by ymd
+
+4-2. template_html을 jinja2의 template로 사용해서.
+html을 write함  html의 파일명은 movie_reive_20210101_20211231.html 로 생김
+
+4-3.주의할 것은 content는 html로 형태로 table에 들어 있음.
+
+위 spec과 같은 파이썬 프로그램 mr.py
+
+
