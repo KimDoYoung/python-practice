@@ -100,9 +100,11 @@ class JudalService:
 
     async def get_csv_file(self, name:str) -> List[JudalCsvData]:
         ''' 테마명에 해당하는 csv 파일을 가져온다. '''
-        base_folder = self.get_last_scraped_folder()
+        base_folder = await self.get_last_scraped_folder()
         csv_file = f'{base_folder}/{name.replace(" ", "_")}.csv'
-        df = pd.read_csv(csv_file)
+        df = pd.read_csv(csv_file, dtype={'종목코드': str})
+        # NaN 값을 None으로 변환
+        df[['PBR', 'PER', 'EPS']] = df[['PBR', 'PER', 'EPS']].replace({np.nan: None})         
         judal_csv_data_list: List[JudalCsvData] = [
             JudalCsvData(
                 **{**row.to_dict(), "종목코드": str(row['종목코드'])}  # 종목코드를 문자열로 변환
@@ -110,6 +112,16 @@ class JudalService:
         ]
         
         return judal_csv_data_list
+    
+    async def get_detail_themes(self) -> List[JudalTheme]:
+        ''' 상세 테마 목록을 가져온다. '''
+        base_folder = await self.get_last_scraped_folder()
+        csv_file = f'{base_folder}/href_list.csv'
+        df = pd.read_csv(csv_file)
+
+        # DataFrame에서 pydantic 모델 리스트로 변환
+        judal_theme_list: List[JudalTheme] = [JudalTheme(name=row['name'], href=row['href']) for _, row in df.iterrows()]
+        return judal_theme_list
     
     async def search(self, query_condition: QueryCondition) -> List[JudalStock]:
         

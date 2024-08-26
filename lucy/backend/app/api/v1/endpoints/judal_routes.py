@@ -14,7 +14,7 @@ from typing import List
 from fastapi import APIRouter, Depends
 
 from backend.app.core.logger import get_logger
-from backend.app.domains.judal.judal_model import JudalStock, JudalTheme, QueryCondition
+from backend.app.domains.judal.judal_model import JudalCsvData, JudalStock, JudalTheme, QueryCondition
 from backend.app.domains.judal.judal_service import JudalService
 from backend.app.core.dependency import get_judal_service
 
@@ -23,11 +23,23 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 @router.get("/themes", response_model=List[JudalTheme])
-async def get_list(judal_service :JudalService=Depends(get_judal_service)) -> List[JudalTheme]:
+async def themes(judal_service :JudalService=Depends(get_judal_service)) -> List[JudalTheme]:
     ''' 테마 목록을 리턴'''
     list = await judal_service.get_themes()
     list = [theme for theme in list if '테마' in theme.name and theme.name != "전체 테마"]
     
+    return list
+
+@router.get("/detail-themes", response_model=List[JudalTheme])
+async def detail_themes(judal_service :JudalService=Depends(get_judal_service)) -> List[JudalTheme]:
+    ''' 상세 테마 목록을 리턴'''
+    list = await judal_service.get_detail_themes()   
+    return list
+
+@router.get("/csv/{csv_file_name}", response_model=List[JudalCsvData])
+async def csv_file(csv_file_name:str, judal_service :JudalService=Depends(get_judal_service)):
+    ''' csv_file을 읽어서 리턴'''
+    list = await judal_service.get_csv_file(csv_file_name)
     return list
 
 @router.post("/search", response_model=List[JudalStock])

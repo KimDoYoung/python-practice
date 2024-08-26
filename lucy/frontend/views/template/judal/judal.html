@@ -10,14 +10,12 @@
     </li>
     <li class="nav-item" role="presentation">
         <button class="nav-link" id="judal-theme-tab" data-bs-toggle="tab"
-            data-bs-target="#judal-theme-area" type="button" role="tab"
+            data-bs-target="#judal-detail-theme-area" type="button" role="tab"
             aria-controls="myreview" aria-selected="false">테마리스트</button>
     </li>
 </ul>
 <div class="tab-content" id="myTabContent">
-    <div id="judal-theme-area" class="tab-pane fade">
-        <h1>주달테마리스트</h1>
-    </div>
+    <!-- 검색탭 -->
     <div id="judal-search-area"  class="tab-pane fade show active">
         <div id="search-area">
             <div id="themes-area" class="d-flex flex-wrap"></div>
@@ -66,6 +64,20 @@
         <div id="result-area"></div>
         <div id="naver-info" class="naver-info-box"></div>
     </div>
+    <!-- 테마리스트탭 -->
+    <div id="judal-detail-theme-area" class="tab-pane fade m-2">
+        <div class="row">
+            <div class="col-2">
+                <div class="">
+                    Filter: <input type="text" id="detail-theme-filter-keyword" style="width:100px"> <button id="theme-filter-clear-button" class="btn btn-primary"><i class="bi bi-x-circle"></i></button>
+                </div>
+                <div id="detail-theme-list-area"></div>
+            </div>
+            <div class="col-10">
+                <div id="csv-result-area"></div>
+            </div>
+        </div>
+    </div>
 </div>
 {% raw %}
 <!--handlebar scripts-->
@@ -85,17 +97,17 @@
         <th>종목명</th>
         <th>종목코드</th>
         <th class="text-end">시가총액</th>
-        <th class="text-end">52최저차이</th>
+        <th class="text-end">52최저<br>차이</th>
         <th class="text-end">현재가</th>
-        <th class="text-end">52최고차이</th>
-        <th class="text-center">소외지수 52주</th>
+        <th class="text-end">52최고<br>차이</th>
+        <th class="text-center">소외지수<br>52주</th>
         <th class="text-end">PBR</th>
         <th class="text-end">PER</th>
         <th class="text-end">EPS</th>
         <th class="text-end">전일비</th>
         <th class="text-end">3일합산</th>
-        <th class="text-end">당일거래량지수</th>
-        <th class="text-end">7일거래량지수</th>
+        <th class="text-end">당일거래량<br>지수</th>
+        <th class="text-end">7일거래량<br>지수</th>
         <th class="text-center">동작</th>
     </thead>
     <tbody>
@@ -123,11 +135,22 @@
     </tbody>
 </table>
 </script>
+<script id="detail-themes-template" type="text/x-handlebars-template">
+    <ul class="list-group">
+        {{#each list}}
+        <li class="list-group-item"><a href="#" class="theme-view" data-csv-name="{{name}}">{{name}}</a></li>
+        {{/each}}
+    </ul>
+    <!-- {{#each list}}
+    <span class="badge bg-warning text-dark m-2">{{name}}</span>
+    {{/each}} -->
+</script>
 {% endraw %}
 {% endblock %}
 {% block script %}
 {% raw %}
 <script>
+let theme_list = [];
 Handlebars.registerHelper('formatKoreanWon', function(number) {
     if (number >= 10000) {
         // 조 단위로 변환
@@ -142,6 +165,19 @@ Handlebars.registerHelper('formatKoreanWon', function(number) {
         return number + '억';
     }
 });    
+function create_theme_list(keyword){
+    if(keyword == '') {
+        const source = document.getElementById("detail-themes-template").innerHTML;
+        const template = Handlebars.compile(source);
+        const html = template({list:theme_list});
+        $('#detail-theme-list-area').html(html);
+    } else {
+        const source = document.getElementById("detail-themes-template").innerHTML;
+        const template = Handlebars.compile(source);
+        const html = template({list:theme_list.filter(theme => theme.name.includes(keyword))});
+        $('#detail-theme-list-area').html(html);
+    }
+}
 function initialize(){
     getFetch('/api/v1/judal/themes').then(data => {
         console.log(data); 
@@ -150,6 +186,18 @@ function initialize(){
         const template = Handlebars.compile(source);
         const html = template({themes:data});
         $('#themes-area').html(html);
+    }).catch(error=> {
+        console.error(error.message); 
+    });
+    getFetch('/api/v1/judal/detail-themes').then(data => {
+        console.log(data); 
+        theme_list = data;
+        create_theme_list('');
+        //테마 리스트 만들기
+        // const source = document.getElementById("detail-themes-template").innerHTML;
+        // const template = Handlebars.compile(source);
+        // const html = template({list:data});
+        // $('#detail-theme-list-area').html(html);
     }).catch(error=> {
         console.error(error.message); 
     });
@@ -168,6 +216,29 @@ function themes2badgeshtml(themeString) {
 } 
 $(document).ready(function() {
     console.log("Document is ready!");
+    $('#detail-theme-filter-keyword').on('input', function() {
+        var keyword = $(this).val().toLowerCase();
+        create_theme_list(keyword);
+    });
+    //테마를 클릭하면 csv파일을 읽어서 리턴받는다.
+    $('#judal-detail-theme-area').on("click", ".theme-view", function(e) {
+        e.preventDefault();
+        var csvName = $(this).data('csv-name');
+        var url = '/api/v1/judal/csv/' + csvName;
+        getFetch(url).then(data => {
+            console.log(data);
+            const source = document.getElementById("themes-result-template").innerHTML;
+            const template = Handlebars.compile(source);
+            let html = template({stocks:data});
+            html = '<h3>' + csvName + '</h3>' + html;
+            $('#csv-result-area').html(html);
+            $('html, body').animate({ scrollTop: 0 }, 'slow'); //스크롤을 위로 올림
+        }).catch(error=> {
+            console.error(error.message); 
+            $('#csv-result-area').html(error.message);
+        });
+
+    });
     //관심추가
     $('#myTabContent').on("click", ".btnAddDanta", function() {
         const stkCode = $(this).data('stk-code');
@@ -184,11 +255,11 @@ $(document).ready(function() {
             var html = "<h3>" + data.stk_name + "</h3>";
                 html += "<p>" + data.company_summary.replace(/\n/g, "<br>") + "</p>";
             $('#naver-info').html(html)
-                         .css({
-                             display: 'block',
-                             top: offset.top + $(this).outerHeight() + 5,
-                             left: offset.left
-                         });             
+                            .css({
+                                display: 'block',
+                                top: offset.top + $(this).outerHeight() + 5,
+                                left: offset.left
+                            });             
         }).catch(error=> {
             console.error(error.message); 
         });        
