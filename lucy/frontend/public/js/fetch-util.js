@@ -38,11 +38,25 @@ async function callLucyApi(url, method, data = null) {
         }
 
         const response = await fetch(url, options);
+        
+        // 세션 타임아웃으로 인해 401 상태 코드가 반환되었는지 체크
+        if (response.status === 401) {
+            console.error('세션이 만료되었습니다.');
+            // 사용자에게 로그인 페이지로 리다이렉트하도록 처리
+            window.location.href = '/login';
+            return;
+        }
 
         if (!response.ok) {
             console.error('에러 발생:', response);
-            const errorData = await response.json();
-            throw new LucyError(response.status, errorData.detail);
+            // 응답이 JSON인지 체크하여 에러 데이터 처리
+            const contentType = response.headers.get('content-type');            
+            if (contentType && contentType.includes('application/json')) {
+                const errorData = await response.json();
+                throw new LucyError(response.status, errorData.detail);
+            } else {
+                throw new LucyError(response.status, 'Unexpected response format');
+            }            
         }
 
         const responseData = await response.json();
