@@ -281,11 +281,12 @@ $(document).ready(function() {
         const stkName = $(this).data('stk-name');
         console.log(stkCode, stkName);
         const url = '/api/v1/mystock/add';
-        const data = { stk_code: stkCode, stk_name: stkName, stk_types:['관심'] };
+        const data = { stk_code: String(stkCode), stk_name: stkName, stk_types:['관심'] };
         postFetch(url, data).then(data => {
             console.log(data);
         }).catch(error=> {
             console.error(error.message);
+            alert(error.message);
         });
     });
     //네이버 정보

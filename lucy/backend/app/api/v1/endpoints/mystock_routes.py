@@ -89,3 +89,24 @@ async def naver_info(stk_code: str):
     ''' 네이버 주식 정보 조회 '''
     stock_info = get_stock_info(stk_code)
     return stock_info
+
+
+@router.get("/extract/stktype", response_model=dict)
+async def extract_stktype(stk_type: Optional[str] = Query(None, description="주식 유형 필터 (예: 단타, 관심, 보유)"),
+                        mystock_service :MyStockService=Depends(get_mystock_service)):
+    ''' 
+    stk_type을 갖고 있는 MyStock 찾아서 거기에서 stk_types에서 제거 
+    stk_types가 모두 비어 있으면 그것 자체를 삭제
+    '''
+    if stk_type.lower() == 'all':
+        await mystock_service.delete_all()
+        return {"message": "Extract all success"}
+                
+    mystocks = await mystock_service.get_all_by_type(stk_type)
+    for mystock in mystocks:
+        mystock.stk_types.remove(stk_type)
+        if not mystock.stk_types:
+            await mystock.delete()
+        else:
+            await mystock.save()
+    return {"message": "Extract success"}

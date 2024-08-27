@@ -37,6 +37,13 @@ class MyStockService:
         except Exception as e:
             logger.error(f"Failed to retrieve all MyStocks: {e}")
             raise e
+        
+    async def delete_all(self) -> bool:
+        ''' MyStock Collection에서 모든 document를 삭제한다.'''
+        mystocks = await MyStock.find().to_list()
+        for mystock in mystocks:
+            await mystock.delete()
+        return True
 
     async def delete_by_id(self, id: str) -> bool:
         ''' id에 해당하는 document를 삭제한다.'''

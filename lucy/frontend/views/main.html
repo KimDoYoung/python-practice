@@ -94,14 +94,14 @@
         });
     }
     $(document).ready(function() {
-        $('#dantaTest').on('click', function(){
-            const url = '/api/v1/mystock/danta';
-            getFetch(url).then(data => {
-                console.log(data); 
-            }).catch(error=> {
-                console.error(error.message); 
-            });
-        });
+        // $('#dantaTest').on('click', function(){
+        //     const url = '/api/v1/mystock/danta';
+        //     getFetch(url).then(data => {
+        //         console.log(data); 
+        //     }).catch(error=> {
+        //         console.error(error.message); 
+        //     });
+        // });
         $('#allCost').on('click', function(){
             $('#list-area').find('.btnCurrentCost').each(function(){
                 $(this).trigger('click');

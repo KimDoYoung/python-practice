@@ -29,8 +29,8 @@ class MyStockBase(BaseModel):
     
     stk_types: Optional[List[str]] = None
     last_update_time: Optional[datetime.datetime] = Field(default_factory=datetime.datetime.now)
-
     @field_validator('stk_code')
+
     def validate_stk_code(cls, v):
         if len(v) != 6:
             raise ValueError('종목코드는 6개의 숫자입니다.')

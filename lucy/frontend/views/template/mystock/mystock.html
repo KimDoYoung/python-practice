@@ -22,6 +22,9 @@
             <label class="form-check-label" for="option3">단타</label>
         </div>
     </form>
+    <div>
+        <button class="btn btn-sm btn-secondary" id="btnExtractStkType">빼기</button>
+    </div>
 </div>
 <div id="mystock-result-area"></div>
 {% raw %}
@@ -106,6 +109,7 @@ function init(){
 $( document ).ready(function() {
     console.log( "ready!")
     init();
+    //stk_type에 따라 보여줄 종목을 필터링한다.
     $('#mystock-search-area').on("change", "input[type=radio]", function() {
         const option = $('input[name=options]:checked').val();
         if(option == 'ALL') {
@@ -117,6 +121,22 @@ $( document ).ready(function() {
             const template = Handlebars.compile(document.getElementById('mystock-template').innerHTML);
             const html = template({list : data});
             $('#mystock-result-area').html(html);
+        }).catch(error=> {
+            console.error(error.message); 
+        });
+    });
+    //종목코드를 빼기
+    $('#btnExtractStkType').on('click', function(){
+        const option = $('input[name=options]:checked').val();
+        const url = '/api/v1/mystock/extract/stktype/?stk_type=' + option
+        if(option == 'ALL') {
+            if (!confirm('all은 모든 종목을 삭제합니다. 모든 myStock을 삭제하시겠습니까?')) {
+                return;
+            }
+        }
+        getFetch(url).then(data => {
+            console.log(data);
+            init();
         }).catch(error=> {
             console.error(error.message); 
         });
