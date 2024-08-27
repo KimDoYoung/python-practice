@@ -1,0 +1,127 @@
+{% extends 'common/base.html' %}
+{% block style %}
+{% endblock %}
+{% block content %}
+<h2>MyStock</h2>
+<div id="mystock-search-area">
+    <form>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="options" id="option0" value="ALL" checked>
+            <label class="form-check-label" for="option0">ALL</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="options" id="option1" value="보유">
+            <label class="form-check-label" for="option1">보유</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="options" id="option2" value="관심">
+            <label class="form-check-label" for="option2">관심</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="options" id="option3" value="단타">
+            <label class="form-check-label" for="option3">단타</label>
+        </div>
+    </form>
+</div>
+<div id="mystock-result-area"></div>
+{% raw %}
+<!--handlebar scripts-->
+<script id="mystock-template" type="text/x-handlebars-template">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>종류</th>
+                <th>종목코드</th>
+                <th>종목명</th>
+                <th>현재가</th>
+                <th>동작</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each list}}
+            <tr>
+                <td>{{split_and_badge this.stk_types}}</td>
+                <td>{{goNaver this.stk_code}}</td>
+                <td>{{this.stk_name}}</td>
+                <td id="cost-{{this.stk_code}}" class="mx-2 p-2 text-end">-</td>
+                <td class="ms-2">
+                    <button class="btnDelete btn btn-secondary btn-sm" data-id="{{this._id}}" title="관심..삭제"><i class="bi bi-dash   "></i></button>
+                    <button class="btnCurrent Cost btn btn-success btn-sm" data-stk-code="{{this.stk_code}}"><img src="public/images/korean-won.svg" alt="아이콘" width="20" height="20"></button>
+                    <button class="btnBuy btn btn-danger btn-sm" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}">買</button>
+                    <button class="btnSell btn btn-primary btn-sm" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}">賣</button>
+                    <button class="btnDantaAdd btn btn-warning btn-sm" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}" title="단타추가"><i class="bi bi-plus-circle"></i></button> 
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</script>
+{% endraw %}
+{% endblock %}
+{% block script %}
+{% raw %}
+<script>
+// 문자열을 잘라서 bootstrap5 뱃지로 만든다.
+Handlebars.registerHelper('split_and_badge', function(stk_types) {
+    // stk_types 문자열을 공백 기준으로 나누기
+    // debugger;
+    // const typesArray = stk_types.split(' ');
+    typesArray = stk_types;
+    // 각 요소를 Bootstrap 배지로 감싸기
+    const badges = typesArray.map(type => {
+        let badgeClass = '';
+
+        // type에 따라 배지 색상을 설정
+        switch (type) {
+            case '보유':
+                badgeClass = 'bg-secondary'; //'bg-primary';
+                break;
+            case '단타':
+                badgeClass = 'bg-success';
+                break;
+            case '관심':
+                badgeClass = 'bg-warning';
+                break;
+            default:
+                badgeClass = 'bg-secondary'; // 기본 색상
+        }
+
+        return `<span class="badge ${badgeClass}">${Handlebars.escapeExpression(type)}</span>`;
+    });
+
+    // 배지를 공백을 기준으로 연결하여 반환
+    return new Handlebars.SafeString(badges.join(' '));
+});    
+function init(){
+    getFetch('/api/v1/mystock').then(data => {
+        console.log(data); 
+        const template = Handlebars.compile(document.getElementById('mystock-template').innerHTML);
+        const html = template({list : data});
+        $('#mystock-result-area').html(html);
+    }).catch(error=> {
+        console.error(error.message); 
+        $('#mystock-result-area').html(error.message);
+    });
+}
+$( document ).ready(function() {
+    console.log( "ready!")
+    init();
+    $('#mystock-search-area').on("change", "input[type=radio]", function() {
+        const option = $('input[name=options]:checked').val();
+        if(option == 'ALL') {
+            init();
+            return;
+        }
+        getFetch('/api/v1/mystock/?stk_type='+option).then(data => {
+            console.log(data); 
+            const template = Handlebars.compile(document.getElementById('mystock-template').innerHTML);
+            const html = template({list : data});
+            $('#mystock-result-area').html(html);
+        }).catch(error=> {
+            console.error(error.message); 
+        });
+    });
+});
+</script>
+{% endraw %}
+{% endblock %}

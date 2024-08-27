@@ -1,4 +1,4 @@
-{% extends 'common/base_kis.html' %}
+{% extends 'common/base.html' %}
 {% block style %}
 <style>
 </style>
@@ -139,7 +139,7 @@
             const data = {
                 stk_code: String(stk_code),
                 stk_name: stk_name,
-                stk_types: ['단타']
+                stk_types: ['관심']
             }
             postFetch(url, data)
             .then(data => { 

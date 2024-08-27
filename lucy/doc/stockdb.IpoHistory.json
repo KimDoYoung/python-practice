@@ -222,4 +222,109 @@
   "Notes": "",
   "Revenue": 728.95,
   "StkCode": "199480"
+},
+{
+  "_id": {
+    "$oid": "66cd32be023f7cb308b3a54d"
+  },
+  "Company": "유라클",
+  "FinalOfferingPrice": 21000,
+  "InstitutionalSubscriptionRatio": 1065.86,
+  "LockupAgreement": 0.55,
+  "MaxValue": 33000,
+  "MultipleVariable": 1.5714285714285714,
+  "NetIncome": 20.98,
+  "Notes": "",
+  "Revenue": 485.81,
+  "StkCode": "088340"
+},
+{
+  "_id": {
+    "$oid": "66cd33a2023f7cb308b3a54e"
+  },
+  "Company": " 전진건설로봇(구.전진중공업)",
+  "FinalOfferingPrice": 16500,
+  "InstitutionalSubscriptionRatio": 870.2,
+  "LockupAgreement": 8.79,
+  "MaxValue": 28900,
+  "MultipleVariable": 1.7515151515151515,
+  "NetIncome": 289.48,
+  "Notes": "",
+  "Revenue": 1583.7,
+  "StkCode": "079900"
+},
+{
+  "_id": {
+    "$oid": "66cd351b023f7cb308b3a54f"
+  },
+  "Company": "넥스트바이오메디컬",
+  "FinalOfferingPrice": 29000,
+  "InstitutionalSubscriptionRatio": 356.95,
+  "LockupAgreement": 2.18,
+  "MaxValue": 29539,
+  "MultipleVariable": 1.0185862068965517,
+  "NetIncome": -57.32,
+  "Notes": "",
+  "Revenue": 279.5,
+  "StkCode": "389650"
+},
+{
+  "_id": {
+    "$oid": "66cd3586023f7cb308b3a550"
+  },
+  "Company": "케이쓰리아이",
+  "FinalOfferingPrice": 15500,
+  "InstitutionalSubscriptionRatio": 239.23,
+  "LockupAgreement": 1.03,
+  "MaxValue": 15950,
+  "MultipleVariable": 1.0290322580645161,
+  "NetIncome": 14.91,
+  "Notes": "",
+  "Revenue": 107.41,
+  "StkCode": "431190"
+},
+{
+  "_id": {
+    "$oid": "66cd360f023f7cb308b3a551"
+  },
+  "Company": "티디에스팜",
+  "FinalOfferingPrice": 13000,
+  "InstitutionalSubscriptionRatio": 1331.2,
+  "LockupAgreement": 4.23,
+  "MaxValue": 52000,
+  "MultipleVariable": 4,
+  "NetIncome": 34.56,
+  "Notes": "",
+  "Revenue": 255.88,
+  "StkCode": "464280"
+},
+{
+  "_id": {
+    "$oid": "66cd3682023f7cb308b3a552"
+  },
+  "Company": "엠83",
+  "FinalOfferingPrice": 16000,
+  "InstitutionalSubscriptionRatio": 1024.72,
+  "LockupAgreement": 0.75,
+  "MaxValue": 54800,
+  "MultipleVariable": 3.425,
+  "NetIncome": 56.82,
+  "Notes": "",
+  "Revenue": 421.13,
+  "StkCode": "476080"
+},
+{
+  "_id": {
+    "$oid": "66cd36eb023f7cb308b3a553"
+  },
+  "Company": "이엔셀",
+  "FinalOfferingPrice": 15300,
+  "InstitutionalSubscriptionRatio": 949.3,
+  "LockupAgreement": 0.24,
+  "MaxValue": 45800,
+  "MultipleVariable": 2.9934640522875817,
+  "NetIncome": -455.67,
+  "Notes": "",
+  "Revenue": 73.67,
+  "StkCode": "456070"
 }]

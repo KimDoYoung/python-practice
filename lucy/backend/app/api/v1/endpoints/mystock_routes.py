@@ -12,9 +12,9 @@
 작성일: 2024-08-21
 버전: 1.0
 """
-from typing import List
+from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 from backend.app.core.logger import get_logger
 from backend.app.domains.system.mystock_model import MyStock, MyStockDto
@@ -26,11 +26,21 @@ logger = get_logger(__name__)
 
 router = APIRouter()
 
+# @router.get("/", response_model=List[MyStock])
+# async def get_list(mystock_service :MyStockService=Depends(get_mystock_service)) -> List[MyStock]:
+#     ''' 나의 주식 목록 조회'''
+#     list = await mystock_service.get_all()
+#     return list
 @router.get("/", response_model=List[MyStock])
-async def get_list(mystock_service :MyStockService=Depends(get_mystock_service)) -> List[MyStock]:
-    ''' 나의 주식 목록 조회'''
-    list = await mystock_service.get_all()
-    # list.sort(key=lambda x: x.last_update_time)
+async def get_list(
+    stk_type: Optional[str] = Query(None, description="주식 유형 필터 (예: 단타, 관심, 보유)"),
+    mystock_service: MyStockService = Depends(get_mystock_service)
+) -> List[MyStock]:
+    '''나의 주식 목록 조회'''
+    if stk_type:
+        list = await mystock_service.get_all_by_type(stk_type)
+    else:
+        list = await mystock_service.get_all()
     return list
 
 @router.delete("/delete/{id}")
