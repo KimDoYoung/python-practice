@@ -1,5 +1,6 @@
+import math
 from typing import List, Optional, Union
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 
 
 class QueryCondition(BaseModel):
@@ -73,6 +74,12 @@ class JudalCsvData(BaseModel):
     최저_3년: Optional[int] = Field(None, alias="3년최저")
     변동률최저_3년: Optional[float] = Field(None, alias="3년변동률최저")
     변동률최고_3년: Optional[float] = Field(None, alias="3년변동률최고")
+    
+    @validator('업데이트', pre=True, always=True)
+    def validate_update(cls, v):
+        if isinstance(v, float) and math.isnan(v):
+            return None
+        return v
 
     class Config:
         allow_population_by_field_name = True

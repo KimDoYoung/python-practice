@@ -235,27 +235,11 @@ function initialize(){
         console.log(data); 
         theme_list = data;
         create_theme_list('');
-        //테마 리스트 만들기
-        // const source = document.getElementById("detail-themes-template").innerHTML;
-        // const template = Handlebars.compile(source);
-        // const html = template({list:data});
-        // $('#detail-theme-list-area').html(html);
     }).catch(error=> {
         console.error(error.message); 
     });
 }
-function themes2badgeshtml(themeString) {
-            // 주어진 문자열을 스페이스로 분리
-            const themes = themeString.split(' ');
 
-            // 각 테마를 뱃지 HTML로 변환하여 합침
-            const badgesHtml = themes.map(theme => {
-                return `<span class="badge bg-primary me-1">${theme}</span>`;
-            }).join('');
-
-            // HTML 문자열 반환
-            return badgesHtml;
-} 
 $(document).ready(function() {
     console.log("Document is ready!");
 
