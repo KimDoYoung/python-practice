@@ -17,6 +17,8 @@ from pydantic import BaseModel, Field, field_validator
 class MyStockBase(BaseModel):
     stk_code: str
     stk_name: Optional[str] = None
+    sell_base_price: Optional[int] = None # 매도기준가격
+    buy_base_price: Optional[int] = None # 매수기준가격
 #------------------------------------------------- 단타머신에서 사용    
     buy_ordno : Optional[str] = '' # 매수주문번호
     buy_qty : Optional[int] = 0 # 매수수량
@@ -26,6 +28,8 @@ class MyStockBase(BaseModel):
     sell_qty : Optional[int] = 0 # 매도수량
     sell_price: Optional[int] = 0  # 매도가격
     sell_time: Optional[str] = '' # 매도시간    
+    
+    stk_company: Optional[str] = None # 증권사
     
     stk_types: Optional[List[str]] = None
     last_update_time: Optional[datetime.datetime] = Field(default_factory=datetime.datetime.now)

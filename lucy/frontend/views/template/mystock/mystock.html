@@ -24,19 +24,22 @@
     </form>
     <div>
         <button class="btn btn-sm btn-secondary" id="btnExtractStkType">빼기</button>
+        <button class="btn btn-sm btn-primary" id="btnMyKeep">보유</button>
     </div>
 </div>
 <div id="mystock-result-area"></div>
 {% raw %}
 <!--handlebar scripts-->
 <script id="mystock-template" type="text/x-handlebars-template">
-    <table class="table">
+    <table class="table table-hover table-sm">
         <thead>
             <tr>
                 <th>종류</th>
                 <th>종목코드</th>
                 <th>종목명</th>
-                <th>현재가</th>
+                <th class="text-end">현재가</th>
+                <th class="text-end">전일대비</th>
+                <th class="text-end">등락율</th>
                 <th>동작</th>
             </tr>
         </thead>
@@ -46,13 +49,18 @@
                 <td>{{split_and_badge this.stk_types}}</td>
                 <td>{{goNaver this.stk_code}}</td>
                 <td>{{this.stk_name}}</td>
-                <td id="cost-{{this.stk_code}}" class="mx-2 p-2 text-end">-</td>
+                <td  id="cost_{{stk_code}}" class="text-end">-</td>
+                <td  id="change_{{stk_code}}" class="text-end">-</td>
+                <td  id="diff_{{stk_code}}" class="text-end">-</td>
                 <td class="ms-2">
-                    <button class="btnDelete btn btn-secondary btn-sm" data-id="{{this._id}}" title="관심..삭제"><i class="bi bi-dash   "></i></button>
-                    <button class="btnCurrent Cost btn btn-success btn-sm" data-stk-code="{{this.stk_code}}"><img src="public/images/korean-won.svg" alt="아이콘" width="20" height="20"></button>
-                    <button class="btnBuy btn btn-danger btn-sm" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}">買</button>
-                    <button class="btnSell btn btn-primary btn-sm" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}">賣</button>
-                    <button class="btnDantaAdd btn btn-warning btn-sm" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}" title="단타추가"><i class="bi bi-plus-circle"></i></button> 
+                    {{#test 'stk_types.indexOf("관심") != -1'}}
+                    <button class="btnAttensionDelete btn btn-warning btn-sm" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}" title="관심..삭제"><i class="bi bi-dash   "></i></button>
+                    {{/test}}
+                    {{#test 'stk_types.indexOf("단타") != -1'}}
+                    <button class="btnDantaDelete btn btn-success btn-sm" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}" title="단타..삭제"><i class="bi bi-dash   "></i></button>
+                    {{else}}
+                    <button class="btnDantaAdd btn btn-success btn-sm" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}" title="단타추가"><i class="bi bi-plus-circle"></i></button> 
+                    {{/test}}
                 </td>
             </tr>
             {{/each}}
@@ -64,6 +72,8 @@
 {% block script %}
 {% raw %}
 <script>
+let intervalId = undefined;
+let current_lists = [];
 // 문자열을 잘라서 bootstrap5 뱃지로 만든다.
 Handlebars.registerHelper('split_and_badge', function(stk_types) {
     // stk_types 문자열을 공백 기준으로 나누기
@@ -95,12 +105,46 @@ Handlebars.registerHelper('split_and_badge', function(stk_types) {
     // 배지를 공백을 기준으로 연결하여 반환
     return new Handlebars.SafeString(badges.join(' '));
 });    
+function getCurrentCost() {
+    if (current_lists.length == 0) {
+        return;
+    }
+    const stkCodes = current_lists.map(item => String(item.stk_code)).join('');
+    const url = '/api/v1/mystock/current_costs/' + stkCodes;
+    getFetch(url).then(data => {
+        console.log(data);
+        data.t8407OutBlock1.forEach(item => {
+            // const cost = item.price;
+            let costFormatted = item.price.toLocaleString();
+            let changeFormatted = item.change.toLocaleString();
+            let diffFormatted = item.diff.toLocaleString();
+            if(item.diff < 0){
+                changeFormatted = "-"+changeFormatted;
+                $('#mystock-result-area').find(`#cost_${item.shcode}`).text(costFormatted);
+                $('#mystock-result-area').find(`#change_${item.shcode}`).text(changeFormatted).removeClass('text-danger').addClass('text-primary');
+                $('#mystock-result-area').find(`#diff_${item.shcode}`).text(diffFormatted).removeClass('text-danger').addClass('text-primary');
+            }else{
+                $('#mystock-result-area').find(`#cost_${item.shcode}`).text(costFormatted);
+                $('#mystock-result-area').find(`#change_${item.shcode}`).text(changeFormatted).removeClass('text-primary').addClass('text-danger');
+                $('#mystock-result-area').find(`#diff_${item.shcode}`).text(diffFormatted).removeClass('text-primary').addClass('text-danger');
+            }
+            //$(`#cost_${item.stk_code}`).text(cost);
+        });
+    }).catch(error=> {
+        console.error(error.message);
+    });
+}
 function init(){
     getFetch('/api/v1/mystock').then(data => {
         console.log(data); 
         const template = Handlebars.compile(document.getElementById('mystock-template').innerHTML);
         const html = template({list : data});
+        current_lists = data;
         $('#mystock-result-area').html(html);
+        //현재가를 가져온다.
+        if(intervalId) clearInterval(intervalId);
+        getCurrentCost();
+        setInterval(getCurrentCost, 1000*10); //10초마다 현재가를 가져온다.
     }).catch(error=> {
         console.error(error.message); 
         $('#mystock-result-area').html(error.message);
@@ -109,6 +153,53 @@ function init(){
 $( document ).ready(function() {
     console.log( "ready!")
     init();
+    //관심삭제
+    $('#mystock-result-area').on("click", ".btnAttensionDelete", function() {
+        const stk_code = $(this).data('stk-code');
+        const stk_name = $(this).data('stk-name');
+        const url = `/api/v1/mystock/extract/stktype/${stk_code}/관심`;
+        const data = {};
+        putFetch(url, data).then(data => {
+            console.log(data);
+            init();
+        }).catch(error=> {
+            console.error(error.message);
+        });
+    });
+    //단타삭제
+    $('#mystock-result-area').on("click", ".btnDantaDelete", function() {
+        const stk_code = $(this).data('stk-code');
+        const stk_name = $(this).data('stk-name');
+        const url = `/api/v1/mystock/extract/stktype/${stk_code}/단타`;
+        const data = {};
+        putFetch(url, data).then(data => {
+            console.log(data);
+            init();
+        }).catch(error=> {
+            console.error(error.message);
+        });
+    });
+    //단타추가
+    $('#mystock-result-area').on("click", ".btnDantaAdd", function() {
+        const stk_code = $(this).data('stk-code');
+        const stk_name = $(this).data('stk-name');
+        const url = `/api/v1/mystock/add/stktype/${stk_code}/단타`;
+        const data = {};
+        putFetch(url, data).then(data => {
+            console.log(data);
+            init();
+        }).catch(error=> {
+            console.error(error.message);
+        });
+    });
+    //보유버튼 : 현재 보유한 종목을 보여준다.
+    $('#btnMyKeep').on('click', function(){
+        getFetch('/api/v1/mystock/mykeep').then(data => {
+            init();
+        }).catch(error=> {
+            $('#mystock-result-area').html(error.message);
+        });
+    });
     //stk_type에 따라 보여줄 종목을 필터링한다.
     $('#mystock-search-area').on("change", "input[type=radio]", function() {
         const option = $('input[name=options]:checked').val();
