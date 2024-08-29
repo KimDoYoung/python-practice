@@ -8,4 +8,4 @@ class StkInfo(Document):
     exp_code: Optional[str]='' # LS 확장코드
 
     class Settings:
-        collection = "stk_info"
+        collection = "StkInfo"

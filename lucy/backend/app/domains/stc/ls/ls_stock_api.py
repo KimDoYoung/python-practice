@@ -37,6 +37,7 @@ from backend.app.core.logger import get_logger
 from backend.app.domains.stc.ls.model.cdpcq04700_model import CDPCQ04700_Request, CDPCQ04700_Response
 from backend.app.domains.stc.ls.model.cspaq12300_model import CSPAQ12300_Request, CSPAQ12300_Response
 from backend.app.domains.stc.ls.model.cspaq13700_model import CSPAQ13700_Request, CSPAQ13700_Response
+from backend.app.domains.stc.ls.model.cspaq22200_model import CSPAQ22200_Request, CSPAQ22200_Response
 from backend.app.domains.stc.ls.model.cspat00601_model import CSPAT00601_Request, CSPAT00601_Response
 from backend.app.domains.stc.ls.model.cspat00701_model import CSPAT00701_Request, CSPAT00701_Response
 from backend.app.domains.stc.ls.model.cspat00801_model import CSPAT00801_Request, CSPAT00801_Response
@@ -287,7 +288,18 @@ class LsStockApi(StockApi):
         }
         response_data = await self.send_request(req_dict)
         return CSPAQ12300_Response(**response_data)
-
+    
+    async def order_possible_money(self, req:CSPAQ22200_Request) -> CSPAQ22200_Response:
+        ''' [주식] 계좌-현물계좌예수금 주문가능금액 총평가2 '''
+        req_dict = {
+            "path": "/stock/accno",
+            "tr_cd" : "CSPAQ22200",
+            "data" : {
+                "CSPAQ22200InBlock1" : req.CSPAQ22200InBlock1.model_dump(), # 0.0
+            }
+        }
+        response_data = await self.send_request(req_dict)
+        return CSPAQ22200_Response(**response_data)        
 #--------------------------------------------------------------------------------------
 # 상위랭크 route
 #--------------------------------------------------------------------------------------

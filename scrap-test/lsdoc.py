@@ -294,8 +294,8 @@ if __name__ == "__main__":
 
     # menu = "[주식] 계좌"
     # sub_menu = "BEP단가조회"
-    menu = "[주식] 상위종목"
-    sub_menu = "거래대금상위"
+    menu = "[주식] 계좌"
+    sub_menu = "현물계좌예수금 주문가능금액 총평가2"
     main(menu, sub_menu)
 
     print("Done!")

@@ -20,3 +20,20 @@ class StockInfoService:
     
     async def delete_all(self):
         await StkInfo.delete_all()
+        
+    async def get_by_stk_code(self, stk_code: str):
+        try:
+            stk_info = await StkInfo.find_one({"stk_code": stk_code})
+            return stk_info
+        except Exception as e:
+            logger.error(f"Failed to retrieve StkInfo by stk_code: {e}")
+            raise e
+    
+    async def list_by_name(self, stk_name: str):
+        try:
+            filter_query = {"stk_name": {"$regex": stk_name}}
+            stk_infos = await StkInfo.find(filter_query).to_list()
+            return stk_infos
+        except Exception as e:
+            logger.error(f"Failed to retrieve StkInfo by stk_name: {e}")
+            raise e

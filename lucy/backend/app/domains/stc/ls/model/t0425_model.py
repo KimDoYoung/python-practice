@@ -35,7 +35,8 @@ class T0425OUTBLOCK1(StockApiBaseModel):
     price1: int # 현재가 
     orggb: str # 주문구분 
     singb: str # 신용구분 
-    loandt: str # 대출일자 	
+    loandt: str # 대출일자
+    hname:Optional[str] = "" # 종목명
 
 class T0425OUTBLOCK(StockApiBaseModel):
 	tqty: int # 총주문수량 

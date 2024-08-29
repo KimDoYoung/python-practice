@@ -35,6 +35,7 @@ from fastapi import APIRouter
 from backend.app.domains.stc.ls.model.cdpcq04700_model import CDPCQ04700_Response
 from backend.app.domains.stc.ls.model.cspaq12300_model import CSPAQ12300_Request, CSPAQ12300_Response, CSPAQ12300InBlock1
 from backend.app.domains.stc.ls.model.cspaq13700_model import CSPAQ13700_Response
+from backend.app.domains.stc.ls.model.cspaq22200_model import CSPAQ22200_Request, CSPAQ22200_Response, CSPAQ22200InBlock1
 from backend.app.domains.stc.ls.model.cspat00601_model import CSPAT00601_Response
 from backend.app.domains.stc.ls.model.cspat00701_model import CSPAT00701_Response
 from backend.app.domains.stc.ls.model.cspat00801_model import CSPAT00801_Response
@@ -58,6 +59,7 @@ from backend.app.managers.client_ws_manager import ClientWsManager
 from backend.app.managers.stock_api_manager import StockApiManager
 from backend.app.managers.stock_ws_manager import StockWsManager
 from backend.app.utils.ls_model_util import acct_history_to_CDPCQ04700_Request, cancel_order_to_cspat00801_Request, fulfill_api_to_cspaq13700_Request, fulfill_to_t0425_Request, high_item_to_T1441_Request, high_item_to_T1452_Request, high_item_to_T1463_Request, high_item_to_T1466_Request, high_item_to_T1481_Request, high_item_to_T1482_Request, high_item_to_T1489_Request, high_item_to_T1492_Request, modify_order_to_cspat00701_Request, order_to_cspat00601_Request
+from backend.app.core.dependency import get_stkinfo_service
 
 logger = get_logger(__name__)
 
@@ -148,6 +150,12 @@ async def fulfill_list(req:Fulfill_Request):
     t042_Req = fulfill_to_t0425_Request(req)
     
     response = await ls_api.fulfill_list(t042_Req)
+    list = response.t0425OutBlock1
+    # hname 종목명을 채운다.
+    stk_info_service = get_stkinfo_service()
+    for item in list:
+        stkinfo =  await stk_info_service.get_by_stk_code(item.expcode)
+        item.hname = stkinfo.stk_name
 
     logger.debug(f"fulfill-list 응답: [{response.to_str()}]")
     return response    
@@ -206,6 +214,17 @@ async def bep_danga(user_id:str, acctno:str):
 
     logger.debug(f"bep_danga 응답: [{response.to_str()}]")
     return response
+
+@router.get("/order-possible-money",response_model=CSPAQ22200_Response)
+async def order_possible_money():
+    '''[주식] 계좌-현물계좌예수금 주문가능금액 총평가2 '''
+    ls_api = await StockApiManager().stock_api('LS')
+    req = CSPAQ22200_Request(CSPAQ22200InBlock1=CSPAQ22200InBlock1())
+    response = await ls_api.order_possible_money(req)
+
+    logger.debug(f"bep_danga 응답: [{response.to_str()}]")
+    return response
+
 
 #--------------------------------------------------------------------------------------
 # 상위랭크 route

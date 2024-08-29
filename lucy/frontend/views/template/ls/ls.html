@@ -10,8 +10,8 @@
     <div>
         <h5>LS증권 계좌조회</h5>
         <div class="row">
-            <div  id="summary-area" class="col-6 mt-3"></div>
-            <div class="col-6"></div>
+            <div  id="summary-area" class="col-8 mt-3"></div>
+            <div class="col-4"></div>
         </div>
         <div id="jango2-area"></div>
     </div> 
@@ -30,11 +30,13 @@
             <th class="text-end">추정순자산</th><td class="text-end">{{displayWon item.sunamt}}</td>
             <th class="text-end">실현손익</th><td class="text-end">{{displayWon item.dtsunik}}</td>
             <th class="text-end">매입금액</th><td class="text-end">{{displayWon item.mamt}}</td>
+            <th class="text-end">증거금현금</th><td class="text-end">{{displayWon orderPossibleMoney.CSPAQ22200OutBlock2.MgnMny}}</td>
         </tr>
         <tr>
             <th class="text-end">추정D2예수금</th><td class="text-end"><strong>{{displayWon item.sunamt1}}</strong></td>
             <th class="text-end">평가손익</th><td class="text-end">{{displayWon item.tdtsunik}}</td>
             <th class="text-end">평가금액</th><td class="text-end">{{displayWon item.sunamt}}</td>
+            <th class="text-end">주문가능(현금)</th><td class="text-end text-primary fw-bold">{{displayWon orderPossibleMoney.CSPAQ22200OutBlock2.MnyOrdAbleAmt}}</td>
         </tr>
     </table>
 </script>
@@ -100,15 +102,16 @@
                 <th>상태</th>
                 <th>주문시간</th>
                 <th>주문번호</th>
+                <th>종목명</th>
                 <th>종목번호</th>
                 <th>구분</th>
                 <th class="text-end">주문수량</th>
                 <th class="text-end">주문가격</th>
                 <th class="text-end">현재가</th>
+                <th class="text-end">체결단가</th>
                 <th class="text-end">체결수량</th>
-                <th class="text-end">체결가격</th>
                 <th class="text-end">미체결잔량</th>
-                <th class="text-end">확인수량</th>
+                <!-- <th class="text-end">확인수량</th> -->
                 <th class="text-center">동작</th>
             </tr>
         </thead>
@@ -116,17 +119,18 @@
             {{#each list}}
             <tr>
                 <td>{{status}}</td>
-                <td>{{ordtime}}</td>
+                <td>{{fulfillTime ordtime}}</td>
                 <td>{{ordno}}</td>
+                <td>{{hname}}</td>
                 <td>{{expcode}}</td>
                 <td>{{medosu}}</td>
                 <td class="text-end">{{displayWon qty}}</td>
                 <td class="text-end">{{displayWon price}}</td>
                 <td class="text-end">{{displayWon price1}}</td>
-                <td class="text-end">{{displayWon cheqty}}</td>
                 <td class="text-end">{{displayWon cheprice}}</td>
+                <td class="text-end">{{displayWon cheqty}}</td>
                 <td class="text-end">{{displayWon ordrem}}</td>
-                <td class="text-end">{{displayWon cfmqty}}</td>
+                <!-- <td class="text-end">{{displayWon cfmqty}}</td> -->
                 <td>
                     {{#test 'status =="접수"'}}
                     <button class="btn btn-sm btn-secondary btnOrderCancel" data-org-ord-no="{{ordno}}" data-stk-code="{{expcode}}" data-qty="{{qty}}">전량취소</button>
@@ -143,23 +147,73 @@
 {% block script %}
 {% raw %}
 <script>
+// Handlebars 헬퍼 등록
+Handlebars.registerHelper('fulfillTime', function(value) {
+    const str = value.toString().padStart(8, '0');
+    const hours = str.slice(0, 2);
+    const minutes = str.slice(2, 4);
+    const seconds = str.slice(4, 6);
+    const milliseconds = str.slice(6, 8);
+
+    return `${hours}:${minutes}.${milliseconds}`;
+});    
     function initalize() {
-        //계좌조회
-        const url = '/api/v1/ls/jango2'
-        getFetch(url).then(data => {
-            console.log(data)
+        // 두 개의 비동기 요청을 병렬로 실행하고 결과를 기다립니다.
+        Promise.all([
+            getFetch('/api/v1/ls/order-possible-money'), // 첫 번째 API 호출
+            getFetch('/api/v1/ls/jango2') // 두 번째 API 호출
+        ]).then(([orderPossibleMoneyData, jango2Data]) => {
+            // 첫 번째 API 호출 결과
+            console.log('주문가능');
+            console.log(orderPossibleMoneyData);
+
+            // 두 번째 API 호출 결과
+            console.log(jango2Data);
+
+            // 템플릿 스크립트 생성
             const template = $('#jango2-table-template').html();
             const templateScript = Handlebars.compile(template);
-            const html = templateScript({list: data.t0424OutBlock1});
+            const html = templateScript({ list: jango2Data.t0424OutBlock1 });
             $('#jango2-area').html(html);
+
             const template1 = $('#summary-table-template').html();
             const templateScript1 = Handlebars.compile(template1);
-            const html1 = templateScript1({item: data.t0424OutBlock});
+
+            // 여기서 첫 번째 API 호출의 결과와 두 번째 API 호출의 결과를 함께 사용합니다.
+            const html1 = templateScript1({
+                item: jango2Data.t0424OutBlock,
+                orderPossibleMoney: orderPossibleMoneyData // 주문 가능 금액 데이터도 추가
+            });
             $('#summary-area').html(html1);
-            
+
         }).catch(error => {
-            console.error(error.message)
-        });
+            console.error(error.message);
+        });        
+        // //현물계좌예수금 주문가능금액 총평가2
+        // getFetch('/api/v1/ls/order-possible-money').then(data => {
+        //     console.log('주문가능'); 
+        //     console.log(data);
+        // }).catch(error=> {
+        //     console.error(error.message); 
+        // });
+        // //계좌조회
+        // const url = '/api/v1/ls/jango2'
+        // getFetch(url).then(data => {
+        //     console.log(data)
+        //     const template = $('#jango2-table-template').html();
+        //     const templateScript = Handlebars.compile(template);
+        //     const html = templateScript({list: data.t0424OutBlock1});
+        //     $('#jango2-area').html(html);
+        //     const template1 = $('#summary-table-template').html();
+        //     const templateScript1 = Handlebars.compile(template1);
+        //     const html1 = templateScript1({item: data.t0424OutBlock});
+        //     $('#summary-area').html(html1);
+            
+        // }).catch(error => {
+        //     console.error(error.message)
+        // });
+
+
         // const url2 = '/api/v1/ls/fulfill-api-list';
         const url2 = '/api/v1/ls/fulfill-list';
         const today = JuliaUtil.dateFormat('yyyyMMdd', new Date())
