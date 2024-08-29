@@ -2,31 +2,7 @@
 {% block style %}
 {% endblock %}
 {% block content %}
-<h2>MyStock</h2>
-<!-- <div id="mystock-search-area">
-    <form>
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="options" id="option0" value="ALL" checked>
-            <label class="form-check-label" for="option0">ALL</label>
-        </div>
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="options" id="option1" value="보유">
-            <label class="form-check-label" for="option1">보유</label>
-        </div>
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="options" id="option2" value="관심">
-            <label class="form-check-label" for="option2">관심</label>
-        </div>
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="options" id="option3" value="단타">
-            <label class="form-check-label" for="option3">단타</label>
-        </div>
-    </form>
-    <div>
-        <button class="btn btn-sm btn-secondary" id="btnExtractStkType">빼기</button>
-        <button class="btn btn-sm btn-primary" id="btnMyKeep">보유</button>
-    </div>
-</div> -->
+<h3>MyStock</h3>
 <div id="mystock-search-area" class="m-2 p-2">
     <form style="display: flex; align-items: center;">
         <div class="form-check form-switch me-3">
@@ -53,10 +29,32 @@
         <div style="margin-left: 10px;">
             <button class="btn btn-sm btn-secondary" id="btnExtractStkType">빼기</button>
             <button class="btn btn-sm btn-primary" id="btnMyKeep">보유</button>
+            <button class="btn btn-sm btn-success" id="btnShowModalFind" data-bs-toggle="modal" data-bs-target="#stock-find-modal">찾기</button>
         </div>
     </form>
 </div>
 <div id="mystock-result-area" class="mt-3"></div>
+<!-- Stock Find Modal -->
+<div class="modal fade" id="stock-find-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">종목찾기</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="modal-search-area">
+                    <input type="text" name="keyword" id="keyword" placeholder="종목명"> <button id="btnModalSearch">찾기</button>
+                </div>
+                <div id="modal-result-area"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% raw %}
 <!--handlebar scripts-->
 <script id="mystock-template" type="text/x-handlebars-template">
@@ -134,6 +132,8 @@ Handlebars.registerHelper('split_and_badge', function(stk_types) {
     // 배지를 공백을 기준으로 연결하여 반환
     return new Handlebars.SafeString(badges.join(' '));
 });    
+
+//현재가격을 가져오기
 function getCurrentCost() {
     if (current_lists.length == 0) {
         return;
@@ -167,6 +167,7 @@ function getCurrentCost() {
         console.error(error.message);
     });
 }
+//초기화 mystock 가져오기, 현재가 가져오기
 function init(){
     getFetch('/api/v1/mystock').then(data => {
         console.log(data); 
@@ -187,7 +188,26 @@ function init(){
 }
 $( document ).ready(function() {
     console.log( "ready!")
+    //초기화
     init();
+    //찾기 
+    $('#btnShowModalFind').on('click', function(e){
+        e.stopPropagation();
+        e.preventDefault();
+    });
+    //종목명으로 찾기
+    $('#btnModalSearch').on('click', function(){
+        e.stopPropagation();
+        e.preventDefault();
+        getFetch().then(data => {
+            console.log(data); 
+
+        }).catch(error=> {
+            console.error(error.message); 
+        });
+    })
+
+    //현재가격 Refresh
     $('#currentCostRefresh').on('change', function(e){
         e.stopPropagation();
         e.preventDefault();

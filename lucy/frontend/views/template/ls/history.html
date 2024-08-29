@@ -1,0 +1,174 @@
+{% extends 'common/base_ls.html' %} 
+{% block style %}
+{% endblock %}
+{% block content %}
+<section id="list" class="container">
+    <h2>LS증권 거래내역</h2>
+    <div id="search-area">
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon1">조회기간</span>
+            <input type="date" class="form-control" id="from_date" value="2021-01-01">
+            <span class="input-group-text">~</span>
+            <input type="date" class="form-control" id="to_date" value="2021-12-31">
+            <button class="btn btn-outline-secondary" type="button" id="search-button">거래내역 조회</button>
+            <button class="btn btn-outline-primary" type="button" id="fulfill-button">체결정보 조회</button>
+        </div>
+    </div>
+    <div id="error-area" class="alert alert-danger d-none" role="alert"></div>
+    <div id="result-area" class="mt-3"></div>
+    <div class="chart-area">
+        <canvas id="chartCanvas" width="300px" height="300px"></canvas>
+    </div>
+</section>
+
+{% raw %}
+<!--handlebar scripts-->
+<script id="history-table" type="text/x-handlebars-template">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>거래일자</th>                
+                <th>처리시각</th>
+                <th>종목명</th>
+                <th class="text-end">거래수량</th>
+                <th class="text-end">거래단가</th>
+                <th class="text-end">거래금액</th>
+                <th class="text-end">거래세</th>
+                <th class="text-end">수수료</th>
+            </tr>
+        </thead>
+        <tbody id="stock-table-body">
+            {{#each list}}
+            <tr>
+                <td>{{TrdDt}}</td>
+                <td>{{TrxTime}}</td>
+                <td>{{IsuNm}}</td>
+                <td  class="text-end">{{displayWon TrdQty}}</td>
+                <td  class="text-end">{{displayWon TrdUprc}}</td>
+                <td  class="text-end">{{displayWon TrdAmt}}</td>
+                <td  class="text-end">{{displayWon Trtax}}</td>
+                <td  class="text-end">{{displayWon CmsnAmt}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+
+</script>
+<script id="fulfill-table" type="text/x-handlebars-template">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>종목명</th>                
+                <th>종목번호</th>
+                <th class="text-end">매도가능수량</th>
+                <th class="text-end">평균단가</th>
+                <th class="text-end">매입금액</th>
+                <th class="text-end">보유비중</th>
+                <th class="text-end">현재가</th>
+                <th class="text-end">평가금액</th>
+                <th class="text-end">평가손익</th>
+                <th class="text-end">수익율</th>
+                <th class="text-end">수수료</th>
+                <th class="text-end">제세금</th>
+                <th class="text-end">보유비율</th>
+            </tr>
+        </thead>
+        <tbody id="stock-table-body">
+            {{#each list}}
+            <tr>
+                <td>{{hname}}</td>
+                <td>{{expcode}}</td>
+                <td class="text-end">{{mdposqt}}</td>
+                <td class="text-end">{{displayWon pamt}}</td>
+                <td class="text-end">{{displayWon mamt}}</td>
+                <td class="text-end">{{displayWon janrt}}</td>
+                <td class="text-end">{{displayWon price}}</td>
+                <td class="text-end">{{displayWon appamt}}</td>
+                <td class="text-end">{{displayWon dtsunik}}</td>
+                <td class="text-end">{{displayWon sunikrt}}</td>
+                <td class="text-end">{{displayWon fee}}</td>
+                <td class="text-end">{{displayWon tax}}</td>
+                <td class="text-end">{{displayWon pct}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</script>
+{% endraw %}
+{% endblock %}
+
+{% block script %}
+{% raw %}
+<script>
+    function initialize() {
+        $('#from_date').val(JuliaUtil.today());
+        $('#to_date').val(JuliaUtil.today());
+    }
+    function drawPieChart(list) {
+        const ctx = document.getElementById('chartCanvas').getContext('2d');
+        const data = {
+            labels: list.map(item => item.hname),
+            datasets: [
+                list.map(item => item.pct),
+            ]
+        };
+        
+        const options  = {
+                responsive: false
+        };
+        window.pieChart = new Chart(ctx, {
+            type: 'pie',
+            data: data,
+            options: options
+        });
+    }
+            
+    $(document).ready(function() {
+        initialize();
+        //체결정보 조회
+        $('#fulfill-button').on('click', function(e){
+            e.stopPropagation();
+            e.preventDefault();
+            var url = '/api/v1/ls/jango2';
+            getFetch(url).then(data => {
+                console.log(data);
+                const template = $('#fulfill-table').html();
+                const templateScript = Handlebars.compile(template);
+                let list = data.t0424OutBlock1;
+                //총 매입금액을 구해서 각 row의 매입금액 대비 비율을 계산한다.
+                //그 값을 pct라는 이름으로 추가한다.
+                let total = list.reduce((acc, cur) => acc + parseInt(cur.mamt), 0);
+                list.forEach(item => {
+                    item.pct = ((parseInt(item.mamt) / total) * 100).toFixed(2);
+                });
+                const html = templateScript({list: list});
+                $('#result-area').html(html);
+                drawPieChart(list);
+
+            }).catch(error=> {
+                console.error(error.message);
+                $('#error-area').text(error.message).removeClass('d-none');
+            });            
+        });
+        //거래내역 조회
+        $('#search-button').on('click', function(e){
+            e.stopPropagation();
+            e.preventDefault();
+            const url = '/api/v1/ls/acct-history';
+            const from_ymd = $('#from_date').val().replace(/[^0-9]/g,'')
+            const to_ymd = $('#to_date').val().replace(/[^0-9]/g,'')
+            const data = { from_ymd : from_ymd, to_ymd : to_ymd};
+            postFetch(url, data).then(data => {
+                console.log(data);
+                const template = $('#history-table').html();
+                const templateScript = Handlebars.compile(template);
+                const html = templateScript({list: data.CDPCQ04700OutBlock3});
+                $('#result-area').html(html);
+            }).catch(error=> {
+                console.error(error.message);
+            });
+        })
+    });
+</script>
+{% endraw %} 
+{% endblock %} 
