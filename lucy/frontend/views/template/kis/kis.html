@@ -150,6 +150,11 @@
             let stck_cash_ord_psbl_amt = data.margin.output.stck_cash_ord_psbl_amt //현금주문가능금액
 
             let template = Handlebars.compile(document.getElementById('inquire-balance-table-template').innerHTML);
+
+            
+            let list = output1;
+            //리스트에서 매입금액의 sum을 구하고
+
             let html = template({list : output1, output2: output2, stck_cash_ord_psbl_amt: stck_cash_ord_psbl_amt});
             $('#inquire-balance-area').html(html)
             console.log(data); 

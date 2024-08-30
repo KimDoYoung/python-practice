@@ -21,7 +21,9 @@ from backend.app.domains.stc.ls.model.t0424_model import T0424INBLOCK, T0424_Req
 from backend.app.domains.stc.ls.model.t8407_model import T8407_Request, T8407_Response, T8407InBLOCK
 from backend.app.domains.system.mystock_model import MyStock, MyStockDto
 from backend.app.domains.system.mystock_service import MyStockService
-from backend.app.core.dependency import  get_mystock_service
+from backend.app.core.dependency import  get_mystock_service, get_stkinfo_service
+from backend.app.domains.system.stk_info_model import StkInfo
+from backend.app.domains.system.stk_info_service import StockInfoService
 from backend.app.managers.stock_api_manager import StockApiManager
 from backend.app.utils.naver_util import get_stock_info
 from typing import List
@@ -99,6 +101,11 @@ async def add_stktype(stk_code: str, stk_type: str, mystock_service :MyStockServ
         if stk_type not in mystock.stk_types:
             mystock.stk_types.append(stk_type)
             await mystock.save()
+    else:
+        # stk_name은 네이버에서 조회해서 추가
+        stk_name = get_stock_info(stk_code)['stk_name']
+        mystock_dto = MyStockDto(stk_code=stk_code, stk_name=stk_name, stk_types=[stk_type])
+        await mystock_service.upsert(mystock_dto)
             
     return {"message": "Add success"}
 
@@ -189,3 +196,9 @@ async def current_costs(stk_codes:str):
     response = await ls_api.multi_current_cost(T8407_Request(t8407InBlock=t8407in))
     return response
 
+
+@router.get("/search", response_model=List[StkInfo])
+async def search(keyword: str,stkInfo_service: StockInfoService = Depends(get_stkinfo_service)):
+    ''' 종목명으로 StkInfo 검색 '''
+    mystocks = await stkInfo_service.search_by_name(keyword)
+    return mystocks

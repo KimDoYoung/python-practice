@@ -58,39 +58,6 @@
                 </button>                
             </div>
         </div>
-        
-        <!-- <div id="search-area">
-            <div id="themes-area" class="d-flex flex-wrap"></div>
-            <div id="marget-area"> 
-                <div id="market-radio" class="btn-group" role="group" aria-label="Market Radio Buttons">
-                    <input type="radio" class="btn-check" name="market" id="radio-all" autocomplete="off" checked value="all">
-                    <label class="btn btn-outline-primary" for="radio-all">전체</label>
-
-                    <input type="radio" class="btn-check" name="market" id="radio-kosdaq" autocomplete="off" value="KOSDAQ">
-                    <label class="btn btn-outline-primary" for="radio-kosdaq">코스닥</label>
-
-                    <input type="radio" class="btn-check" name="market" id="radio-kospi" autocomplete="off" value="KOSPI">
-                    <label class="btn btn-outline-primary" for="radio-kospi">코스피</label>
-                </div>
-            </div>
-            <div id="cost-area" class="d-flex flex-wrap">
-                <div>
-                    <label for="total-cost">시가총액:</label>
-                    <input type="number" id="total-cost" class="form-control" value="5000" required>
-                </div>
-                <div>
-                    <label for="current-cost-start">현재가:</label>
-                    <input type="number" id="current-cost-start" class="form-control" value="1000" required>
-                    <input type="number" id="current-cost-end" class="form-control" value="250000" required>
-                </div>
-            </div>
-            <div id="search-button-area">
-                <button id="search-button" class="btn btn-primary">검색</button>
-                <button class="btn btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapseHelp" aria-expanded="false" aria-controls="collapseExample">
-                    <i class="bi bi-question-circle"></i>
-                </button>                
-            </div>
-        </div> -->
         <div class="collapse" id="collapseHelp">
             <div class="card card-body">
                 <ul>
@@ -170,7 +137,7 @@
             <td class="text-end table-danger">{{'당일 거래량지수'}}</td>
             <td class="text-end table-danger">{{'최근7일 거래량지수'}}%</td>
             <td class="text-center">
-                <button class="btnAddDanta btn btn-light" data-stk-code="{{종목코드}}" data-stk-name="{{종목명}}"><i class="bi bi-plus-circle"></i></button>
+                <button class="btnAddDanta btn btn-warning" title="나의 주식 관심 추가" data-stk-code="{{종목코드}}" data-stk-name="{{종목명}}"><i class="bi bi-plus-circle"></i></button>
             </td>
         </tr>
         {{/each}}
@@ -183,9 +150,6 @@
         <li class="list-group-item"><a href="#" class="theme-view" data-csv-name="{{name}}">{{name}}</a></li>
         {{/each}}
     </ul>
-    <!-- {{#each list}}
-    <span class="badge bg-warning text-dark m-2">{{name}}</span>
-    {{/each}} -->
 </script>
 {% endraw %}
 {% endblock %}

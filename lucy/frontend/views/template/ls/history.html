@@ -16,8 +16,9 @@
     </div>
     <div id="error-area" class="alert alert-danger d-none" role="alert"></div>
     <div id="result-area" class="mt-3"></div>
-    <div class="chart-area">
-        <canvas id="chartCanvas" width="300px" height="300px"></canvas>
+    <div class="chart-area text-center"></div>
+        <!-- <canvas id="chartCanvas" width="500px" height="500px"></canvas> -->
+        <div id="chartDiv" style="width: 900px; height: 500px;"></div>
     </div>
 </section>
 
@@ -70,7 +71,6 @@
                 <th class="text-end">수익율</th>
                 <th class="text-end">수수료</th>
                 <th class="text-end">제세금</th>
-                <th class="text-end">보유비율</th>
             </tr>
         </thead>
         <tbody id="stock-table-body">
@@ -88,7 +88,6 @@
                 <td class="text-end">{{displayWon sunikrt}}</td>
                 <td class="text-end">{{displayWon fee}}</td>
                 <td class="text-end">{{displayWon tax}}</td>
-                <td class="text-end">{{displayWon pct}}</td>
             </tr>
             {{/each}}
         </tbody>
@@ -99,30 +98,46 @@
 
 {% block script %}
 {% raw %}
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script>
+google.charts.load('current', {'packages':['corechart']});
+
     function initialize() {
         $('#from_date').val(JuliaUtil.today());
         $('#to_date').val(JuliaUtil.today());
     }
-    function drawPieChart(list) {
-        const ctx = document.getElementById('chartCanvas').getContext('2d');
-        const data = {
-            labels: list.map(item => item.hname),
-            datasets: [
-                list.map(item => item.pct),
-            ]
-        };
-        
-        const options  = {
-                responsive: false
-        };
-        window.pieChart = undefined;
-        window.pieChart = new Chart(ctx, {
-            type: 'pie',
-            data: data,
-            options: options
-        });
+    function drawPieChart(list){
+
+        var dataArray = [];
+        dataArray.push(['종목', '보유비율']);
+        for (var i = 0; i < list.length; i++) {
+            var item = list[i];
+            dataArray.push([item.hname, parseFloat(item.janrt)]);
+        }
+        var data = google.visualization.arrayToDataTable(dataArray);
+        var options = {title : '보유비율', is3D: true};
+        var chart = new google.visualization.PieChart(document.getElementById('chartDiv'));
+        chart.draw(data, options);
     }
+    // function drawPieChart(list) {
+    //     const ctx = document.getElementById('chartCanvas').getContext('2d');
+    //     const data = {
+    //         labels: list.map(item => item.hname),
+    //         datasets: [
+    //             { data: list.map(item => item.pct)},
+    //         ]
+    //     };
+        
+    //     const options  = {
+    //             responsive: false
+    //     };
+    //     window.pieChart = undefined;
+    //     window.pieChart = new Chart(ctx, {
+    //         type: 'pie',
+    //         data: data,
+    //         options: options
+    //     });
+    // }
             
     $(document).ready(function() {
         initialize();
@@ -136,14 +151,9 @@
                 const template = $('#fulfill-table').html();
                 const templateScript = Handlebars.compile(template);
                 let list = data.t0424OutBlock1;
-                //총 매입금액을 구해서 각 row의 매입금액 대비 비율을 계산한다.
-                //그 값을 pct라는 이름으로 추가한다.
-                let total = list.reduce((acc, cur) => acc + parseInt(cur.mamt), 0);
-                list.forEach(item => {
-                    item.pct = ((parseInt(item.mamt) / total) * 100).toFixed(2);
-                });
                 const html = templateScript({list: list});
                 $('#result-area').html(html);
+                debugger;
                 drawPieChart(list);
 
             }).catch(error=> {

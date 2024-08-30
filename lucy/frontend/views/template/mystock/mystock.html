@@ -43,14 +43,19 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div id="modal-search-area">
-                    <input type="text" name="keyword" id="keyword" placeholder="종목명"> <button id="btnModalSearch">찾기</button>
+                <div id="modal-search-area" class="form-inline d-flex">
+                    <input type="text" name="keyword" id="keyword" placeholder="종목명" class="form-control mx-2">
+                    <button id="btnModalSearch" class="btn btn-primary btn-sm"><i class="bi bi-search"></i></button>
+                    <button id="btnModalClear" class="btn btn-secondary btn-sm ms-2"><i class="bi bi-x"></i></button>
                 </div>
-                <div id="modal-result-area"></div>
+                <div id="modal-result-area" class="mt-3" style="max-height: 300px; overflow-y: auto;">
+                    <ul class="list-group">
+                        <!-- 검색 결과 리스트 항목이 여기 들어갑니다 -->
+                    </ul>                    
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
             </div>
         </div>
     </div>
@@ -81,10 +86,12 @@
                 <td  id="diff_{{stk_code}}" class="text-end">-</td>
                 <td class="ms-2">
                     {{#test 'stk_types.indexOf("관심") != -1'}}
-                    <button class="btnAttensionDelete btn btn-warning btn-sm" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}" title="관심..삭제"><i class="bi bi-dash   "></i></button>
+                    <button class="btnAttensionDelete btn btn-warning btn-sm" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}" title="관심..삭제"><i class="bi bi-dash"></i></button>
+                    {{else}}
+                    <button class="btnAddAttension btn btn-warning btn-sm" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}" title="관심..추가"><i class="bi bi-plus"></i></button>
                     {{/test}}
                     {{#test 'stk_types.indexOf("단타") != -1'}}
-                    <button class="btnDantaDelete btn btn-success btn-sm" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}" title="단타..삭제"><i class="bi bi-dash   "></i></button>
+                    <button class="btnDantaDelete btn btn-success btn-sm" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}" title="단타..삭제"><i class="bi bi-dash"></i></button>
                     {{else}}
                     <button class="btnDantaAdd btn btn-success btn-sm" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}" title="단타추가"><i class="bi bi-plus-circle"></i></button> 
                     {{/test}}
@@ -93,6 +100,16 @@
             {{/each}}
         </tbody>
     </table>
+</script>
+<script id="result-template" type="text/x-handlebars-template">
+    {{#each results}}
+    <li class="mb-2 list-group-item d-flex justify-content-between align-items-center">
+        <span>{{stk_code}} - {{stk_name}}</span>
+        <button class="btn btn-sm btn-warning me-5 btnAddAttension" data-stk-code="{{stk_code}}" data-stk-name="{{stk_name}}" title="관심 추가">
+            <i class="bi bi-plus"></i>
+        </button>
+    </li>
+    {{/each}}
 </script>
 {% endraw %}
 {% endblock %}
@@ -190,22 +207,71 @@ $( document ).ready(function() {
     console.log( "ready!")
     //초기화
     init();
+    $('#mystock-result-area').on("click", ".btnAddAttension", function() {
+        //관심을 추가한다.
+        const stk_code = $(this).data('stk-code');
+        const stk_name = $(this).data('stk-name');
+        const url = `/api/v1/mystock/add/stktype/${stk_code}/관심`;
+        const data = {};
+        putFetch(url, data).then(data => {
+            console.log(data);
+            init();
+        }).catch(error=> {
+            console.error(error.message);
+        });
+    });
+    $('#stock-find-modal').on('show.bs.modal', function (event) {
+        //  모달이 열릴 때 검색 필드에 자동 포커스를 줄 수 있습니다.
+        $('#keyword').empty().focus();
+    });    
+    $("#modal-result-area").on("click", ".btnAddAttension", function() {
+        //관심을 추가한다.
+        const stk_code = $(this).data('stk-code');
+        const stk_name = $(this).data('stk-name');
+        const url = `/api/v1/mystock/add/stktype/${stk_code}/관심`;
+        const data = {};
+        putFetch(url, data).then(data => {
+            console.log(data);
+            init();
+        }).catch(error=> {
+            console.error(error.message);
+        });
+    });
+    $('#keyword').on('keypress', function(event) {
+        if (event.which === 13) {  // 13은 Enter 키의 키코드입니다.
+            $('#btnModalSearch').click();  // 검색 버튼 클릭 이벤트 트리거
+        }
+    });    
     //찾기 
     $('#btnShowModalFind').on('click', function(e){
         e.stopPropagation();
         e.preventDefault();
+        $('#keyword').empty().focus();
     });
     //종목명으로 찾기
-    $('#btnModalSearch').on('click', function(){
+    $('#btnModalSearch').on('click', function(e){
         e.stopPropagation();
         e.preventDefault();
-        getFetch().then(data => {
+        const keyword = $('#keyword').val();
+        if(keyword == ''){
+            alert('종목명을 입력하세요.');
+            return;
+        }
+        const url = '/api/v1/mystock/search?keyword=' + keyword;
+        getFetch(url).then(data => {
             console.log(data); 
-
+            const template = Handlebars.compile(document.getElementById('result-template').innerHTML);
+            const html = template({results : data});
+            $('#modal-result-area').html(html);
         }).catch(error=> {
             console.error(error.message); 
         });
-    })
+    });
+    $('#btnModalClear').on('click', function(e){
+        e.stopPropagation();
+        e.preventDefault();
+        $('#keyword').val('');
+    });
 
     //현재가격 Refresh
     $('#currentCostRefresh').on('change', function(e){
