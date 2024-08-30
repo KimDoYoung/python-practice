@@ -3,7 +3,7 @@
  */
 	// 사용자 함수 inc 등록
 	Handlebars.registerHelper("inc", function(value, options){
-	        return parseInt(value) + 1;
+        return parseInt(value) + 1;
 	});
     Handlebars.registerHelper('formatComma', function (number) {
         // 숫자에 콤마 추가
@@ -57,22 +57,7 @@
         var html =  bytes.toFixed(1) + ' ' + units[u];        
         return new Handlebars.SafeString(html);
     });
-    /**
-     * gcTest가 호출하는 함수로 직접 html에는 사용하지 않아야함
-     */
-    // Handlebars.registerHelper("t", function( exp, options){
-    //     // debugger;
-    //     // logger.log(this);
-    //     var r = (function(){
-    //             try {
-    //                 var r =  eval(exp);
-    //                 return r;
-    //             } catch (error) {
-    //                 logger.error("gctest : " + error + ' [' + exp +']');
-    //             }
-    //         }).call(this);
-    //     return r;
-    // }); 
+
     Handlebars.registerHelper("t", function(exp, options) {
         var context = this;
         var result;
@@ -95,17 +80,6 @@
      * javascript문법으로 논리식을 판별
      * 
      */       
-    // Handlebars.registerHelper("test", function(expression, options){
-    //     // logger.log(this);
-    //     var exp = '(' + expression.replace(/^\s+|\s+$/,'') +')';
-        
-    //     var result = Handlebars.helpers["t"].call(this, exp, options);
-    //     if(result === true){
-    //         return options.fn(this);
-    //     } else {
-    //         return options.inverse(this);
-    //     }
-    // });    
     Handlebars.registerHelper("test", function(expression, options){
         var exp = '(' + expression.replace(/^\s+|\s+$/,'') +')';
         var result = Handlebars.helpers["t"].call(this, exp, options);
@@ -186,6 +160,20 @@
         const roundedNumber = number.toFixed(2);
         return roundedNumber;
     });
+
+    // Handlebars helper 등록
+    Handlebars.registerHelper('displayTime', function(input) {
+        // 입력에서 숫자만 추출
+        const digits = input.replace(/\D/g, '');
+
+        // 길이가 4 미만이면 앞에 0을 추가하여 4자리로 만듦
+        const paddedDigits = digits.padStart(4, '0');
+
+        // 앞 두 자리와 뒤 두 자리를 :로 구분하여 반환
+        const formattedTime = `${paddedDigits.slice(0, 2)}:${paddedDigits.slice(2, 4)}`;
+
+        return formattedTime;
+    });    
 
     Handlebars.registerHelper('goNaver', function(code) {
         const url = `https://finance.naver.com/item/coinfo.naver?code=${code}`;

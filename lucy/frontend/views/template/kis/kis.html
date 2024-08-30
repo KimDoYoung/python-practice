@@ -35,6 +35,7 @@
                 <th class="text-end">현재가</th>
                 <th class="text-end">1주당</th>
                 <th class="text-end">보유수량</th>
+                <th class="text-end">보유비중</th>
                 <th class="text-end">매입금액</th>
                 <th class="text-end">평가금액</th>
                 <th class="text-end">평가손익</th>
@@ -55,6 +56,7 @@
                 <td class="text-end text-danger">{{judang_plus_minus pchs_avg_pric prpr}}</td>
                 {{/test}}
                 <td class="text-end">{{hldg_qty}}</td>
+                <td class="text-end">{{pchs_amt_ratio}}</td>
                 <td class="text-end">{{displayWon pchs_amt}}</td>
                 <td class="text-end">{{displayWon evlu_amt}}</td>
                 {{#test "evlu_pfls_amt > 0"}}
@@ -101,7 +103,7 @@
             {{#test "rmn_qty != '0'" }}
             <tr>
                 <td>{{this.prdt_name}}({{this.pdno}})</td>
-                <td>{{this.ord_dt}} {{this.ord_tmd}}</td>
+                <td>{{displayYmd this.ord_dt}} {{displayTime this.ord_tmd}}</td>
                 <td>{{this.odno}}</td>
                 <td>{{this.ord_dvsn_name}}</td>
                 {{#test "sll_buy_dvsn_cd == '01'"}} <!--매도 -->
@@ -153,9 +155,13 @@
 
             
             let list = output1;
-            //리스트에서 매입금액의 sum을 구하고
+            //리스트에서 매입금액의 sum을 구하고 각 row의 매입금액/sum으로 매입비중을 구한다.
+            let sum = list.reduce((acc, cur) => acc + Number(cur.pchs_amt), 0);
+            list.forEach(item => {
+                item.pchs_amt_ratio = (item.pchs_amt / sum * 100).toFixed(2);
+            });
 
-            let html = template({list : output1, output2: output2, stck_cash_ord_psbl_amt: stck_cash_ord_psbl_amt});
+            let html = template({list : list, output2: output2, stck_cash_ord_psbl_amt: stck_cash_ord_psbl_amt});
             $('#inquire-balance-area').html(html)
             console.log(data); 
         })

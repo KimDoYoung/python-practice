@@ -199,6 +199,18 @@ async def current_costs(stk_codes:str):
 
 @router.get("/search", response_model=List[StkInfo])
 async def search(keyword: str,stkInfo_service: StockInfoService = Depends(get_stkinfo_service)):
-    ''' 종목명으로 StkInfo 검색 '''
+    ''' 종목명의 일부문자열로 StkInfo 검색 '''
     mystocks = await stkInfo_service.search_by_name(keyword)
     return mystocks
+
+@router.put("/base-cost",  response_model=dict)
+async def search(dto: MyStockDto,mystock_service :MyStockService=Depends(get_mystock_service)):
+    ''' dto의 sell_base_price, buy_base_price를 업데이트 '''
+    mystock = await mystock_service.get_1(dto.stk_code)
+    if mystock:
+        mystock.sell_base_price = dto.sell_base_price
+        mystock.buy_base_price = dto.buy_base_price
+        await mystock.save()
+        return {"result":"success", "message": "Update success"}
+    else:
+        return {"result":"fail", "message": "Not found"}

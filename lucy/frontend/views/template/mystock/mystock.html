@@ -72,7 +72,8 @@
                 <th class="text-end">현재가</th>
                 <th class="text-end">전일대비</th>
                 <th class="text-end">등락율</th>
-                <th>동작</th>
+                <th class="text-center">동작</th>
+                <th class="text-center">매수/매도 기준가</th>
             </tr>
         </thead>
         <tbody>
@@ -84,7 +85,7 @@
                 <td  id="cost_{{stk_code}}" class="text-end">-</td>
                 <td  id="change_{{stk_code}}" class="text-end">-</td>
                 <td  id="diff_{{stk_code}}" class="text-end">-</td>
-                <td class="ms-2">
+                <td class="ms-2 text-center">
                     {{#test 'stk_types.indexOf("관심") != -1'}}
                     <button class="btnAttensionDelete btn btn-warning btn-sm" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}" title="관심..삭제"><i class="bi bi-dash"></i></button>
                     {{else}}
@@ -95,6 +96,12 @@
                     {{else}}
                     <button class="btnDantaAdd btn btn-success btn-sm" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}" title="단타추가"><i class="bi bi-plus-circle"></i></button> 
                     {{/test}}
+                </td>
+                <td class="d-flex align-items-center">
+                    <input type="number" class="form-control form-control-sm buyBaseCost me-1" style="width:120px" value="{{this.buy_base_price}}" placeholder="매수 기준가"> 
+                    <input type="number" class="form-control form-control-sm sellBaseCost me-1" style="width:120px"  value="{{this.sell_base_price}}" placeholder="매도 기준가"> 
+                    <button class="btn btn-primary btn-sm btnBaseCostsSave me-1" title="매수/매도 기준가격 저장" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}"><i class="bi bi-floppy"></i></button>
+                    <button class="btn btn-success btn-sm btnBaseCostsAutoset" title="매수/매도 기준가격 자동설정(-3,+5%)" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}"><i class="bi bi-arrows-expand-vertical"></i></button>
                 </td>
             </tr>
             {{/each}}
@@ -207,6 +214,55 @@ $( document ).ready(function() {
     console.log( "ready!")
     //초기화
     init();
+
+    $('#mystock-result-area').on("click", ".btnBaseCostsAutoset", function() {
+        const stk_code = $(this).data('stk-code');
+        let currentCost = $('#mystock-result-area').find('#cost_'+stk_code).text();
+        //매수는 현재가격보다 3% 낮게, 매도는 현재가격보다 5% 높게 설정한다.
+        let buy_cost = Math.floor(Number(currentCost.replace(/,/g, '')) * 0.97);
+        let sell_cost = Math.floor(Number(currentCost.replace(/,/g, '')) * 1.05);
+        $(this).parent().find('.buyBaseCost').val(buy_cost);
+        $(this).parent().find('.sellBaseCost').val(sell_cost);
+    });
+    $('#mystock-result-area').on("click", ".btnBaseCostsSave", function() {
+        const url = '/api/v1/mystock/base-cost';
+        const stk_code = $(this).data('stk-code');
+        const buy_cost = $(this).parent().find('.buyBaseCost').val();
+        const sell_cost = $(this).parent().find('.sellBaseCost').val();
+        let currentCost = $('#mystock-result-area').find('#cost_'+stk_code).text();
+        if (buy_cost == '' || sell_cost == '') {
+            alert('매수/매도 기준가를 입력하세요.');
+            return;
+        }
+        let buy_cost_num = Number(buy_cost);
+        let sell_cost_num = Number(sell_cost);
+        let currentCost_num = Number(currentCost.replace(/,/g, ''));
+        
+        if (buy_cost_num >= currentCost_num) {
+            alert('매수 기준가는 현재가보다 작아야 합니다.');
+            return;
+        }
+        if (sell_cost_num <= currentCost_num) {
+            alert('매도 기준가는 현재가보다 커야 합니다.');
+            return;
+        }
+        
+        const data = { 
+                stk_code : String(stk_code),
+                buy_base_price : buy_cost_num, 
+                sell_base_price : sell_cost_num
+        };
+        putFetch(url, data).then(data => {
+            console.log(data);
+            if(data.result == 'success'){
+                init();
+            }else{
+                alert('저장에 실패했습니다.');
+            }
+        }).catch(error=> {
+            console.error(error.message);
+        });
+    });
     $('#mystock-result-area').on("click", ".btnAddAttension", function() {
         //관심을 추가한다.
         const stk_code = $(this).data('stk-code');
