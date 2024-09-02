@@ -3,15 +3,108 @@
 {% endblock %}
 {% block content %}
 <h1>KIS관심종목</h1>
+<div id="group-list-area">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">일자</th>
+                <th scope="col">전송 시간</th>
+                <th scope="col">데이터 순위</th>
+                <th scope="col">관심 그룹 코드</th>
+                <th scope="col">관심 그룹 명</th>
+                <th scope="col">요청 개수</th>
+            </tr>
+        </thead>
+        <tbody id="grouplist-table-body">
+            <!-- Handlebars 템플릿이 여기서 사용됩니다 -->
+        </tbody>
+    </table>
+</div>
+<div id="stock-list-area">
+    <!-- Handlebars 템플릿이 여기서 사용됩니다 -->
+</div>
 {% raw %}
 <!--handlebar scripts-->
+<script id="group-list-template" type="text/x-handlebars-template">
+    {{#each items}}
+    <tr>
+        <td>{{date}}</td>
+        <td>{{trnm_hour}}</td>
+        <td>{{data_rank}}</td>
+        <td>{{inter_grp_code}}</td>
+        <td><a href="#" data-code={{inter_grp_code}} class="btnGroup">{{inter_grp_name}}</a></td>
+        <td>{{ask_cnt}}</td>
+    </tr>
+    {{/each}}
+</script>
+<script id="stocklist-template" type="text/x-handlebars-template">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th scope="col">데이터 순위</th>
+                <th scope="col">거래소코드</th>
+                <th scope="col">종목코드</th>
+                <th scope="col">HTS 한글 종목명</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each items}}
+            <tr>
+                <td>{{data_rank}}</td>
+                <td>{{exch_code}}</td>
+                <td>{{jong_code}}</td>
+                <td>{{hts_kor_isnm}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</script>
 {% endraw %}
 {% endblock %}
 {% block script %}
 {% raw %}
 <script>
+let current_stock_code_list = [];
+function initialize(){
+    const url = '/api/v1/kis/attension/grouplist'
+    getFetch(url).then(data => {
+        console.log(data);
+        const source = document.getElementById('group-list-template').innerHTML;
+        const template = Handlebars.compile(source);
+        const html = template({items: data.output2});
+        document.getElementById('grouplist-table-body').innerHTML = html;
+    }).catch(error=> {
+        console.error(error.message); 
+    });
+}
+function get_multi_price(){
+    const url = '/api/v1/kis/attension/multi_price/' + current_stock_code_list.join('');
+    getFetch(url).then(data => {
+        console.log('멀티가격');
+        console.log(data);
+    }).catch(error=> {
+        console.error(error.message); 
+    });
+}
 $( document ).ready(function() {
-    console.log( "ready!")
+    console.log( "ready!");
+    initialize();
+    $('#grouplist-table-body').on("click", ".btnGroup", function() {
+        const code = $(this).data('code');
+        console.log(code);
+        const url = '/api/v1/kis/attension/stocklist_by_group/' + code;
+        getFetch(url).then(data => {
+            console.log(data);
+            const source = document.getElementById('stocklist-template').innerHTML;
+            const template = Handlebars.compile(source);
+            const html = template({items: data.output2});
+            document.getElementById('stock-list-area').innerHTML = html;
+            current_stock_code_list = data.output2.map(item => item.jong_code);
+            get_multi_price();
+        }).catch(error=> {
+            console.error(error.message); 
+        });
+    });
 });
 </script>
 {% endraw %}

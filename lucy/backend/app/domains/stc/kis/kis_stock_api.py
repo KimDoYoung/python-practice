@@ -705,6 +705,7 @@ class KisStockApi(StockApi):
             "custtype": "P" #  "B : 법인 P : 개인",
         }    
         json_response = await self.send_request('관심종목 그룹리스트 조회', 'GET', url, headers, params=params)
+        logger.debug(f"관심종목 그룹리스트 조회 : {json_response}")
         try:
             return IntstockGrouplist_Response(**json_response)
         except ValidationError as e:
@@ -733,6 +734,7 @@ class KisStockApi(StockApi):
             "custtype": "P" #  "B : 법인 P : 개인",
         }    
         json_response = await self.send_request('2.관심종목 그룹별 종목 조회', 'GET', url, headers, params=params)
+        logger.debug(f"2. 관심종목 그룹별 종목 조회 : {json_response}")
         try:
             return IntstockStocklistByGroup_Response(**json_response)
         except ValidationError as e:

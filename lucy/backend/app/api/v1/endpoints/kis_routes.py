@@ -25,6 +25,7 @@ from backend.app.domains.stc.kis.model.kis_inquire_daily_ccld_model import Inqui
 from backend.app.domains.stc.kis.model.kis_intgr_margin_model import IntgrMargin_Request
 from backend.app.domains.stc.kis.model.kis_intstock_grouplist import IntstockGrouplist_Response
 from backend.app.domains.stc.kis.model.kis_intstock_multiprice import IntstockMultprice_Response
+from backend.app.domains.stc.kis.model.kis_intstock_stocklist_by_group import IntstockStocklistByGroup_Response
 from backend.app.domains.stc.kis.model.kis_order_cash_model import KisOrderCancel_Request, OrderCash_Request
 from backend.app.domains.stc.kis.model.kis_quote_balance_model import QuoteBalance_Response
 from backend.app.domains.stc.kis_interface_model import Rank_Request
@@ -169,7 +170,7 @@ async def attension_grouplist():
     response = await kis_api.attension_grouplist()
     return response
 
-@router.get("/attension/stocklist_by_group/{group_code}", response_model=IntstockGrouplist_Response)
+@router.get("/attension/stocklist_by_group/{group_code}", response_model=IntstockStocklistByGroup_Response)
 async def attension_grouplist(group_code:str):
     ''' 2. 관심종목 그룹별 종목 조회'''    
     kis_api = await StockApiManager().kis_api()

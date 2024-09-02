@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 from backend.app.domains.stock_api_base_model import StockApiBaseModel
 
 
@@ -15,4 +15,4 @@ class IntstockGrouplist_Response(StockApiBaseModel):
     rt_cd: str # 성공 실패 여부 
     msg_cd: str # 응답코드 
     msg1: str # 응답메세지     
-    output1: Optional[IntstockGrouplistItem] = None
+    output2: Optional[List[IntstockGrouplistItem]] = None
