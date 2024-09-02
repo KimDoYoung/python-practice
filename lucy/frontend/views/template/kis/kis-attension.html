@@ -45,6 +45,8 @@
                 <th scope="col">거래소코드</th>
                 <th scope="col">종목코드</th>
                 <th scope="col">HTS 한글 종목명</th>
+                <th scope="col">현재가</th>
+                <th scope="col">전일대비율</th>
             </tr>
         </thead>
         <tbody>
@@ -54,6 +56,8 @@
                 <td>{{exch_code}}</td>
                 <td>{{jong_code}}</td>
                 <td>{{hts_kor_isnm}}</td>
+                <td id="{{jong_code}}_prpr">-</td>
+                <td id="{{jong_code}}_ctrt">-</td>
             </tr>
             {{/each}}
         </tbody>
@@ -82,6 +86,15 @@ function get_multi_price(){
     getFetch(url).then(data => {
         console.log('멀티가격');
         console.log(data);
+        let list = data.output
+        for (let i = 0; i < list.length; i++) {
+            const item = list[i];
+            const code = item.jong_code;
+            const prpr = item.prpr;
+            const ctrt = item.ctrt;
+            document.getElementById(code + '_prpr').innerText = prpr;
+            document.getElementById(code + '_ctrt').innerText = ctrt;
+        }
     }).catch(error=> {
         console.error(error.message); 
     });
