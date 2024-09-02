@@ -98,8 +98,8 @@
                     {{/test}}
                 </td>
                 <td class="d-flex align-items-center">
-                    <input type="number" class="form-control form-control-sm buyBaseCost me-1" style="width:120px" value="{{this.buy_base_price}}" placeholder="매수 기준가"> 
-                    <input type="number" class="form-control form-control-sm sellBaseCost me-1" style="width:120px"  value="{{this.sell_base_price}}" placeholder="매도 기준가"> 
+                    <input type="number" class="form-control form-control-sm buyBaseCost me-1" style="width:120px" value="{{this.buy_base_price}}" placeholder="매수 기준가" step="100"> 
+                    <input type="number" class="form-control form-control-sm sellBaseCost me-1" style="width:120px"  value="{{this.sell_base_price}}" placeholder="매도 기준가"  step="100"> 
                     <button class="btn btn-primary btn-sm btnBaseCostsSave me-1" title="매수/매도 기준가격 저장" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}"><i class="bi bi-floppy"></i></button>
                     <button class="btn btn-success btn-sm btnBaseCostsAutoset" title="매수/매도 기준가격 자동설정(-3,+5%)" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}"><i class="bi bi-arrows-expand-vertical"></i></button>
                 </td>

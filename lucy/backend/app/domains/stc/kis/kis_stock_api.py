@@ -29,6 +29,7 @@
 import asyncio
 from datetime import datetime, timedelta
 import json
+from typing import List
 import aiohttp
 from fastapi import HTTPException
 import requests
@@ -44,6 +45,9 @@ from backend.app.domains.stc.kis.model.kis_inquire_psbl_rvsecncl_model import In
 from backend.app.domains.stc.kis.model.kis_inquire_psbl_sell_model import InquirePsblSell_Response
 from backend.app.domains.stc.kis.model.kis_inquire_psble_order import InquirePsblOrder_Response, InquirePsblOrder_Request
 from backend.app.domains.stc.kis.model.kis_intgr_margin_model import IntgrMargin_Request, IntgrMargin_Response
+from backend.app.domains.stc.kis.model.kis_intstock_grouplist import IntstockGrouplist_Response
+from backend.app.domains.stc.kis.model.kis_intstock_multiprice import IntstockMultprice_Response
+from backend.app.domains.stc.kis.model.kis_intstock_stocklist_by_group import IntstockStocklistByGroup_Response
 from backend.app.domains.stc.kis.model.kis_order_cash_model import KisOrderRvsecncl_Request, OrderCash_Request, KisOrderCash_Response, KisOrderCancel_Response
 from backend.app.domains.stc.kis.model.kis_psearch_result_model import PsearchResult_Response
 from backend.app.domains.stc.kis.model.kis_quote_balance_model import QuoteBalance_Request, QuoteBalance_Response
@@ -680,3 +684,82 @@ class KisStockApi(StockApi):
             return IntgrMargin_Response(**json_response)
         except ValidationError as e:
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")        
+    
+    # -------------------------------------------------------------------------------
+    # 관심종목 1.그룹리스트 조회 2. 그룹별 관심 종목리스트 조회 3. 관심종목 시세조회
+    async def attension_grouplist(self)-> IntstockGrouplist_Response:
+        '''관심종목 그룹리스트 조회 '''
+        logger.info(f"관심종목 그룹리스트 조회")
+        url = self.BASE_URL + "/uapi/domestic-stock/v1/quotations/intstock-grouplist"
+        params = {
+            "TYPE": "1",
+            "FID_ETC_CLS_CODE": "00",
+            "USER_ID": self.HTS_USER_ID
+        }    
+        headers ={
+            "content-type": "application/json; charset=utf-8",
+            "authorization": f"Bearer {self.ACCESS_TOKEN}",
+            "appkey": self.APP_KEY,
+            "appsecret": self.APP_SECRET,
+            "tr_id": "HHKCM113004C7",
+            "custtype": "P" #  "B : 법인 P : 개인",
+        }    
+        json_response = await self.send_request('관심종목 그룹리스트 조회', 'GET', url, headers, params=params)
+        try:
+            return IntstockGrouplist_Response(**json_response)
+        except ValidationError as e:
+            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
+        
+    async def attension_stocklist_by_group(self, group_code:str)-> IntstockStocklistByGroup_Response:
+        '''2.관심종목 그룹별 종목 조회 '''
+        logger.info(f"2.관심종목 그룹별 종목 조회")
+        url = self.BASE_URL + "/uapi/domestic-stock/v1/quotations/intstock-stocklist-by-group"
+        params = {
+            "TYPE": "1",
+            "USER_ID": self.HTS_USER_ID,
+            "DATA_RANK": "",
+            "INTER_GRP_CODE": group_code,
+            "INTER_GRP_NAME": "",
+            "HTS_KOR_ISNM": "",
+            "CNTG_CLS_CODE": "",
+            "FID_ETC_CLS_CODE": "4"
+        }   
+        headers ={
+            "content-type": "application/json; charset=utf-8",
+            "authorization": f"Bearer {self.ACCESS_TOKEN}",
+            "appkey": self.APP_KEY,
+            "appsecret": self.APP_SECRET,
+            "tr_id": "HHKCM113004C6",
+            "custtype": "P" #  "B : 법인 P : 개인",
+        }    
+        json_response = await self.send_request('2.관심종목 그룹별 종목 조회', 'GET', url, headers, params=params)
+        try:
+            return IntstockStocklistByGroup_Response(**json_response)
+        except ValidationError as e:
+            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")     
+        
+    async def attension_multi_price(self, codes:List[str])-> IntstockMultprice_Response:
+        '''3.관심종목(멀티종목) 시세조회 '''
+        logger.info(f"3.관심종목(멀티종목) 시세조회")
+        url = self.BASE_URL + "/uapi/domestic-stock/v1/quotations/intstock-multprice"
+        params = {}
+        # codes 리스트의 길이를 제한 (최대 30개)
+        limited_codes = codes[:30]
+        # FID_COND_MRKT_DIV_CODE_n와 FID_INPUT_ISCD_n 값들을 params에 추가
+        for i, code in enumerate(limited_codes, start=1):
+            params[f"FID_COND_MRKT_DIV_CODE_{i}"] = "J"
+            params[f"FID_INPUT_ISCD_{i}"] = code
+        
+        headers ={
+            "content-type": "application/json; charset=utf-8",
+            "authorization": f"Bearer {self.ACCESS_TOKEN}",
+            "appkey": self.APP_KEY,
+            "appsecret": self.APP_SECRET,
+            "tr_id": "FHKST11300006",
+            "custtype": "P" #  "B : 법인 P : 개인",
+        }    
+        json_response = await self.send_request('3.관심종목(멀티종목) 시세조회 ', 'GET', url, headers, params=params)
+        try:
+            return IntstockMultprice_Response(**json_response)
+        except ValidationError as e:
+            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")     

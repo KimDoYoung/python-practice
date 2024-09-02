@@ -23,6 +23,8 @@ from backend.app.core.dependency import get_mystock_service, get_user_service
 from backend.app.domains.stc.kis.model.kis_after_hour_balance_model import AfterHourBalance_Response
 from backend.app.domains.stc.kis.model.kis_inquire_daily_ccld_model import InquireDailyCcld_Request
 from backend.app.domains.stc.kis.model.kis_intgr_margin_model import IntgrMargin_Request
+from backend.app.domains.stc.kis.model.kis_intstock_grouplist import IntstockGrouplist_Response
+from backend.app.domains.stc.kis.model.kis_intstock_multiprice import IntstockMultprice_Response
 from backend.app.domains.stc.kis.model.kis_order_cash_model import KisOrderCancel_Request, OrderCash_Request
 from backend.app.domains.stc.kis.model.kis_quote_balance_model import QuoteBalance_Response
 from backend.app.domains.stc.kis_interface_model import Rank_Request
@@ -155,4 +157,30 @@ async def after_hour_balance(rank_req: Rank_Request):
     kis_api = await StockApiManager().kis_api()
     ahb_req = rank_to_after_hour_balance_request(rank_req)
     response = await  kis_api.after_hour_balance(ahb_req)
+    return response
+
+#-----------------------------------------------------
+# KIS관심종목
+#-----------------------------------------------------
+@router.get("/attension/grouplist", response_model=IntstockGrouplist_Response)
+async def attension_grouplist():
+    ''' 1. 관심종목 그룹 조회'''    
+    kis_api = await StockApiManager().kis_api()
+    response = await kis_api.attension_grouplist()
+    return response
+
+@router.get("/attension/stocklist_by_group/{group_code}", response_model=IntstockGrouplist_Response)
+async def attension_grouplist(group_code:str):
+    ''' 2. 관심종목 그룹별 종목 조회'''    
+    kis_api = await StockApiManager().kis_api()
+    response = await kis_api.attension_stocklist_by_group(group_code)
+    return response
+
+@router.get("/attension/multi_price/{stocks}", response_model=IntstockMultprice_Response)
+async def attension_grouplist(stocks:str):
+    ''' 3. 관심종목(멀티종목) 시세조회 '''    
+    kis_api = await StockApiManager().kis_api()
+    stocks_array = [stocks[i:i+6] for i in range(0, len(stocks), 6)]
+    
+    response = await kis_api.attension_multi_price(stocks_array)
     return response
