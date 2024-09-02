@@ -26,4 +26,5 @@
 8. pytest-test : pytest로 mock 연습
 9. lucy : 자동단타머신
 10. stock-api : multi user, multi account 주식거래 
+11. movie_review : kalpadb의 movie_review의 내요을 html로 뽑아냄
 

@@ -11,3 +11,4 @@ pymongo
 sympy
 xmltodict
 python-dotenv
+webdriver-manager
