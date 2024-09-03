@@ -2,7 +2,7 @@
 {% block style %}
 {% endblock %}
 {% block content %}
-<h1>KIS관심종목</h1>
+<h4 class="text-primary">KIS관심종목 그룹</h4>
 <div id="group-list-area">
     <table class="table table-striped table-sm">
         <thead>
@@ -19,6 +19,7 @@
         </tbody>
     </table>
 </div>
+<h4 id="group-title" class="text-primary"></h4>
 <div id="stock-list-area">
     <!-- Handlebars 템플릿이 여기서 사용됩니다 -->
 </div>
@@ -30,7 +31,7 @@
         <td>{{displayYmd date}} {{displayTime trnm_hour}}</td>
         <td>{{index data_rank}}</td>
         <td>{{inter_grp_code}}</td>
-        <td><a href="#" data-code={{inter_grp_code}} class="btnGroup">{{inter_grp_name}}</a></td>
+        <td><a href="#" data-code={{inter_grp_code}} data-title="{{inter_grp_name}}" class="btnGroup">{{inter_grp_name}}</a></td>
         <td class="text-end">{{toInt ask_cnt}}</td>
     </tr>
     {{/each}}
@@ -38,11 +39,11 @@
 <script id="stocklist-template" type="text/x-handlebars-template">
     <table class="table table-bordered">
         <thead>
-            <tr>
+            <tr class="table-secondary">
                 <th scope="col">순위</th>
-                <th scope="col">거래소코드</th>
+                <th scope="col">거래소</th>
                 <th scope="col">종목코드</th>
-                <th scope="col">HTS 한글 종목명</th>
+                <th scope="col">종목명</th>
                 <th class="text-end" scope="col">현재가</th>
                 <th class="text-end" scope="col">전일대비</th>
                 <th class="text-end" scope="col">전일대비율</th>
@@ -141,6 +142,8 @@ $( document ).ready(function() {
     initialize();
     $('#grouplist-table-body').on("click", ".btnGroup", function() {
         const code = $(this).data('code');
+        const title = $(this).data('title');
+        $('#group-title').text(title);
         console.log(code);
         const url = '/api/v1/kis/attension/stocklist_by_group/' + code;
         getFetch(url).then(data => {
