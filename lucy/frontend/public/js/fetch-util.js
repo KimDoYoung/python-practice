@@ -36,7 +36,6 @@ async function callLucyApi(url, method, data = null) {
         if (data) {
             options.body = JSON.stringify(data);
         }
-
         const response = await fetch(url, options);
         
         // 세션 타임아웃으로 인해 401 상태 코드가 반환되었는지 체크
@@ -63,6 +62,7 @@ async function callLucyApi(url, method, data = null) {
         return responseData;
     } catch (error) {
         console.error('에러 발생:', error);
+        console.error('에러 발생:', error.toString());
         throw error;
     }
 }

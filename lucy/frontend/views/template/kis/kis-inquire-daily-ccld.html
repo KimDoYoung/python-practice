@@ -62,7 +62,7 @@
             {{#each data.output1}}
             <tr>
                 <td>{{this.prdt_name}}({{this.pdno}})</td>
-                <td>{{this.ord_dt}} {{this.ord_tmd}}</td>
+                <td>{{displayYmd this.ord_dt}} {{displayTime this.ord_tmd}}</td>
                 <td>{{this.odno}}</td>
                 <td>{{this.ord_dvsn_name}}</td>
                 {{#test "sll_buy_dvsn_cd == '01'"}} <!--매도 -->
