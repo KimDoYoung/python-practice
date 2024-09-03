@@ -41,7 +41,7 @@
             <tr>
                 <td>{{this.stk_types}}</td>
                 <td>{{goNaver this.stk_code}}</td>
-                <td>{{this.stk_name}}</td>
+                <td>{{toggleCompanyCanvas this.stk_code this.stk_name}}</td>
                 <td id="cost-{{this.stk_code}}" class="mx-2 p-2 text-end">-</td>
                 <td class="ms-2">
                     <button class="btnDelete btn btn-secondary btn-sm" data-id="{{this._id}}" title="관심..삭제"><i class="bi bi-dash"></i></button>

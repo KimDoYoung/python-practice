@@ -6,7 +6,15 @@ $(document).ready(function() {
             // backdrop: 'static',
             // keyboard: false
     });
-    //offcanvas가 보여질때 증권사를 선택
+    let offCanvasCompanyElm = document.getElementById('offcanvasCompany');
+    const offcanvasCompany = new bootstrap.Offcanvas(offCanvasCompanyElm, {
+            // backdrop: 'static',
+            // keyboard: false
+    });    
+    $('#offcanvasCompany').on('shown.bs.offcanvas', function(){
+        console.log("회사정보 canvas가 보여질때");
+    });
+    //매수/매도offcanvas가 보여질때 증권사를 선택
     $('#offcanvasBuySell').on('shown.bs.offcanvas', function(){
         const stk_abbr = $('#page_path').val() ;
         const stk_company = String(stk_abbr);
@@ -16,7 +24,11 @@ $(document).ready(function() {
             $('#kisorls2').prop('checked', true);
         }
     })
-    //offcanvas를 보이게 하는 함수
+    function showCompanyCanvas(stk_code){
+        $('#offcanvasCompanyName').text(stk_code);
+        offcanvasCompany.toggle();
+    }
+    //매수/매도offcanvas를 보이게 하는 함수
     function showBuySellCanvas(stk_company, stk_code, stk_name, which, qty, cost){
         if(qty === undefined) qty = 1;
         if(cost === undefined) cost = 0;
@@ -69,6 +81,7 @@ $(document).ready(function() {
     //global functions
     window.showBuySellCanvas = showBuySellCanvas;
     window.showToastError = showToastError;
+    window.showCompanyCanvas = showCompanyCanvas;
     //로그아웃
     $('#logout').click(function() {
         localStorage.removeItem('lucy_token');  // JWT 토큰 삭제

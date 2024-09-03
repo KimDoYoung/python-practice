@@ -61,9 +61,13 @@ async function callLucyApi(url, method, data = null) {
         const responseData = await response.json();
         return responseData;
     } catch (error) {
-        console.error('에러 발생:', error);
-        console.error('에러 발생:', error.toString());
-        throw error;
+        let errorStr = error.toString();
+        if (errorStr.includes('SyntaxError: Unexpected end of JSON input')) {
+            alert("세션 종료되었습니다. 서버와의 통신이 원활하지 않습니다. 다시 로그인해주세요.");
+            window.location.href = '/login';
+        }else{
+            throw new LucyError('500', 'SessionOut-로그인이 필요합니다.(Unexpected response format)');
+        }
     }
 }
 

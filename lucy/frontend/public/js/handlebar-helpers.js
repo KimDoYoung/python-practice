@@ -265,3 +265,14 @@
         return result.toLocaleString();
     });
 
+
+    /**
+     * 회사정보 canvas를 보여주는 함수, lucy_main.js와 sell_buy_canvas.html을 가지고 어느곳에서나 사용가능하도록함
+     * {{toggleCompanyCanvas stk_code stk_name}}
+     */
+    Handlebars.registerHelper('toggleCompanyCanvas', function(stk_code, stk_name) {
+        // a 태그 HTML 문자열을 반환
+        return new Handlebars.SafeString(
+            `<a href="#" class="companycanvas-link" onclick="javascript:showCompanyCanvas('${stk_code}')" title="${stk_name}의 정보보기">${stk_name}</a>`
+        );
+    });
