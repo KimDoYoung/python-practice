@@ -47,7 +47,6 @@
             <tr class="table-primary">
                 <th>종목명</th>
                 <th class="text-center">종목번호</th>
-                <th class="text-end">보유수량</th>
                 <th class="text-end">평균단가</th>
                 <th class="text-end">현재가</th>
                 <th class="text-end">1주당</th>
@@ -55,6 +54,8 @@
                 <th class="text-end">평가금액</th>
                 <th class="text-end">평가손익</th>
                 <th class="text-end">수익율</th>
+                <th class="text-end">보유수량</th>
+                <th class="text-end">보유비중</th>
                 <th class="text-end">수수료</th>
                 <th class="text-end">제세금</th>
                 <th class="text-center">동작</th>
@@ -63,9 +64,8 @@
         <tbody id="table-body">
             {{#each list}}
             <tr>
-                <td class="">{{hname}}</td>
+                <td class="">{{toggleCompanyCanvas expcode hname}}</td>
                 <td class="text-center">{{goNaver expcode}}</td>
-                <td class="text-end">{{displayWon mdposqt}}</td>
                 <td class="text-end">{{displayWon pamt}}</td>
                 <td class="text-end">{{displayWon price}}</td>
                 {{#test "Number(pamt) > Number(price)"}}
@@ -82,7 +82,8 @@
                 <td class="text-end text-primary">{{displayWon dtsunik}}</td>
                 <td class="text-end text-primary">{{sunikrt}}</td>
                 {{/test}}
-
+                <td class="text-end">{{displayWon mdposqt}}</td>
+                <td class="text-end">{{janrt}}</td>
                 <td class="text-end">{{displayWon fee}}</td>
                 <td class="text-end">{{displayWon tax}}</td>
                 <td class="text-center">

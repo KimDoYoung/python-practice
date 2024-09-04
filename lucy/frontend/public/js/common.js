@@ -322,6 +322,53 @@ var JuliaUtil = (function(){
         return formObject;
     }
 
+    // 사용 예시
+    // const today = '2024-09-04';  // 'yyyy-MM-dd' 형식
+    // console.log(addDate(today, 'month', -1));  // '2024-08-04' (한 달 빼기)
+
+    // const customDate = '20240904';  // 숫자만 있는 경우
+    // console.log(addDate(customDate, 'day', 3));  // '2024-09-07' (3일 더하기)
+
+    // const customDateWithSymbols = '2024/09/04';  // 다른 형식 (기호 포함)
+    // console.log(addDate(customDateWithSymbols, 'day', 3));  // '2024-09-07'
+
+    var addDate = function (dateStr, unit, value) {
+        // 'yyyy-MM-dd' 형식이 아니어도 숫자만 추출해서 8자리로 처리
+        const cleanedDateStr = dateStr.replace(/\D/g, ''); // 숫자가 아닌 문자는 모두 제거
+    
+        // 8자리 숫자에서 연, 월, 일을 추출
+        const year = parseInt(cleanedDateStr.substring(0, 4), 10);  // 처음 4자리: 연도
+        const month = parseInt(cleanedDateStr.substring(4, 6), 10) - 1;  // 5~6번째 자리: 월 (0부터 시작하므로 -1)
+        const day = parseInt(cleanedDateStr.substring(6, 8), 10);  // 7~8번째 자리: 일
+    
+        // Date 객체 생성
+        const date = new Date(year, month, day);
+    
+        // 단위에 따라 날짜 변경
+        switch (unit) {
+            case 'day':
+                date.setDate(date.getDate() + value);
+                break;
+            case 'month':
+                date.setMonth(date.getMonth() + value);
+                break;
+            case 'year':
+                date.setFullYear(date.getFullYear() + value);
+                break;
+            default:
+                console.error('지원하지 않는 단위입니다.');
+                return null;
+        }
+    
+        // 변경된 날짜를 'yyyy-MM-dd' 형식으로 반환
+        const newYear = date.getFullYear();
+        const newMonth = String(date.getMonth() + 1).padStart(2, '0');  // 월은 0부터 시작하므로 +1
+        const newDay = String(date.getDate()).padStart(2, '0');
+    
+        return `${newYear}-${newMonth}-${newDay}`;
+    }
+    
+
     return {
         isString : isString,
         isNumber : isNumber,
@@ -355,7 +402,8 @@ var JuliaUtil = (function(){
         isValidYmd : isValidYmd,
         contextPath : contextPath,
         removeElement : removeElement,
-        objectFromForm : objectFromFrom
+        objectFromForm : objectFromFrom,
+        addDate : addDate
     };    
 })();
 

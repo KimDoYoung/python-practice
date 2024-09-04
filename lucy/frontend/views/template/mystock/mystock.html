@@ -7,7 +7,7 @@
     <form style="display: flex; align-items: center;">
         <div class="form-check form-switch me-3">
             <input class="form-check-input" type="checkbox" id="currentCostRefresh" checked>
-            <label class="form-check-label" for="flexSwitchCheckChecked">현재가 Refresh</label>
+            <label class="form-check-label" for="currentCostRefresh">현재가<i class="bi bi-arrow-clockwise"></i></label>
         </div>        
         <div class="form-check form-check-inline">
             <input class="form-check-input" type="radio" name="options" id="option0" value="ALL" checked>
@@ -81,7 +81,7 @@
             <tr>
                 <td>{{split_and_badge this.stk_types}}</td>
                 <td>{{goNaver this.stk_code}}</td>
-                <td>{{this.stk_name}}</td>
+                <td>{{toggleCompanyCanvas this.stk_code this.stk_name}}</td>
                 <td  id="cost_{{stk_code}}" class="text-end">-</td>
                 <td  id="change_{{stk_code}}" class="text-end">-</td>
                 <td  id="diff_{{stk_code}}" class="text-end">-</td>
@@ -96,6 +96,7 @@
                     {{else}}
                     <button class="btnDantaAdd btn btn-success btn-sm" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}" title="단타추가"><i class="bi bi-plus-circle"></i></button> 
                     {{/test}}
+                    <a href="/page?path=mystock/stock_detail&stk_code={{this.stk_code}}" class="btn btn-primary btn-sm" title="상세보기"><i class="bi bi-eye"></i></a>
                 </td>
                 <td class="d-flex align-items-center">
                     <input type="number" class="form-control form-control-sm buyBaseCost me-1" style="width:120px" value="{{this.buy_base_price}}" placeholder="매수 기준가" step="100"> 

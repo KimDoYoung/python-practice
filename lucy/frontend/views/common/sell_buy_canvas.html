@@ -73,12 +73,20 @@
     </div>
 </div>
 
-
+<!-- 회사정보를 보여주는 offcanvas component -->
 <div class="offcanvas offcanvas-bottom" tabindex="-1" id="offcanvasCompany" >
     <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="offcanvasCompanyName"></h5>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
+        <div id="offcanvas-naver-company-summary"></div> <!--기업개요-->
+        <div class="mt-3">
+            <table><tr>
+                <th>시가총액</th><td id="offcanvas-naver-market-cap"></td>
+                <th>시가총액순위</th><td id="offcanvas-naver-market-cap-rank"></td>
+                <th>상장주식수</th><td id="offcanvas-naver-num-of-shares"></td>
+            </tr></table>
+        </div>
     </div>
 </div>

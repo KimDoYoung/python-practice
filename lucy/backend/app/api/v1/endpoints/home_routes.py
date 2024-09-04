@@ -44,13 +44,21 @@ async def display_main(request: Request):
     return render_template("main.html", context)
 
 @router.get("/page", response_class=HTMLResponse, include_in_schema=False)
-async def page(request: Request, path: str = Query(..., description="template폴더안의 html path")):
+async def page(
+    request: Request, 
+    path: str = Query(..., description="template폴더안의 html path"),
+    stk_code: str = Query(None, description="선택적 주식 코드")
+):
     ''' path에 해당하는 페이지를 가져와서 보낸다. '''
     current_user = await get_current_user(request)
     
     if not current_user:
         raise HTTPException(status_code=401, detail="Invalid token-현재 사용자 정보가 없습니다")
-    stk_code = request.cookies.get("stk_code")
+    
+    # 쿠키에서 stk_code를 가져오거나, 쿼리 파라미터로 전달된 stk_code를 사용
+    cookie_stk_code = request.cookies.get("stk_code")
+    stk_code = stk_code or cookie_stk_code    
+    
     today = get_today()
     context = {
         "request": request, 

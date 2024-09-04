@@ -13,8 +13,6 @@
 from bs4 import BeautifulSoup
 import requests
 
-
-
 def get_stock_info(stk_code: str):
     '''주식 코드로부터 주식 정보를 가져온다.'''
     page = requests.get(f"https://finance.naver.com/item/main.nhn?code={stk_code}")
@@ -29,10 +27,24 @@ def get_stock_info(stk_code: str):
     # <p> 태그 내용을 줄바꿈과 함께 합침
     company_summary = "\n".join(p.get_text(strip=True) for p in paragraphs)
 
+    # 필요한 div 컨테이너를 먼저 찾아서 그 안에서 작업
+    container_div = soup.find('div', id='tab_con1', class_='tab_con1')
+    
+    # 시가총액
+    market_cap = container_div.find('th', text='시가총액').find_next('td').get_text(separator='').strip()
+
+    # 시가총액순위
+    market_cap_rank = container_div.find('a', text='시가총액순위').find_next('td').get_text(separator='').strip()
+
+    # 상장주식수
+    num_of_shares = container_div.find('th', text='상장주식수').find_next('td').get_text(separator='').strip()
 
     stock_info = {
         'stk_code': stk_code,
         'stk_name': stk_name,
-        'company_summary': company_summary
+        'company_summary': company_summary,
+        'market_cap': market_cap,
+        'market_cap_rank': market_cap_rank,
+        'num_of_shares': num_of_shares,
     }
     return stock_info

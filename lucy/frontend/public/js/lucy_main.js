@@ -24,9 +24,28 @@ $(document).ready(function() {
             $('#kisorls2').prop('checked', true);
         }
     })
+    /**
+     * 하단에 offcanvas로 회사정보를 보여준다.
+     * 
+     * @param {*} stk_code 
+     */
     function showCompanyCanvas(stk_code){
-        $('#offcanvasCompanyName').text(stk_code);
-        offcanvasCompany.toggle();
+        const url = '/api/v1/mystock/company-info/' + stk_code;
+        getFetch(url).then(data => {
+            console.log(data); 
+            const name_code = data.naver.stk_name + ' (' + data.naver.stk_code + ')';
+            const $companyCanvas = $('#offcanvasCompany');
+            $companyCanvas.find('#offcanvasCompanyName').text(name_code);
+            $companyCanvas.find('#offcanvas-naver-company-summary').text(data.naver.company_summary);
+            $companyCanvas.find('#offcanvas-naver-market-cap').text(data.naver.market_cap);
+            $companyCanvas.find('#offcanvas-naver-market-cap-rank').text(data.naver.market_cap_rank);
+            $companyCanvas.find('#offcanvas-naver-num-of-shares').text(data.naver.num_of_shares);
+
+            offcanvasCompany.toggle();
+        }).catch(error=> {
+            console.error(error.message); 
+        });
+        
     }
     //매수/매도offcanvas를 보이게 하는 함수
     function showBuySellCanvas(stk_company, stk_code, stk_name, which, qty, cost){

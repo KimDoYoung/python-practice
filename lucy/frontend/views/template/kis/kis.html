@@ -47,7 +47,7 @@
             {{#test "hldg_qty > 0"}}
             <tr class="align-middle">
                 <td>{{goNaver pdno}}</td>
-                <td><a href="#" class="btnStockInfo" data-stk-code="{{pdno}}">{{prdt_name}}</a></td>
+                <td><a href="#" class="btnStockInfo" data-stk-code="{{pdno}}">{{toggleCompanyCanvas pdno prdt_name}}</a></td>
                 <td class="text-end">{{displayWon pchs_avg_pric}}</td>
                 <td class="text-end">{{displayWon prpr}}</td>
                 {{#test "Number(pchs_avg_pric) > Number(prpr)"}}

@@ -40,6 +40,7 @@ from backend.app.domains.stc.kis.model.kis_after_hour_balance_model import After
 from backend.app.domains.stc.kis.model.kis_chk_holiday_model import ChkWorkingDay_Response
 from backend.app.domains.stc.kis.model.kis_inquire_balance_model import KisInquireBalance_Response
 from backend.app.domains.stc.kis.model.kis_inquire_daily_ccld_model import InquireDailyCcld_Response, InquireDailyCcld_Request
+from backend.app.domains.stc.kis.model.kis_inquire_daily_itemchartprice import InquireDailyItemchartprice_Request, InquireDailyItemchartprice_Response
 from backend.app.domains.stc.kis.model.kis_inquire_price import InquirePrice_Response
 from backend.app.domains.stc.kis.model.kis_inquire_psbl_rvsecncl_model import InquirePsblRvsecncl_Response
 from backend.app.domains.stc.kis.model.kis_inquire_psbl_sell_model import InquirePsblSell_Response
@@ -764,4 +765,31 @@ class KisStockApi(StockApi):
         try:
             return IntstockMultprice_Response(**json_response)
         except ValidationError as e:
-            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")     
+            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
+        
+    # -------------------------------------------------------------------------------
+    async def inquire_daily_itemchartprice(self, req:InquireDailyItemchartprice_Request)-> InquireDailyItemchartprice_Response:
+        '''국내주식기간별시세(일/주/월/년)[v1_국내주식-016] '''
+        logger.info(f"국내주식기간별시세(일/주/월/년)[v1_국내주식-016]")
+        url = self.BASE_URL + "/uapi/domestic-stock/v1/quotations/intstock-stocklist-by-group"
+        params = {
+            "FID_COND_MRKT_DIV_CODE": req.FID_COND_MRKT_DIV_CODE,  #시장 분류 코드 J : 주식, ETF, ETN",
+            "FID_INPUT_ISCD": req.FID_INPUT_ISCD,   #종목코드 종목번호 (6자리) ETN의 경우, Q로 시작 (EX. Q500001)",
+            "FID_INPUT_DATE_1": req.FID_INPUT_DATE_1, #입력 날짜 (시작) 조회 시작일자 (ex. 20220501)",
+            "FID_INPUT_DATE_2": req.FID_INPUT_DATE_2, #입력 날짜 (종료) 조회 종료일자 (ex. 20220530) ※ 주(W), 월(M), 년(Y) 봉 조회 시에 아래 참고 ㅁ FID_INPUT_DATE_2 가 현재일 까지일때  . 주봉 조회 : 해당 주의 첫번째 영업일이 포함되어야함  . 월봉 조회 : 해당 월의 전월 일자로 시작되어야함  . 년봉 조회 : 해당 년의 전년도 일자로 시작되어야함 ㅁ FID_INPUT_DATE_2 가 현재일보다 이전일 때  . 주봉 조회 : 해당 주의 첫번째 영업일이 포함되어야함  . 월봉 조회 : 해당 월의 영업일이 포함되어야함  . 년봉 조회 : 해당 년의 영업일이 포함되어야함",
+            "FID_PERIOD_DIV_CODE": req.FID_PERIOD_DIV_CODE, #기간분류코드 D:일봉, W:주봉, M:월봉, Y:년봉",
+            "FID_ORG_ADJ_PRC": req.FID_ORG_ADJ_PRC #수정주가 원주가 가격 여부 0:수정주가 1:원주가",
+        }   
+        headers ={
+            "content-type": "application/json; charset=utf-8",
+            "authorization": f"Bearer {self.ACCESS_TOKEN}",
+            "appkey": self.APP_KEY,
+            "appsecret": self.APP_SECRET,
+            "tr_id": "FHKST03010100",
+        }    
+        json_response = await self.send_request('국내주식기간별시세(일/주/월/년)[v1_국내주식-016]', 'GET', url, headers, params=params)
+        logger.debug(f"국내주식기간별시세(일/주/월/년)[v1_국내주식-016] : {json_response}")
+        try:
+            return InquireDailyItemchartprice_Response(**json_response)
+        except ValidationError as e:
+            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")      

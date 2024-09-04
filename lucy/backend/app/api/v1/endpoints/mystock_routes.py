@@ -3,11 +3,19 @@
 모듈 설명: 
     - mystock 관련 API 라우터
 주요 기능:
-    - get_list : 나의 주식 목록 조회
-    - delete_mystock : 나의 주식 삭제
-    - add_mystock : 나의 주식 추가
-    - danta : 단타 머신에서 쓰는 service
-
+    - / : 나의 주식 목록 조회
+    - /delete/{id} : 나의 주식 id로 삭제
+    - /add : 나의 주식 1개 추가
+    - /danta : 단타 머신에서 쓰는 service
+    - /naver-info/{stk_code} : 네이버 주식 정보 조회
+    - /add/stktype/{stk_code}/{stk_type} : stk_code로 찾아서 거기에 stk_type을 추가한다. 이미 있으면 추가하지 않는다.
+    - /extract/stktype/{stk_code}/{stk_type} : stk_code로 찾아서 거기에 stk_type이 있으면 제거한다.
+    - /extract/stktype : stk_type을 갖고 있는 모든 MyStock 찾아서 거기에서 stk_types에서 제거
+    - /mykeep : 내가 보유한 종목, 현재 보유를 모두 지우고 다시 추가한다.
+    - /current_costs/{stk_codes} : 현재 비용 조회(멀티)
+    - /search : 종목명의 일부문자열로 StkInfo 검색
+    - /base-cost : dto의 sell_base_price, buy_base_price를 업데이트    
+    - /company/{stk_code} : 회사 정보 조회
 작성자: 김도영
 작성일: 2024-08-21
 버전: 1.0
@@ -214,3 +222,13 @@ async def search(dto: MyStockDto,mystock_service :MyStockService=Depends(get_mys
         return {"result":"success", "message": "Update success"}
     else:
         return {"result":"fail", "message": "Not found"}
+
+@router.get("/company-info/{stk_code}", response_model=dict)
+async def company_info(stk_code: str):
+    ''' 회사정보 네이버 주식 정보 포함 조회 '''
+    naver_info = get_stock_info(stk_code)
+    info = {}
+    info['naver'] = naver_info
+    
+    return info
+    

@@ -22,6 +22,7 @@ from backend.app.core.dependency import get_mystock_service, get_user_service
 # from backend.app.domains.stc.kis.kis_api import KoreaInvestmentApi
 from backend.app.domains.stc.kis.model.kis_after_hour_balance_model import AfterHourBalance_Response
 from backend.app.domains.stc.kis.model.kis_inquire_daily_ccld_model import InquireDailyCcld_Request
+from backend.app.domains.stc.kis.model.kis_inquire_daily_itemchartprice import InquireDailyItemchartprice_Request, InquireDailyItemchartprice_Response
 from backend.app.domains.stc.kis.model.kis_intgr_margin_model import IntgrMargin_Request
 from backend.app.domains.stc.kis.model.kis_intstock_grouplist import IntstockGrouplist_Response
 from backend.app.domains.stc.kis.model.kis_intstock_multiprice import IntstockMultprice_Response
@@ -184,4 +185,13 @@ async def attension_grouplist(stocks:str):
     stocks_array = [stocks[i:i+6] for i in range(0, len(stocks), 6)]
     
     response = await kis_api.attension_multi_price(stocks_array)
+    return response
+
+# chart
+@router.get("/chart/{stk_code}/{startymd}/{endymd}/{chart_type}", response_model=InquireDailyItemchartprice_Response)
+async def inquire_daily_itemchartprice(stk_code:str, startymd:str, endymd:str, chart_type:str):
+    ''' 국내주식기간별시세(일/주/월/년)[v1_국내주식-016]'''    
+    kis_api = await StockApiManager().kis_api()
+    req = InquireDailyItemchartprice_Request(FID_INPUT_ISCD=stk_code, FID_INPUT_DATE_1=startymd, FID_INPUT_DATE_2=endymd, FID_PERIOD_DIV_CODE=chart_type)
+    response = await kis_api.inquire_daily_itemchartprice(req)
     return response
