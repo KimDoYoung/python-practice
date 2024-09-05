@@ -224,17 +224,18 @@ Handlebars.registerHelper('fulfillTime', function(value) {
 
         postFetch(url2, data).then(data => {
             console.log(data);
-            const template = $('#fulfill-table-template').html();
-            const templateScript = Handlebars.compile(template);
-            var list = data.t0425OutBlock1;
-            var list1 = list.filter(item => item.status === '접수');
-            const html = templateScript({list: list1, title: '미체결'});
-            $('#fulfill-table-area').html(html);
+            if(data.t0425OutBlock1){
+                const template = $('#fulfill-table-template').html();
+                const templateScript = Handlebars.compile(template);
+                var list = data.t0425OutBlock1;
+                var list1 = list.filter(item => item.status === '접수');
+                const html = templateScript({list: list1, title: '미체결'});
+                $('#fulfill-table-area').html(html);
 
-            list2 = list.filter(item => item.status !== '접수');
-            const html2 = templateScript({list: list2, title: '체결'});
-            $('#fulfill-table-area2').html(html2);
-
+                list2 = list.filter(item => item.status !== '접수');
+                const html2 = templateScript({list: list2, title: '체결'});
+                $('#fulfill-table-area2').html(html2);
+            }    
             
         }).catch(error=> {
             console.error(error.message);

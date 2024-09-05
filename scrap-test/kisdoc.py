@@ -325,8 +325,15 @@ if __name__ == "__main__":
 
     # main_menu  = "[국내주식] 시세분석"
     # sub_menu = "관심종목(멀티종목) 시세조회 "
-    main_menu  = "[국내주식] 기본시세분석"
-    sub_menu = "국내주식기간별시세(일/주/월/년)"
+
+    # main_menu  = "[국내주식] 기본시세분석"
+    # sub_menu = "국내주식기간별시세(일/주/월/년)"
+
+    # main_menu  = "[국내주식] 기본시세"
+    # sub_menu = "주식현재가 시세2"
+
+    main_menu  = "[국내주식] 종목정보"
+    sub_menu = "국내주식 증권사별 투자의견 "
 
     main(main_menu, sub_menu)
     print("Done!")

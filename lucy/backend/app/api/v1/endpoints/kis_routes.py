@@ -20,6 +20,11 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
 from backend.app.core.dependency import get_mystock_service, get_user_service
 # from backend.app.domains.stc.kis.kis_api import KoreaInvestmentApi
+from backend.app.domains.stc.kis.model.inquire_daily_price_model import InquireDailyPrice_Request, InquireDailyPrice_Response
+from backend.app.domains.stc.kis.model.inquire_price_2_model import InquirePrice2_Request, InquirePrice2_Response
+from backend.app.domains.stc.kis.model.inquire_time_itemchartprice_model import InquireTimeItemchartprice_Request, InquireTimeItemchartprice_Response
+from backend.app.domains.stc.kis.model.invest_opbysec_model import InvestOpbysec_Request, InvestOpbysec_Response
+from backend.app.domains.stc.kis.model.invest_opinion_model import InvestOpinion_Request, InvestOpinion_Response
 from backend.app.domains.stc.kis.model.kis_after_hour_balance_model import AfterHourBalance_Response
 from backend.app.domains.stc.kis.model.kis_inquire_daily_ccld_model import InquireDailyCcld_Request
 from backend.app.domains.stc.kis.model.kis_inquire_daily_itemchartprice import InquireDailyItemchartprice_Request, InquireDailyItemchartprice_Response
@@ -195,3 +200,54 @@ async def inquire_daily_itemchartprice(stk_code:str, startymd:str, endymd:str, c
     req = InquireDailyItemchartprice_Request(FID_INPUT_ISCD=stk_code, FID_INPUT_DATE_1=startymd, FID_INPUT_DATE_2=endymd, FID_PERIOD_DIV_CODE=chart_type)
     response = await kis_api.inquire_daily_itemchartprice(req)
     return response
+
+# 주식현재가 일자별
+@router.get("/inquire-daily-price", response_model=InquireDailyPrice_Response)
+async def inquire_daily_price():
+    ''' 주식현재가 일자별 '''
+    kis_api = await StockApiManager().kis_api()
+    req = InquireDailyPrice_Request()
+    response = await kis_api.inquire_daily_price(req)
+    return response
+
+# 주식당일분봉조회
+@router.get("/inquire-time-itemchartprice", response_model=InquireTimeItemchartprice_Response)
+async def inquire_time_itemchartprice():
+    ''' 주식당일분봉조회 '''
+    kis_api = await StockApiManager().kis_api()
+    req = InquireTimeItemchartprice_Request()
+    response = await kis_api.inquire_time_itemchartprice(req)
+    return response
+
+# 주식현재가 시세2
+@router.get("/inquire-price2", response_model=InquirePrice2_Response)
+async def inquire_price_2():
+    ''' 주식현재가 시세2 '''
+    kis_api = await StockApiManager().kis_api()
+    req = InquirePrice2_Request()
+    response = await kis_api.inquire_price_2(req)
+    return response
+
+# 국내주식 종목투자의견  
+@router.get("/invest-opinion", response_model=InvestOpinion_Response)
+async def invest_opinion():
+    ''' 국내주식 종목투자의견 '''
+    kis_api = await StockApiManager().kis_api()
+    req = InvestOpinion_Request()
+    response = await kis_api.invest_opinion(req)
+    return response
+
+# 국내주식 증권사별 투자의견 
+@router.get("/invest-opbysec/", response_model=InvestOpbysec_Response)
+async def invest_opbysec():
+    ''' 국내주식 증권사별 투자의견  '''
+    kis_api = await StockApiManager().kis_api()
+    req = InvestOpbysec_Request()
+    response = await kis_api.invest_opbysec(req)
+    return response
+
+
+
+
+
+

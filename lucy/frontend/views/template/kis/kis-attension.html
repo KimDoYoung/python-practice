@@ -72,6 +72,7 @@
                     <button class="btnBuy btn btn-danger btn-sm" data-stk-code="{{this.jong_code}}" data-stk-name="{{this.hts_kor_isnm}}">買</button>
                     <button class="btnSell btn btn-primary btn-sm" data-stk-code="{{this.jong_code}}" data-stk-name="{{this.hts_kor_isnm}}">賣</button>
                     <button class="btnDantaAdd btn btn-warning btn-sm" data-stk-code="{{this.jong_code}}" data-stk-name="{{this.hts_kor_isnm}}" title="관심 추가"><i class="bi bi-plus-circle"></i></button>
+                    <a href="/page?path=mystock/stock_detail&stk_code={{this.jong_code}}" class="btn btn-primary btn-sm" title="상세보기"><i class="bi bi-eye"></i></a>
                 </td>
             </tr>
             {{/each}}

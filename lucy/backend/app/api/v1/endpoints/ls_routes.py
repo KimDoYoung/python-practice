@@ -150,6 +150,10 @@ async def fulfill_list(req:Fulfill_Request):
     t042_Req = fulfill_to_t0425_Request(req)
     
     response = await ls_api.fulfill_list(t042_Req)
+    
+    if response.t0425OutBlock1 is  None:
+        return response
+    
     list = response.t0425OutBlock1
     # hname 종목명을 채운다.
     stk_info_service = get_stkinfo_service()
