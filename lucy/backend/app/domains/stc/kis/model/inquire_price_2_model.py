@@ -3,7 +3,7 @@ from backend.app.domains.stock_api_base_model import StockApiBaseModel
 
 
 class InquirePrice2_Request(StockApiBaseModel):
-    FID_COND_MRKT_DIV_CODE: str # FID 조건 시장 분류 코드 J : 주식, ETF, ETN
+    FID_COND_MRKT_DIV_CODE: str = 'J' # FID 조건 시장 분류 코드 J : 주식, ETF, ETN
     FID_INPUT_ISCD: str # FID 입력 종목코드 000660
 
 class InquirePrice2Item(StockApiBaseModel):

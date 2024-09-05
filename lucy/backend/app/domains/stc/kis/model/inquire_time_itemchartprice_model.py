@@ -4,11 +4,11 @@ from backend.app.domains.stock_api_base_model import StockApiBaseModel
 
 
 class InquireTimeItemchartprice_Request(StockApiBaseModel):
-    FID_ETC_CLS_CODE: str # FID 기타 구분 코드 기타 구분 코드("")
-    FID_COND_MRKT_DIV_CODE: str # FID 조건 시장 분류 코드 시장 분류 코드 (J : 주식, ETF, ETN U: 업종)
+    FID_ETC_CLS_CODE: str = '' # FID 기타 구분 코드 기타 구분 코드("")
+    FID_COND_MRKT_DIV_CODE: str = 'J' # FID 조건 시장 분류 코드 시장 분류 코드 (J : 주식, ETF, ETN U: 업종)
     FID_INPUT_ISCD: str # FID 입력 종목코드 종목번호 (6자리) ETN의 경우, Q로 시작 (EX. Q500001)
     FID_INPUT_HOUR_1: str # FID 입력 시간1 조회대상(FID_COND_MRKT_DIV_CODE)에 따라 입력하는 값 상이 종목(J)일 경우, 조회 시작일자(HHMMSS) ex) "123000" 입력 시 12시 30분 이전부터 1분 간격으로 조회 업종(U)일 경우, 조회간격(초) (60 or 120 만 입력 가능) ex) "60" 입력 시 현재시간부터 1분간격으로 조회 "120" 입력 시 현재시간부터 2분간격으로 조회 ※ FID_INPUT_HOUR_1 에 미래일시 입력 시에 현재가로 조회됩니다. ex) 오전 10시에 113000 입력 시에 오전 10시~11시30분 사이의 데이터가 오전 10시 값으로 조회됨
-    FID_PW_DATA_INCU_YN: str # FID 과거 데이터 포함 여부 과거 데이터 포함 여부(Y/N) * 업종(U) 조회시에만 동작하는 구분값 N : 당일데이터만 조회 Y : 이후데이터도 조회 (조회시점이 083000(오전8:30)일 경우 전일자 업종 시세 데이터도 같이 조회됨)
+    FID_PW_DATA_INCU_YN: str = 'Y' # FID 과거 데이터 포함 여부 과거 데이터 포함 여부(Y/N) * 업종(U) 조회시에만 동작하는 구분값 N : 당일데이터만 조회 Y : 이후데이터도 조회 (조회시점이 083000(오전8:30)일 경우 전일자 업종 시세 데이터도 같이 조회됨)
 
 class InquireTimeItemchartpriceItem(StockApiBaseModel):
     stck_bsop_date: str # 주식 영업 일자 주식 영업 일자

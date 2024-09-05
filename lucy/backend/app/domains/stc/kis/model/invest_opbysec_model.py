@@ -4,10 +4,10 @@ from backend.app.domains.stock_api_base_model import StockApiBaseModel
 
 
 class InvestOpbysec_Request(StockApiBaseModel):
-    FID_COND_MRKT_DIV_CODE: str # 조건시장분류코드 J(시장 구분 코드)
-    FID_COND_SCR_DIV_CODE: str # 조건화면분류코드 16634(Primary key)
+    FID_COND_MRKT_DIV_CODE: str ='J' # 조건시장분류코드 J(시장 구분 코드)
+    FID_COND_SCR_DIV_CODE: str = '16634'  # 조건화면분류코드 16634(Primary key)
     FID_INPUT_ISCD: str # 입력종목코드 회원사코드 (kis developers 포탈 사이트 포럼-> FAQ -> 종목정보 다운로드(국내) 참조)
-    FID_DIV_CLS_CODE: str # 분류구분코드 전체(0) 매수(1) 중립(2) 매도(3)
+    FID_DIV_CLS_CODE: str = '0' # 분류구분코드 전체(0) 매수(1) 중립(2) 매도(3)
     FID_INPUT_DATE_1: str # 입력날짜1 이후 ~
     FID_INPUT_DATE_2: str # 입력날짜2 ~ 이전
 

@@ -4,8 +4,8 @@ from backend.app.domains.stock_api_base_model import StockApiBaseModel
 
 
 class InvestOpinion_Request(StockApiBaseModel):
-    FID_COND_MRKT_DIV_CODE: str # 조건시장분류코드 J(시장 구분 코드)
-    FID_COND_SCR_DIV_CODE: str # 조건화면분류코드 16633(Primary key)
+    FID_COND_MRKT_DIV_CODE: str = 'J' # 조건시장분류코드 J(시장 구분 코드)
+    FID_COND_SCR_DIV_CODE: str  = '16633' # 조건화면분류코드 16633(Primary key)
     FID_INPUT_ISCD: str # 입력종목코드 종목코드(ex) 005930(삼성전자))
     FID_INPUT_DATE_1: str # 입력날짜1 이후 ~(ex) 0020231113)
     FID_INPUT_DATE_2: str # 입력날짜2 ~ 이전(ex) 0020240513)

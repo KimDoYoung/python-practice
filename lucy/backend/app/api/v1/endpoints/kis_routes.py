@@ -211,43 +211,37 @@ async def inquire_daily_price():
     return response
 
 # 주식당일분봉조회
-@router.get("/inquire-time-itemchartprice", response_model=InquireTimeItemchartprice_Response)
-async def inquire_time_itemchartprice():
+@router.get("/inquire-time-itemchartprice/{stk_code}/{hour1}", response_model=InquireTimeItemchartprice_Response)
+async def inquire_time_itemchartprice(stk_code:str, hour1:str):
     ''' 주식당일분봉조회 '''
     kis_api = await StockApiManager().kis_api()
-    req = InquireTimeItemchartprice_Request()
+    req = InquireTimeItemchartprice_Request(FID_INPUT_ISCD=stk_code, FID_INPUT_HOUR_1=hour1)
     response = await kis_api.inquire_time_itemchartprice(req)
     return response
 
 # 주식현재가 시세2
-@router.get("/inquire-price2", response_model=InquirePrice2_Response)
-async def inquire_price_2():
-    ''' 주식현재가 시세2 '''
+@router.get("/inquire-price2/{stk_code}", response_model=InquirePrice2_Response)
+async def inquire_price_2(stk_code:str):
+    ''' 주식현재가 시세2'''
     kis_api = await StockApiManager().kis_api()
-    req = InquirePrice2_Request()
+    req = InquirePrice2_Request(FID_INPUT_ISCD=stk_code)
     response = await kis_api.inquire_price_2(req)
     return response
 
 # 국내주식 종목투자의견  
-@router.get("/invest-opinion", response_model=InvestOpinion_Response)
-async def invest_opinion():
+@router.get("/invest-opinion/{iscd}/{startYmd}/{endYmd}", response_model=InvestOpinion_Response)
+async def invest_opinion(iscd:str, startYmd:str, endYmd:str):
     ''' 국내주식 종목투자의견 '''
     kis_api = await StockApiManager().kis_api()
-    req = InvestOpinion_Request()
+    req = InvestOpinion_Request(FID_INPUT_ISCD=iscd, FID_INPUT_DATE_1=startYmd, FID_INPUT_DATE_2=endYmd)
     response = await kis_api.invest_opinion(req)
     return response
 
 # 국내주식 증권사별 투자의견 
-@router.get("/invest-opbysec/", response_model=InvestOpbysec_Response)
-async def invest_opbysec():
+@router.get("/invest-opbysec/{iscd}/{startYmd}/{endYmd}", response_model=InvestOpbysec_Response)
+async def invest_opbysec(iscd:str, startYmd:str, endYmd:str):
     ''' 국내주식 증권사별 투자의견  '''
     kis_api = await StockApiManager().kis_api()
-    req = InvestOpbysec_Request()
+    req = InvestOpbysec_Request(FID_INPUT_ISCD=iscd, FID_INPUT_DATE_1=startYmd, FID_INPUT_DATE_2=endYmd)
     response = await kis_api.invest_opbysec(req)
     return response
-
-
-
-
-
-
