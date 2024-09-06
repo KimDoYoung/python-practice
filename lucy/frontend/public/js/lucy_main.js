@@ -140,13 +140,6 @@ $(document).ready(function() {
                     alert(data.rsp_msg);
                 }
                 offcanvasBuySell.toggle();
-                // debugger;
-                // var page_path = $('#page_path').val();
-                // if(page_path === '/main'){
-                //     window.location.href = '/main'
-                // }else{
-                //     window.location.href = `/page?path=${page_path}`;
-                // }
             }).catch(error => {
                 console.error(error);
                 $('#buy-sell-message-area').html(error)

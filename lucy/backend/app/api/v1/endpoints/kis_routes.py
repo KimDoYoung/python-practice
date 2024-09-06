@@ -11,6 +11,18 @@
     - /psearch/title : 조건식 타이틀 조회
     - /psearch/result/{seq} : 조건식 결과 조회
     - /inquire-daily-ccld : 주식일별주문체결조회
+    - /rank/quote-balance : 호가잔량순위
+    - /rank/after-hour-balance : 시간외호가잔량순위
+    - /attension/grouplist : 관심종목 그룹 조회
+    - /attension/stocklist_by_group/{group_code} : 관심종목 그룹별 종목 조회
+    - /attension/multi_price/{stocks} : 관심종목(멀티종목) 시세조회
+    - /chart/{stk_code}/{startymd}/{endymd}/{chart_type} : 국내주식기간별시세(일/주/월/년)
+    - /inquire-daily-price/{stk_code}/{div_code} : 기본시세-주식현재가 일자별
+    - /inquire-time-itemchartprice/{stk_code}/{hour1} : 기본시세-주식당일분봉조회
+    - /inquire-price2/{stk_code} : 주식현재가 시세2
+    - /invest-opinion/{stk_code}/{startYmd}/{endYmd} : 국내주식 종목투자의견
+    - /invest-opbysec/{iscd}/{startYmd}/{endYmd} : 국내주식 증권사별 투자의견
+
 
 작성자: 김도영
 작성일: 2024-06-16
@@ -40,8 +52,12 @@ from backend.app.domains.user.user_service import UserService
 
 from backend.app.core.logger import get_logger
 from backend.app.core.security import get_current_user
+from backend.app.managers.client_ws_manager import ClientWsManager
 from backend.app.managers.stock_api_manager import StockApiManager
+from backend.app.managers.stock_ws_manager import StockWsManager
 from backend.app.utils.kis_model_util import rank_to_after_hour_balance_request, rank_to_quote_balance_request
+from backend.app.core.config import config
+from backend.app.utils.kis_ws_util import KIS_WSReq
 
 logger = get_logger(__name__)
 
@@ -58,6 +74,26 @@ async def validate_user(request: Request, user_service: UserService):
         raise HTTPException(status_code=401, detail="Invalid token-사용자 정보가 없습니다")
     
     return user
+
+@router.get("/ws/call-hoga/{stk_code}", response_class=JSONResponse)
+async def kis_call(stk_code:str):
+    ''' KIS 증권사에 주식호가 요청 '''
+    user_id = config.DEFAULT_USER_ID
+    user_service = get_user_service()
+    user = await user_service.get_1(user_id)
+    account = user.find_account_by_abbr('KIS')
+    kis_acctno = account.account_no
+
+    client_ws_manager = ClientWsManager()
+    stock_ws_manager = StockWsManager(client_ws_manager)    
+    task = await stock_ws_manager.get_task(user_id, kis_acctno)
+    
+    if task is None:
+        return JSONResponse(content={"code": "01", "detail": f"{kis_acctno} 계좌에 대한 WebSocket 작업이 없습니다."})
+    else: 
+        await task.subscribe(KIS_WSReq.BID_ASK, stk_code)
+    
+    return JSONResponse(content={"code": "00", "detail": f"{stk_code}호가 요청 성공"})
 
 
 @router.get("/", response_class=JSONResponse, response_model=None)
@@ -191,8 +227,9 @@ async def attension_grouplist(stocks:str):
     
     response = await kis_api.attension_multi_price(stocks_array)
     return response
-
+#-----------------------------------------------------
 # chart
+#-----------------------------------------------------
 @router.get("/chart/{stk_code}/{startymd}/{endymd}/{chart_type}", response_model=InquireDailyItemchartprice_Response)
 async def inquire_daily_itemchartprice(stk_code:str, startymd:str, endymd:str, chart_type:str):
     ''' 국내주식기간별시세(일/주/월/년)[v1_국내주식-016]'''    

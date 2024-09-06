@@ -71,8 +71,10 @@ class StockWsManager:
 
         if acctno not in self.stock_connections[user_id]:
             try:
-                task = asyncio.create_task(self.stock_ws_task(user_id, acctno, abbr))
+                # task = asyncio.create_task(self.stock_ws_task(user_id, acctno, abbr))
+                task = await self.stock_ws_task(user_id, acctno, abbr)
                 self.stock_connections[user_id][acctno] = task
+                logger.debug(f"{acctno} 계좌에 대한 WebSocket 작업 생성: {user_id}")
             except Exception as e:
                 logger.error(f"에러 발생: {e}")
                 if acctno in self.stock_connections.get(user_id, {}):
@@ -113,16 +115,18 @@ class StockWsManager:
                 raise Exception(result["detail"])
             try:
                 await kis_task.run()
+                logger.debug(f"KIS 작업 완료: {user_id}/{acctno}/{abbr} ")
+                return kis_task
             except Exception as e:
                 logger.error(f"KIS WebSocket 작업 중 에러 발생: {e}")
                 raise Exception(f"KIS WebSocket 작업 중 에러 발생: {e}")
             
-            logger.debug(f"KIS 작업 완료: {user_id}/{acctno}/{abbr} ")
         elif abbr == "LS":
             ls_task = LSTask(user_id, acctno, self.client_ws_manager)
             await ls_task.initialize()
             await ls_task.run()
             logger.debug(f"LS 작업 완료: {user_id}")
+            return ls_task
         else:
             logger.error(f"알 수 없는 증권사: {abbr}")        
 
@@ -140,3 +144,17 @@ class StockWsManager:
             status_info[user_id] = user_status
         logger.debug(f"현재 연결 상태: {status_info}")
         return status_info
+
+    async def get_task(self, user_id: str, acctno: str):
+        ''' user_id의 acctno에 대한 WebSocket Task를 반환한다 '''
+        # user_id가 존재하는지 확인하고 없으면 초기화
+        if user_id not in self.stock_connections:
+            logger.error(f"ws_manager : 사용자 {user_id}를 찾을 수 없음")
+            return None
+        
+        # 계좌 번호가 존재하지 않으면 기본값 추가
+        if acctno not in self.stock_connections[user_id]:
+            logger.error(f"ws_manager : 계좌 {acctno}를 찾을 수 없음")
+            return None
+
+        return self.stock_connections[user_id][acctno]        

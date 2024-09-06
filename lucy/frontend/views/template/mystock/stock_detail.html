@@ -292,8 +292,17 @@ function get_data_and_draw_chart(){
     });
 }
 function initalize(){
+    //호가정보 요청
+    getFetch('/api/v1/kis/ws/call-hoga/' + current_stk_code)
+    .then(data => {
+        console.log('호가정보를 요청하다' + current_stk_code);
+        console.log(data); 
+    }).catch(error=> {
+        console.error(error.message); 
+    });
     //stk_code 쿠키에 저장 refresh시 stk_code를 잃어버리지 않게한다
     setCookie('stk_code', current_stk_code, 100);
+    
     //naver 회사정보
     const url = `/api/v1/mystock/company-info/${current_stk_code}`;
     getFetch(url).then(data => {
@@ -308,6 +317,7 @@ function initalize(){
         console.error(error.message); 
         showToastError(error);
     });
+    
     //chart 데이터
     let today = JuliaUtil.today();
     let startDay = JuliaUtil.addDate(today, 'month', -1);
@@ -323,7 +333,7 @@ $( document ).ready(function() {
         event.preventDefault();
         get_data_and_draw_chart();
     });
-    // <button id="test1">주식현재가일자별</button>
+    //     <button id="test1">주식현재가일자별</button>
     //     <button id="test2">주식당일분봉조회</button>
     //     <button id="test3">주식현재가시세2</button>
     //     <button id="test4">국내주식 종목투자의견</button>

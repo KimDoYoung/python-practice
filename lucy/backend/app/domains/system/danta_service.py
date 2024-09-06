@@ -53,7 +53,7 @@ class DantaService:
         if result_in_cache is not None:
             return result_in_cache
         
-        resp = await self.kisapi.chk_workingday(now_ymd)        
+        resp = await self.kisapi.chk_workingday(now_ymd)
         for item in resp.output:
             if item.opnd_yn == 'Y' and item.bass_dt == now_ymd:
                 self.cache['holiday'][now_ymd] = True
