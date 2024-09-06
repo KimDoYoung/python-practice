@@ -97,10 +97,25 @@ $(document).ready(function() {
             });
         $('.toast').toast('show');
     }
-    //global functions
+    //alsert 에러메세지 표시
+    function showAlertError(error) {
+        const statusCode = error.status;
+        const detail = error.detail || error.message;
+        const $alert = $('#alertError')
+        $alert.find('#alertErrorStatus').text(statusCode);
+        $alert.find('#alertErrorMessage').text(detail);
+        $alert.removeClass('d-none');
+        setTimeout(() => {
+            $alert.addClass('d-none');
+        }, 5000);
+    }
+    //----------------------------------------------------------------
+    // global functions
+    //----------------------------------------------------------------
     window.showBuySellCanvas = showBuySellCanvas;
     window.showToastError = showToastError;
     window.showCompanyCanvas = showCompanyCanvas;
+    window.showAlertError = showAlertError;
     //로그아웃
     $('#logout').click(function() {
         localStorage.removeItem('lucy_token');  // JWT 토큰 삭제

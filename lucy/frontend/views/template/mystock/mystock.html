@@ -66,10 +66,11 @@
     <table class="table table-hover table-sm">
         <thead>
             <tr>
+                <th>순서</th>
                 <th>종류</th>
                 <th>종목코드</th>
                 <th>종목명</th>
-                <th class="text-end">현재가</th>
+                <th class="text-end"><a href="#" data-field-name="price" class="sorting-header">현재가<i class="bi"></i></a></th>
                 <th class="text-end">전일대비</th>
                 <th class="text-end">등락율</th>
                 <th class="text-center">동작</th>
@@ -79,6 +80,7 @@
         <tbody>
             {{#each list}}
             <tr>
+                <td>{{inc @index}}</td>
                 <td>{{split_and_badge this.stk_types}}</td>
                 <td>{{goNaver this.stk_code}}</td>
                 <td>{{toggleCompanyCanvas this.stk_code this.stk_name}}</td>
@@ -126,6 +128,8 @@
 <script>
 let intervalId = undefined;
 let current_lists = [];
+// 현재 정렬 상태를 저장하는 변수
+let currentSort = { field: null, direction: 'asc' };
 // 문자열을 잘라서 bootstrap5 뱃지로 만든다.
 Handlebars.registerHelper('split_and_badge', function(stk_types) {
     // stk_types 문자열을 공백 기준으로 나누기
@@ -192,14 +196,45 @@ function getCurrentCost() {
         console.error(error.message);
     });
 }
+function renderTable(){
+    const data = current_lists;
+    const template = Handlebars.compile(document.getElementById('mystock-template').innerHTML);
+    const html = template({list : data});
+    current_lists = data;
+    $('#mystock-result-area').html(html);
+}
+// 아이콘 업데이트 함수
+function updateSortIcons() {
+    $('.sorting-header i').removeClass('bi-arrow-up bi-arrow-down');  // 모든 아이콘 제거
+
+    // 현재 정렬 기준에 따라 아이콘 추가
+    var currentIcon = currentSort.direction === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down';
+    $('a[data-field-name="' + currentSort.field + '"] i').addClass(currentIcon);
+}
+function sortTable(fieldName){
+    var isAscending = currentSort.field === fieldName && currentSort.direction === 'asc';
+    currentSort.direction = isAscending ? 'desc' : 'asc';
+    currentSort.field = fieldName;
+    const data = current_lists.t8407OutBlock1;
+    // 데이터 정렬
+    data.sort(function(a, b) {
+        if (a[fieldName] < b[fieldName]) return currentSort.direction === 'asc' ? -1 : 1;
+        if (a[fieldName] > b[fieldName]) return currentSort.direction === 'asc' ? 1 : -1;
+        return 0;
+    });
+
+    // 정렬된 데이터를 다시 렌더링
+    renderTable(data);
+
+    // 아이콘 업데이트
+    updateSortIcons();
+}
 //초기화 mystock 가져오기, 현재가 가져오기
 function init(){
     getFetch('/api/v1/mystock').then(data => {
         console.log(data); 
-        const template = Handlebars.compile(document.getElementById('mystock-template').innerHTML);
-        const html = template({list : data});
         current_lists = data;
-        $('#mystock-result-area').html(html);
+        renderTable();
         //현재가를 가져온다.
         if(intervalId) clearInterval(intervalId);
         if($('#currentCostRefresh').is(':checked')){
@@ -216,7 +251,16 @@ $( document ).ready(function() {
     //초기화
     init();
 
-    $('#mystock-result-area').on("click", ".btnBaseCostsAutoset", function() {
+    $('#mystock-result-area').on('click', '.sorting-header', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const fieldName = $(this).data('field-name');
+        sortTable(fieldName);
+    });
+    
+    $('#mystock-result-area').on("click", ".btnBaseCostsAutoset", function(e) {
+        e.stopPropagation();
+        e.preventDefault();
         const stk_code = $(this).data('stk-code');
         let currentCost = $('#mystock-result-area').find('#cost_'+stk_code).text();
         //매수는 현재가격보다 3% 낮게, 매도는 현재가격보다 5% 높게 설정한다.
