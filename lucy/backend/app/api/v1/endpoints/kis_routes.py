@@ -202,18 +202,18 @@ async def inquire_daily_itemchartprice(stk_code:str, startymd:str, endymd:str, c
     return response
 
 # 주식현재가 일자별
-@router.get("/inquire-daily-price", response_model=InquireDailyPrice_Response)
-async def inquire_daily_price():
-    ''' 주식현재가 일자별 '''
+@router.get("/inquire-daily-price/{stk_code}/{div_code}", response_model=InquireDailyPrice_Response)
+async def inquire_daily_price(stk_code:str, div_code:str):
+    ''' 기본시세-주식현재가 일자별 '''
     kis_api = await StockApiManager().kis_api()
-    req = InquireDailyPrice_Request()
+    req = InquireDailyPrice_Request(FID_INPUT_ISCD=stk_code, FID_PERIOD_DIV_CODE=div_code)
     response = await kis_api.inquire_daily_price(req)
     return response
 
 # 주식당일분봉조회
 @router.get("/inquire-time-itemchartprice/{stk_code}/{hour1}", response_model=InquireTimeItemchartprice_Response)
 async def inquire_time_itemchartprice(stk_code:str, hour1:str):
-    ''' 주식당일분봉조회 '''
+    ''' 기본시세-주식당일분봉조회 '''
     kis_api = await StockApiManager().kis_api()
     req = InquireTimeItemchartprice_Request(FID_INPUT_ISCD=stk_code, FID_INPUT_HOUR_1=hour1)
     response = await kis_api.inquire_time_itemchartprice(req)
@@ -229,11 +229,11 @@ async def inquire_price_2(stk_code:str):
     return response
 
 # 국내주식 종목투자의견  
-@router.get("/invest-opinion/{iscd}/{startYmd}/{endYmd}", response_model=InvestOpinion_Response)
-async def invest_opinion(iscd:str, startYmd:str, endYmd:str):
+@router.get("/invest-opinion/{stk_code}/{startYmd}/{endYmd}", response_model=InvestOpinion_Response)
+async def invest_opinion(stk_code:str, startYmd:str, endYmd:str):
     ''' 국내주식 종목투자의견 '''
     kis_api = await StockApiManager().kis_api()
-    req = InvestOpinion_Request(FID_INPUT_ISCD=iscd, FID_INPUT_DATE_1=startYmd, FID_INPUT_DATE_2=endYmd)
+    req = InvestOpinion_Request(FID_INPUT_ISCD=stk_code, FID_INPUT_DATE_1=startYmd, FID_INPUT_DATE_2=endYmd)
     response = await kis_api.invest_opinion(req)
     return response
 

@@ -66,7 +66,7 @@ async function callLucyApi(url, method, data = null) {
             alert("세션 종료되었습니다. 서버와의 통신이 원활하지 않습니다. 다시 로그인해주세요.");
             window.location.href = '/login';
         }else{
-            throw new LucyError('500', 'SessionOut-로그인이 필요합니다.(Unexpected response format)');
+            throw new LucyError('500', errorStr);
         }
     }
 }

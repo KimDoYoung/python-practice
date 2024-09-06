@@ -28,4 +28,4 @@ class InvestOpinion_Response(StockApiBaseModel):
     rt_cd: str # 성공 실패 여부 
     msg_cd: str # 응답코드 
     msg1: str # 응답메세지 
-    output1: List[InvestOpinionItem]
+    output: List[InvestOpinionItem]

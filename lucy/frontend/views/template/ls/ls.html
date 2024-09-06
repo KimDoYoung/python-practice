@@ -34,7 +34,12 @@
         </tr>
         <tr>
             <th class="text-end">추정D2예수금</th><td class="text-end"><strong>{{displayWon item.sunamt1}}</strong></td>
-            <th class="text-end">평가손익</th><td class="text-end">{{displayWon item.tdtsunik}}</td>
+            <th class="text-end">평가손익</th>
+            {{#test "Number(item.tdtsunik) < 0"}}
+            <td class="text-end text-primary">{{displayWon item.tdtsunik}}</td>
+            {{else}}
+            <td class="text-end text-danger">{{displayWon item.tdtsunik}}</td>
+            {{/test}}
             <th class="text-end">평가금액</th><td class="text-end">{{displayWon item.sunamt}}</td>
             <th class="text-end">주문가능(현금)</th><td class="text-end text-primary fw-bold">{{displayWon orderPossibleMoney.CSPAQ22200OutBlock2.MnyOrdAbleAmt}}</td>
         </tr>
@@ -189,6 +194,7 @@ Handlebars.registerHelper('fulfillTime', function(value) {
 
         }).catch(error => {
             console.error(error.message);
+            showToastError(error);
         });        
         // //현물계좌예수금 주문가능금액 총평가2
         // getFetch('/api/v1/ls/order-possible-money').then(data => {
@@ -239,6 +245,7 @@ Handlebars.registerHelper('fulfillTime', function(value) {
             
         }).catch(error=> {
             console.error(error.message);
+            showToastError(error);
         });
 
     };        
@@ -286,7 +293,7 @@ Handlebars.registerHelper('fulfillTime', function(value) {
                 location.reload();
             }).catch(error=> {
                 console.error(error.message);
-                showToastError(error.message);
+                showToastError(error);
                 
             });
         });

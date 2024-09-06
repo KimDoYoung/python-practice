@@ -8,7 +8,7 @@ class InquireDailyPrice_Request(StockApiBaseModel):
     FID_COND_MRKT_DIV_CODE: str = 'J' # FID 조건 시장 분류 코드 J : 주식, ETF, ETN
     FID_INPUT_ISCD: str # FID 입력 종목코드 종목번호 (6자리) ETN의 경우, Q로 시작 (EX. Q500001)
     FID_PERIOD_DIV_CODE: str # FID 기간 분류 코드 D : (일)최근 30거래일 W : (주)최근 30주 M : (월)최근 30개월
-    FID_ORG_ADJ_PRC: str = '1' # FID 수정주가 원주가 가격 0 : 수정주가반영 1 : 수정주가미반영 * 수정주가는 액면분할/액면병합 등 권리 발생 시 과거 시세를 현재 주가에 맞게 보정한 가격
+    FID_ORG_ADJ_PRC: str = '0000000001' # FID 수정주가 원주가 가격 0 : 수정주가반영 1 : 수정주가미반영 * 수정주가는 액면분할/액면병합 등 권리 발생 시 과거 시세를 현재 주가에 맞게 보정한 가격
 
 class InquireDailyPriceItem(StockApiBaseModel):
     stck_bsop_date: str # 주식 영업 일자 

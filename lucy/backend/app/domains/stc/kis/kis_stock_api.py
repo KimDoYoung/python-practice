@@ -804,12 +804,12 @@ class KisStockApi(StockApi):
         logger.info(f"국내주식 증권사별 투자의견 ")
         url = self.BASE_URL + "/uapi/domestic-stock/v1/quotations/invest-opbysec"
         params = {
-            "FID_COND_MRKT_DIV_CODE": "조건시장분류코드 J(시장 구분 코드)",
-            "FID_COND_SCR_DIV_CODE": "조건화면분류코드 16634(Primary key)",
-            "FID_INPUT_ISCD": "입력종목코드 회원사코드 (kis developers 포탈 사이트 포럼-> FAQ -> 종목정보 다운로드(국내) 참조)",
-            "FID_DIV_CLS_CODE": "분류구분코드 전체(0) 매수(1) 중립(2) 매도(3)",
-            "FID_INPUT_DATE_1": "입력날짜1 이후 ~",
-            "FID_INPUT_DATE_2": "입력날짜2 ~ 이전",
+            "FID_COND_MRKT_DIV_CODE":req.FID_COND_MRKT_DIV_CODE, #조건시장분류코드 J(시장 구분 코드)",
+            "FID_COND_SCR_DIV_CODE": req.FID_COND_SCR_DIV_CODE, #조건화면분류코드 16634(Primary key)",
+            "FID_INPUT_ISCD": req.FID_INPUT_ISCD, #입력종목코드 회원사코드 (kis developers 포탈 사이트 포럼-> FAQ -> 종목정보 다운로드(국내) 참조)",
+            "FID_DIV_CLS_CODE": req.FID_DIV_CLS_CODE, #분류구분코드 전체(0) 매수(1) 중립(2) 매도(3)",
+            "FID_INPUT_DATE_1": req.FID_INPUT_DATE_1, #입력날짜1 이후 ~",
+            "FID_INPUT_DATE_2": req.FID_INPUT_DATE_2 #입력날짜2 ~ 이전",
         }   
         headers ={
             "content-type": "application/json; charset=utf-8",
@@ -831,11 +831,11 @@ class KisStockApi(StockApi):
         logger.info(f"국내주식 종목투자의견  ")
         url = self.BASE_URL + "/uapi/domestic-stock/v1/quotations/invest-opinion"
         params = {
-            "FID_COND_MRKT_DIV_CODE": "조건시장분류코드 J(시장 구분 코드)",
-            "FID_COND_SCR_DIV_CODE": "조건화면분류코드 16633(Primary key)",
-            "FID_INPUT_ISCD": "입력종목코드 종목코드(ex) 005930(삼성전자))",
-            "FID_INPUT_DATE_1": "입력날짜1 이후 ~(ex) 0020231113)",
-            "FID_INPUT_DATE_2": "입력날짜2 ~ 이전(ex) 0020240513)",
+            "FID_COND_MRKT_DIV_CODE": req.FID_COND_MRKT_DIV_CODE, #조건시장분류코드 J(시장 구분 코드)",
+            "FID_COND_SCR_DIV_CODE": req.FID_COND_SCR_DIV_CODE, #조건화면분류코드 16633(Primary key)",
+            "FID_INPUT_ISCD": req.FID_INPUT_ISCD, #입력종목코드 종목코드(ex) 005930(삼성전자))",
+            "FID_INPUT_DATE_1": req.FID_INPUT_DATE_1, #입력날짜1 이후 ~(ex) 0020231113)",
+            "FID_INPUT_DATE_2":  req.FID_INPUT_DATE_2 #입력날짜2 ~ 이전(ex) 0020240513)",
         }   
         headers ={
             "content-type": "application/json; charset=utf-8",
@@ -857,8 +857,8 @@ class KisStockApi(StockApi):
         logger.info(f"주식현재가 시세2")
         url = self.BASE_URL + "/uapi/domestic-stock/v1/quotations/inquire-price-2"
         params = {
-            "FID_COND_MRKT_DIV_CODE": "FID 조건 시장 분류 코드 J : 주식, ETF, ETN",
-            "FID_INPUT_ISCD": "FID 입력 종목코드 000660",
+            "FID_COND_MRKT_DIV_CODE":req.FID_COND_MRKT_DIV_CODE, # FID 조건 시장 분류 코드 J : 주식, ETF, ETN",
+            "FID_INPUT_ISCD": req.FID_INPUT_ISCD#FID 입력 종목코드 000660",
         }   
         headers ={
             "content-type": "application/json; charset=utf-8",
@@ -881,11 +881,11 @@ class KisStockApi(StockApi):
         url = self.BASE_URL + "/uapi/domestic-stock/v1/quotations/inquire-time-itemchartprice"
         
         params = {
-            "FID_ETC_CLS_CODE": "", # FID 기타 구분 코드 기타 구분 코드("")",
-            "FID_COND_MRKT_DIV_CODE": "", # FID 조건 시장 분류 코드 시장 분류 코드 (J : 주식, ETF, ETN U: 업종)",
-            "FID_INPUT_ISCD": "", # FID 입력 종목코드 종목번호 (6자리) ETN의 경우, Q로 시작 (EX. Q500001)",
-            "FID_INPUT_HOUR_1": "", # FID 입력 시간1 조회대상(FID_COND_MRKT_DIV_CODE)에 따라 입력하는 값 상이 종목(J)일 경우, 조회 시작일자(HHMMSS) ex) "123000" 입력 시 12시 30분 이전부터 1분 간격으로 조회 업종(U)일 경우, 조회간격(초) (60 or 120 만 입력 가능) ex) "60" 입력 시 현재시간부터 1분간격으로 조회 "120" 입력 시 현재시간부터 2분간격으로 조회 ※ FID_INPUT_HOUR_1 에 미래일시 입력 시에 현재가로 조회됩니다. ex) 오전 10시에 113000 입력 시에 오전 10시~11시30분 사이의 데이터가 오전 10시 값으로 조회됨",
-            "FID_PW_DATA_INCU_YN": "" # FID 과거 데이터 포함 여부 과거 데이터 포함 여부(Y/N) * 업종(U) 조회시에만 동작하는 구분값 N : 당일데이터만 조회 Y : 이후데이터도 조회 (조회시점이 083000(오전8:30)일 경우 전일자 업종 시세 데이터도 같이 조회됨)",
+            "FID_ETC_CLS_CODE": req.FID_ETC_CLS_CODE, # FID 기타 구분 코드 기타 구분 코드("")",
+            "FID_COND_MRKT_DIV_CODE": req.FID_COND_MRKT_DIV_CODE, # FID 조건 시장 분류 코드 시장 분류 코드 (J : 주식, ETF, ETN U: 업종)",
+            "FID_INPUT_ISCD": req.FID_INPUT_ISCD, # FID 입력 종목코드 종목번호 (6자리) ETN의 경우, Q로 시작 (EX. Q500001)",
+            "FID_INPUT_HOUR_1": req.FID_INPUT_HOUR_1, # FID 입력 시간1 조회대상(FID_COND_MRKT_DIV_CODE)에 따라 입력하는 값 상이 종목(J)일 경우, 조회 시작일자(HHMMSS) ex) "123000" 입력 시 12시 30분 이전부터 1분 간격으로 조회 업종(U)일 경우, 조회간격(초) (60 or 120 만 입력 가능) ex) "60" 입력 시 현재시간부터 1분간격으로 조회 "120" 입력 시 현재시간부터 2분간격으로 조회 ※ FID_INPUT_HOUR_1 에 미래일시 입력 시에 현재가로 조회됩니다. ex) 오전 10시에 113000 입력 시에 오전 10시~11시30분 사이의 데이터가 오전 10시 값으로 조회됨",
+            "FID_PW_DATA_INCU_YN": req.FID_PW_DATA_INCU_YN # FID 과거 데이터 포함 여부 과거 데이터 포함 여부(Y/N) * 업종(U) 조회시에만 동작하는 구분값 N : 당일데이터만 조회 Y : 이후데이터도 조회 (조회시점이 083000(오전8:30)일 경우 전일자 업종 시세 데이터도 같이 조회됨)",
         }   
         headers ={
                 "content-type": "application/json; charset=utf-8",
@@ -908,10 +908,10 @@ class KisStockApi(StockApi):
         url = self.BASE_URL + "/uapi/domestic-stock/v1/quotations/inquire-daily-price"
         
         params = {
-            "FID_COND_MRKT_DIV_CODE": "", #FID 조건 시장 분류 코드 J : 주식, ETF, ETN",
-            "FID_INPUT_ISCD": "", #FID 입력 종목코드 종목번호 (6자리) ETN의 경우, Q로 시작 (EX. Q500001)",
-            "FID_PERIOD_DIV_CODE": "", #FID 기간 분류 코드 D : (일)최근 30거래일 W : (주)최근 30주 M : (월)최근 30개월",
-            "FID_ORG_ADJ_PRC": "" #FID 수정주가 원주가 가격 0 : 수정주가반영 1 : 수정주가미반영 * 수정주가는 액면분할/액면병합 등 권리 발생 시 과거 시세를 현재 주가에 맞게 보정한 가격",
+            "FID_COND_MRKT_DIV_CODE": req.FID_COND_MRKT_DIV_CODE , #FID 조건 시장 분류 코드 J : 주식, ETF, ETN",
+            "FID_INPUT_ISCD": req.FID_INPUT_ISCD, #FID 입력 종목코드 종목번호 (6자리) ETN의 경우, Q로 시작 (EX. Q500001)",
+            "FID_PERIOD_DIV_CODE": req.FID_PERIOD_DIV_CODE, #FID 기간 분류 코드 D : (일)최근 30거래일 W : (주)최근 30주 M : (월)최근 30개월",
+            "FID_ORG_ADJ_PRC": req.FID_ORG_ADJ_PRC #FID 수정주가 원주가 가격 0 : 수정주가반영 1 : 수정주가미반영 * 수정주가는 액면분할/액면병합 등 권리 발생 시 과거 시세를 현재 주가에 맞게 보정한 가격",
         }   
         headers ={
             "authorization": f"Bearer {self.ACCESS_TOKEN}",

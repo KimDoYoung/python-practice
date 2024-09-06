@@ -109,21 +109,3 @@ async def websocket_endpoint(websocket: WebSocket):
     result = await stock_ws_manager.connect(user_id, ls_acctno)
     return result
 
-
-# async def broadcast_message(message: str):
-#     for client in clients:
-#         await client.send_text(message)
-
-# TODO : 증권사와 연결 후
-# async def connect_to_broker():
-#     uri = "wss://broker-websocket-url"  # 증권사 WebSocket URL을 여기에 입력
-#     async with websockets.connect(uri) as websocket:
-#         while True:
-#             data = await websocket.recv()
-#             print(f"Received data from broker: {data}")
-#             # 모든 클라이언트에 데이터 전송
-#             await broadcast_message(data)
-
-# @app.on_event("startup")
-# async def startup_event():
-#     asyncio.create_task(connect_to_broker())
