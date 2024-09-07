@@ -12,7 +12,8 @@
 {% block style %}{% endblock %}  
 </head>
 <body>
-{% include "common/nav_ls.html" %}    
+{% include "common/nav_ls.html" %}
+{% include "common/error_alert.html" %}
 <div id="main-area" class="container mt-4">
     <div id="alert-container"></div> <!-- 웹소켓으로 받은 체결정보를 여기서 보여준다.-->
     {% block content %}{% endblock %}

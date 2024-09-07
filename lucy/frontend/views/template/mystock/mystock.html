@@ -70,7 +70,8 @@
                 <th>종류</th>
                 <th>종목코드</th>
                 <th>종목명</th>
-                <th class="text-end"><a href="#" data-field-name="price" class="sorting-header">현재가<i class="bi"></i></a></th>
+                <!-- <th class="text-end"><a href="#" data-field-name="price" class="sorting-header">현재가<i class="bi"></i></a></th> -->
+                <th class="text-end">현재가</th>
                 <th class="text-end">전일대비</th>
                 <th class="text-end">등락율</th>
                 <th class="text-center">동작</th>
@@ -171,6 +172,7 @@ function getCurrentCost() {
         if(intervalId) clearInterval(intervalId);
         return;
     }
+    showAlertError(new Error('현재가격을 가져옵니다.'));
     const stkCodes = current_lists.map(item => String(item.stk_code)).join('');
     const url = '/api/v1/mystock/current_costs/' + stkCodes;
     getFetch(url).then(data => {
@@ -192,8 +194,10 @@ function getCurrentCost() {
             }
             //$(`#cost_${item.stk_code}`).text(cost);
         });
+        
     }).catch(error=> {
         console.error(error.message);
+        showAlertError(error); 
     });
 }
 function renderTable(){
@@ -215,7 +219,7 @@ function sortTable(fieldName){
     var isAscending = currentSort.field === fieldName && currentSort.direction === 'asc';
     currentSort.direction = isAscending ? 'desc' : 'asc';
     currentSort.field = fieldName;
-    const data = current_lists.t8407OutBlock1;
+    const data = current_lists;
     // 데이터 정렬
     data.sort(function(a, b) {
         if (a[fieldName] < b[fieldName]) return currentSort.direction === 'asc' ? -1 : 1;
@@ -465,7 +469,8 @@ $( document ).ready(function() {
             console.log(data);
             init();
         }).catch(error=> {
-            console.error(error.message); 
+            console.error(error.message);
+            showAlertError(error); 
         });
     });
 });
