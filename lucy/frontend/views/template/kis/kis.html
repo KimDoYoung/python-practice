@@ -7,12 +7,7 @@
 
 {% block content %}
 <section id="list-section" class="container">
-    <h3>KIS(한국투자증권) 계좌조회</h3>
-    <!-- <button id="btnTesTToken">Test-AccessToken</button>
-    <button id="btnPsearchTitle">조건식리스트</button>
-    <button id="btnInquireDailyCcld">주식일별주문체결조회</button>
-    <button id="btnRefresh" class="btn btn-primary"><i class="bi bi-arrow-clockwise"></i>Refresh</button> -->
-
+    <h4>KIS(한국투자증권) 계좌조회</h4>
     <div id="message-area"></div> 
     <div id="inquire-balance-area"></div>
     <div>
@@ -23,9 +18,13 @@
 
 {% raw %} 
 <script id="inquire-balance-table-template" type="text/x-handlebars-template">
-    <h4>
-        예수금총액 : {{displayWon output2.dnca_tot_amt}} D1: {{displayWon output2.nxdy_excc_amt}} D2: {{displayWon output2.prvs_rcdl_excc_amt}} 현금주문가능금액: {{displayWon stck_cash_ord_psbl_amt}}
-    </h4>
+    <h5>
+        예수금총액 : {{displayWon output2.dnca_tot_amt}} 
+        D1: {{displayWon output2.nxdy_excc_amt}} 
+        D2: {{displayWon output2.prvs_rcdl_excc_amt}} 
+        현금주문가능금액: {{displayWon stck_cash_ord_psbl_amt}}
+        평가손익 : <span id="sum_evlu_pfls_amt"></span>
+    </h5>
     <table class="table table-sm table-hover">
         <thead>
             <tr>
@@ -59,7 +58,7 @@
                 <td class="text-end">{{pchs_amt_ratio}}</td>
                 <td class="text-end">{{displayWon pchs_amt}}</td>
                 <td class="text-end">{{displayWon evlu_amt}}</td>
-                {{#test "evlu_pfls_amt > 0"}}
+                {{#test "evlu_pfls_amt > 0"}} 
                 <td class="text-end text-danger">{{displayWon evlu_pfls_amt}}</td>
                 {{else}}
                 <td class="text-end text-primary">{{displayWon evlu_pfls_amt}}</td>
@@ -152,17 +151,19 @@
             let stck_cash_ord_psbl_amt = data.margin.output.stck_cash_ord_psbl_amt //현금주문가능금액
 
             let template = Handlebars.compile(document.getElementById('inquire-balance-table-template').innerHTML);
-
             
             let list = output1;
             //리스트에서 매입금액의 sum을 구하고 각 row의 매입금액/sum으로 매입비중을 구한다.
             let sum = list.reduce((acc, cur) => acc + Number(cur.pchs_amt), 0);
+            let sum_evlu_pfls_amt = 0; //평가손익 합계
             list.forEach(item => {
                 item.pchs_amt_ratio = (item.pchs_amt / sum * 100).toFixed(2);
+                sum_evlu_pfls_amt += Number(item.evlu_pfls_amt);
             });
 
             let html = template({list : list, output2: output2, stck_cash_ord_psbl_amt: stck_cash_ord_psbl_amt});
             $('#inquire-balance-area').html(html)
+            $('#sum_evlu_pfls_amt').html(JuliaUtil.displayMoney(sum_evlu_pfls_amt));
             console.log(data); 
         })
         .catch(error=> { 

@@ -172,7 +172,6 @@ function getCurrentCost() {
         if(intervalId) clearInterval(intervalId);
         return;
     }
-    showAlertError(new Error('현재가격을 가져옵니다.'));
     const stkCodes = current_lists.map(item => String(item.stk_code)).join('');
     const url = '/api/v1/mystock/current_costs/' + stkCodes;
     getFetch(url).then(data => {

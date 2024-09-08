@@ -1,0 +1,173 @@
+{% extends 'common/base.html' %}
+{% block style %}
+{% endblock %}
+{% block content %}
+<h4>증권사 투자의견</h4>
+<div id="search-area" class="container">
+    <div class="row">
+        <div class="col-4">
+            <select id="filter-mbcr" class="form-select" aria-label="Default select example">
+                <option selected>회원사</option>
+            </select>
+        </div>
+        <div class="col-4">
+            <select id="filter-dprt" class="form-select" aria-label="Default select example">
+                <option selected value="">괴리율</option>
+                <option value="-80">-80</option>
+                <option value="-70">-70</option>
+                <option value="-60">-60</option>
+                <option value="-50">-50</option>
+                <option value="-40">-40</option>
+                <option value="-30">-30</option>
+                <option value="-20">-20</option>
+                <option value="-10">-10</option>
+            </select>
+        </div>
+        <div class="col-4"></div> <!-- 마지막 컬럼을 비워둠 -->
+    </div>
+</div>
+<div id="result-area"></div>
+{% raw %}
+<!--handlebar scripts-->
+<script id="investOpbysecItem-template" type="text/x-handlebars-template">
+    <table class="table table-striped table-hover table-sm">
+        <thead>
+            <tr>
+                <th>영업일자</th>
+                <th>종목코드</th>
+                <th>종목명</th>
+                <th>회원사</th>
+                <th>투자의견</th>
+                <th class="text-end"><a href="#" data-field="stck_prpr" class="sort-title">현재가<i class="bi"></i></a></th>
+                <th class="text-end"><a href="#" data-field="prdy_vrss" class="sort-title">전일대비<i class="bi"></i></a></th>
+                <!-- <th>전일대비부호</th> -->
+                <th class="text-end"><a href="#" data-field="prdy_ctrt" class="sort-title">전일대비율<i class="bi"></i></a></th>
+                <th class="text-end"><a href="#" data-field="hts_goal_prc" class="sort-title">목표가격<i class="bi"></i></a></th>
+                <th class="text-end"><a href="#" data-field="stck_prdy_clpr" class="sort-title">전일종가<i class="bi"></i></a></th>
+                <th class="text-end"><a href="#" data-field="stft_esdg" class="sort-title">선물괴리도<i class="bi"></i></a></th>
+                <th class="text-end"><a href="#" data-field="dprt" class="sort-title">괴리율<i class="bi"></i></a></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each list}}
+            <tr>
+                <td>{{displayYmd stck_bsop_date}}</td>
+                <td>{{goNaver stck_shrn_iscd}}</td>
+                <td>{{hts_kor_isnm}}</td>
+                <td>{{mbcr_name}}</td>
+                <td>{{rgbf_invt_opnn}}-{{invt_opnn}}</td>
+                <td class="text-end">{{displayWon stck_prpr}}</td>
+                <td class="text-end">{{displayWon prdy_vrss}}</td>
+                <!-- <td>{{prdy_vrss_sign}}</td> -->
+                <td class="text-end">{{prdy_ctrt}}</td>
+                <td class="text-end">{{displayWon hts_goal_prc}}</td>
+                <td class="text-end">{{displayWon stck_prdy_clpr}}</td>
+                <td class="text-end">{{stft_esdg}}</td>
+                <td class="text-end">{{dprt}}</td>
+            </tr>
+        {{/each}}
+        </tbody>
+    </table>
+</script>
+{% endraw %}
+{% endblock %}
+{% block script %}
+{% raw %}
+<script>
+let current_list = [];
+let filter_mbcr_name = '';
+let filter_dprt = '';
+let currentSort = { field: null, direction: 'asc' };
+
+function makeTable() {
+    let list = current_list
+    if (list.length === 0) {
+        $('#result-area').html('데이터가 없습니다.');
+        return;
+    }
+    //필터
+    if (filter_mbcr_name !== '') {
+        list = list.filter(item => item.mbcr_name === filter_mbcr_name);
+    }
+    if(filter_dprt !== '') {
+        list = list.filter(item => Number(item.dprt) >= Number(filter_dprt));
+    }
+    //정렬
+    let fieldName = currentSort.field;
+    if(fieldName){
+        list.sort(function(a, b) {
+            let x = parseFloat(a[fieldName]);
+            let y = parseFloat(b[fieldName]);
+
+            if (x < y) return currentSort.direction === 'asc' ? -1 : 1;
+            if (x > y) return currentSort.direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }
+
+
+    //템플릿으로 데이터 생성.
+    const source = $('#investOpbysecItem-template').html();
+    const template = Handlebars.compile(source);
+    const html = template({list});
+    $('#result-area').html(html);
+
+        // 아이콘 설정
+    const $resultArea = $('#result-area').find('table thead tr');
+    $resultArea.find('.sort-title i').removeClass('bi-arrow-up bi-arrow-down');  // 모든 아이콘 제거
+    var currentIcon = currentSort.direction === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down';
+    $resultArea.find('a[data-field="' + currentSort.field + '"] i').addClass(currentIcon);
+    
+}
+function make_filter_mbcr() {
+    const mbcrs = current_list.map(item => item.mbcr_name);
+    const unique_mbcrs = [...new Set(mbcrs)];
+    let html = '<option selected value="">회원사</option>';
+    html += unique_mbcrs.map(mbcr_name => `<option value='${mbcr_name}'>${mbcr_name}</option>`).join('');
+    $('#filter-mbcr').html(html);
+}
+function initialize(){
+    const startYmd = new Date().getFullYear() + '0101';
+    const endYmd = JuliaUtil.today('yyyyMMdd');
+    const iscd = '999'; //회원사코드
+    const url = `/api/v1/kis/invest-opbysec/${iscd}/${startYmd}/${endYmd}`;
+    getFetch(url).then(data => {
+        console.log(data);
+        debugger;
+        //dprt가 0보다 큰 것만 필터링
+        current_list = data.output.filter(item => {
+            const dprtValue = Number(item.dprt);  // dprt 값을 숫자로 변환
+            return !isNaN(dprtValue) && dprtValue != 0;  // NaN이 아니고 0보다 큰 경우 필터링            
+        });
+        makeTable();
+        make_filter_mbcr();
+    }).catch(error=> {
+        console.error(error.message);
+        showAlertError(error);
+    });
+}    
+$( document ).ready(function() {
+    console.log( "ready!");
+    initialize();
+    $('#filter-mbcr').on("change", function() {
+        console.log('filter-mbcr:', this.value);
+        filter_mbcr_name = this.value;
+        makeTable();
+    });
+    $('#filter-dprt').on("change", function() {
+        console.log('filter-dprt:', this.value);
+        filter_dprt = this.value;
+        makeTable();
+    });
+    $('#result-area').on('click', '.sort-title', function() {
+        const fieldName = $(this).data('field');
+        console.log('sort:', fieldName);
+        var isAscending = currentSort.field === fieldName && currentSort.direction === 'asc';
+        currentSort.direction = isAscending ? 'desc' : 'asc';
+        currentSort.field = fieldName;
+        makeTable();
+    });
+});
+</script>
+{% endraw %}
+{% endblock %}
