@@ -40,15 +40,17 @@
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
     background-color: #aea6a6;
 }
+.height40 {
+    height: 800px;
+}
+/* companycanvas-link 스타일 */
+.companycanvas-link {
+    color: #003366; /* 짙은 청색 */
+    text-decoration: none; /* 밑줄 제거 */
+}
 
-    /* companycanvas-link 스타일 */
-    .companycanvas-link {
-        color: #003366; /* 짙은 청색 */
-        text-decoration: none; /* 밑줄 제거 */
-    }
-
-    /* 마우스를 올렸을 때 스타일 (hover 효과) */
-    .companycanvas-link:hover {
-        color: #002244; /* 더 짙은 청색으로 변경 */
-        text-decoration: underline; /* 밑줄 추가 (선택 사항) */
-    }
+/* 마우스를 올렸을 때 스타일 (hover 효과) */
+.companycanvas-link:hover {
+    color: #002244; /* 더 짙은 청색으로 변경 */
+    text-decoration: underline; /* 밑줄 추가 (선택 사항) */
+}

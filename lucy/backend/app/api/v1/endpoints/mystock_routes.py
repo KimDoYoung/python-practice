@@ -25,6 +25,8 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from backend.app.core.logger import get_logger
+from backend.app.domains.stc.kis.model.inquire_daily_price_model import InquireDailyPrice_Request
+from backend.app.domains.stc.kis.model.inquire_price_2_model import InquirePrice2_Request
 from backend.app.domains.stc.ls.model.t0424_model import T0424INBLOCK, T0424_Request
 from backend.app.domains.stc.ls.model.t8407_model import T8407_Request, T8407_Response, T8407InBLOCK
 from backend.app.domains.system.mystock_model import MyStock, MyStockDto
@@ -225,10 +227,18 @@ async def search(dto: MyStockDto,mystock_service :MyStockService=Depends(get_mys
 
 @router.get("/company-info/{stk_code}", response_model=dict)
 async def company_info(stk_code: str):
-    ''' 회사정보 네이버 주식 정보 포함 조회 '''
+    ''' 회사정보 네이버 주식 정보 포함 하단에 canvas로 보여준다. '''
+    # 1. naver info = company basic info
     naver_info = get_stock_info(stk_code)
     info = {}
     info['naver'] = naver_info
-    
+    #2. 주식현재가 시세2
+    kis_api = await StockApiManager().kis_api()
+    response_current_price = await kis_api.inquire_price_2(InquirePrice2_Request(FID_INPUT_ISCD=stk_code))
+    info['current_price'] = response_current_price
+    #3. 주식현재가 일자별
+    req = InquireDailyPrice_Request(FID_INPUT_ISCD=stk_code, FID_PERIOD_DIV_CODE='D')
+    response_price_history =await kis_api.inquire_daily_price(req)
+    info['price_history'] = response_price_history
     return info
     

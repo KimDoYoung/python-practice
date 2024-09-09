@@ -40,10 +40,36 @@ $(document).ready(function() {
             $companyCanvas.find('#offcanvas-naver-market-cap').text(data.naver.market_cap);
             $companyCanvas.find('#offcanvas-naver-market-cap-rank').text(data.naver.market_cap_rank);
             $companyCanvas.find('#offcanvas-naver-num-of-shares').text(data.naver.num_of_shares);
-
+            //현재가
+            let price_data = data.current_price.output;
+            $companyCanvas.find('#offcanvas-stck_prpr').text(JuliaUtil.displayMoney(price_data.stck_prpr));
+            $companyCanvas.find('#offcanvas-prdy_vrss').text(JuliaUtil.displayMoney(data.current_price.output.prdy_vrss));
+            $companyCanvas.find('#offcanvas-prdy_ctrt').text(data.current_price.output.prdy_ctrt);
+            $companyCanvas.find('#offcanvas-acml_vol').text(JuliaUtil.displayMoney(data.current_price.output.acml_vol));
+            $companyCanvas.find('#offcanvas-acml_tr_pbmn').text(moneyFormat(data.current_price.output.acml_tr_pbmn));
+            //candle chart
+            const chart_data = data.price_history.output;
+            let columns = [];
+            let columns1 = ['data1'];
+            let columns2 = ['x'];
+            //시가,고가,저가,종가
+            debugger;
+            for (let i = chart_data.length - 1; i >= 0; i--) {
+                let item = chart_data[i];
+                columns1.push([Number(item.stck_oprc), Number(item.stck_hgpr), Number(item.stck_lwpr), Number(item.stck_clpr)]);
+                columns2.push(item.stck_bsop_date);
+            }
+            let start_ymd = columns2[1].substring(0, 4) + '-' + columns2[1].substring(4, 6) + '-' + columns2[1].substring(6, 8);
+            let end_ymd = columns2[chart_data.length-1].substring(0, 4) + '-' + columns2[chart_data.length-1].substring(4, 6) + '-' + columns2[chart_data.length-1].substring(6, 8);
+            let x_name = `${data.naver.stk_name} (${start_ymd}~${end_ymd})`;
+            columns.push(columns1);
+            //columns.push(columns2);
+            
             offcanvasCompany.toggle();
+            create_billboard_chart(columns, x_name)
         }).catch(error=> {
             console.error(error.message); 
+            showAlertError(error);
         });
         
     }
