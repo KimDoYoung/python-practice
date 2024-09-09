@@ -122,21 +122,20 @@ var JuliaUtil = (function(){
 		}
 	}
     var displayComma = function (str){
-        var str = str;
-        if(isNumber(str)){
-            str = str + '';
-        }
-        var chars = str.split("").reverse();
-        var reChars = [];
-
-        for (var i = 0; chars.length > i; i++){
-            if( i != 0 &&( ( i+1 ) % 3) == 1){
-                reChars[reChars.length] = ",";
-            }
-            reChars[reChars.length] = chars[i];
+        // 숫자인지 체크 후 문자열로 변환
+        if (!isNaN(str)) {
+            str = str.toString();
         }
 
-        return reChars.reverse().join("");
+        // 음수인 경우 처리
+        var isNegative = str[0] === '-';
+        var numberPart = isNegative ? str.slice(1) : str; // 음수라면 첫 번째 문자는 제외
+
+        // 콤마 붙이기
+        var formattedNumber = numberPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+        // 음수면 부호 다시 붙여서 반환
+        return isNegative ? '-' + formattedNumber : formattedNumber;
     };
     var extendsOptions = function(options, defaults){
         var options = options || {},

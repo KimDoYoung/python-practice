@@ -1,5 +1,5 @@
 var billboard_chart;
-function create_billboard_chart(columns, name) {
+function create_billboard_chart(divId, columns, name) {
     let x_name = name || 'data1';
 
     billboard_chart = bb.generate({
@@ -31,7 +31,7 @@ function create_billboard_chart(columns, name) {
                 }
             }
         },
-        bindto: "#offcanvas_daily_chart"
+        bindto: "#" + divId
     });
 }
 

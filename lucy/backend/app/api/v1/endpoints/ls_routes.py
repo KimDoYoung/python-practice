@@ -60,6 +60,7 @@ from backend.app.managers.stock_api_manager import StockApiManager
 from backend.app.managers.stock_ws_manager import StockWsManager
 from backend.app.utils.ls_model_util import acct_history_to_CDPCQ04700_Request, cancel_order_to_cspat00801_Request, fulfill_api_to_cspaq13700_Request, fulfill_to_t0425_Request, high_item_to_T1441_Request, high_item_to_T1452_Request, high_item_to_T1463_Request, high_item_to_T1466_Request, high_item_to_T1481_Request, high_item_to_T1482_Request, high_item_to_T1489_Request, high_item_to_T1492_Request, modify_order_to_cspat00701_Request, order_to_cspat00601_Request
 from backend.app.core.dependency import get_stkinfo_service
+from backend.app.utils.naver_util import get_name_by_code
 
 logger = get_logger(__name__)
 
@@ -159,7 +160,11 @@ async def fulfill_list(req:Fulfill_Request):
     stk_info_service = get_stkinfo_service()
     for item in list:
         stkinfo =  await stk_info_service.get_by_stk_code(item.expcode)
-        item.hname = stkinfo.stk_name
+        item.hname = ""
+        if stkinfo is not None:
+            item.hname = stkinfo.stk_name
+        else:
+            item.hname = get_name_by_code(item.expcode)
 
     logger.debug(f"fulfill-list 응답: [{response.to_str()}]")
     return response    

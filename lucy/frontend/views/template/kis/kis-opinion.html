@@ -53,7 +53,7 @@
             <tr>
                 <td>{{displayYmd stck_bsop_date}}</td>
                 <td>{{goNaver stck_shrn_iscd}}</td>
-                <td>{{hts_kor_isnm}}</td>
+                <td>{{toggleCompanyCanvas stck_shrn_iscd hts_kor_isnm}}</td>
                 <td>{{mbcr_name}}</td>
                 <td>{{rgbf_invt_opnn}}-{{invt_opnn}}</td>
                 <td class="text-end">{{displayWon stck_prpr}}</td>
@@ -90,7 +90,7 @@ function makeTable() {
         list = list.filter(item => item.mbcr_name === filter_mbcr_name);
     }
     if(filter_dprt !== '') {
-        list = list.filter(item => Number(item.dprt) >= Number(filter_dprt));
+        list = list.filter(item => Number(item.dprt) <= Number(filter_dprt));
     }
     //정렬
     let fieldName = currentSort.field;
@@ -133,7 +133,7 @@ function initialize(){
     const url = `/api/v1/kis/invest-opbysec/${iscd}/${startYmd}/${endYmd}`;
     getFetch(url).then(data => {
         console.log(data);
-        debugger;
+        //debugger;
         //dprt가 0보다 큰 것만 필터링
         current_list = data.output.filter(item => {
             const dprtValue = Number(item.dprt);  // dprt 값을 숫자로 변환

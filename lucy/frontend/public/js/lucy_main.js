@@ -66,7 +66,7 @@ $(document).ready(function() {
             //columns.push(columns2);
             
             offcanvasCompany.toggle();
-            create_billboard_chart(columns, x_name)
+            create_billboard_chart("offcanvas_daily_chart",columns, x_name)
         }).catch(error=> {
             console.error(error.message); 
             showAlertError(error);

@@ -12,6 +12,13 @@
 
 from bs4 import BeautifulSoup
 import requests
+def get_name_by_code(code: str):
+    '''주식 코드로부터 주식 이름을 가져온다.'''
+    stock_info = get_stock_info(code)
+    if stock_info['stk_name'] is not None:
+        return stock_info['stk_name']
+    else:
+        return None
 
 def get_stock_info(stk_code: str):
     '''주식 코드로부터 주식 정보를 가져온다.'''
