@@ -44,13 +44,13 @@
                 <th scope="col">거래소</th>
                 <th scope="col">종목코드</th>
                 <th scope="col">종목명</th>
-                <th class="text-end" scope="col">현재가</th>
-                <th class="text-end" scope="col">전일대비</th>
-                <th class="text-end" scope="col">전일대비율</th>
-                <th class="text-end" scope="col">총매도 잔량</th>
-                <th class="text-end" scope="col">총매수 잔량</th>
-                <th class="text-end" scope="col">누적거래량</th>
-                <th class="text-end" scope="col">누적거래대금</th>
+                <th class="text-end" scope="col"><a href="#" data-field="inter2_prpr" class="sort-title">현재가<i class="bi"></i></a></th>
+                <th class="text-end" scope="col"><a href="#" data-field="inter2_prdy_vrss" class="sort-title">전일대비<i class="bi"></i></a></th>
+                <th class="text-end" scope="col"><a href="#" data-field="prdy_ctrt" class="sort-title">전일대비율<i class="bi"></i></a></th>
+                <th class="text-end" scope="col"><a href="#" data-field="total_askp_rsqn" class="sort-title">총매도 잔량<i class="bi"></i></a></th>
+                <th class="text-end" scope="col"><a href="#" data-field="total_bidp_rsqn" class="sort-title">총매수 잔량<i class="bi"></i></a></th>
+                <th class="text-end" scope="col"><a href="#" data-field="acml_vol" class="sort-title">누적거래량<i class="bi"></i></a></th>
+                <th class="text-end" scope="col"><a href="#" data-field="acml_tr_pbmn" class="sort-title">누적거래대금<i class="bi"></i></a></th>
                 <th class="text-center" scope="col">동작</th>
             </tr>
         </thead>
@@ -61,13 +61,18 @@
                 <td>{{exch_code}}</td>
                 <td>{{goNaver jong_code}}</td>
                 <td>{{toggleCompanyCanvas jong_code hts_kor_isnm}}</td>
-                <td class="text-end" id="{{jong_code}}_prpr">-</td>
-                <td class="text-end" id="{{jong_code}}_inter2_prdy_vrss">-</td>
-                <td class="text-end" id="{{jong_code}}_ctrt">-</td>
-                <td class="text-end" id="{{jong_code}}_total_askp_rsqn">-</td>
-                <td class="text-end" id="{{jong_code}}_total_bidp_rsqn">-</td>
-                <td class="text-end" id="{{jong_code}}_acml_vol">-</td>
-                <td class="text-end" id="{{jong_code}}_acml_tr_pbmn">-</td>
+                <td class="text-end" id="{{jong_code}}_prpr">{{displayWon inter2_prpr}}</td>
+                {{#test "Number(inter2_prdy_vrss) <= 0"}}
+                <td class="text-end text-primary" id="{{jong_code}}_inter2_prdy_vrss">{{displayWon inter2_prdy_vrss}}</td>
+                <td class="text-end text-primary" id="{{jong_code}}_ctrt">{{prdy_ctrt}}</td>
+                {{else}}
+                <td class="text-end text-danger" id="{{jong_code}}_inter2_prdy_vrss">{{displayWon inter2_prdy_vrss}}</td>
+                <td class="text-end text-danger" id="{{jong_code}}_ctrt">{{prdy_ctrt}}</td>
+                {{/test}}
+                <td class="text-end" id="{{jong_code}}_total_askp_rsqn">{{displayWon total_askp_rsqn}}</td>
+                <td class="text-end" id="{{jong_code}}_total_bidp_rsqn">{{displayWon total_bidp_rsqn}}</td>
+                <td class="text-end" id="{{jong_code}}_acml_vol">{{displayWon acml_vol}}</td>
+                <td class="text-end" id="{{jong_code}}_acml_tr_pbmn">{{displayJoEok2 acml_tr_pbmn}}</td>
                 <td>
                     <button class="btnBuy btn btn-danger btn-sm" data-stk-code="{{this.jong_code}}" data-stk-name="{{this.hts_kor_isnm}}">買</button>
                     <button class="btnSell btn btn-primary btn-sm" data-stk-code="{{this.jong_code}}" data-stk-name="{{this.hts_kor_isnm}}">賣</button>
@@ -90,7 +95,12 @@ Handlebars.registerHelper('index', function(value) {
 Handlebars.registerHelper('toInt', function(value) {
     return parseInt(value, 10);  // 문자열을 정수로 변환
 });
-let current_stock_code_list = [];
+let gList = [];
+// 헤드로 소팅하기 위해서 사용
+let currentSort = { field: null, direction: 'asc' };
+// let current_stock_code_list = [];
+
+// 초기화 : KIS에 저장되어 있는 관심종목 그룹을 조회
 function initialize(){
     const url = '/api/v1/kis/attension/grouplist'
     getFetch(url).then(data => {
@@ -101,42 +111,70 @@ function initialize(){
         document.getElementById('grouplist-table-body').innerHTML = html;
     }).catch(error=> {
         console.error(error.message); 
+        showAlertError(error);
     });
 }
-function get_multi_price(){
-    const url = '/api/v1/kis/attension/multi_price/' + current_stock_code_list.join('');
-    getFetch(url).then(data => {
-        console.log('멀티가격');
-        console.log(data);
-        let list = data.output
-        for (let i = 0; i < list.length; i++) {
-            const item = list[i];
-            const code = item.inter_shrn_iscd;
-            const prpr = item.inter2_prpr;
-            const inter2_prdy_vrss = item.inter2_prdy_vrss;
-            const ctrt = item.prdy_ctrt;
-            const acml_vol = item.acml_vol;
-            const acml_tr_pbmn = moneyFormat(Number(item.acml_tr_pbmn));
-            const total_askp_rsqn = item.total_askp_rsqn;
-            const total_bidp_rsqn = item.total_bidp_rsqn;
-            $('#stock-list-area').find('#'+code + '_prpr').text(Number(prpr).toLocaleString());
-            if (inter2_prdy_vrss <= 0) {
-                $('#stock-list-area').find('#'+code + '_inter2_prdy_vrss').removeClass('text-danger').addClass('text-primary'); 
-                $('#stock-list-area').find('#'+code + '_ctrt').removeClass('text-danger').addClass('text-primary'); 
+// function get_multi_price(){
+//     const url = '/api/v1/kis/attension/multi_price/' + current_stock_code_list.join('');
+//     getFetch(url).then(data => {
+//         console.log('멀티가격');
+//         console.log(data);
+//         let list = data.output
+//         for (let i = 0; i < list.length; i++) {
+//             const item = list[i];
+//             const code = item.inter_shrn_iscd;
+//             const prpr = item.inter2_prpr;
+//             const inter2_prdy_vrss = item.inter2_prdy_vrss;
+//             const ctrt = item.prdy_ctrt;
+//             const acml_vol = item.acml_vol;
+//             const acml_tr_pbmn = moneyFormat(Number(item.acml_tr_pbmn));
+//             const total_askp_rsqn = item.total_askp_rsqn;
+//             const total_bidp_rsqn = item.total_bidp_rsqn;
+//             $('#stock-list-area').find('#'+code + '_prpr').text(Number(prpr).toLocaleString());
+//             if (inter2_prdy_vrss <= 0) {
+//                 $('#stock-list-area').find('#'+code + '_inter2_prdy_vrss').removeClass('text-danger').addClass('text-primary'); 
+//                 $('#stock-list-area').find('#'+code + '_ctrt').removeClass('text-danger').addClass('text-primary'); 
+//             } else {
+//                 $('#stock-list-area').find('#'+code + '_inter2_prdy_vrss').removeClass('text-primary').addClass('text-danger');
+//                 $('#stock-list-area').find('#'+code + '_ctrt').removeClass('text-primary').addClass('text-danger');
+//             }
+//             $('#stock-list-area').find('#'+code + '_inter2_prdy_vrss').text(Number(inter2_prdy_vrss).toLocaleString());
+//             $('#stock-list-area').find('#'+code + '_ctrt').text(ctrt);
+//             $('#stock-list-area').find('#'+code + '_total_askp_rsqn').text(Number(total_askp_rsqn).toLocaleString());
+//             $('#stock-list-area').find('#'+code + '_total_bidp_rsqn').text(Number(total_bidp_rsqn).toLocaleString());
+//             $('#stock-list-area').find('#'+code + '_acml_vol').text(Number(acml_vol).toLocaleString());
+//             $('#stock-list-area').find('#'+code + '_acml_tr_pbmn').text(acml_tr_pbmn);
+//         }
+//     }).catch(error=> {
+//         console.error(error.message); 
+//         showAlertError(error);
+//     });
+// }
+// list로 테이블 HTML을 만들어서 화면에 보여준다.
+function makeTable(list){
+    if (!list || list.length == 0) return;
+    //sort
+    if (currentSort.field) {
+        list.sort((a, b) => {
+            if (currentSort.direction === 'asc') {
+                return Number(a[currentSort.field]) > Number(b[currentSort.field]) ? 1 : -1;
             } else {
-                $('#stock-list-area').find('#'+code + '_inter2_prdy_vrss').removeClass('text-primary').addClass('text-danger');
-                $('#stock-list-area').find('#'+code + '_ctrt').removeClass('text-primary').addClass('text-danger');
+                return Number(a[currentSort.field]) < Number(b[currentSort.field]) ? 1 : -1;
             }
-            $('#stock-list-area').find('#'+code + '_inter2_prdy_vrss').text(Number(inter2_prdy_vrss).toLocaleString());
-            $('#stock-list-area').find('#'+code + '_ctrt').text(ctrt);
-            $('#stock-list-area').find('#'+code + '_total_askp_rsqn').text(Number(total_askp_rsqn).toLocaleString());
-            $('#stock-list-area').find('#'+code + '_total_bidp_rsqn').text(Number(total_bidp_rsqn).toLocaleString());
-            $('#stock-list-area').find('#'+code + '_acml_vol').text(Number(acml_vol).toLocaleString());
-            $('#stock-list-area').find('#'+code + '_acml_tr_pbmn').text(acml_tr_pbmn);
-        }
-    }).catch(error=> {
-        console.error(error.message); 
-    });
+        });
+    }
+
+    // handlebar template을 이용하여 HTML을 만들어서 화면에 보여준다.
+    const source = document.getElementById('stocklist-template').innerHTML;
+    const template = Handlebars.compile(source);
+    const html = template({items: list});
+    document.getElementById('stock-list-area').innerHTML = html;
+    // head에 icon을 넣어준다.
+    const $resultArea = $('#stock-list-area').find('table thead tr');
+    $resultArea.find('.sort-title i').removeClass('bi-arrow-up bi-arrow-down');  // 모든 아이콘 제거
+    var currentIcon = currentSort.direction === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down';
+    $resultArea.find('a[data-field="' + currentSort.field + '"] i').addClass(currentIcon);
+
 }
 $( document ).ready(function() {
     console.log( "ready!");
@@ -149,17 +187,51 @@ $( document ).ready(function() {
         const url = '/api/v1/kis/attension/stocklist_by_group/' + code;
         getFetch(url).then(data => {
             console.log(data);
-            const source = document.getElementById('stocklist-template').innerHTML;
-            const template = Handlebars.compile(source);
-            const html = template({items: data.output2});
-            document.getElementById('stock-list-area').innerHTML = html;
-            current_stock_code_list = data.output2.map(item => item.jong_code);
-            get_multi_price();
+            let codes = data.output2.map(item => item.jong_code).join(''); // 종목코드를 문자열로 변환하여 한번에 멀티가격을 가져오기 위함
+            let url2 =  '/api/v1/kis/attension/multi_price/' + codes;
+            getFetch(url2).then(data2 => {
+                console.log('data들')
+                console.log(data);
+                let list1 = data.output2; //jong_code
+                console.log(data2); //inter_shrn_iscd
+                let list2 = data2.output;
+                //list1과 list2를 합쳐서 list_merged를 만드는데, list1을 베이스로 jong_code와 같은  list2의 inter_shrn_iscd를 찾아서 합친다.
+                let list_merged = list1.map(item1 => {
+                    let item2 = list2.find(item2 => item2.inter_shrn_iscd === item1.jong_code);
+                    return {...item1, ...item2};
+                });
+                gList = list_merged;
+                makeTable(list_merged);
+
+            }).catch(error=> {
+                console.error(error.message); 
+            });
+            // getFetch(url2)
+            // const source = document.getElementById('stocklist-template').innerHTML;
+            // const template = Handlebars.compile(source);
+            // const html = template({items: data.output2});
+            // document.getElementById('stock-list-area').innerHTML = html;
+            // current_stock_code_list = data.output2.map(item => item.jong_code);
+            // get_multi_price();
         }).catch(error=> {
             //console.error(error.message);
             showToastError(error.message); 
         });
     });
+    $('#stock-list-area').on('click', '.sort-title', function(e){
+        debugger;
+        e.stopPropagation();
+        e.preventDefault();
+        const fieldName = $(this).data('field');
+        if (currentSort.field === fieldName) {
+            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+        } else {
+            currentSort.field = fieldName;
+            currentSort.direction = 'asc';
+        }
+        makeTable(gList);
+    });
+
     // btnBuy구매 버튼 클릭
     $('#stock-list-area').on('click', '.btnBuy', function(e){
         e.stopPropagation();
