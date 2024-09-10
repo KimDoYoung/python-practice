@@ -74,6 +74,7 @@ class StockWsManager:
                 # task = asyncio.create_task(self.stock_ws_task(user_id, acctno, abbr))
                 task = await self.stock_ws_task(user_id, acctno, abbr)
                 self.stock_connections[user_id][acctno] = task
+                await task.run()
                 logger.debug(f"{acctno} 계좌에 대한 WebSocket 작업 생성: {user_id}")
             except Exception as e:
                 logger.error(f"에러 발생: {e}")
@@ -114,7 +115,7 @@ class StockWsManager:
             if result["code"] != "00":
                 raise Exception(result["detail"])
             try:
-                await kis_task.run()
+                #await kis_task.run()
                 logger.debug(f"KIS 작업 완료: {user_id}/{acctno}/{abbr} ")
                 return kis_task
             except Exception as e:
@@ -124,7 +125,7 @@ class StockWsManager:
         elif abbr == "LS":
             ls_task = LSTask(user_id, acctno, self.client_ws_manager)
             await ls_task.initialize()
-            await ls_task.run()
+            #await ls_task.run()
             logger.debug(f"LS 작업 완료: {user_id}")
             return ls_task
         else:
@@ -157,4 +158,9 @@ class StockWsManager:
             logger.error(f"ws_manager : 계좌 {acctno}를 찾을 수 없음")
             return None
 
-        return self.stock_connections[user_id][acctno]        
+        task =  self.stock_connections[user_id][acctno]
+        if task is None:
+            logger.error(f"ws_manager : {user_id}/{acctno}에 대한 Task를 찾을 수 없음")
+            return None
+        logger.info(f"ws_manager : {user_id}/{acctno}에 대한 Task 반환")
+        return task

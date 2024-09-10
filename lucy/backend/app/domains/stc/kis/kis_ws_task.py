@@ -37,6 +37,7 @@ class KISTask(StockTask):
             self.APPROVAL_KEY = None
             self.AES_IV = None
             self.AES_KEY = None
+            self.stk_websocket = None
 
             #필요한 변수들 체크 
             if self.APP_KEY is None :
@@ -102,6 +103,7 @@ class KISTask(StockTask):
             logger.debug(f"{self.user_id}/{self.acctno}/{self.abbr} {tr_id} 등록 senddata: [{data}]")
         except Exception as e:
             logger.error(f"subscription 중 오류 발생: {e}")
+            raise Exception(f"stockk_code subscription 중 오류 발생: {e}")
         await asyncio.sleep(0.5)
         
     async def unsubscribe(self, tr_id, stock_code):
@@ -146,6 +148,7 @@ class KISTask(StockTask):
                         #model_str = real_model.to_str()
                         real_data_dict = real_model.data_for_client_ws()
                         message_str = json.dumps(real_data_dict)
+                        logger.info(f"client로 보내는 실시간데이터: {message_str}")
                         await self.broadcast(message_str)
                         await asyncio.sleep(0.5)
                     else: # 실시간 데이터가 아닌 경우

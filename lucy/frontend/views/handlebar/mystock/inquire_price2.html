@@ -1,0 +1,98 @@
+{% raw %}
+  <!-- Table Template -->
+  <script id="inquire_price2-template" type="text/x-handlebars-template">
+    <table class="table table-sm">
+      <tr>
+        <th>대표 시장 한글 명</th> <td>{{rprs_mrkt_kor_name}}</td>
+        <th>신 고가 저가 구분 코드</th> <td>{{new_hgpr_lwpr_cls_code}}</td>
+        <th>상하한가 구분 코드</th> <td>{{mxpr_llam_cls_code}}</td>
+      </tr>
+      <tr>
+        <th>신용 가능 여부</th> <td>{{crdt_able_yn}}</td>
+        <th>주식 상한가</th> <td>{{stck_mxpr}}</td>
+        <th>ELW 발행 여부</th> <td>{{elw_pblc_yn}}</td>
+      </tr>
+      <tr>
+        <th>전일 종가 대비 시가2 비율</th> <td>{{prdy_clpr_vrss_oprc_rate}}</td>
+        <th>신용 비율</th> <td>{{crdt_rate}}</td>
+        <th>증거금 비율</th> <td>{{marg_rate}}</td>
+      </tr>
+      <tr>
+        <th>최저가 대비 현재가</th> <td>{{lwpr_vrss_prpr}}</td>
+        <th>최저가 대비 현재가 부호</th> <td>{{lwpr_vrss_prpr_sign}}</td>
+        <th>전일 종가 대비 최저가 비율</th> <td>{{prdy_clpr_vrss_lwpr_rate}}</td>
+      </tr>
+      <tr>
+        <th>주식 최저가</th> <td>{{stck_lwpr}}</td>
+        <th>최고가 대비 현재가</th> <td>{{hgpr_vrss_prpr}}</td>
+        <th>최고가 대비 현재가 부호</th> <td>{{hgpr_vrss_prpr_sign}}</td>
+      </tr>
+      <tr>
+        <th>전일 종가 대비 최고가 비율</th> <td>{{prdy_clpr_vrss_hgpr_rate}}</td>
+        <th>주식 최고가</th> <td>{{stck_hgpr}}</td>
+        <th>시가2 대비 현재가</th> <td>{{oprc_vrss_prpr}}</td>
+      </tr>
+      <tr>
+        <th>시가2 대비 현재가 부호</th> <td>{{oprc_vrss_prpr_sign}}</td>
+        <th>관리 종목 여부</th> <td>{{mang_issu_yn}}</td>
+        <th>동시호가배분처리코드</th> <td>{{divi_app_cls_code}}</td>
+      </tr>
+      <tr>
+        <th>단기과열 여부</th> <td>{{short_over_yn}}</td>
+        <th>시장 경고 코드</th> <td>{{mrkt_warn_cls_code}}</td>
+        <th>투자유의 여부</th> <td>{{invt_caful_yn}}</td>
+      </tr>
+      <tr>
+        <th>이상급등 여부</th> <td>{{stange_runup_yn}}</td>
+        <th>공매도과열 여부</th> <td>{{ssts_hot_yn}}</td>
+        <th>저유동성 종목 여부</th> <td>{{low_current_yn}}</td>
+      </tr>
+      <tr>
+        <th>VI적용구분코드</th> <td>{{vi_cls_code}}</td>
+        <th>단기과열 구분 코드</th> <td>{{short_over_cls_code}}</td>
+        <th>주식 하한가</th> <td>{{stck_llam}}</td>
+      </tr>
+      <tr>
+        <th>신규 상장 구분 명</th> <td>{{new_lstn_cls_name}}</td>
+        <th>임의 매매 구분 명</th> <td>{{vlnt_deal_cls_name}}</td>
+        <th>락 구분 이름</th> <td>{{flng_cls_name}}</td>
+      </tr>
+      <tr>
+        <th>재평가 종목 사유 명</th> <td>{{revl_issu_reas_name}}</td>
+        <th>시장 경고 구분 명</th> <td>{{mrkt_warn_cls_name}}</td>
+        <th>주식 기준가</th> <td>{{stck_sdpr}}</td>
+      </tr>
+      <tr>
+        <th>업종 구분 코드</th> <td>{{bstp_cls_code}}</td>
+        <th>주식 전일 종가</th> <td>{{stck_prdy_clpr}}</td>
+        <th>불성실 공시 여부</th> <td>{{insn_pbnt_yn}}</td>
+      </tr>
+      <tr>
+        <th>액면가 변경 구분 명</th> <td>{{fcam_mod_cls_name}}</td>
+        <th>주식 현재가</th> <td>{{stck_prpr}}</td>
+        <th>전일 대비</th> <td>{{prdy_vrss}}</td>
+      </tr>
+      <tr>
+        <th>전일 대비 부호</th> <td>{{prdy_vrss_sign}}</td>
+        <th>전일 대비율</th> <td>{{prdy_ctrt}}</td>
+        <th>누적 거래 대금</th> <td>{{acml_tr_pbmn}}</td>
+      </tr>
+      <tr>
+        <th>누적 거래량</th> <td>{{acml_vol}}</td>
+        <th>전일 대비 거래량 비율</th> <td>{{prdy_vrss_vol_rate}}</td>
+        <th>업종 한글 종목명</th> <td>{{bstp_kor_isnm}}</td>
+      </tr>
+      <tr>
+        <th>정리매매 여부</th> <td>{{sltr_yn}}</td>
+        <th>거래정지 여부</th> <td>{{trht_yn}}</td>
+        <th>시가 범위 연장 여부</th> <td>{{oprc_rang_cont_yn}}</td>
+      </tr>
+      <tr>
+        <th>임의 종료 구분 코드</th> <td>{{vlnt_fin_cls_code}}</td>
+        <th>주식 시가2</th> <td>{{stck_oprc}}</td>
+        <th>전일 거래량</th> <td>{{prdy_vol}}</td>
+      </tr>
+    </table>
+  </script>
+
+{% endraw %}

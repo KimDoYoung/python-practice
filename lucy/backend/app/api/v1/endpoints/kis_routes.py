@@ -74,9 +74,28 @@ async def validate_user(request: Request, user_service: UserService):
         raise HTTPException(status_code=401, detail="Invalid token-사용자 정보가 없습니다")
     
     return user
+@router.get("/ws/hoga/un-subscribe/{stk_code}", response_class=JSONResponse)
+async def kis_hoga_unsubscribe(stk_code:str):
+    ''' KIS 증권사에 주식호가 취소 '''
+    user_id = config.DEFAULT_USER_ID
+    user_service = get_user_service()
+    user = await user_service.get_1(user_id)
+    account = user.find_account_by_abbr('KIS')
+    kis_acctno = account.account_no
 
-@router.get("/ws/call-hoga/{stk_code}", response_class=JSONResponse)
-async def kis_call(stk_code:str):
+    client_ws_manager = ClientWsManager()
+    stock_ws_manager = StockWsManager(client_ws_manager)    
+    task = await stock_ws_manager.get_task(user_id, kis_acctno)
+    
+    if task is None:
+        return JSONResponse(content={"code": "01", "detail": f"{kis_acctno} 계좌에 대한 WebSocket 작업이 없습니다."})
+    else: 
+        await task.unsubscribe(KIS_WSReq.BID_ASK, stk_code)
+    
+    return JSONResponse(content={"code": "00", "detail": f"{stk_code} 호가 요청 성공"})
+
+@router.get("/ws/hoga/subscribe/{stk_code}", response_class=JSONResponse)
+async def kis_hoga_subscribe(stk_code:str):
     ''' KIS 증권사에 주식호가 요청 '''
     user_id = config.DEFAULT_USER_ID
     user_service = get_user_service()
@@ -93,7 +112,7 @@ async def kis_call(stk_code:str):
     else: 
         await task.subscribe(KIS_WSReq.BID_ASK, stk_code)
     
-    return JSONResponse(content={"code": "00", "detail": f"{stk_code}호가 요청 성공"})
+    return JSONResponse(content={"code": "00", "detail": f"{stk_code} 호가 요청 성공"})
 
 
 @router.get("/", response_class=JSONResponse, response_model=None)

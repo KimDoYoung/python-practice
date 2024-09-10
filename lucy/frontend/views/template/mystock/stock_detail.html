@@ -3,64 +3,89 @@
 {% endblock %}
 {% block content %}
 <h5 id="companyId" class="text-primary fw-bold">Stock 상세</h5> 
-<div id="chart-area">
-    <div id="chart-area-search">
-        <form method="POST" action="/submit" id="form1">
-            <input type="hidden" name="current_stk_code" id="current_stk_code" value="{{stk_code}}">
-            <input type="hidden" name="FID_COND_MRKT_DIV_CODE" id="FID_COND_MRKT_DIV_CODE" value="J">
-            <div class="row g-3 align-items-center">
-                <!-- FID_INPUT_DATE_1 -->
-                <div class="col-auto">
-                    <label for="FID_INPUT_DATE_1" class="form-label">조회 시작일자</label>
-                    <input type="date" id="FID_INPUT_DATE_1" name="FID_INPUT_DATE_1" class="form-control" placeholder="시작일자 (ex. 20220501)">
-                </div>
 
-                <!-- FID_INPUT_DATE_2 -->
-                <div class="col-auto">
-                    <label for="FID_INPUT_DATE_2" class="form-label">조회 종료일자</label>
-                    <input type="date" id="FID_INPUT_DATE_2" name="FID_INPUT_DATE_2" class="form-control" placeholder="종료일자 (ex. 20220530)">
-                </div>
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="chart-basic-tab" data-bs-toggle="tab" data-bs-target="#chart-basic" type="button" role="tab" aria-controls="chart-basic" aria-selected="true">Home</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="sell-buy-detail-tab" data-bs-toggle="tab" data-bs-target="#sell-buy-detail" type="button" role="tab" aria-controls="sell-buy-detail" aria-selected="false">Profile</button>
+        </li>
+    </ul>
 
-                <!-- FID_PERIOD_DIV_CODE -->
-                <div class="col-auto">
-                    <label for="FID_PERIOD_DIV_CODE" class="form-label">기간분류코드</label>
-                    <select id="FID_PERIOD_DIV_CODE" name="FID_PERIOD_DIV_CODE" class="form-select">
-                        <option value="D" selected>일봉</option>
-                        <option value="W">주봉</option>
-                        <option value="M">월봉</option>
-                        <option value="Y">년봉</option>
-                    </select>
+    <!-- Tab panes -->
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="chart-basic" role="tabpanel" aria-labelledby="chart-basic-tab">
+            <div id="chart-area">
+                <div id="chart-area-search">
+                    <form method="POST" action="/submit" id="form1">
+                        <input type="hidden" name="current_stk_code" id="current_stk_code" value="{{stk_code}}">
+                        <input type="hidden" name="FID_COND_MRKT_DIV_CODE" id="FID_COND_MRKT_DIV_CODE" value="J">
+                        <div class="row g-3 align-items-center">
+                            <!-- FID_INPUT_DATE_1 -->
+                            <div class="col-auto">
+                                <label for="FID_INPUT_DATE_1" class="form-label">조회 시작일자</label>
+                                <input type="date" id="FID_INPUT_DATE_1" name="FID_INPUT_DATE_1" class="form-control" placeholder="시작일자 (ex. 20220501)">
+                            </div>
+            
+                            <!-- FID_INPUT_DATE_2 -->
+                            <div class="col-auto">
+                                <label for="FID_INPUT_DATE_2" class="form-label">조회 종료일자</label>
+                                <input type="date" id="FID_INPUT_DATE_2" name="FID_INPUT_DATE_2" class="form-control" placeholder="종료일자 (ex. 20220530)">
+                            </div>
+            
+                            <!-- FID_PERIOD_DIV_CODE -->
+                            <div class="col-auto">
+                                <label for="FID_PERIOD_DIV_CODE" class="form-label">기간분류코드</label>
+                                <select id="FID_PERIOD_DIV_CODE" name="FID_PERIOD_DIV_CODE" class="form-select">
+                                    <option value="D" selected>일봉</option>
+                                    <option value="W">주봉</option>
+                                    <option value="M">월봉</option>
+                                    <option value="Y">년봉</option>
+                                </select>
+                            </div>
+            
+                            <!-- FID_ORG_ADJ_PRC -->
+                            <div class="col-auto">
+                                <label for="FID_ORG_ADJ_PRC" class="form-label">수정주가/원주가</label>
+                                <select id="FID_ORG_ADJ_PRC" name="FID_ORG_ADJ_PRC" class="form-select">
+                                    <option value="0" selected>수정주가</option>
+                                    <option value="1">원주가</option>
+                                </select>
+                            </div>
+            
+                            <!-- Submit Button -->
+                            <div class="col-auto mt-4">
+                                <button type="submit" class="btn btn-primary">조회</button>
+                            </div>
+                        </div>
+                    </form>        
                 </div>
-
-                <!-- FID_ORG_ADJ_PRC -->
-                <div class="col-auto">
-                    <label for="FID_ORG_ADJ_PRC" class="form-label">수정주가/원주가</label>
-                    <select id="FID_ORG_ADJ_PRC" name="FID_ORG_ADJ_PRC" class="form-select">
-                        <option value="0" selected>수정주가</option>
-                        <option value="1">원주가</option>
-                    </select>
+                <div id="chart-result">
+                    <canvas id="detailChart" width="1400" height="400"></canvas>
                 </div>
-
-                <!-- Submit Button -->
-                <div class="col-auto mt-4">
-                    <button type="submit" class="btn btn-primary">조회</button>
+                <div id="company-summary" class="mt-3"></div>
+                <div id="capital-area" class="mt-3 d-none"></div>
+                <div>
+                    <button id="test1">주식현재가일자별</button>
+                    <button id="test2">주식당일분봉조회</button>
+                    <button id="test3">주식현재가시세2</button>
+                    <button id="test4">국내주식 종목투자의견</button>
+                    <button id="test5">국내주식 증권사별 투자의견</button>
+                    <button id="test6">호가정보요청</button>
+                    <button id="test7">호가정보취소</button>
                 </div>
+                
+            
             </div>
-        </form>        
+            
+        </div>
+        <div class="tab-pane fade" id="sell-buy-detail" role="tabpanel" aria-labelledby="sell-buy-detail-tab">
+            <div id="hoga-area" class="mt-3"></div>
+        </div>
     </div>
-    <div id="chart-result">
-        <canvas id="detailChart" width="1400" height="400"></canvas>
-    </div>
-    <div id="company-summary" class="mt-3"></div>
-    <div id="capital-area" class="mt-3 d-none"></div>
-    <div>
-        <button id="test1">주식현재가일자별</button>
-        <button id="test2">주식당일분봉조회</button>
-        <button id="test3">주식현재가시세2</button>
-        <button id="test4">국내주식 종목투자의견</button>
-        <button id="test5">국내주식 증권사별 투자의견</button>
-    </div>
-</div>
+
 {% raw %}
 <!--handlebar scripts-->
 <script id="capital-template" type="text/x-handlebars-template">
@@ -221,6 +246,8 @@
 <script>
 let current_stk_code =  undefined ; 
 let chart = undefined;
+
+
 function drawCandleChart(org_data){
 
     let ctx = document.getElementById('detailChart').getContext('2d');
@@ -292,14 +319,13 @@ function get_data_and_draw_chart(){
     });
 }
 function initalize(){
-    //호가정보 요청
-    getFetch('/api/v1/kis/ws/call-hoga/' + current_stk_code)
-    .then(data => {
-        console.log('호가정보를 요청하다' + current_stk_code);
-        console.log(data); 
-    }).catch(error=> {
-        console.error(error.message); 
-    });
+
+    //id hoga-area에 hoga-container- div를 추가한다.
+    $('#hoga-area').empty();
+    let hoga_container = document.createElement('div');
+    hoga_container.id = 'hoga-container-' + current_stk_code;
+    document.getElementById('hoga-area').appendChild(hoga_container);
+
     //stk_code 쿠키에 저장 refresh시 stk_code를 잃어버리지 않게한다
     setCookie('stk_code', current_stk_code, 100);
     
@@ -393,6 +419,28 @@ $( document ).ready(function() {
             showToastError(error);
         });
     });
+    $('#test6').click(function(){
+        //호가정보 요청
+        getFetch('/api/v1/kis/ws/hoga/subscribe/' + current_stk_code)
+        .then(data => {
+            console.log('호가정보를 요청하다' + current_stk_code);
+            console.log(data); 
+        }).catch(error=> {
+            console.error(error.message);
+            showAlertError(error); 
+        });
+    });
+    $('#test7').click(function(){
+        //호가정보 unsubscribe요청
+        getFetch('/api/v1/kis/ws/hoga/un-subscribe/' + current_stk_code)
+        .then(data => {
+            console.log('호가정보를 취소 요청하다' + current_stk_code);
+            console.log(data); 
+        }).catch(error=> {
+            console.error(error.message);
+            showAlertError(error); 
+        });
+    });    
 });
 </script>
 {% endraw %}

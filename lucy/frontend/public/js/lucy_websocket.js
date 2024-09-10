@@ -14,17 +14,20 @@ class StkRealDataParser {
         const parts = this.rawData.split('|');
         
         if (parts.length > 4) {
-            const type = parts[3];
+            const stk_company = parts[3];
             // JSON 부분 추출
             const jsonPart = parts.pop();
             try {
                 console.log("웹소켓: ", jsonPart);
                 const data = JSON.parse(jsonPart);
                 
-                if (type === 'KIS' && data.CNTG_YN === '2') {
+                if (stk_company === 'KIS' && data.CNTG_YN === '2') {
                     this.type = 'KIS-체결정보';
                     this.parsedData = data;
-                } else if (type === 'LS' && data.header.tr_cd === 'SC1') {
+                } else if (stk_company === 'KIS' && data.CODE === 'H0STASP0') {
+                    this.type = 'KIS-호가정보';
+                    this.parsedData = data;
+                } else if (stk_company === 'LS' && data.header.tr_cd === 'SC1') {
                     this.type = 'LS-체결정보';
                     this.parsedData = data;
                 } else {
@@ -66,6 +69,8 @@ window.ws.onmessage = function(event) {
         displayKISInfo(parser.parsedData);
     }else if(parser.type === 'LS-체결정보') {
         displayLSInfo(parser.parsedData);
+    }else if(parser.type === 'KIS-호가정보') {
+        displayHogaInfo(parser.parsedData);
     } else {
         // displayMessage(event.data);
         console.log("일반 메시지: ", event.data);
@@ -106,9 +111,43 @@ function buySellTypeLs(s){
         return "";
     }
 }
+function displayHogaInfo(response) {
+    debugger;
+    var data = response;
+    var stk_code = data.MKSC_SHRN_ISCD;
+    var $hogaContainer = $('#hoga-container-' + stk_code);
+    if ($hogaContainer.length === 0) {
+        return;
+    }
+    var html0 =   '<table class="table table-sm"><tr>';
+    html0 += '<th>총매도잔량</th><td>' + data.TOTAL_ASKP_RSQN + '</td>';
+    html0 += '<th>종매수잔량</th><td>' + data.TOTAL_BIDP_RSQN + '</td>';
+    html0 += '<th>누적거래량</th><td>' + data.ACML_VOL + '</td>';
+    html0 += '<th>시간외총<strong>매도</strong>잔량</th><td>' + data.OVTM_TOTAL_ASKP_RSQN + '</td>';
+    html0 += '<th>시간외총<strong>매수</strong>잔량</th><td>' + data.OVTM_TOTAL_BIDP_RSQN + '</td>';
+    html0 += '</tr></table>';
+
+    var html = '<table class="table table-sm"><tr>';
+    html += '<th>종목코드</th><td>' + data.MKSC_SHRN_ISCD + '</td>';
+    html += '<th>호가시간</th><td>' + (data.BSOP_HOUR) + '</td>';
+    html += `</tr><td>매도호가1</td><td>${data.ASKP1}</td><td>매도잔량1</td><td>${data.ASKP_RSQN1}</td><td>매수호가1</td><td>${data.BIDP1}</td><td>매수잔량1</td><td>${data.BIDP_RSQN1}</td></tr>`;
+    html += `</tr><td>매도호가2</td><td>${data.ASKP2}</td><td>매도잔량2</td><td>${data.ASKP_RSQN2}</td><td>매수호가2</td><td>${data.BIDP2}</td><td>매수잔량2</td><td>${data.BIDP_RSQN2}</td></tr>`;
+    html += `</tr><td>매도호가3</td><td>${data.ASKP3}</td><td>매도잔량3</td><td>${data.ASKP_RSQN3}</td><td>매수호가3</td><td>${data.BIDP3}</td><td>매수잔량3</td><td>${data.BIDP_RSQN3}</td></tr>`;
+    html += `</tr><td>매도호가4</td><td>${data.ASKP4}</td><td>매도잔량4</td><td>${data.ASKP_RSQN4}</td><td>매수호가4</td><td>${data.BIDP4}</td><td>매수잔량4</td><td>${data.BIDP_RSQN4}</td></tr>`;
+    html += `</tr><td>매도호가5</td><td>${data.ASKP5}</td><td>매도잔량5</td><td>${data.ASKP_RSQN5}</td><td>매수호가5</td><td>${data.BIDP5}</td><td>매수잔량5</td><td>${data.BIDP_RSQN5}</td></tr>`;
+    html += `</tr><td>매도호가6</td><td>${data.ASKP6}</td><td>매도잔량6</td><td>${data.ASKP_RSQN6}</td><td>매수호가6</td><td>${data.BIDP6}</td><td>매수잔량6</td><td>${data.BIDP_RSQN6}</td></tr>`;
+    html += `</tr><td>매도호가7</td><td>${data.ASKP7}</td><td>매도잔량7</td><td>${data.ASKP_RSQN7}</td><td>매수호가7</td><td>${data.BIDP7}</td><td>매수잔량7</td><td>${data.BIDP_RSQN7}</td></tr>`;
+    html += `</tr><td>매도호가8</td><td>${data.ASKP8}</td><td>매도잔량8</td><td>${data.ASKP_RSQN8}</td><td>매수호가8</td><td>${data.BIDP8}</td><td>매수잔량8</td><td>${data.BIDP_RSQN8}</td></tr>`;
+    html += `</tr><td>매도호가9</td><td>${data.ASKP9}</td><td>매도잔량9</td><td>${data.ASKP_RSQN9}</td><td>매수호가9</td><td>${data.BIDP9}</td><td>매수잔량9</td><td>${data.BIDP_RSQN9}</td></tr>`;
+    html += `</tr><td>매도호가10</td><td>${data.ASKP10}</td><td>매도잔량10</td><td>${data.ASKP_RSQN10}</td><td>매수호가10</td><td>${data.BIDP10}</td><td>매수잔량10</td><td>${data.BIDP_RSQN10}</td></tr>`;
+    html += '</table>';
+    $hogaContainer.html(html0+html);
+    return;
+    
+}
 function displayLSInfo(response) {
-    var data = response.body;
     var $alertContainer = $('#alert-container');
+    var data = response.body;
     
     let html = '<table class="table table-sm"><tr>';
     html += '<th>증권사</th><td>LS증권</td>';
