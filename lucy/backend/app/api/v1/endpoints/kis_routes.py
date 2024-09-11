@@ -28,7 +28,7 @@
 작성일: 2024-06-16
 버전: 1.0
 """
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
 from backend.app.core.dependency import get_mystock_service, get_user_service
 # from backend.app.domains.stc.kis.kis_api import KoreaInvestmentApi
@@ -38,14 +38,23 @@ from backend.app.domains.stc.kis.model.inquire_time_itemchartprice_model import 
 from backend.app.domains.stc.kis.model.invest_opbysec_model import InvestOpbysec_Request, InvestOpbysec_Response
 from backend.app.domains.stc.kis.model.invest_opinion_model import InvestOpinion_Request, InvestOpinion_Response
 from backend.app.domains.stc.kis.model.kis_after_hour_balance_model import AfterHourBalance_Response
+from backend.app.domains.stc.kis.model.kis_balance_sheet_model import BalanceSheet_Request, BalanceSheet_Response
+from backend.app.domains.stc.kis.model.kis_foreign_institution_total_model import ForeignInstitutionTotal_Request, ForeignInstitutionTotal_Response
+from backend.app.domains.stc.kis.model.kis_growth_ratio_model import GrowthRatio_Request, GrowthRatio_Response
+from backend.app.domains.stc.kis.model.kis_income_statement_model import IncomeStatement_Request, IncomeStatement_Response
 from backend.app.domains.stc.kis.model.kis_inquire_daily_ccld_model import InquireDailyCcld_Request
 from backend.app.domains.stc.kis.model.kis_inquire_daily_itemchartprice import InquireDailyItemchartprice_Request, InquireDailyItemchartprice_Response
+from backend.app.domains.stc.kis.model.kis_inquire_daily_trade_volume_model import InquireDailyTradeVolume_Request, InquireDailyTradeVolume_Response
 from backend.app.domains.stc.kis.model.kis_intgr_margin_model import IntgrMargin_Request
 from backend.app.domains.stc.kis.model.kis_intstock_grouplist import IntstockGrouplist_Response
 from backend.app.domains.stc.kis.model.kis_intstock_multiprice import IntstockMultprice_Response
 from backend.app.domains.stc.kis.model.kis_intstock_stocklist_by_group import IntstockStocklistByGroup_Response
 from backend.app.domains.stc.kis.model.kis_order_cash_model import KisOrderCancel_Request, OrderCash_Request
+from backend.app.domains.stc.kis.model.kis_other_major_ratios_model import OtherMajorRatios_Request, OtherMajorRatios_Response
+from backend.app.domains.stc.kis.model.kis_profit_ratio_model import ProfitRatio_Request, ProfitRatio_Response
 from backend.app.domains.stc.kis.model.kis_quote_balance_model import QuoteBalance_Response
+from backend.app.domains.stc.kis.model.kis_stability_ratio_model import StabilityRatio_Request, StabilityRatio_Response
+from backend.app.domains.stc.kis.model.kist_financial_ratio_model import FinancialRatio_Request, FinancialRatio_Response
 from backend.app.domains.stc.kis_interface_model import Rank_Request
 from backend.app.domains.system.mystock_model import MyStockDto
 from backend.app.domains.user.user_service import UserService
@@ -300,4 +309,103 @@ async def invest_opbysec(iscd:str, startYmd:str, endYmd:str):
     kis_api = await StockApiManager().kis_api()
     req = InvestOpbysec_Request(FID_INPUT_ISCD=iscd, FID_INPUT_DATE_1=startYmd, FID_INPUT_DATE_2=endYmd)
     response = await kis_api.invest_opbysec(req)
+    return response
+
+# 대차대조표
+@router.get("/balance-sheet/{stk_code}", response_model=BalanceSheet_Response)
+async def balance_sheet(stk_code:str, div_cls: str = Query(default="1")):
+    '''대차대조표 '''
+    kis_api = await StockApiManager().kis_api()
+    req =  BalanceSheet_Request(FID_DIV_CLS_CODE=div_cls, fid_input_iscd=stk_code)
+    response = await kis_api.balance_sheet(req)
+    return response
+
+# 손익계산서
+@router.get("/income-statement/{stk_code}", response_model=IncomeStatement_Response)
+async def income_statement(stk_code:str, div_cls: str = Query(default="1")):
+    '''손익계산서 '''
+    kis_api = await StockApiManager().kis_api()
+    req =  IncomeStatement_Request(FID_DIV_CLS_CODE=div_cls, fid_input_iscd=stk_code)
+    response = await kis_api.income_statement(req)
+    return response
+
+# 재무비율
+@router.get("/financial-ratio/{stk_code}", response_model=FinancialRatio_Response)
+async def financial_ratio(stk_code:str, div_cls: str = Query(default="1")):
+    '''재무비율 '''
+    kis_api = await StockApiManager().kis_api()
+    req =  FinancialRatio_Request(FID_DIV_CLS_CODE=div_cls, fid_input_iscd=stk_code)
+    response = await kis_api.financial_ratio(req)
+    return response
+
+# 수익성비율
+@router.get("/profit-ratio/{stk_code}", response_model=ProfitRatio_Response)
+async def profit_ratio(stk_code:str, div_cls: str = Query(default="1")):
+    '''수익성비율 '''
+    kis_api = await StockApiManager().kis_api()
+    req =  ProfitRatio_Request(FID_DIV_CLS_CODE=div_cls, fid_input_iscd=stk_code)
+    response = await kis_api.profit_ratio(req)
+    return response
+
+# 기타주요비율
+@router.get("/other-major-ratios/{stk_code}", response_model=OtherMajorRatios_Response)
+async def other_major_ratios(stk_code:str, div_cls: str = Query(default="1")):
+    '''기타주요비율 '''
+    kis_api = await StockApiManager().kis_api()
+    req =  OtherMajorRatios_Request(fid_input_iscd=stk_code, fid_div_cls_code=div_cls)
+    response = await kis_api.other_major_ratios(req)
+    return response
+
+# 안정성비율
+@router.get("/stability-ratio/{stk_code}", response_model=StabilityRatio_Response)
+async def stability_ratio(stk_code:str, div_cls: str = Query(default="1")):
+    '''안정성비율 '''
+    kis_api = await StockApiManager().kis_api()
+    req =  StabilityRatio_Request(fid_input_iscd=stk_code, fid_div_cls_code=div_cls)
+    response = await kis_api.stability_ratio(req)
+    return response
+
+# 성장성비율
+@router.get("/growth-ratio/{stk_code}", response_model=GrowthRatio_Response)
+async def growth_ratio(stk_code:str, div_cls: str = Query(default="1")):
+    '''성장성비율 '''
+    kis_api = await StockApiManager().kis_api()
+    req =  GrowthRatio_Request(fid_input_iscd=stk_code, fid_div_cls_code=div_cls)
+    response = await kis_api.growth_ratio(req)
+    return response
+
+# 국내기관_외국인 매매종목가집계
+@router.get("/foreign-institution-total/", response_model=ForeignInstitutionTotal_Response)
+async def foreign_institution_total(
+                                    is_cd: str = Query(default="0000"),
+                                    div_cls: str = Query(default="1"),
+                                    rank_sort_cls_code: str = Query(default="0"),
+                                    etc_cls_code: str = Query(default="0")
+                                ):
+    '''국내기관_외국인 매매종목가집계 '''
+    '''
+    FID_INPUT_ISCD: str = '0000' # 입력 종목코드 0000:전체, 0001:코스피, 1001:코스닥 ... 포탈 (FAQ : 종목정보 다운로드(국내) - 업종코드 참조)
+    FID_DIV_CLS_CODE: str = '1' # 분류 구분 코드 0: 수량정열, 1: 금액정열
+    FID_RANK_SORT_CLS_CODE: str = '0' # 순위 정렬 구분 코드 0: 순매수상위, 1: 순매도상위
+    FID_ETC_CLS_CODE: str = '0' # 기타 구분 정렬 0:전체 1:외국인 2:기관계 3:기타    
+    '''
+    kis_api = await StockApiManager().kis_api()
+    req =  ForeignInstitutionTotal_Request(FID_INPUT_ISCD=is_cd,
+                                        FID_DIV_CLS_CODE=div_cls,
+                                        FID_RANK_SORT_CLS_CODE=rank_sort_cls_code,
+                                        FID_ETC_CLS_CODE=etc_cls_code
+                                        )
+    response = await kis_api.foreign_institution_total(req)
+    return response
+
+# 종목별일별매수매도체결량
+@router.get("/inquire-daily-trade-volume/{frYmd}/{toYmd}/{stk_code}", response_model=InquireDailyTradeVolume_Response)
+async def inquire_daily_trade_volume(frYmd:str, toYmd:str, stk_code:str):
+    '''종목별일별매수매도체결량 '''
+    kis_api = await StockApiManager().kis_api()
+    req =  InquireDailyTradeVolume_Request(FID_INPUT_ISCD=stk_code,
+                                        FID_INPUT_DATE_1=frYmd,
+                                        FID_INPUT_DATE_2=toYmd
+                                        )
+    response = await kis_api.inquire_daily_trade_volume(req)
     return response

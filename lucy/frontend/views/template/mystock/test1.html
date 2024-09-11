@@ -1,0 +1,111 @@
+{% extends 'common/base.html' %}
+{% block style %}
+{% endblock %}
+{% block content %}
+<h1>테스트</h1>
+<div>
+    <button id="apitest1">대차대조표</button>
+    <button id="apitest2">손익계산서</button>
+    <button id="apitest3">재무비율</button>
+    <button id="apitest4">수익성비율</button>
+    <button id="apitest5">기타주요비율</button>
+    <button id="apitest6">안정성비율</button>
+    <button id="apitest7">성장성비율</button>
+    <button id="apitest8">기관-외국인 매매종목</button>
+    <button id="apitest9">종목별일별매수매도체결량</button>
+</div>
+{% raw %}
+<!--handlebar scripts-->
+{% endraw %}
+{% endblock %}
+{% block script %}
+{% raw %}
+<script>
+$( document ).ready(function() {
+    $('#apitest1').click(function(){
+        console.log('대차대조표');
+        const url = '/api/v1/kis/balance-sheet/005930';
+        getFetch(url).then(data => {
+            console.log(data); 
+        }).catch(error=> {
+            console.error(error.message); 
+        });
+    });
+    $('#apitest2').click(function(){
+        console.log('손익계산서');
+        const url = '/api/v1/kis/income-statement/005930';
+        getFetch(url).then(data => {
+            console.log(data); 
+        }).catch(error=> {
+            console.error(error.message); 
+        });
+    });
+    $('#apitest3').click(function(){
+        console.log('재무비율');
+        const url = '/api/v1/kis/financial-ratio/005930';
+        getFetch(url).then(data => {
+            console.log(data); 
+        }).catch(error=> {
+            console.error(error.message); 
+        });
+    });
+    $('#apitest4').click(function(){
+        console.log('수익성비율');
+        const url = '/api/v1/kis/profit-ratio/005930';
+        getFetch(url).then(data => {
+            console.log(data); 
+        }).catch(error=> {
+            console.error(error.message); 
+        });
+    });
+    $('#apitest5').click(function(){
+        console.log('기타주요비율');
+        const url = '/api/v1/kis/other-major-ratios/005930';
+        getFetch(url).then(data => {
+            console.log(data); 
+        }).catch(error=> {
+            console.error(error.message); 
+        });
+    });
+    $('#apitest6').click(function(){
+        console.log('안정성비율');
+        const url = '/api/v1/kis/stability-ratio/005930';
+        getFetch(url).then(data => {
+            console.log(data); 
+        }).catch(error=> {
+            console.error(error.message); 
+        });
+    });
+    $('#apitest7').click(function(){
+        console.log('성장성비율');
+        const url = '/api/v1/kis/growth-ratio/005930';
+        getFetch(url).then(data => {
+            console.log(data); 
+        }).catch(error=> {
+            console.error(error.message); 
+        });
+    });
+    $('#apitest8').click(function(){
+        console.log('국내기관_외국인 매매종목가집계');
+        const url = '/api/v1/kis/foreign-institution-total';
+        getFetch(url).then(data => {
+            console.log(data); 
+        }).catch(error=> {
+            console.error(error.message); 
+        });
+    });
+    $('#apitest9').click(function(){
+        console.log('종목별일별매수매도체결량');
+        const toYmd = JuliaUtil.today('yyyyMMdd');
+        const frYmd = JuliaUtil.addDate(toYmd, 'year', -1);
+        const url = `/api/v1/kis/inquire-daily-trade-volume/${frYmd}/${toYmd}/005930`;
+        getFetch(url).then(data => {
+            console.log(data); 
+        }).catch(error=> {
+            console.error(error.message); 
+        });
+    });     
+});
+</script>
+{% endraw %}
+{% endblock %}
