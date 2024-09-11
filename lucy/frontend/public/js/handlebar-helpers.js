@@ -89,7 +89,22 @@
         } else {
             return options.inverse(this);
         }
-    });    
+    });
+    /**
+     * 소숫점 2자리까지만 표시
+     */
+    Handlebars.registerHelper('displayRate', function(value) {
+        // 문자열을 숫자로 변환
+        var num = parseFloat(value);
+    
+        // NaN 체크 (숫자가 아니면 원래 값을 반환)
+        if (isNaN(num)) {
+            return value;
+        }
+    
+        // 소수점 두 자리까지 출력 (정수면 0 추가)
+        return num.toFixed(2);
+    });        
     /**
      * displayYmd : 20200101 -> 2020-01-01
      */

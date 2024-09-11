@@ -70,10 +70,9 @@
                 <th>종류</th>
                 <th>종목코드</th>
                 <th>종목명</th>
-                <!-- <th class="text-end"><a href="#" data-field-name="price" class="sorting-header">현재가<i class="bi"></i></a></th> -->
-                <th class="text-end">현재가</th>
-                <th class="text-end">전일대비</th>
-                <th class="text-end">등락율</th>
+                <th class="text-end"><a href="#" data-field="price" class="sort-title">현재가<i class="bi"></i></a></th>
+                <th class="text-end"><a href="#" data-field="change" class="sort-title">전일대비<i class="bi"></i></a></th>
+                <th class="text-end"><a href="#" data-field="diff" class="sort-title">등락율<i class="bi"></i></a></th>
                 <th class="text-center">동작</th>
                 <th class="text-center">매수/매도 기준가</th>
             </tr>
@@ -85,9 +84,14 @@
                 <td>{{split_and_badge this.stk_types}}</td>
                 <td>{{goNaver this.stk_code}}</td>
                 <td>{{toggleCompanyCanvas this.stk_code this.stk_name}}</td>
-                <td  id="cost_{{stk_code}}" class="text-end">{{this.price}}</td>
-                <td  id="change_{{stk_code}}" class="text-end">{{this.change}}</td>
-                <td  id="diff_{{stk_code}}" class="text-end">{{this.diff}}</td>
+                <td  id="cost_{{stk_code}}" class="text-end">{{displayWon this.price}}</td>
+                {{#test 'Number(diff) < 0'}}
+                <td  id="change_{{stk_code}}" class="text-end text-primary">{{displayWon this.change}}</td>
+                <td  id="diff_{{stk_code}}" class="text-end text-primary">{{displayRate this.diff}}</td>
+                {{else}}
+                <td  id="change_{{stk_code}}" class="text-end text-danger">{{displayWon this.change}}</td>
+                <td  id="diff_{{stk_code}}" class="text-end text-danger">{{displayRate this.diff}}</td>
+                {{/test}}
                 <td class="ms-2 text-center">
                     {{#test 'stk_types.indexOf("관심") != -1'}}
                     <button class="btnAttensionDelete btn btn-warning btn-sm" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}" title="관심..삭제"><i class="bi bi-dash"></i></button>
@@ -201,10 +205,28 @@ function getCurrentCost() {
 }
 //handlebar helper 로 html을 만든다
 function renderTable(list){
-    const data = list;
+    //정렬
+    let fieldName = currentSort.field;
+    if(fieldName){
+        list.sort(function(a, b) {
+            let x = parseFloat(a[fieldName]);
+            let y = parseFloat(b[fieldName]);
+
+            if (x < y) return currentSort.direction === 'asc' ? -1 : 1;
+            if (x > y) return currentSort.direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }
+    //템플릿으로 html 생성 표현
     const template = Handlebars.compile(document.getElementById('mystock-template').innerHTML);
-    const html = template({list : data});
+    const html = template({list : list});
     $('#mystock-result-area').html(html);
+
+    // 아이콘 설정
+    const $resultArea = $('#mystock-result-area').find('table thead tr');
+    $resultArea.find('.sort-title i').removeClass('bi-arrow-up bi-arrow-down');  // 모든 아이콘 제거
+    var currentIcon = currentSort.direction === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down';
+    $resultArea.find('a[data-field="' + currentSort.field + '"] i').addClass(currentIcon);
 }
 // 아이콘 업데이트 함수
 function updateSortIcons() {
@@ -252,53 +274,53 @@ function init(){
         const stkCodes = data.map(item => String(item.stk_code)).join('');
         const url = '/api/v1/mystock/current_costs/' + stkCodes;
         getFetch(url).then(data2 => {
-            debugger;
+            // debugger;
             //data의 stk_code와 data2의 shcode가 같으면 그것을 합쳐서 current_lists에 넣는다.
             data.forEach(item => {
                 const found = data2.t8407OutBlock1.find(x => x.shcode == item.stk_code);
                 if(found){
-                    item.cost = found.price;
-                    item.change = found.change;
-                    item.diff = found.diff;
-                    item.price = found.price;
-                    item.sign = found.sign;
-                    item.change = found.change;
-                    item.diff = found.diff;
-                    item.volume = found.volume;
-                    item.offerho = found.offerho;
-                    item.bidho = found.bidho;
-                    item.cvolume = found.cvolume;
-                    item.chdegree = found.chdegree;
-                    item.open = found.open;
-                    item.high = found.high;
-                    item.low = found.low;
-                    item.value = found.value;
-                    item.offerrem = found.offerrem;
-                    item.bidrem = found.bidrem;
-                    item.totofferrem = found.totofferrem;
-                    item.totbidrem = found.totbidrem;
-                    item.jnilclose = found.jnilclose;
-                    item.uplmtprice = found.uplmtprice;
-                    item.dnlmtprice = found.dnlmtprice;
+                    item.cost = found.price;        // 현재가
+                    item.change = found.change;     // 전일대비
+                    item.diff = found.diff;         // 등락율
+                    item.price = found.price;       // 현재가
+                    item.sign = found.sign;         // 전일대비구분
+                    item.change = found.change;     // 전일대비
+                    item.diff = found.diff;         // 등락율
+                    item.volume = found.volume;     // 누적거래량
+                    item.offerho = found.offerho;   // 매도호가
+                    item.bidho = found.bidho;       // 매수호가
+                    item.cvolume = found.cvolume;   // 체결수량
+                    item.chdegree = found.chdegree; // 체결강도
+                    item.open = found.open;         // 시가
+                    item.high = found.high;         // 고가
+                    item.low = found.low;           // 저가
+                    item.value = found.value;       // 거래대금(백만)
+                    item.offerrem = found.offerrem; // 우선매도잔량
+                    item.bidrem = found.bidrem;     // 우선매수잔량
+                    item.totofferrem = found.totofferrem; // 총매도잔량
+                    item.totbidrem = found.totbidrem;     // 총매수잔량
+                    item.jnilclose = found.jnilclose;     // 전일종가
+                    item.uplmtprice = found.uplmtprice;   // 상한가
+                    item.dnlmtprice = found.dnlmtprice;   // 하한가
                 }
             });
             console.log(data2); 
             current_lists=data;
             renderTable(current_lists);
+            //현재가를 가져온다.
+            if(isMarketTime() == false){
+                $('#currentCostRefresh').prop('checked', false);
+            }
+            if(intervalId) clearInterval(intervalId);
+            if($('#currentCostRefresh').is(':checked') && isMarketTime()){
+                getCurrentCost();
+                intervalId=setInterval(getCurrentCost, 1000*10); //10초마다 현재가를 가져온다.
+            }            
         }).catch(error=> {
             console.error(error.message); 
         });
 
-        // renderTable(current_lists);
-        // //현재가를 가져온다.
-        // if(isMarketTime() == false){
-        //     $('#currentCostRefresh').prop('checked'; false);
-        // }
-        // if(intervalId) clearInterval(intervalId);
-        // if($('#currentCostRefresh').is(':checked') && isMarketTime()){
-        //     getCurrentCost();
-        //     intervalId=setInterval(getCurrentCost; 1000*10); //10초마다 현재가를 가져온다.
-        // }
+
     }).catch(error=> {
         console.error(error.message); 
         $('#mystock-result-area').html(error.message);
@@ -309,11 +331,15 @@ $( document ).ready(function() {
     //초기화
     init();
 
-    $('#mystock-result-area').on('click', '.sorting-header', function(e) {
+    $('#mystock-result-area').on('click', '.sort-title', function(e) {
         e.preventDefault();
         e.stopPropagation();
-        const fieldName = $(this).data('field-name');
-        sortTable(fieldName);
+        const fieldName = $(this).data('field');
+        console.log('sort:', fieldName);
+        var isAscending = currentSort.field === fieldName && currentSort.direction === 'asc';
+        currentSort.direction = isAscending ? 'desc' : 'asc';
+        currentSort.field = fieldName;
+        renderTable(current_lists);
     });
     
     $('#mystock-result-area').on("click", ".btnBaseCostsAutoset", function(e) {
