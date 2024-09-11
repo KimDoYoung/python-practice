@@ -85,9 +85,9 @@
                 <td>{{split_and_badge this.stk_types}}</td>
                 <td>{{goNaver this.stk_code}}</td>
                 <td>{{toggleCompanyCanvas this.stk_code this.stk_name}}</td>
-                <td  id="cost_{{stk_code}}" class="text-end">-</td>
-                <td  id="change_{{stk_code}}" class="text-end">-</td>
-                <td  id="diff_{{stk_code}}" class="text-end">-</td>
+                <td  id="cost_{{stk_code}}" class="text-end">{{this.price}}</td>
+                <td  id="change_{{stk_code}}" class="text-end">{{this.change}}</td>
+                <td  id="diff_{{stk_code}}" class="text-end">{{this.diff}}</td>
                 <td class="ms-2 text-center">
                     {{#test 'stk_types.indexOf("관심") != -1'}}
                     <button class="btnAttensionDelete btn btn-warning btn-sm" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}" title="관심..삭제"><i class="bi bi-dash"></i></button>
@@ -105,7 +105,9 @@
                     <input type="number" class="form-control form-control-sm buyBaseCost me-1" style="width:120px" value="{{this.buy_base_price}}" placeholder="매수 기준가" step="100"> 
                     <input type="number" class="form-control form-control-sm sellBaseCost me-1" style="width:120px"  value="{{this.sell_base_price}}" placeholder="매도 기준가"  step="100"> 
                     <button class="btn btn-primary btn-sm btnBaseCostsSave me-1" title="매수/매도 기준가격 저장" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}"><i class="bi bi-floppy"></i></button>
-                    <button class="btn btn-success btn-sm btnBaseCostsAutoset" title="매수/매도 기준가격 자동설정(-3,+5%)" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}"><i class="bi bi-arrows-expand-vertical"></i></button>
+                    <button class="btn btn-success btn-sm btnBaseCostsAutoset me-1" title="매수/매도 기준가격 자동설정(-3;+5%)" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}"><i class="bi bi-arrows-expand-vertical"></i></button>
+                    <button class="btnBuy btn btn-danger btn-sm me-1" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}" title="매수(buy)">買</button>
+                    <button class="btnSell btn btn-primary btn-sm" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}" title="매도(sell)">賣</button>
                 </td>
             </tr>
             {{/each}}
@@ -133,14 +135,11 @@ let current_lists = [];
 let currentSort = { field: null, direction: 'asc' };
 // 문자열을 잘라서 bootstrap5 뱃지로 만든다.
 Handlebars.registerHelper('split_and_badge', function(stk_types) {
-    // stk_types 문자열을 공백 기준으로 나누기
     // debugger;
-    // const typesArray = stk_types.split(' ');
     typesArray = stk_types;
     // 각 요소를 Bootstrap 배지로 감싸기
     const badges = typesArray.map(type => {
         let badgeClass = '';
-
         // type에 따라 배지 색상을 설정
         switch (type) {
             case '보유':
@@ -165,7 +164,8 @@ Handlebars.registerHelper('split_and_badge', function(stk_types) {
 
 //현재가격을 가져오기
 function getCurrentCost() {
-    if (current_lists.length == 0) {
+    //리스트가 없거나 check가 false이거나 시장시간이 아니면 return
+    if (current_lists.length == 0 || !$('#currentCostRefresh').is(':checked') || !isMarketTime()) {
         return;
     }
     if($('#currentCostRefresh').is(':checked') == false){
@@ -199,11 +199,11 @@ function getCurrentCost() {
         showAlertError(error); 
     });
 }
-function renderTable(){
-    const data = current_lists;
+//handlebar helper 로 html을 만든다
+function renderTable(list){
+    const data = list;
     const template = Handlebars.compile(document.getElementById('mystock-template').innerHTML);
     const html = template({list : data});
-    current_lists = data;
     $('#mystock-result-area').html(html);
 }
 // 아이콘 업데이트 함수
@@ -232,18 +232,73 @@ function sortTable(fieldName){
     // 아이콘 업데이트
     updateSortIcons();
 }
-//초기화 mystock 가져오기, 현재가 가져오기
+//현재시간인 오전9시 ~ 오후3시30분 사이인지 확인   
+function isMarketTime(){
+    const now = new Date();
+    const day = now.getDay();
+    const hour = now.getHours();
+    const minute = now.getMinutes();
+    if(day == 0 || day == 6) return false; //토요일; 일요일은 false
+    if(hour < 9 || hour > 15) return false; //오전9시 ~ 오후3시30분
+    if(hour == 15 && minute > 30) return false;
+    return true;
+}
+//초기화 mystock 가져오기; 현재가 가져오기
 function init(){
     getFetch('/api/v1/mystock').then(data => {
         console.log(data); 
-        current_lists = data;
-        renderTable();
-        //현재가를 가져온다.
-        if(intervalId) clearInterval(intervalId);
-        if($('#currentCostRefresh').is(':checked')){
-            getCurrentCost();
-            intervalId=setInterval(getCurrentCost, 1000*10); //10초마다 현재가를 가져온다.
-        }
+        //current_lists = data;
+        //처음1번은 가격을 가져온다.
+        const stkCodes = data.map(item => String(item.stk_code)).join('');
+        const url = '/api/v1/mystock/current_costs/' + stkCodes;
+        getFetch(url).then(data2 => {
+            debugger;
+            //data의 stk_code와 data2의 shcode가 같으면 그것을 합쳐서 current_lists에 넣는다.
+            data.forEach(item => {
+                const found = data2.t8407OutBlock1.find(x => x.shcode == item.stk_code);
+                if(found){
+                    item.cost = found.price;
+                    item.change = found.change;
+                    item.diff = found.diff;
+                    item.price = found.price;
+                    item.sign = found.sign;
+                    item.change = found.change;
+                    item.diff = found.diff;
+                    item.volume = found.volume;
+                    item.offerho = found.offerho;
+                    item.bidho = found.bidho;
+                    item.cvolume = found.cvolume;
+                    item.chdegree = found.chdegree;
+                    item.open = found.open;
+                    item.high = found.high;
+                    item.low = found.low;
+                    item.value = found.value;
+                    item.offerrem = found.offerrem;
+                    item.bidrem = found.bidrem;
+                    item.totofferrem = found.totofferrem;
+                    item.totbidrem = found.totbidrem;
+                    item.jnilclose = found.jnilclose;
+                    item.uplmtprice = found.uplmtprice;
+                    item.dnlmtprice = found.dnlmtprice;
+                }
+            });
+            console.log(data2); 
+            current_lists=data;
+            renderTable(current_lists);
+        }).catch(error=> {
+            console.error(error.message); 
+        });
+
+        // renderTable(current_lists);
+        // //현재가를 가져온다.
+        // if(isMarketTime() == false){
+        //     $('#currentCostRefresh').prop('checked'; false);
+        // }
+        // if(intervalId) clearInterval(intervalId);
+        // if($('#currentCostRefresh').is(':checked') && isMarketTime()){
+        //     getCurrentCost();
+        //     intervalId=setInterval(getCurrentCost; 1000*10); //10초마다 현재가를 가져온다.
+        // }
     }).catch(error=> {
         console.error(error.message); 
         $('#mystock-result-area').html(error.message);
@@ -266,9 +321,9 @@ $( document ).ready(function() {
         e.preventDefault();
         const stk_code = $(this).data('stk-code');
         let currentCost = $('#mystock-result-area').find('#cost_'+stk_code).text();
-        //매수는 현재가격보다 3% 낮게, 매도는 현재가격보다 5% 높게 설정한다.
-        let buy_cost = Math.floor(Number(currentCost.replace(/,/g, '')) * 0.97);
-        let sell_cost = Math.floor(Number(currentCost.replace(/,/g, '')) * 1.05);
+        //매수는 현재가격보다 3% 낮게; 매도는 현재가격보다 5% 높게 설정한다.
+        let buy_cost = Math.floor(Number(currentCost.replace(/;/g, '')) * 0.97);
+        let sell_cost = Math.floor(Number(currentCost.replace(/;/g, '')) * 1.05);
         $(this).parent().find('.buyBaseCost').val(buy_cost);
         $(this).parent().find('.sellBaseCost').val(sell_cost);
     });
