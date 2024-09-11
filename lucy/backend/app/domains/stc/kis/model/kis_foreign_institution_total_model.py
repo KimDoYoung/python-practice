@@ -11,12 +11,12 @@
 from backend.app.domains.stock_api_base_model import StockApiBaseModel
 
 class ForeignInstitutionTotal_Request(StockApiBaseModel):
-    FID_COND_MRKT_DIV_CODE: str # 시장 분류 코드 V(Default)
+    FID_COND_MRKT_DIV_CODE: str = 'V' # 시장 분류 코드 V(Default)
     FID_COND_SCR_DIV_CODE: str # 조건 화면 분류 코드 16449(Default)
-    FID_INPUT_ISCD: str # 입력 종목코드 0000:전체, 0001:코스피, 1001:코스닥 ... 포탈 (FAQ : 종목정보 다운로드(국내) - 업종코드 참조)
-    FID_DIV_CLS_CODE: str # 분류 구분 코드 0: 수량정열, 1: 금액정열
-    FID_RANK_SORT_CLS_CODE: str # 순위 정렬 구분 코드 0: 순매수상위, 1: 순매도상위
-    FID_ETC_CLS_CODE: str # 기타 구분 정렬 0:전체 1:외국인 2:기관계 3:기타
+    FID_INPUT_ISCD: str = '0000' # 입력 종목코드 0000:전체, 0001:코스피, 1001:코스닥 ... 포탈 (FAQ : 종목정보 다운로드(국내) - 업종코드 참조)
+    FID_DIV_CLS_CODE: str = '1' # 분류 구분 코드 0: 수량정열, 1: 금액정열
+    FID_RANK_SORT_CLS_CODE: str = '0' # 순위 정렬 구분 코드 0: 순매수상위, 1: 순매도상위
+    FID_ETC_CLS_CODE: str = '0' # 기타 구분 정렬 0:전체 1:외국인 2:기관계 3:기타
 
 class ForeignInstitutionTotalItem(StockApiBaseModel):
     hts_kor_isnm: str # HTS 한글 종목명 

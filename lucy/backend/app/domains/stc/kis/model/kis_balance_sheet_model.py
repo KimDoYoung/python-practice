@@ -12,8 +12,8 @@ from backend.app.domains.stock_api_base_model import StockApiBaseModel
 
 
 class BalanceSheet_Request(StockApiBaseModel):
-    FID_DIV_CLS_CODE: str # 분류 구분 코드 0: 년, 1: 분기
-    fid_cond_mrkt_div_code: str # 조건 시장 분류 코드 J
+    FID_DIV_CLS_CODE: str = '1' # 분류 구분 코드 0: 년, 1: 분기
+    fid_cond_mrkt_div_code: str = 'J' # 조건 시장 분류 코드 J
     fid_input_iscd: str # 입력 종목코드 000660 : 종목코드
 
 class BalanceSheetItem(StockApiBaseModel):

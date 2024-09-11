@@ -10,11 +10,11 @@
 from typing import List
 from backend.app.domains.stock_api_base_model import StockApiBaseModel
 class InquireDailyTradeVolume_Request(StockApiBaseModel):
-    FID_COND_MRKT_DIV_CODE: str # FID 조건 시장 분류 코드 J
+    FID_COND_MRKT_DIV_CODE: str = 'J' # FID 조건 시장 분류 코드 J
     FID_INPUT_ISCD: str # FID 입력 종목코드 005930
     FID_INPUT_DATE_1: str # FID 입력 날짜1 from
     FID_INPUT_DATE_2: str # FID 입력 날짜2 to
-    FID_PERIOD_DIV_CODE: str # FID 기간 분류 코드 D
+    FID_PERIOD_DIV_CODE: str = 'D' # FID 기간 분류 코드 D
 
 class InquireDailyTradeVolume(StockApiBaseModel):
     shnu_cnqn_smtn: str # 매수 체결량 합계

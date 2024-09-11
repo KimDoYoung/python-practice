@@ -42,10 +42,15 @@ from backend.app.domains.stc.kis.model.inquire_time_itemchartprice_model import 
 from backend.app.domains.stc.kis.model.invest_opbysec_model import InvestOpbysec_Request, InvestOpbysec_Response
 from backend.app.domains.stc.kis.model.invest_opinion_model import InvestOpinion_Request, InvestOpinion_Response
 from backend.app.domains.stc.kis.model.kis_after_hour_balance_model import AfterHourBalance_Request, AfterHourBalance_Response
+from backend.app.domains.stc.kis.model.kis_balance_sheet_model import BalanceSheet_Request, BalanceSheet_Response
 from backend.app.domains.stc.kis.model.kis_chk_holiday_model import ChkWorkingDay_Response
+from backend.app.domains.stc.kis.model.kis_foreign_institution_total_model import ForeignInstitutionTotal_Request, ForeignInstitutionTotal_Response
+from backend.app.domains.stc.kis.model.kis_growth_ratio_model import GrowthRatio_Request, GrowthRatio_Response
+from backend.app.domains.stc.kis.model.kis_income_statement_model import IncomeStatement_Request, IncomeStatement_Response
 from backend.app.domains.stc.kis.model.kis_inquire_balance_model import KisInquireBalance_Response
 from backend.app.domains.stc.kis.model.kis_inquire_daily_ccld_model import InquireDailyCcld_Response, InquireDailyCcld_Request
 from backend.app.domains.stc.kis.model.kis_inquire_daily_itemchartprice import InquireDailyItemchartprice_Request, InquireDailyItemchartprice_Response
+from backend.app.domains.stc.kis.model.kis_inquire_daily_trade_volume_model import InquireDailyTradeVolume_Request, InquireDailyTradeVolume_Response
 from backend.app.domains.stc.kis.model.kis_inquire_price import InquirePrice_Response
 from backend.app.domains.stc.kis.model.kis_inquire_psbl_rvsecncl_model import InquirePsblRvsecncl_Response
 from backend.app.domains.stc.kis.model.kis_inquire_psbl_sell_model import InquirePsblSell_Response
@@ -55,10 +60,14 @@ from backend.app.domains.stc.kis.model.kis_intstock_grouplist import IntstockGro
 from backend.app.domains.stc.kis.model.kis_intstock_multiprice import IntstockMultprice_Response
 from backend.app.domains.stc.kis.model.kis_intstock_stocklist_by_group import IntstockStocklistByGroup_Response
 from backend.app.domains.stc.kis.model.kis_order_cash_model import KisOrderRvsecncl_Request, OrderCash_Request, KisOrderCash_Response, KisOrderCancel_Response
+from backend.app.domains.stc.kis.model.kis_other_major_ratios_model import OtherMajorRatios_Request, OtherMajorRatios_Response
+from backend.app.domains.stc.kis.model.kis_profit_ratio_model import ProfitRatio_Request, ProfitRatio_Response
 from backend.app.domains.stc.kis.model.kis_psearch_result_model import PsearchResult_Response
 from backend.app.domains.stc.kis.model.kis_quote_balance_model import QuoteBalance_Request, QuoteBalance_Response
 from backend.app.domains.stc.kis.model.kis_search_stock_info_model import SearchStockInfo_Response
 from backend.app.domains.stc.kis.model.kis_psearch_title_model import PsearchTitle_Result
+from backend.app.domains.stc.kis.model.kis_stability_ratio_model import StabilityRatio_Request, StabilityRatio_Response
+from backend.app.domains.stc.kis.model.kist_financial_ratio_model import FinancialRatio_Request, FinancialRatio_Response
 from backend.app.domains.stc.stock_api import StockApi
 from backend.app.domains.user.user_model import StkAccount, User
 from backend.app.core.exception.lucy_exception import AccessTokenExpireException, AccessTokenInvalidException, InvalidResponseException, KisApiException
@@ -923,5 +932,235 @@ class KisStockApi(StockApi):
         logger.debug(f"주식현재가 일자별: {json_response}")
         try:
             return InquireDailyPrice_Response(**json_response)
+        except ValidationError as e:
+            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
+    
+    async def balance_sheet(self, req:BalanceSheet_Request)-> BalanceSheet_Response:
+        ''' 국내주식-대차대조표 '''
+        logger.info(f" 국내주식-대차대조표")
+        url = self.BASE_URL + "/uapi/domestic-stock/v1/finance/balance-sheet"
+        
+        params = {
+            "FID_DIV_CLS_CODE": req.FID_DIV_CLS_CODE , #분류 구분 코드 0: 년, 1: 분기"
+            "fid_cond_mrkt_div_code": req.fid_cond_mrkt_div_code , #조건 시장 분류 코드 J"
+            "fid_input_iscd": req.fid_input_iscd #입력 종목코드 000660 : 종목코드"
+        }   
+        headers ={
+            "content-type": "application/json; charset=utf-8",
+            "authorization": f"Bearer {self.ACCESS_TOKEN}",
+            "appkey": self.APP_KEY,
+            "appsecret": self.APP_SECRET,
+            "tr_id": "FHKST66430100",
+            "custtype": "P", #B : 법인 P : 개인"",
+        }    
+        json_response = await self.send_request(' 국내주식-대차대조표', 'GET', url, headers, params=params)
+        logger.debug(f" 국내주식-대차대조표: {json_response}")
+        try:
+            return BalanceSheet_Response(**json_response)
+        except ValidationError as e:
+            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
+
+    async def income_statement(self, req:IncomeStatement_Request)-> IncomeStatement_Response:
+        ''' 국내주식-손익계산서 '''
+        logger.info(f" 국내주식-손익계산서")
+        url = self.BASE_URL + "/uapi/domestic-stock/v1/finance/income-statement"
+        
+        params = {
+            "FID_DIV_CLS_CODE": req.FID_DIV_CLS_CODE ,#분류 구분 코드 0: 년, 1: 분기 ※ 분기데이터는 연단위 누적합산",
+            "fid_cond_mrkt_div_code": req.fid_cond_mrkt_div_code ,#조건 시장 분류 코드 J",
+            "fid_input_iscd": req.fid_input_iscd ,#입력 종목코드 000660 : 종목코드",
+        }   
+        headers ={
+            "content-type": "application/json; charset=utf-8",
+            "authorization": f"Bearer {self.ACCESS_TOKEN}",
+            "appkey": self.APP_KEY,
+            "appsecret": self.APP_SECRET,
+            "tr_id": "FHKST66430200",
+            "custtype": "P" # "B : 법인 P : 개인",
+        }    
+        json_response = await self.send_request(' 국내주식-손익계산서', 'GET', url, headers, params=params)
+        logger.debug(f" 국내주식-손익계산서: {json_response}")
+        try:
+            return IncomeStatement_Response(**json_response)
+        except ValidationError as e:
+            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
+    
+    async def financial_ratio(self, req:FinancialRatio_Request)-> FinancialRatio_Response:
+        ''' 국내주식 재무비율 '''
+        logger.info(f" 국내주식 재무비율")
+        url = self.BASE_URL + "/uapi/domestic-stock/v1/finance/financial-ratio"
+        
+        params = {
+            "FID_DIV_CLS_CODE":req.FID_DIV_CLS_CODE ,#분류 구분 코드 0: 년, 1: 분기",
+            "fid_cond_mrkt_div_code": req.fid_cond_mrkt_div_code ,#조건 시장 분류 코드 J",
+            "fid_input_iscd": req.fid_input_iscd ,#입력 종목코드 000660 : 종목코드",
+        }   
+        headers ={
+            "content-type": "application/json; charset=utf-8",
+            "authorization": f"Bearer {self.ACCESS_TOKEN}",
+            "appkey": self.APP_KEY,
+            "appsecret": self.APP_SECRET,
+            "tr_id": "FHKST66430300",
+            "custtype": 'P' #"B : 법인 P : 개인",
+        }    
+        json_response = await self.send_request(' 국내주식 재무비율', 'GET', url, headers, params=params)
+        logger.debug(f" 국내주식 재무비율: {json_response}")
+        try:
+            return FinancialRatio_Response(**json_response)
+        except ValidationError as e:
+            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
+
+    async def profit_ratio(self, req:ProfitRatio_Request)-> ProfitRatio_Response:
+        ''' 국내주식 수익성비율 '''
+        logger.info(f" 국내주식 수익성비율")
+        url = self.BASE_URL + "/uapi/domestic-stock/v1/finance/profit-ratio"
+        
+        params = {
+                "fid_input_iscd": req.fid_input_iscd ,#입력 종목코드 000660 : 종목코드",
+                "FID_DIV_CLS_CODE": req.FID_DIV_CLS_CODE ,#분류 구분 코드 0: 년, 1: 분기",
+                "fid_cond_mrkt_div_code": req.fid_cond_mrkt_div_code ,#조건 시장 분류 코드 J",
+        }   
+        headers ={
+                "content-type": "application/json; charset=utf-8",
+                "authorization": f"Bearer {self.ACCESS_TOKEN}",
+                "appkey": self.APP_KEY,
+                "appsecret": self.APP_SECRET,
+                "tr_id": "FHKST66430400",
+                "custtype": "P" #"B : 법인 P : 개인",
+        }    
+        json_response = await self.send_request(' 국내주식 수익성비율', 'GET', url, headers, params=params)
+        logger.debug(f" 국내주식 수익성비율: {json_response}")
+        try:
+            return ProfitRatio_Response(**json_response)
+        except ValidationError as e:
+            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
+        
+    async def other_major_ratios(self, req:OtherMajorRatios_Request)-> OtherMajorRatios_Response:
+        ''' 국내주식 기타주요비율 '''
+        logger.info(f" 국내주식 기타주요비율")
+        url = self.BASE_URL + "/uapi/domestic-stock/v1/finance/other-major-ratios"
+        
+        params = {
+                "fid_input_iscd": req.fid_input_iscd , #"입력 종목코드 000660 : 종목코드",
+                "fid_div_cls_code": req.fid_div_cls_code , #"분류 구분 코드 0: 년, 1: 분기",
+                "fid_cond_mrkt_div_code": req.fid_cond_mrkt_div_code , #"조건 시장 분류 코드 J",
+        }   
+        headers ={
+            "content-type": "application/json; charset=utf-8",
+            "authorization": f"Bearer {self.ACCESS_TOKEN}",
+            "appkey": self.APP_KEY,
+            "appsecret": self.APP_SECRET,
+            "tr_id": "FHKST66430500",
+            "custtype": "P" # "B : 법인 P : 개인",
+        }    
+        json_response = await self.send_request(' 국내주식 기타주요비율', 'GET', url, headers, params=params)
+        logger.debug(f" 국내주식 기타주요비율: {json_response}")
+        try:
+            return OtherMajorRatios_Response(**json_response)
+        except ValidationError as e:
+            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
+
+    async def stability_ratio(self, req:StabilityRatio_Request)-> StabilityRatio_Response:
+        ''' 국내주식 안정성비율 '''
+        logger.info(f" 국내주식 안정성비율")
+        url = self.BASE_URL + "/uapi/domestic-stock/v1/finance/stability-ratio"
+        
+        params = {
+            "fid_input_iscd": req.fid_input_iscd , # 입력 종목코드 000660 : 종목코드",
+            "fid_div_cls_code": req.fid_div_cls_code , # 분류 구분 코드 0: 년, 1: 분기",
+            "fid_cond_mrkt_div_code": req.fid_cond_mrkt_div_code , # 조건 시장 분류 코드 J",
+        }   
+        headers ={
+            "content-type": "application/json; charset=utf-8",
+            "authorization": f"Bearer {self.ACCESS_TOKEN}",
+            "appkey": self.APP_KEY,
+            "appsecret": self.APP_SECRET,
+            "tr_id": "FHKST66430600",
+            "custtype": "P" # B : 법인 P : 개인",
+        }    
+        json_response = await self.send_request(' 국내주식 안정성비율', 'GET', url, headers, params=params)
+        logger.debug(f" 국내주식 안정성비율: {json_response}")
+        try:
+            return StabilityRatio_Response(**json_response)
+        except ValidationError as e:
+            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
+
+    async def growth_ratio(self, req:GrowthRatio_Request)-> GrowthRatio_Response:
+        ''' 국내주식 성장성비율 '''
+        logger.info(f" 국내주식 성장성비율")
+        url = self.BASE_URL + "/uapi/domestic-stock/v1/finance/growth-ratio"
+        
+        params = {
+            "fid_input_iscd": req.fid_input_iscd , # 입력 종목코드 000660 : 종목코드",
+            "fid_div_cls_code": req.fid_div_cls_code , #분류 구분 코드 0: 년, 1: 분기",
+            "fid_cond_mrkt_div_code": req.fid_cond_mrkt_div_code , #조건 시장 분류 코드 J",
+        }   
+        headers ={
+            "content-type": "application/json; charset=utf-8",
+            "authorization": f"Bearer {self.ACCESS_TOKEN}",
+            "appkey": self.APP_KEY,
+            "appsecret": self.APP_SECRET,
+            "tr_id": "FHKST66430600",
+            "custtype": "P" # "B : 법인 P : 개인",
+        }    
+        json_response = await self.send_request(' 국내주식 성장성비율', 'GET', url, headers, params=params)
+        logger.debug(f" 국내주식 성장성비율: {json_response}")
+        try:
+            return GrowthRatio_Response(**json_response)
+        except ValidationError as e:
+            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
+
+    async def foreign_institution_total(self, req:ForeignInstitutionTotal_Request)-> ForeignInstitutionTotal_Response:
+        ''' 국내기관_외국인 매매종목가집계 '''
+        logger.info(f" 국내기관_외국인 매매종목가집계")
+        url = self.BASE_URL + "/uapi/domestic-stock/v1/quotations/foreign-institution-total"
+        
+        params = {
+            "FID_COND_MRKT_DIV_CODE": req.FID_COND_MRKT_DIV_CODE , # 시장 분류 코드 V(Default)",
+            "FID_COND_SCR_DIV_CODE": req.FID_COND_SCR_DIV_CODE , # 조건 화면 분류 코드 16449(Default)",
+            "FID_INPUT_ISCD": req.FID_INPUT_ISCD , # 입력 종목코드 0000:전체, 0001:코스피, 1001:코스닥 ... 포탈 (FAQ : 종목정보 다운로드(국내) - 업종코드 참조)",
+            "FID_DIV_CLS_CODE": req.FID_DIV_CLS_CODE , # 분류 구분 코드 0: 수량정열, 1: 금액정열",
+            "FID_RANK_SORT_CLS_CODE": req.FID_RANK_SORT_CLS_CODE , # 순위 정렬 구분 코드 0: 순매수상위, 1: 순매도상위",
+            "FID_ETC_CLS_CODE": req.FID_ETC_CLS_CODE , # 기타 구분 정렬 0:전체 1:외국인 2:기관계 3:기타",
+        }   
+        headers ={
+            "content-type": "application/json; charset=utf-8",
+            "authorization": f"Bearer {self.ACCESS_TOKEN}",
+            "appkey": self.APP_KEY,
+            "appsecret": self.APP_SECRET,
+            "tr_id": "FHPTJ04400000",
+            "custtype": "P" # B : 법인 P : 개인",
+        }    
+        json_response = await self.send_request(' 국내기관_외국인 매매종목가집계', 'GET', url, headers, params=params)
+        logger.debug(f" 국내기관_외국인 매매종목가집계: {json_response}")
+        try:
+            return ForeignInstitutionTotal_Response(**json_response)
+        except ValidationError as e:
+            raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")
+                
+    async def inquire_daily_trade_volume(self, req:InquireDailyTradeVolume_Request)-> InquireDailyTradeVolume_Response:
+        ''' 종목별일별매수매도체결량 '''
+        logger.info(f" 종목별일별매수매도체결량")
+        url = self.BASE_URL + "/uapi/domestic-stock/v1/quotations/inquire-daily-trade-volume"
+        
+        params = {
+            "FID_COND_MRKT_DIV_CODE":req.FID_COND_MRKT_DIV_CODE , # FID 조건 시장 분류 코드 J",
+            "FID_INPUT_ISCD": req.FID_INPUT_ISCD , # FID 입력 종목코드 005930",
+            "FID_INPUT_DATE_1": req.FID_INPUT_DATE_1 , # FID 입력 날짜1 from",
+            "FID_INPUT_DATE_2": req.FID_INPUT_DATE_2 , # FID 입력 날짜2 to",
+            "FID_PERIOD_DIV_CODE": req.FID_PERIOD_DIV_CODE , # FID 기간 분류 코드 D",
+        }   
+        headers ={
+            "content-type": "application/json; charset=utf-8",
+            "authorization": f"Bearer {self.ACCESS_TOKEN}",
+            "appkey": self.APP_KEY,
+            "appsecret": self.APP_SECRET,
+            "tr_id": "FHKST03010800",
+            "custtype": "P" # B : 법인 P : 개인",
+        }    
+        json_response = await self.send_request(' 종목별일별매수매도체결량', 'GET', url, headers, params=params)
+        logger.debug(f" 종목별일별매수매도체결량: {json_response}")
+        try:
+            return InquireDailyTradeVolume_Response(**json_response)
         except ValidationError as e:
             raise HTTPException(status_code=500, detail=f"Error parsing JSON: {e}")        
