@@ -124,11 +124,16 @@ def get_url_and_tables(url:str, main_menu:str, sub_menu:str):
             df_array.append(df)
         # Example 찾기
         example_div_parent = parent_div.find('div', class_='api_example_wrap')
-        example_divs = example_div_parent.find_all('div', class_='example_apicode_box')
-        example_array = []
-        for example_div in example_divs:
-            example_code = example_div.get_text(strip=True)
-            example_array.append(example_code)
+        if example_div_parent is None:
+            example_array = []
+            example_array.append("")
+            example_array.append("")
+        else:
+            example_divs = example_div_parent.find_all('div', class_='example_apicode_box')
+            example_array = []
+            for example_div in example_divs:
+                example_code = example_div.get_text(strip=True)
+                example_array.append(example_code)
 
     except TimeoutException :
         print("페이지 parsing 시간 초과")
@@ -323,8 +328,8 @@ if __name__ == "__main__":
     # main_menu  = "[국내주식] 주문계좌"
     # sub_menu = "주식통합증거금 현황 "
 
-    # main_menu  = "[국내주식] 시세분석"
-    # sub_menu = "관심종목(멀티종목) 시세조회 "
+    main_menu  = "[국내주식] 시세분석"
+    sub_menu = "국내기관_외국인 매매종목가집계"
 
     # main_menu  = "[국내주식] 기본시세분석"
     # sub_menu = "국내주식기간별시세(일/주/월/년)"
@@ -332,8 +337,8 @@ if __name__ == "__main__":
     # main_menu  = "[국내주식] 기본시세"
     # sub_menu = "주식현재가 시세2"
 
-    main_menu  = "[국내주식] 종목정보"
-    sub_menu = "국내주식 증권사별 투자의견 "
+    # main_menu  = "[국내주식] 종목정보"
+    # sub_menu = "국내주식 성장성비율"
 
     main(main_menu, sub_menu)
     print("Done!")

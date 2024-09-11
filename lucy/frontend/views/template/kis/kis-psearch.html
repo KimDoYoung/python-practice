@@ -44,10 +44,10 @@
         <div class="col-md-4 mb-4">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="card-title text-primary">{{this.name}}</h5>
+                    <h5 class="card-title text-primary">{{toggleCompanyCanvas this.code this.name}}</h5>
                     <div>
                         <button class="btnBuy btn btn-danger" data-stk-code="{{this.code}}" data-stk-name="{{this.name}}">買</button>
-                        <button class="btnAddDanta btn btn-primary" data-stk-code="{{this.code}}" data-stk-name="{{this.name}}">+</button>
+                        <button class="btnAddDanta btn btn-primary" data-stk-code="{{this.code}}" data-stk-name="{{this.name}}" title="관심 추가">+</button>
                     </div>
                 </div>
                 <div class="card-body">
