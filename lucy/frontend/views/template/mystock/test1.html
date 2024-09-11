@@ -14,6 +14,10 @@
     <button id="apitest8">기관-외국인 매매종목</button>
     <button id="apitest9">종목별일별매수매도체결량</button>
 </div>
+<div>
+    <h1 id="title"></h1>
+    <textarea name="result" id="result" style="width:100%; height:500px"></textarea>
+</div>
 {% raw %}
 <!--handlebar scripts-->
 {% endraw %}
@@ -27,6 +31,9 @@ $( document ).ready(function() {
         const url = '/api/v1/kis/balance-sheet/005930';
         getFetch(url).then(data => {
             console.log(data); 
+            //data를 문자열로 바꾸어서 result에 출력
+            $('#title').text("대차대조표");
+            $('#result').val(JSON.stringify(data));
         }).catch(error=> {
             console.error(error.message); 
         });
@@ -36,6 +43,8 @@ $( document ).ready(function() {
         const url = '/api/v1/kis/income-statement/005930';
         getFetch(url).then(data => {
             console.log(data); 
+            $('#title').text("손익계산서");
+            $('#result').val(JSON.stringify(data));
         }).catch(error=> {
             console.error(error.message); 
         });
@@ -45,6 +54,8 @@ $( document ).ready(function() {
         const url = '/api/v1/kis/financial-ratio/005930';
         getFetch(url).then(data => {
             console.log(data); 
+            $('#title').text("재무비율");
+            $('#result').val(JSON.stringify(data));
         }).catch(error=> {
             console.error(error.message); 
         });
@@ -54,6 +65,8 @@ $( document ).ready(function() {
         const url = '/api/v1/kis/profit-ratio/005930';
         getFetch(url).then(data => {
             console.log(data); 
+            $('#title').text("수익성비율");
+            $('#result').val(JSON.stringify(data));
         }).catch(error=> {
             console.error(error.message); 
         });
@@ -62,7 +75,9 @@ $( document ).ready(function() {
         console.log('기타주요비율');
         const url = '/api/v1/kis/other-major-ratios/005930';
         getFetch(url).then(data => {
-            console.log(data); 
+            console.log(data);
+            $('#title').text("기타주요비율");
+            $('#result').val(JSON.stringify(data)); 
         }).catch(error=> {
             console.error(error.message); 
         });
@@ -72,6 +87,8 @@ $( document ).ready(function() {
         const url = '/api/v1/kis/stability-ratio/005930';
         getFetch(url).then(data => {
             console.log(data); 
+            $('#title').text("안정성비율");
+            $('#result').val(JSON.stringify(data));
         }).catch(error=> {
             console.error(error.message); 
         });
@@ -80,7 +97,9 @@ $( document ).ready(function() {
         console.log('성장성비율');
         const url = '/api/v1/kis/growth-ratio/005930';
         getFetch(url).then(data => {
-            console.log(data); 
+            console.log(data);
+            $('#title').text("성장성비율");
+            $('#result').val(JSON.stringify(data));
         }).catch(error=> {
             console.error(error.message); 
         });
@@ -89,7 +108,9 @@ $( document ).ready(function() {
         console.log('국내기관_외국인 매매종목가집계');
         const url = '/api/v1/kis/foreign-institution-total';
         getFetch(url).then(data => {
-            console.log(data); 
+            console.log(data);
+            $('#title').text("국내기관_외국인 매매종목가집계");
+            $('#result').val(JSON.stringify(data));
         }).catch(error=> {
             console.error(error.message); 
         });
@@ -100,7 +121,9 @@ $( document ).ready(function() {
         const frYmd = JuliaUtil.addDate(toYmd, 'year', -1);
         const url = `/api/v1/kis/inquire-daily-trade-volume/${frYmd}/${toYmd}/005930`;
         getFetch(url).then(data => {
-            console.log(data); 
+            console.log(data);
+            $('#title').text("종목별일별매수매도체결량");
+            $('#result').val(JSON.stringify(data));
         }).catch(error=> {
             console.error(error.message); 
         });
