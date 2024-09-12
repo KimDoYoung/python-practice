@@ -103,7 +103,7 @@
                     {{else}}
                     <button class="btnDantaAdd btn btn-success btn-sm" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}" title="단타추가"><i class="bi bi-plus-circle"></i></button> 
                     {{/test}}
-                    <a href="/page?path=mystock/stock_detail&stk_code={{this.stk_code}}" class="btn btn-primary btn-sm" title="상세보기"><i class="bi bi-eye"></i></a>
+                    <a href="/page?path=mystock/stock_detail&stk_code={{this.stk_code}}" class="btn btn-primary btn-sm" title="상세보기" target="_blank"><i class="bi bi-eye"></i></a>
                 </td>
                 <td class="d-flex align-items-center">
                     <input type="number" class="form-control form-control-sm buyBaseCost me-1" style="width:120px" value="{{this.buy_base_price}}" placeholder="매수 기준가" step="100"> 

@@ -1,5 +1,14 @@
 # 코드 샘플
 
+## 종목명 offcanvas
+
+```html
+    회사정보
+    <td>{{toggleCompanyCanvas stck_shrn_iscd hts_kor_isnm}}</td>
+    상세보기
+    <a href="/page?path=mystock/stock_detail&stk_code={{this.stk_code}}" class="btn btn-primary btn-sm" title="상세보기" target="_blank"><i class="bi bi-eye"></i></a>
+```
+
 ## header sorting
 
 ```html
@@ -43,7 +52,7 @@ function makeTable() {
     const html = template({list});
     $('#result-area').html(html);
 
-        // 아이콘 설정
+    // 아이콘 설정
     const $resultArea = $('#result-area').find('table thead tr');
     $resultArea.find('.sort-title i').removeClass('bi-arrow-up bi-arrow-down');  // 모든 아이콘 제거
     var currentIcon = currentSort.direction === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down';
