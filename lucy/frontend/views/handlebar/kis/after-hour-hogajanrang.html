@@ -1,34 +1,44 @@
 {% raw %}
 <table class="table table-bordered table-hover table-sm">
-    <thead>
+    <thead class="table-warning">
         <tr>
-            <th class="align-middle">종목코드</th>
-            <th class="align-middle">순위</th>
-            <th class="align-middle">종목명</th>
-            <th class="align-middle">현재가</th>
-            <th class="align-middle">전일 대비</th>
-            <th class="align-middle">전일 대비 부호</th>
-            <th class="align-middle">전일 대비율</th>
-            <th class="align-middle">시간외 총 <br>매도호가 <br>잔량</th>
-            <th class="align-middle">시간외 총 <br>매수호가 <br>잔량</th>
-            <th class="align-middle">장개시전 <br>시간외종가 <br>거래량</th>
-            <th class="align-middle">장종료후 <br>시간외종가 <br>거래량</th>
+            <th class="align-middle text-center" rowspan="2">순위</th>
+            <th class="align-middle text-center" rowspan="2">종목명</th>
+            <th class="align-middle text-center" rowspan="2">종목코드</th>
+            <th class="align-middle text-center" rowspan="2">현재가</th>
+            <th class="align-middle text-center" colspan="3">전일</th>
+            <th class="align-middle text-center" colspan="2">시간외 총</th>
+            <th class="align-middle text-center" colspan="2">시간외종가 거래량</th>
+            <th class="align-middle text-center" rowspan="2">동작</th>
+        </tr>
+        <tr>
+            <th class="text-center">대비</th>
+            <th class="text-center">부호</th>
+            <th class="text-center">대비율</th>
+            <th class="text-center">매도호가잔량</th>
+            <th class="text-center">매도매수잔량</th>
+            <th class="text-center">장개시전</th>
+            <th class="text-center">장개시후</th>
         </tr>
     </thead>
     <tbody>
         {{#each list}}
         <tr class="{{addBgColor prdy_vrss_sign 'table-danger'}}">
-            <td class="text-start">{{stck_shrn_iscd}}</td>
             <td class="text-start">{{data_rank}}</td>
-            <td class="text-start">{{hts_kor_isnm}}</td>
-            <td class="text-end">{{stck_prpr}}</td>
+            <td class="text-start">{{toggleCompanyCanvas stck_shrn_iscd hts_kor_isnm}}</td>
+            <td class="text-start">{{goNaver stck_shrn_iscd}}</td>
+            <td class="text-end">{{displayWon stck_prpr}}</td>
             <td class="text-end">{{prdy_vrss}}</td>
             <td class="text-center">{{displaySign prdy_vrss_sign}}</td>
             <td class="text-end">{{prdy_ctrt}}</td>
-            <td class="text-end">{{ovtm_total_askp_rsqn}}</td>
-            <td class="text-end">{{ovtm_total_bidp_rsqn}}</td>
-            <td class="text-end">{{mkob_otcp_vol}}</td>
-            <td class="text-end">{{mkfa_otcp_vol}}</td>
+            <td class="text-end">{{displayWon ovtm_total_askp_rsqn}}</td>
+            <td class="text-end">{{displayWon ovtm_total_bidp_rsqn}}</td>
+            <td class="text-end">{{displayWon mkob_otcp_vol}}</td>
+            <td class="text-end">{{displayWon mkfa_otcp_vol}}</td>
+            <td>
+                <button class="btnAddAttension btn btn-warning btn-sm" data-stk-code="{{this.stck_shrn_iscd}}" data-stk-name="{{this.hts_kor_isnm}}" title="관심..추가"><i class="bi bi-plus"></i></button>                
+                <a href="/page?path=mystock/stock_detail&stk_code={{this.stck_shrn_iscd}}" class="btn btn-primary btn-sm" title="상세보기" target="_blank"><i class="bi bi-eye"></i></a>
+            </td>
         </tr>
         {{/each}}
     </tbody>

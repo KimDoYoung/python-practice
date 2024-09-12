@@ -66,7 +66,7 @@ async function callLucyApi(url, method, data = null) {
             alert("세션 종료되었습니다. 서버와의 통신이 원활하지 않습니다. 다시 로그인해주세요.");
             window.location.href = '/login';
         }else{
-            throw new LucyError('500', errorStr);
+            throw new LucyError(500, errorStr);
         }
     }
 }
@@ -121,7 +121,7 @@ async function deleteFetch(url, data) {
 async function fetch_handlebar(hbs_file_path) {
     const response = await fetch(`/template?path=${hbs_file_path}`);
     if (!response.ok) {
-        throw new Error("Network response was not ok " + response.statusText);
+        throw new LucyError(500, "Network response was not ok " + response.statusText);
     }
     const data = await response.json();
     return data.template;

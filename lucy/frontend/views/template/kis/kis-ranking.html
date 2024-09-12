@@ -2,9 +2,9 @@
 {% block style %}
 {% endblock %}
 {% block content %}
-<h1>KIS-Ranking</h1>
 <div class="m-2 p-2 d-flex align-items-center flex-wrap" style="background-color: rgb(203, 244, 217);">
-    <div class="me-2">
+    <div><h3>KIS-상위종목</h3></div>
+    <div class="mx-2">
         시장구분 : 
         <select name="market" id="market" class="form-select d-inline w-auto">
             <option value="전체">전체</option>
@@ -38,7 +38,7 @@
 </div>
 
 <div  class="m-2 p-2" id="result-area">
-    <h1 id="title"></h1>
+    <h4 id="title"></h4>
     <div id="result"></div>
 </div>
 {% raw %}
@@ -105,7 +105,21 @@ $( document ).ready(function() {
             .catch(error => {
                 $('#result').html(error.message);
             });
-    })
+    });
+    $('#result').on("click", ".btnAddAttension", function() {
+        //관심을 추가한다.
+        const stk_code = $(this).data('stk-code');
+        const stk_name = $(this).data('stk-name');
+        const url = `/api/v1/mystock/add/stktype/${stk_code}/관심`;
+        const data = {};
+        putFetch(url, data).then(data => {
+            console.log(data);
+            alert(`${stk_name}(${stk_code}) 관심종목으로 추가되었습니다.`);
+        }).catch(error=> {
+            console.error(error.message);
+            showAlertError(error);
+        });
+    });    
 });
 </script>
 {% endraw %}
