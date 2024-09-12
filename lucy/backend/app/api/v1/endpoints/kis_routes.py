@@ -375,7 +375,7 @@ async def growth_ratio(stk_code:str, div_cls: str = Query(default="1")):
     return response
 
 # 국내기관_외국인 매매종목가집계
-@router.get("/foreign-institution-total/", response_model=ForeignInstitutionTotal_Response)
+@router.get("/foreign-institution-total", response_model=ForeignInstitutionTotal_Response)
 async def foreign_institution_total(
                                     is_cd: str = Query(default="0000"),
                                     div_cls: str = Query(default="1"),

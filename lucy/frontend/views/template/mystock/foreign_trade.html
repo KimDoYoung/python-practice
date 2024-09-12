@@ -3,15 +3,201 @@
 {% endblock %}
 {% block content %}
 <h4>외국인 매매 종목</h4>
+<div id="search-area">
+    <div class="row">
+        <div class="col-3">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="is_cd" id="is_cd_1" value="0000" checked>
+                <label class="form-check-label" for="is_cd_1">
+                    전체
+                </label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="is_cd" id="is_cd_2" value="0001">
+                <label class="form-check-label" for="is_cd_2">
+                    코스피
+                </label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="is_cd" id="is_cd_2" value="1001">
+                <label class="form-check-label" for="is_cd_2">
+                    코스닥
+                </label>
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="div_cls" id="div_cls_1" value="0" checked>
+                <label class="form-check-label" for="div_cls_1">
+                    수량정렬
+                </label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="div_cls" id="div_cls_2" value="1">
+                <label class="form-check-label" for="div_cls_2">
+                    금액정렬
+                </label>
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="rank_sort_cls_code" id="rank_sort_cls_code_1" value="0" checked>
+                <label class="form-check-label" for="rank_sort_cls_code_1">
+                    순매수상위
+                </label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="rank_sort_cls_code" id="rank_sort_cls_code_2" value="1">
+                <label class="form-check-label" for="rank_sort_cls_code_2">
+                    순매도상위
+                </label>
+            </div>
+        </div> 
+        <div class="col-3">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="etc_cls_code" id="etc_cls_code_1" value="0" checked>
+                <label class="form-check-label" for="etc_cls_code_1">
+                    전체
+                </label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="etc_cls_code" id="etc_cls_code_2" value="1">
+                <label class="form-check-label" for="etc_cls_code_2">
+                    외국인
+                </label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="etc_cls_code" id="etc_cls_code_3" value="2">
+                <label class="form-check-label" for="etc_cls_code_3">
+                    기관계
+                </label>
+            </div>
+        </div> 
+    </div>
+</div>
+<div id="result-area">
+
+</div>
 {% raw %}
 <!--handlebar scripts-->
+<script id="foreign-table" type="text/x-handlebars-template">
+    <table class="table table-striped table-bordered">
+        <thead class="table-secondary">
+            <tr class="align-middle">
+                <th class="text-center" rowspan="2">종목명</th>
+                <th class="text-center" rowspan="2">코드</th>
+                <th class="text-center" rowspan="2"><a href="#" data-field="ntby_qty" class="sort-title">순매수 수량<i class="bi"></i></a></th>
+                <th class="text-center" rowspan="2"><a href="#" data-field="stck_prpr" class="sort-title">현재가<i class="bi"></i></a></th>
+                <th class="text-center" colspan="2">전일</th>
+                <th class="text-center" rowspan="2"><a href="#" data-field="acml_vol" class="sort-title">누적 거래량<i class="bi"></i></a></th>
+                <th class="text-center" colspan="2">외국인</th> <!-- 외국인 컬럼을 2개의 하위 항목으로 나눔 -->
+                <th class="text-center" colspan="2">기관계</th> <!-- 기관계를 2개의 하위 항목으로 나눔 -->
+              </tr>
+              <tr>
+                <th class="text-center"><a href="#" data-field="prdy_vrss" class="sort-title">증감<i class="bi"></i></a></th>
+                <th class="text-center"><a href="#" data-field="prdy_ctrt" class="sort-title">비율<i class="bi"></i></a></th>
+                <th class="text-center"><a href="#" data-field="frgn_ntby_qty" class="sort-title">순매수 수량<i class="bi"></i></a></th>
+                <th class="text-center"><a href="#" data-field="frgn_ntby_tr_pbmn" class="sort-title">순매수 거래 대금<i class="bi"></i></a></th>
+                <th class="text-center"><a href="#" data-field="orgn_ntby_qty" class="sort-title">순매수 수량<i class="bi"></i></a></th>
+                <th class="text-center"><a href="#" data-field="orgn_ntby_tr_pbmn" class="sort-title">순매수 거래 대금<i class="bi"></i></a></th>
+              </tr>
+        </thead>
+        <tbody>
+            {{#each list}}
+          <tr>
+            <td>{{toggleCompanyCanvas mksc_shrn_iscd hts_kor_isnm}}</td>
+            <td>{{goNaver mksc_shrn_iscd}}</td>
+            <td class="text-end">{{displayWon ntby_qty}}</td>
+            <td class="text-end">{{displayWon stck_prpr}}</td>
+            <td class="text-end">{{displayWon prdy_vrss}}</td>
+            <td class="text-end">{{prdy_ctrt}}</td>
+            <td class="text-end">{{displayWon acml_vol}}</td>
+            <td class="text-end">{{displayWon frgn_ntby_qty}}</td>
+            <td class="text-end">{{displayWon frgn_ntby_tr_pbmn}}</td>
+            <td class="text-end">{{displayWon orgn_ntby_qty}}</td>
+            <td class="text-end">{{displayWon orgn_ntby_tr_pbmn}}</td>
+          </tr>
+            {{/each}}
+        </tbody>
+      </table>
+      
+</script>
 {% endraw %}
 {% endblock %}
 {% block script %}
 {% raw %}
 <script>
+let current_list =  [];
+let currentSort = { field: null, direction: 'asc' };
+function makeTable(list){
+    //let list = current_list;
+    if (list.length === 0) {
+        $('#result-area').html('데이터가 없습니다.');
+        return;
+    }
+    let fieldName = currentSort.field;
+    if(fieldName){
+        list.sort(function(a, b) {
+            let x = parseFloat(a[fieldName]);
+            let y = parseFloat(b[fieldName]);
+
+            if (x < y) return currentSort.direction === 'asc' ? -1 : 1;
+            if (x > y) return currentSort.direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }
+
+    let source = document.getElementById('foreign-table').innerHTML;
+    let template = Handlebars.compile(source);
+    let html = template({list});
+    $('#result-area').html(html);
+
+    // 아이콘 설정
+    const $resultArea = $('#result-area').find('table thead tr');
+    $resultArea.find('.sort-title i').removeClass('bi-arrow-up bi-arrow-down');  // 모든 아이콘 제거
+    var currentIcon = currentSort.direction === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down';
+    $resultArea.find('a[data-field="' + currentSort.field + '"] i').addClass(currentIcon);
+}
+function fetchAndMakeTable(){
+        let url = '/api/v1/kis/foreign-institution-total';
+        const ls_cd = $('input[name=is_cd]:checked').val();
+        const div_cls = $('input[name=div_cls]:checked').val();
+        const rank_sort_cls_code = $('input[name=rank_sort_cls_code]:checked').val();
+        const etc_cls_code = $('input[name=etc_cls_code]:checked').val();
+
+        url += '?is_cd=0000&div_cls=0&rank_sort_cls_code=0&etc_cls_code=0';
+        getFetch(url).then(data => {
+            console.log(data);
+            current_list = data.output;
+            makeTable(current_list); 
+        }).catch(error=> {
+            console.error(error.message); 
+        });
+    }
 $( document ).ready(function() {
     console.log( "ready!")
+
+    fetchAndMakeTable();
+    $('input[name=is_cd]').change(function(){
+        fetchAndMakeTable();
+    });
+    $('input[name=div_cls]').change(function(){
+        fetchAndMakeTable();
+    });
+    $('input[name=rank_sort_cls_code]').change(function(){
+        fetchAndMakeTable();
+    });
+    $('input[name=etc_cls_code]').change(function(){
+        fetchAndMakeTable();
+    });
+    $('#result-area').on('click', '.sort-title', function() {
+        const fieldName = $(this).data('field');
+        console.log('sort:', fieldName);
+        var isAscending = currentSort.field === fieldName && currentSort.direction === 'asc';
+        currentSort.direction = isAscending ? 'desc' : 'asc';
+        currentSort.field = fieldName;
+        makeTable(current_list);
+    });
 });
 </script>
 {% endraw %}
