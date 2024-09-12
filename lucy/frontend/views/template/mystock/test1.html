@@ -4,6 +4,15 @@
 {% block content %}
 <h1>테스트</h1>
 <div>
+    <button id="test1">주식현재가일자별</button>
+    <button id="test2">주식당일분봉조회</button>
+    <button id="test3">주식현재가시세2</button>
+    <button id="test4">국내주식 종목투자의견</button>
+    <button id="test5">국내주식 증권사별 투자의견</button>
+    <button id="test6">호가정보요청</button>
+    <button id="test7">호가정보취소</button>
+</div>
+<div>
     <button id="apitest1">대차대조표</button>
     <button id="apitest2">손익계산서</button>
     <button id="apitest3">재무비율</button>
@@ -25,7 +34,85 @@
 {% block script %}
 {% raw %}
 <script>
+let current_stk_code = '005930';
 $( document ).ready(function() {
+    $('#test1').click(function(){
+        const url = `/api/v1/kis/inquire-daily-price/${current_stk_code}/D`;
+        getFetch(url).then(data => {
+            console.log(data);
+        }).catch(error=> {
+            console.error(error.message);
+            showToastError(error);
+        });
+    });
+    $('#test2').click(function(){
+        const now = new Date();
+        const nowHHmm = now.getHours().toString().padStart(2, '0') + now.getMinutes().toString().padStart(2, '0') + '00';
+        const url = `/api/v1/kis/inquire-time-itemchartprice/${current_stk_code}/${nowHHmm}`;
+        getFetch(url).then(data => {
+            console.log(data);
+        }).catch(error=> {
+            console.error(error.message);
+            showToastError(error);
+        });
+    });
+    //현재가2 시세2
+    $('#test3').click(function(){
+        const url = `/api/v1/kis/inquire-price2/${current_stk_code}`;
+        getFetch(url).then(data => {
+            console.log(data);
+        }).catch(error=> {
+            console.error(error.message);
+            showToastError(error);
+        });
+    });
+    //종목정보 국내주식 종목투자의견
+    $('#test4').click(function(){
+        const startYmd = new Date().getFullYear() + '0101';
+        const endYmd = JuliaUtil.today('yyyyMMdd');
+        const url = `/api/v1/kis/invest-opinion/${current_stk_code}/${startYmd}/${endYmd}`;
+        getFetch(url).then(data => {
+            console.log(data);
+        }).catch(error=> {
+            console.error(error.message);
+            showToastError(error);
+        });
+    });
+    //종목정보 국내주식 증권사별 투자의견
+    $('#test5').click(function(){
+        const startYmd = new Date().getFullYear() + '0101';
+        const endYmd = JuliaUtil.today('yyyyMMdd');
+        const iscd = '999'; //회원사코드
+        const url = `/api/v1/kis/invest-opbysec/${iscd}/${startYmd}/${endYmd}`;
+        getFetch(url).then(data => {
+            console.log(data);
+        }).catch(error=> {
+            console.error(error.message);
+            showToastError(error);
+        });
+    });
+    $('#test6').click(function(){
+        //호가정보 요청
+        getFetch('/api/v1/kis/ws/hoga/subscribe/' + current_stk_code)
+        .then(data => {
+            console.log('호가정보를 요청하다' + current_stk_code);
+            console.log(data); 
+        }).catch(error=> {
+            console.error(error.message);
+            showAlertError(error); 
+        });
+    });
+    $('#test7').click(function(){
+        //호가정보 unsubscribe요청
+        getFetch('/api/v1/kis/ws/hoga/un-subscribe/' + current_stk_code)
+        .then(data => {
+            console.log('호가정보를 취소 요청하다' + current_stk_code);
+            console.log(data); 
+        }).catch(error=> {
+            console.error(error.message);
+            showAlertError(error); 
+        });
+    });
     $('#apitest1').click(function(){
         console.log('대차대조표');
         const url = '/api/v1/kis/balance-sheet/005930';
@@ -127,7 +214,8 @@ $( document ).ready(function() {
         }).catch(error=> {
             console.error(error.message); 
         });
-    });     
+    });
+
 });
 </script>
 {% endraw %}

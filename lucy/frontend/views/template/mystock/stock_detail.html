@@ -17,27 +17,28 @@
     <!-- Tab panes -->
     <div class="tab-content" id="myTabContent">
         <div class="tab-pane fade show active" id="chart-basic" role="tabpanel" aria-labelledby="chart-basic-tab">
-            <div id="chart-area">
+            <div id="chart-area mt-2">
                 <div id="chart-area-search">
                     <form method="POST" action="/submit" id="form1">
                         <input type="hidden" name="current_stk_code" id="current_stk_code" value="{{stk_code}}">
+                        <input type="hidden" name="current_stk_name" id="current_stk_name">
                         <input type="hidden" name="FID_COND_MRKT_DIV_CODE" id="FID_COND_MRKT_DIV_CODE" value="J">
                         <div class="row g-3 align-items-center">
                             <!-- FID_INPUT_DATE_1 -->
                             <div class="col-auto">
-                                <label for="FID_INPUT_DATE_1" class="form-label">조회 시작일자</label>
+                                <!-- <label for="FID_INPUT_DATE_1" class="form-label">조회 시작일자</label> -->
                                 <input type="date" id="FID_INPUT_DATE_1" name="FID_INPUT_DATE_1" class="form-control" placeholder="시작일자 (ex. 20220501)">
                             </div>
             
                             <!-- FID_INPUT_DATE_2 -->
                             <div class="col-auto">
-                                <label for="FID_INPUT_DATE_2" class="form-label">조회 종료일자</label>
+                                <!-- <label for="FID_INPUT_DATE_2" class="form-label">조회 종료일자</label> -->
                                 <input type="date" id="FID_INPUT_DATE_2" name="FID_INPUT_DATE_2" class="form-control" placeholder="종료일자 (ex. 20220530)">
                             </div>
             
                             <!-- FID_PERIOD_DIV_CODE -->
                             <div class="col-auto">
-                                <label for="FID_PERIOD_DIV_CODE" class="form-label">기간분류코드</label>
+                                <!-- <label for="FID_PERIOD_DIV_CODE" class="form-label">기간분류코드</label> -->
                                 <select id="FID_PERIOD_DIV_CODE" name="FID_PERIOD_DIV_CODE" class="form-select">
                                     <option value="D" selected>일봉</option>
                                     <option value="W">주봉</option>
@@ -48,7 +49,7 @@
             
                             <!-- FID_ORG_ADJ_PRC -->
                             <div class="col-auto">
-                                <label for="FID_ORG_ADJ_PRC" class="form-label">수정주가/원주가</label>
+                                <!-- <label for="FID_ORG_ADJ_PRC" class="form-label">수정주가/원주가</label> -->
                                 <select id="FID_ORG_ADJ_PRC" name="FID_ORG_ADJ_PRC" class="form-select">
                                     <option value="0" selected>수정주가</option>
                                     <option value="1">원주가</option>
@@ -63,16 +64,12 @@
                     </form>        
                 </div>
                 <div id="chart-result">
-                    <canvas id="detailChart" width="1400" height="400"></canvas>
+                    <div id="detailChart" width="1400" height="400"></div>
                 </div>
                 <div id="company-summary" class="mt-3"></div>
                 <div id="capital-area" class="mt-3 d-none"></div>
                 <div>
-                    <button id="test1">주식현재가일자별</button>
-                    <button id="test2">주식당일분봉조회</button>
-                    <button id="test3">주식현재가시세2</button>
-                    <button id="test4">국내주식 종목투자의견</button>
-                    <button id="test5">국내주식 증권사별 투자의견</button>
+
                     <button id="test6">호가정보요청</button>
                     <button id="test7">호가정보취소</button>
                 </div>
@@ -239,69 +236,35 @@
 {% endraw %}
 {% endblock %}
 {% block script %}
-<script src="https://cdn.jsdelivr.net/npm/luxon@1.26.0"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.0.0"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
 {% raw %}
 <script>
 let current_stk_code =  undefined ; 
 let chart = undefined;
 
-
-function drawCandleChart(org_data){
-
-    let ctx = document.getElementById('detailChart').getContext('2d');
-    let cost_data = [];
+function drawCandleChart(org_data, title){
+    let columns = []
+    let column1 = ['data1'];
     for (let i = 0; i < org_data.output2.length; i++) {
         let item = org_data.output2[i];
-        cost_data.push({
-            x: luxon.DateTime.fromFormat(item.stck_bsop_date, 'yyyyMMdd').valueOf(), //item.stck_bsop_date,
-            o: Number(item.stck_oprc),
-            h: Number(item.stck_hgpr),
-            l: Number(item.stck_lwpr),
-            c: Number(item.stck_clpr)
-        });
+        column1.push([
+            Number(item.stck_oprc),
+            Number(item.stck_hgpr),
+            Number(item.stck_lwpr),
+            Number(item.stck_clpr)
+        ]);
     }
-    let title = org_data.output1.hts_kor_isnm;
-    const data1 = {
-        datasets: [{
-                label: title,
-                data: cost_data,
-            }
-        ]
-    };
-    console.log(data1);
-    if(chart){
-        chart.destroy();
-    }
-    chart = new Chart(ctx, {
-        type: 'candlestick',
-        data: data1,
-        options: {
-            plugins: {
-                title: {
-                    display: true,
-                    text: title
-                },
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                x: {
-                    type: 'time',
-                    time: {
-                        unit: 'day'
-                    }
-                }
-            }
-        }});
+    columns.push(column1);
+    // debugger;
+    create_billboard_candle_chart('detailChart', columns, title);    
 }
+
+//데이터를 가져와서 캔들챠트를 그린다.
 function get_data_and_draw_chart(){
     let stk_code = $('#current_stk_code').val();
     let startYmd = $('#FID_INPUT_DATE_1').val().replace(/\D/g, '');
     let endYmd = $('#FID_INPUT_DATE_2').val().replace(/\D/g, '');
     let period = $('#FID_PERIOD_DIV_CODE').val();
+    let stk_name = $('#current_stk_name').val();
     const url = `/api/v1/kis/chart/${stk_code}/${startYmd}/${endYmd}/${period}`;
     getFetch(url).then(data => {
         console.log(data); 
@@ -311,8 +274,13 @@ function get_data_and_draw_chart(){
         let template = Handlebars.compile(source);
         let html = template(capital);
         $('#capital-area').html(html);
-
-        drawCandleChart(data);
+        // debugger;
+        let startYmd1 = startYmd.substring(0, 4) + '-' + startYmd.substring(4, 6) + '-' + startYmd.substring(6, 8);
+        let endYmd1 = endYmd.substring(0, 4) + '-' + endYmd.substring(4, 6) + '-' + endYmd.substring(6, 8);
+        let periodNames ={'D':'일봉', 'W':'주봉', 'M':'월봉', 'Y':'년봉'};
+        let period1 = periodNames[period];
+        let title = `${stk_name}(${stk_code}) ${startYmd1} ~ ${endYmd1} ${period1}`;
+        drawCandleChart(data, title);
     }).catch(error=> {
         console.error(error.message);
         showToastError(error);
@@ -334,6 +302,7 @@ function initalize(){
     getFetch(url).then(data => {
         console.log(data);
         let text = `${data.naver.stk_name}(${data.naver.stk_code})`;
+        $('#current_stk_name').val(data.naver.stk_name);
         $('#companyId').text(text);
         let source = document.getElementById('naver-template').innerHTML;
         let template = Handlebars.compile(source);
@@ -344,7 +313,7 @@ function initalize(){
         showToastError(error);
     });
     
-    //chart 데이터
+    //chart 그리기
     let today = JuliaUtil.today();
     let startDay = JuliaUtil.addDate(today, 'month', -1);
     $('#FID_INPUT_DATE_1').val(startDay)
@@ -355,6 +324,8 @@ $( document ).ready(function() {
     console.log( "ready!")
     current_stk_code = $('#current_stk_code').val();
     initalize();
+
+    //챠트 조회
     $('#form1').submit(function(event){
         event.preventDefault();
         get_data_and_draw_chart();
@@ -364,83 +335,7 @@ $( document ).ready(function() {
     //     <button id="test3">주식현재가시세2</button>
     //     <button id="test4">국내주식 종목투자의견</button>
     //     <button id="test5">국내주식 증권사별 투자의견</button>
-    $('#test1').click(function(){
-        const url = `/api/v1/kis/inquire-daily-price/${current_stk_code}/D`;
-        getFetch(url).then(data => {
-            console.log(data);
-        }).catch(error=> {
-            console.error(error.message);
-            showToastError(error);
-        });
-    });
-    $('#test2').click(function(){
-        const now = new Date();
-        const nowHHmm = now.getHours().toString().padStart(2, '0') + now.getMinutes().toString().padStart(2, '0') + '00';
-        const url = `/api/v1/kis/inquire-time-itemchartprice/${current_stk_code}/${nowHHmm}`;
-        getFetch(url).then(data => {
-            console.log(data);
-        }).catch(error=> {
-            console.error(error.message);
-            showToastError(error);
-        });
-    });
-    //현재가2 시세2
-    $('#test3').click(function(){
-        const url = `/api/v1/kis/inquire-price2/${current_stk_code}`;
-        getFetch(url).then(data => {
-            console.log(data);
-        }).catch(error=> {
-            console.error(error.message);
-            showToastError(error);
-        });
-    });
-    //종목정보 국내주식 종목투자의견
-    $('#test4').click(function(){
-        const startYmd = new Date().getFullYear() + '0101';
-        const endYmd = JuliaUtil.today('yyyyMMdd');
-        const url = `/api/v1/kis/invest-opinion/${current_stk_code}/${startYmd}/${endYmd}`;
-        getFetch(url).then(data => {
-            console.log(data);
-        }).catch(error=> {
-            console.error(error.message);
-            showToastError(error);
-        });
-    });
-    //종목정보 국내주식 증권사별 투자의견
-    $('#test5').click(function(){
-        const startYmd = new Date().getFullYear() + '0101';
-        const endYmd = JuliaUtil.today('yyyyMMdd');
-        const iscd = '999'; //회원사코드
-        const url = `/api/v1/kis/invest-opbysec/${iscd}/${startYmd}/${endYmd}`;
-        getFetch(url).then(data => {
-            console.log(data);
-        }).catch(error=> {
-            console.error(error.message);
-            showToastError(error);
-        });
-    });
-    $('#test6').click(function(){
-        //호가정보 요청
-        getFetch('/api/v1/kis/ws/hoga/subscribe/' + current_stk_code)
-        .then(data => {
-            console.log('호가정보를 요청하다' + current_stk_code);
-            console.log(data); 
-        }).catch(error=> {
-            console.error(error.message);
-            showAlertError(error); 
-        });
-    });
-    $('#test7').click(function(){
-        //호가정보 unsubscribe요청
-        getFetch('/api/v1/kis/ws/hoga/un-subscribe/' + current_stk_code)
-        .then(data => {
-            console.log('호가정보를 취소 요청하다' + current_stk_code);
-            console.log(data); 
-        }).catch(error=> {
-            console.error(error.message);
-            showAlertError(error); 
-        });
-    });
+   
     
     $('#apitest1').click(function(){
         const url = `/api/v1/kis/inquire-financial-statement/${current_stk_code}/1`;

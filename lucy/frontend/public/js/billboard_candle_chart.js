@@ -1,5 +1,5 @@
 var billboard_chart;
-function create_billboard_chart(divId, columns, name) {
+function create_billboard_candle_chart(divId, columns, name) {
     let x_name = name || 'data1';
 
     billboard_chart = bb.generate({

@@ -53,7 +53,7 @@ $(document).ready(function() {
             let columns1 = ['data1'];
             let columns2 = ['x'];
             //시가,고가,저가,종가
-            debugger;
+            // debugger;
             for (let i = chart_data.length - 1; i >= 0; i--) {
                 let item = chart_data[i];
                 columns1.push([Number(item.stck_oprc), Number(item.stck_hgpr), Number(item.stck_lwpr), Number(item.stck_clpr)]);
@@ -66,7 +66,7 @@ $(document).ready(function() {
             //columns.push(columns2);
             
             offcanvasCompany.toggle();
-            create_billboard_chart("offcanvas_daily_chart",columns, x_name)
+            create_billboard_candle_chart("offcanvas_daily_chart",columns, x_name)
         }).catch(error=> {
             console.error(error.message); 
             showAlertError(error);

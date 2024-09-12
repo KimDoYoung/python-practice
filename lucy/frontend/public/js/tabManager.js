@@ -17,10 +17,8 @@ function TabManager(selector) {
             this.tabList.append(newTab);
             this.tabContent.append(newTabContent);
 
-			newTab.find('a[href="#' + id + '"]').click(() => {
-			    this.selectTab(id);
-			});			
-            newTab.find('.close').click(() => this.removeTab(id));
+			newTab.find('a[href="#' + id + '"]').on('click', () => {this.selectTab(id);});
+            newTab.find('.close').on('click', () => this.removeTab(id));
             if (typeof onClickCallback === 'function') {
                 onClickCallback(id, title);
             }
