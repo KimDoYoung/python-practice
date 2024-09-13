@@ -322,12 +322,13 @@ function init(){
                 $('#currentCostRefresh').prop('checked', false);
             }
             if(intervalId) clearInterval(intervalId);
+            getCurrentCost();
             if($('#currentCostRefresh').is(':checked') && isMarketTime()){
-                getCurrentCost();
                 intervalId=setInterval(getCurrentCost, 1000*10); //10초마다 현재가를 가져온다.
             }            
         }).catch(error=> {
             console.error(error.message); 
+            showAlertError(error);
         });
 
 

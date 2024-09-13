@@ -113,6 +113,7 @@ async function putFetch(url, data) {
 async function deleteFetch(url, data) {
     return callLucyApi(url, 'DELETE', data);
 }
+
 /**
  * 서버로부터 handlebar template을 가져온다.
  * @param {*} hbs_file_path 
@@ -128,10 +129,46 @@ async function fetch_handlebar(hbs_file_path) {
 }
 /**
  * 서버로부터 handlebar template을 가져와서 compile한다.
+        const template = await fetch_handlebar_and_compile("ls/range.html");
+        postFetch(url, data)
+        .then((data) => {
+            
+            JuliaUtil.displayLoading(false);
+            console.log(data);
+            const html = template({ list: data.t1441OutBlock1 });
+            $("#list-area").html(html);
+        })
+        .catch((error) => {
+            JuliaUtil.displayLoading(false);
+            $("#list-area").html(error.message);
+        });* 
  * @param {*} hbs_file_path 
  * @returns 
  */
 async function fetch_handlebar_and_compile(hbs_file_path) {
     const data = await fetch_handlebar(hbs_file_path);
     return Handlebars.compile(data);
+}
+/*
+    사용법
+    const pageCache = new TemplateCache();
+    const template = await pageCache.getTemplate('example.html');
+*/
+class TemplateCache {
+    constructor() {
+        this.cacheTemplate = {};
+    }
+
+    async get(path) {
+        if (!this.cacheTemplate[path]) {
+            this.cacheTemplate[path] = fetch_handlebar_and_compile(path);
+        }else{
+            console.log("template cache 에 있는 것을 사용합니다."+path);
+        }
+        return this.cacheTemplate[path];
+    }
+
+    clearCache() {
+        this.cacheTemplate = {};
+    }
 }

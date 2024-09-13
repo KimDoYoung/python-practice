@@ -132,6 +132,18 @@ Handlebars.registerHelper('addBgColor', function(value, className) {
 </script>
 {% raw %}
 <script>
+// let cacheTemplate = {};
+// async function getTemplate(path){
+//     // 캐시에 값이 없는 경우, 즉 비동기 작업이 처음일 때만 fetch 작업 수행
+//     if (!cacheTemplate[path]) {
+//         // Promise를 캐시에 저장하여 동시 요청에 대비
+//         cacheTemplate[path] = fetch_handlebar_and_compile(path);  // await 필요 없음
+//     }
+    
+//     // 캐시에 있는 Promise를 반환하고, 완료될 때까지 기다림
+//     return cacheTemplate[path];  // 결과가 반환될 때까지 기다리게 됨
+// }
+const templateCache = new TemplateCache();
 $(document).ready(function () {
     console.log("ready!");
     //등락률
@@ -148,7 +160,7 @@ $(document).ready(function () {
         };
         // debugger;
         JuliaUtil.displayLoading(true);
-        const template = await fetch_handlebar_and_compile("ls/range.html");
+        const template = await templateCache.get("ls/range.html");
         postFetch(url, data)
         .then((data) => {
             
@@ -177,7 +189,7 @@ $(document).ready(function () {
         };
         // debugger;
         JuliaUtil.displayLoading(true);
-        const template = await fetch_handlebar_and_compile("ls/volumn.html");
+        const template = await templateCache.get("ls/volumn.html");
         postFetch(url, data)
             .then((data) => {
             JuliaUtil.displayLoading(false);
@@ -205,7 +217,7 @@ $(document).ready(function () {
         };
         // debugger;
         JuliaUtil.displayLoading(true);
-        const template = await fetch_handlebar_and_compile("ls/rapid_up.html");
+        const template = await templateCache.get("ls/rapid_up.html");
         postFetch(url, data)
             .then((data) => {
             JuliaUtil.displayLoading(false);
@@ -233,7 +245,7 @@ $(document).ready(function () {
         };
         // debugger;
         JuliaUtil.displayLoading(true);
-        const template = await fetch_handlebar_and_compile(
+        const template = await templateCache.get(
             "ls/timeout_range.html"
         );
         postFetch(url, data)
@@ -263,7 +275,7 @@ $(document).ready(function () {
         };
         // debugger;
         JuliaUtil.displayLoading(true);
-        const template = await fetch_handlebar_and_compile(
+        const template = await templateCache.get(
             "ls/timeout_volume.html"
         );
         postFetch(url, data)
@@ -293,7 +305,7 @@ $(document).ready(function () {
         };
         // debugger;
         JuliaUtil.displayLoading(true);
-        const template = await fetch_handlebar_and_compile(
+        const template = await templateCache.get(
             "ls/expect_fulfill.html"
         );
         postFetch(url, data)
@@ -323,7 +335,7 @@ $(document).ready(function () {
         };
         // debugger;
         JuliaUtil.displayLoading(true);
-        const template = await fetch_handlebar_and_compile(
+        const template = await templateCache.get(
             "ls/expect_danilga_range.html"
         );
         postFetch(url, data)
@@ -354,7 +366,7 @@ $(document).ready(function () {
         };
         // debugger;
         JuliaUtil.displayLoading(true);
-        const template = await fetch_handlebar_and_compile(
+        const template = await templateCache.get(
             "ls/purchase_cost.html"
         );
         postFetch(url, data)
