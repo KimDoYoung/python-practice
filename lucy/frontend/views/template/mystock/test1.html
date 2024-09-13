@@ -26,6 +26,8 @@
 <div>
     <h1 id="title"></h1>
     <textarea name="result" id="result" style="width:100%; height:500px"></textarea>
+    <div id="chart0"></div>
+    <div id="tab-area"></div>
 </div>
 {% raw %}
 <!--handlebar scripts-->
@@ -33,13 +35,21 @@
 {% endblock %}
 {% block script %}
 {% raw %}
+<script src="/public/js/tab-manager.js"></script>
 <script>
 let current_stk_code = '005930';
+var tabManager = new TabManager('#tab-area');
 $( document ).ready(function() {
     $('#test1').click(function(){
         const url = `/api/v1/kis/inquire-daily-price/${current_stk_code}/D`;
         getFetch(url).then(data => {
             console.log(data);
+            let tabId =tabManager.addTab('tab1', '주식현재가일자별', function(){
+                console.log('tab1')
+            });
+            tabManager.addTabContent(tabId, '<div id="chart1"></div>');
+            let column1 = extract_candle_data(data.output, 'stck_oprc', 'stck_hgpr', 'stck_lwpr', 'stck_clpr');
+            create_billboard_candle_chart("chart1",[column1], 'title1')            
         }).catch(error=> {
             console.error(error.message);
             showToastError(error);
@@ -51,6 +61,13 @@ $( document ).ready(function() {
         const url = `/api/v1/kis/inquire-time-itemchartprice/${current_stk_code}/${nowHHmm}`;
         getFetch(url).then(data => {
             console.log(data);
+            let tabId =tabManager.addTab('tab2', '일봉데이터', function(){
+                console.log('tab2')
+            });
+            tabManager.addTabContent(tabId, '<div id="chart2"></div>');
+            let column1 = extract_candle_data(data.output2, 'stck_oprc', 'stck_hgpr', 'stck_lwpr', 'stck_prpr');
+            create_billboard_candle_chart("chart2",[column1], 'title1')            
+
         }).catch(error=> {
             console.error(error.message);
             showToastError(error);

@@ -2,10 +2,13 @@
 
 ## billboard chart
 
+[api문서](https://naver.github.io/billboard.js/release/latest/doc/)
+[데모](https://naver.github.io/billboard.js/demo/)
+
 - create_billboard_chart를 호출 billboard_candle_chart.js
 
 ```javascript
-
+<div id="candlestickChart_1"></div>
 //columns
 let column = []
 let columns1 = ['data1'];
@@ -21,7 +24,7 @@ let columns1 = ['data1'];
 }
 
 column.push(column1);
-create_billboard_chart("offcanvas_daily_chart",columns, x_name)
+create_billboard_candle_chart("offcanvas_daily_chart",columns, x_name)
 ```
 
 ## 종목명 offcanvas

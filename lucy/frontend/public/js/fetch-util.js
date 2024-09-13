@@ -128,20 +128,6 @@ async function fetch_handlebar(hbs_file_path) {
     return data.template;
 }
 /**
- * 서버로부터 handlebar template을 가져와서 compile한다.
-        const template = await fetch_handlebar_and_compile("ls/range.html");
-        postFetch(url, data)
-        .then((data) => {
-            
-            JuliaUtil.displayLoading(false);
-            console.log(data);
-            const html = template({ list: data.t1441OutBlock1 });
-            $("#list-area").html(html);
-        })
-        .catch((error) => {
-            JuliaUtil.displayLoading(false);
-            $("#list-area").html(error.message);
-        });* 
  * @param {*} hbs_file_path 
  * @returns 
  */

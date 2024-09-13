@@ -25,6 +25,7 @@ function TabManager(selector) {
         } else {
             console.warn("Tab with ID '" + id + "' already exists.");
         }
+        return id;
     };
 
     this.removeTab = function(id) {
@@ -60,6 +61,15 @@ function TabManager(selector) {
             return tab.contents().not(tab.children()).text().trim(); // 닫기 버튼의 텍스트를 제외하고 탭의 제목만 반환
         } else {
             return null; // 해당 ID를 가진 탭이 없는 경우
+        }
+    };
+    //  탭의 컨텐츠에 HTML을 넣는 함수
+    this.addTabContent = function(id, htmlContent) {
+        var tabContent = this.tabContent.find('#' + id);
+        if (tabContent.length > 0) {
+            tabContent.html(htmlContent); // 해당 탭의 컨텐츠 영역에 HTML 삽입
+        } else {
+            console.warn("No tab content area found for ID '" + id + "'.");
         }
     };
 }

@@ -31,10 +31,28 @@ function create_billboard_candle_chart(divId, columns, name) {
                 }
             }
         },
-        bindto: "#" + divId
+        bindto: d3.select("#" + divId)
     });
 }
 
+function extract_candle_data(list, openField, highField, lowField, closeField) {
+    let column1 = ['data1'];  // 초기 값 설정
+    
+    // 리스트의 각 항목을 순회하여 필드에 맞는 데이터를 추출
+    for (let i = list.length - 1; i >= 0; i--) {
+        let item = list[i];
+        
+        // 주어진 필드명을 사용해 시가, 고가, 저가, 종가 데이터를 배열로 추가
+        column1.push([
+            Number(item[openField]),  // 시가
+            Number(item[highField]),  // 고가
+            Number(item[lowField]),   // 저가
+            Number(item[closeField])  // 종가
+        ]);
+    }
+
+    return column1;  // 완성된 데이터를 반환
+}
 /**
 const $td = $('<td></td>').append('<canvas width="200" height="50"></canvas>');
 // canvas 요소 선택
@@ -65,7 +83,7 @@ function drawHorizontalCandle(ctx, open, close, high, low) {
     ctx.stroke();
 
     // 캔들 몸통
-    ctx.fillStyle = open > close ? "red" : "green"; // 시가 > 종가면 붉은 캔들
+    ctx.fillStyle = open > close ? "red" : "blue"; // 시가 > 종가면 붉은 캔들
     ctx.fillRect(openX, (height - candleWidth) / 2, closeX - openX, candleWidth);
 
     // 캔들 아래꼬리 (low)
