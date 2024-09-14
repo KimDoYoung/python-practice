@@ -25,7 +25,7 @@
 </div>
 <div>
     <h1 id="title"></h1>
-    <textarea name="result" id="result" style="width:100%; height:500px"></textarea>
+    <!-- <textarea name="result" id="result" style="width:100%; height:500px"></textarea> -->
     <div id="chart0"></div>
     <div id="tab-area"></div>
 </div>
@@ -39,17 +39,29 @@
 <script>
 let current_stk_code = '005930';
 var tabManager = new TabManager('#tab-area');
+function displayDataAtTab(tabName, title, data){
+        let tabId =tabManager.addTab(tabName, title);
+        tabManager.addTabContent(tabId, '<textarea style="width:100%; height:500px"></textarea><div id="chart2"></div>');
+        const content = tabManager.getTabContent(tabId);
+        content.find('textarea').val(JSON.stringify(data));
+        tabManager.selectTab(tabId);           
+    }    
 $( document ).ready(function() {
     $('#test1').click(function(){
         const url = `/api/v1/kis/inquire-daily-price/${current_stk_code}/D`;
         getFetch(url).then(data => {
             console.log(data);
+            //tab 만들어서 넣기    
             let tabId =tabManager.addTab('tab1', '주식현재가일자별', function(){
                 console.log('tab1')
             });
-            tabManager.addTabContent(tabId, '<div id="chart1"></div>');
+            tabManager.addTabContent(tabId, '<textarea style="width:100%; height:500px"></textarea><div id="chart11"></div>');
+            const content = tabManager.getTabContent(tabId);
+            content.find('textarea').val(JSON.stringify(data));
+            tabManager.selectTab(tabId);
+            //chart
             let column1 = extract_candle_data(data.output, 'stck_oprc', 'stck_hgpr', 'stck_lwpr', 'stck_clpr');
-            create_billboard_candle_chart("chart1",[column1], 'title1')            
+            create_billboard_candle_chart("tab-area chart11",[column1], 'title1')
         }).catch(error=> {
             console.error(error.message);
             showToastError(error);
@@ -61,10 +73,12 @@ $( document ).ready(function() {
         const url = `/api/v1/kis/inquire-time-itemchartprice/${current_stk_code}/${nowHHmm}`;
         getFetch(url).then(data => {
             console.log(data);
-            let tabId =tabManager.addTab('tab2', '일봉데이터', function(){
-                console.log('tab2')
-            });
-            tabManager.addTabContent(tabId, '<div id="chart2"></div>');
+            let tabId =tabManager.addTab('tab2', '일봉데이터');
+            tabManager.addTabContent(tabId, '<textarea style="width:100%; height:500px"></textarea><div id="chart2"></div>');
+            const content = tabManager.getTabContent(tabId);
+            content.find('textarea').val(JSON.stringify(data));
+            tabManager.selectTab(tabId);
+
             let column1 = extract_candle_data(data.output2, 'stck_oprc', 'stck_hgpr', 'stck_lwpr', 'stck_prpr');
             create_billboard_candle_chart("chart2",[column1], 'title1')            
 
@@ -73,11 +87,13 @@ $( document ).ready(function() {
             showToastError(error);
         });
     });
+
     //현재가2 시세2
     $('#test3').click(function(){
         const url = `/api/v1/kis/inquire-price2/${current_stk_code}`;
         getFetch(url).then(data => {
             console.log(data);
+            displayDataAtTab('tab3', '현재가2 시세2', data);
         }).catch(error=> {
             console.error(error.message);
             showToastError(error);
@@ -90,6 +106,7 @@ $( document ).ready(function() {
         const url = `/api/v1/kis/invest-opinion/${current_stk_code}/${startYmd}/${endYmd}`;
         getFetch(url).then(data => {
             console.log(data);
+            displayDataAtTab('tab3', '현재가2 시세2', data);
         }).catch(error=> {
             console.error(error.message);
             showToastError(error);
@@ -103,6 +120,7 @@ $( document ).ready(function() {
         const url = `/api/v1/kis/invest-opbysec/${iscd}/${startYmd}/${endYmd}`;
         getFetch(url).then(data => {
             console.log(data);
+            
         }).catch(error=> {
             console.error(error.message);
             showToastError(error);
@@ -147,8 +165,7 @@ $( document ).ready(function() {
         const url = '/api/v1/kis/income-statement/005930';
         getFetch(url).then(data => {
             console.log(data); 
-            $('#title').text("손익계산서");
-            $('#result').val(JSON.stringify(data));
+            displayDataAtTab('apitest2', '손익계산서', data);
         }).catch(error=> {
             console.error(error.message); 
         });
@@ -158,8 +175,7 @@ $( document ).ready(function() {
         const url = '/api/v1/kis/financial-ratio/005930';
         getFetch(url).then(data => {
             console.log(data); 
-            $('#title').text("재무비율");
-            $('#result').val(JSON.stringify(data));
+            displayDataAtTab('apitest3', '재무비율', data);
         }).catch(error=> {
             console.error(error.message); 
         });
@@ -169,8 +185,7 @@ $( document ).ready(function() {
         const url = '/api/v1/kis/profit-ratio/005930';
         getFetch(url).then(data => {
             console.log(data); 
-            $('#title').text("수익성비율");
-            $('#result').val(JSON.stringify(data));
+            displayDataAtTab('apitest4', '수익성비율', data);
         }).catch(error=> {
             console.error(error.message); 
         });
@@ -180,8 +195,7 @@ $( document ).ready(function() {
         const url = '/api/v1/kis/other-major-ratios/005930';
         getFetch(url).then(data => {
             console.log(data);
-            $('#title').text("기타주요비율");
-            $('#result').val(JSON.stringify(data)); 
+            displayDataAtTab('apitest5', '기타주요비율', data);
         }).catch(error=> {
             console.error(error.message); 
         });
@@ -191,8 +205,7 @@ $( document ).ready(function() {
         const url = '/api/v1/kis/stability-ratio/005930';
         getFetch(url).then(data => {
             console.log(data); 
-            $('#title').text("안정성비율");
-            $('#result').val(JSON.stringify(data));
+            displayDataAtTab('apitest6', '안정성비율', data);
         }).catch(error=> {
             console.error(error.message); 
         });
@@ -202,8 +215,7 @@ $( document ).ready(function() {
         const url = '/api/v1/kis/growth-ratio/005930';
         getFetch(url).then(data => {
             console.log(data);
-            $('#title').text("성장성비율");
-            $('#result').val(JSON.stringify(data));
+            displayDataAtTab('apitest7', '성장성비율', data);
         }).catch(error=> {
             console.error(error.message); 
         });
@@ -213,8 +225,7 @@ $( document ).ready(function() {
         const url = '/api/v1/kis/foreign-institution-total';
         getFetch(url).then(data => {
             console.log(data);
-            $('#title').text("국내기관_외국인 매매종목가집계");
-            $('#result').val(JSON.stringify(data));
+            displayDataAtTab('apitest8', '국내기관_외국인 매매종목가집계', data);
         }).catch(error=> {
             console.error(error.message); 
         });
@@ -226,8 +237,7 @@ $( document ).ready(function() {
         const url = `/api/v1/kis/inquire-daily-trade-volume/${frYmd}/${toYmd}/005930`;
         getFetch(url).then(data => {
             console.log(data);
-            $('#title').text("종목별일별매수매도체결량");
-            $('#result').val(JSON.stringify(data));
+            displayDataAtTab('apitest9', '종목별일별매수매도체결량', data);
         }).catch(error=> {
             console.error(error.message); 
         });
