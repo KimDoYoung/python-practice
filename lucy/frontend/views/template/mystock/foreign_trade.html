@@ -117,7 +117,9 @@
             <td class="text-end">{{displayWon frgn_ntby_tr_pbmn}}</td>
             <td class="text-end">{{displayWon orgn_ntby_qty}}</td>
             <td class="text-end">{{displayWon orgn_ntby_tr_pbmn}}</td>
-            <td><button class="btnAddAttension btn btn-warning btn-sm" data-stk-code="{{mksc_shrn_iscd}}" data-stk-name="{{hts_kor_isnm}}" title="관심..추가"><i class="bi bi-plus"></i></button>
+            <td>
+                <button class="btnAddAttension btn btn-warning btn-sm" data-stk-code="{{mksc_shrn_iscd}}" data-stk-name="{{hts_kor_isnm}}" title="{{hts_kor_isnm}} 관심..추가"><i class="bi bi-plus"></i></button>
+                <a href="/page?path=mystock/stock_detail&stk_code={{this.mksc_shrn_iscd}}" class="btn btn-primary btn-sm" title="{{hts_kor_isnm}} 상세보기" target="_blank"><i class="bi bi-eye"></i></a>
             </td>
           </tr>
             {{/each}}
@@ -186,7 +188,7 @@ function fetchAndMakeTable(){
         const rank_sort_cls_code = $('input[name=rank_sort_cls_code]:checked').val();
         const etc_cls_code = $('input[name=etc_cls_code]:checked').val();
 
-        url += '?is_cd=0000&div_cls=0&rank_sort_cls_code=0&etc_cls_code=0';
+        url += `?is_cd=${ls_cd}&div_cls=${div_cls}&rank_sort_cls_code=${rank_sort_cls_code}&etc_cls_code=${etc_cls_code}`;
         getFetch(url).then(data => {
             console.log(data);
             current_list = data.output;
@@ -211,6 +213,10 @@ $( document ).ready(function() {
     $('input[name=etc_cls_code]').change(function(){
         fetchAndMakeTable();
     });
+    
+
+
+    // Head 정렬 이벤트
     $('#result-area').on('click', '.sort-title', function() {
         const fieldName = $(this).data('field');
         console.log('sort:', fieldName);
