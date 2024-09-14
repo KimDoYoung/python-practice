@@ -35,7 +35,7 @@
             <tr class="table-warning">
                 <th>영업일자</th>
                 <th>종목코드</th>
-                <th>종목명</th>
+                <th><a href="#" data-field="hts_kor_isnm" class="sort-title">종목명<i class="bi"></i></a></th>
                 <th>회원사</th>
                 <th>투자의견</th>
                 <th class="text-end"><a href="#" data-field="stck_prpr" class="sort-title">현재가<i class="bi"></i></a></th>
@@ -100,14 +100,25 @@ function makeTable() {
     //정렬
     let fieldName = currentSort.field;
     if(fieldName){
-        list.sort(function(a, b) {
-            let x = parseFloat(a[fieldName]);
-            let y = parseFloat(b[fieldName]);
+        if(fieldName === 'hts_kor_isnm'){
+            list.sort(function(a, b) {
+                let x = a[fieldName].toUpperCase();
+                let y = b[fieldName].toUpperCase();
 
-            if (x < y) return currentSort.direction === 'asc' ? -1 : 1;
-            if (x > y) return currentSort.direction === 'asc' ? 1 : -1;
-            return 0;
-        });
+                if (x < y) return currentSort.direction === 'asc' ? -1 : 1;
+                if (x > y) return currentSort.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }else{
+            list.sort(function(a, b) {
+                let x = parseFloat(a[fieldName]);
+                let y = parseFloat(b[fieldName]);
+
+                if (x < y) return currentSort.direction === 'asc' ? -1 : 1;
+                if (x > y) return currentSort.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
     }
 
 

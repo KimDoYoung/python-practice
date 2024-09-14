@@ -84,7 +84,7 @@
     <table class="table table-striped table-bordered">
         <thead class="table-secondary">
             <tr class="align-middle">
-                <th class="text-center" rowspan="2">종목명</th>
+                <th class="text-center" rowspan="2"><a href="#" data-field="hts_kor_isnm" class="sort-title">종목명<i class="bi"></i></a></th>
                 <th class="text-center" rowspan="2">코드</th>
                 <th class="text-center" rowspan="2"><a href="#" data-field="ntby_qty" class="sort-title">순매수 수량<i class="bi"></i></a></th>
                 <th class="text-center" rowspan="2"><a href="#" data-field="stck_prpr" class="sort-title">현재가<i class="bi"></i></a></th>
@@ -140,6 +140,24 @@ function makeTable(list){
     }
     let fieldName = currentSort.field;
     if(fieldName){
+        if (fieldName == 'hts_kor_isnm') {
+            list.sort(function(a, b) {
+                let x = a[fieldName].toUpperCase();
+                let y = b[fieldName].toUpperCase();
+                if (x < y) return currentSort.direction === 'asc' ? -1 : 1;
+                if (x > y) return currentSort.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+        } else {
+            list.sort(function(a, b) {
+                let x = parseFloat(a[fieldName]);
+                let y = parseFloat(b[fieldName]);
+
+                if (x < y) return currentSort.direction === 'asc' ? -1 : 1;
+                if (x > y) return currentSort.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
         list.sort(function(a, b) {
             let x = parseFloat(a[fieldName]);
             let y = parseFloat(b[fieldName]);

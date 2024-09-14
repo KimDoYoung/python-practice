@@ -31,7 +31,7 @@ function create_billboard_candle_chart(divId, columns, name) {
                 }
             }
         },
-        bindto: d3.select("#" + divId)
+        bindto: '#'+divId // d3.select(divId)
     });
 }
 

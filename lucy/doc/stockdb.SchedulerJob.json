@@ -24,4 +24,11 @@
   "run_type": "cron",
   "args": "LS stk_info채우기",
   "cron_str": "53 15 * * *"
-}]
+},
+{
+    "job_id": "judal_fetch",
+    "run_type": "cron",
+    "args": "주달 데이터 가져오기",
+    "cron_str": "53 15 * * *"
+  }
+]

@@ -43,7 +43,7 @@
                 <th scope="col">순위</th>
                 <th scope="col">거래소</th>
                 <th scope="col">종목코드</th>
-                <th scope="col">종목명</th>
+                <th scope="col"><a href="#" data-field="hts_kor_isnm" class="sort-title">종목명<i class="bi"></i></a></th>
                 <th class="text-end" scope="col"><a href="#" data-field="inter2_prpr" class="sort-title">현재가<i class="bi"></i></a></th>
                 <th class="text-end" scope="col"><a href="#" data-field="inter2_prdy_vrss" class="sort-title">전일대비<i class="bi"></i></a></th>
                 <th class="text-end" scope="col"><a href="#" data-field="prdy_ctrt" class="sort-title">전일대비율<i class="bi"></i></a></th>
@@ -74,8 +74,8 @@
                 <td class="text-end" id="{{jong_code}}_acml_vol">{{displayWon acml_vol}}</td>
                 <td class="text-end" id="{{jong_code}}_acml_tr_pbmn">{{displayJoEok2 acml_tr_pbmn}}</td>
                 <td>
-                    <button class="btnBuy btn btn-danger btn-sm" data-stk-code="{{this.jong_code}}" data-stk-name="{{this.hts_kor_isnm}}">買</button>
-                    <button class="btnSell btn btn-primary btn-sm" data-stk-code="{{this.jong_code}}" data-stk-name="{{this.hts_kor_isnm}}">賣</button>
+                    <button class="btnBuy btn btn-danger btn-sm" data-stk-code="{{this.jong_code}}" data-stk-name="{{this.hts_kor_isnm}}" title="매수(Buy)">買</button>
+                    <button class="btnSell btn btn-primary btn-sm" data-stk-code="{{this.jong_code}}" data-stk-name="{{this.hts_kor_isnm}}" title="매도(Sell)">賣</button>
                     <button class="btnDantaAdd btn btn-warning btn-sm" data-stk-code="{{this.jong_code}}" data-stk-name="{{this.hts_kor_isnm}}" title="관심 추가"><i class="bi bi-plus-circle"></i></button>
                     <a href="/page?path=mystock/stock_detail&stk_code={{this.jong_code}}" class="btn btn-primary btn-sm" title="상세보기"><i class="bi bi-eye"></i></a>
                 </td>
@@ -114,54 +114,29 @@ function initialize(){
         showAlertError(error);
     });
 }
-// function get_multi_price(){
-//     const url = '/api/v1/kis/attension/multi_price/' + current_stock_code_list.join('');
-//     getFetch(url).then(data => {
-//         console.log('멀티가격');
-//         console.log(data);
-//         let list = data.output
-//         for (let i = 0; i < list.length; i++) {
-//             const item = list[i];
-//             const code = item.inter_shrn_iscd;
-//             const prpr = item.inter2_prpr;
-//             const inter2_prdy_vrss = item.inter2_prdy_vrss;
-//             const ctrt = item.prdy_ctrt;
-//             const acml_vol = item.acml_vol;
-//             const acml_tr_pbmn = moneyFormat(Number(item.acml_tr_pbmn));
-//             const total_askp_rsqn = item.total_askp_rsqn;
-//             const total_bidp_rsqn = item.total_bidp_rsqn;
-//             $('#stock-list-area').find('#'+code + '_prpr').text(Number(prpr).toLocaleString());
-//             if (inter2_prdy_vrss <= 0) {
-//                 $('#stock-list-area').find('#'+code + '_inter2_prdy_vrss').removeClass('text-danger').addClass('text-primary'); 
-//                 $('#stock-list-area').find('#'+code + '_ctrt').removeClass('text-danger').addClass('text-primary'); 
-//             } else {
-//                 $('#stock-list-area').find('#'+code + '_inter2_prdy_vrss').removeClass('text-primary').addClass('text-danger');
-//                 $('#stock-list-area').find('#'+code + '_ctrt').removeClass('text-primary').addClass('text-danger');
-//             }
-//             $('#stock-list-area').find('#'+code + '_inter2_prdy_vrss').text(Number(inter2_prdy_vrss).toLocaleString());
-//             $('#stock-list-area').find('#'+code + '_ctrt').text(ctrt);
-//             $('#stock-list-area').find('#'+code + '_total_askp_rsqn').text(Number(total_askp_rsqn).toLocaleString());
-//             $('#stock-list-area').find('#'+code + '_total_bidp_rsqn').text(Number(total_bidp_rsqn).toLocaleString());
-//             $('#stock-list-area').find('#'+code + '_acml_vol').text(Number(acml_vol).toLocaleString());
-//             $('#stock-list-area').find('#'+code + '_acml_tr_pbmn').text(acml_tr_pbmn);
-//         }
-//     }).catch(error=> {
-//         console.error(error.message); 
-//         showAlertError(error);
-//     });
-// }
+
 // list로 테이블 HTML을 만들어서 화면에 보여준다.
 function makeTable(list){
     if (!list || list.length == 0) return;
     //sort
     if (currentSort.field) {
-        list.sort((a, b) => {
-            if (currentSort.direction === 'asc') {
-                return Number(a[currentSort.field]) > Number(b[currentSort.field]) ? 1 : -1;
-            } else {
-                return Number(a[currentSort.field]) < Number(b[currentSort.field]) ? 1 : -1;
-            }
-        });
+        if (currentSort.field === 'hts_kor_isnm') {
+            list.sort((a, b) => {
+                if (currentSort.direction === 'asc') {
+                    return a[currentSort.field] > b[currentSort.field] ? 1 : -1;
+                } else {
+                    return a[currentSort.field] < b[currentSort.field] ? 1 : -1;
+                }
+            });
+        } else {
+            list.sort((a, b) => {
+                if (currentSort.direction === 'asc') {
+                    return Number(a[currentSort.field]) > Number(b[currentSort.field]) ? 1 : -1;
+                } else {
+                    return Number(a[currentSort.field]) < Number(b[currentSort.field]) ? 1 : -1;
+                }
+            });
+        }
     }
 
     // handlebar template을 이용하여 HTML을 만들어서 화면에 보여준다.
