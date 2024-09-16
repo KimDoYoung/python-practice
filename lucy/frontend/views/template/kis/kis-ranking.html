@@ -54,7 +54,86 @@ Handlebars.registerHelper('addBgColor', function(value, className) {
     }
     return '';
 });
+let afterBuffer ={
+    list : [],
+    currentSort : { field: null, direction:  'asc'},
+    template : null
+}
+let hogaBuffer ={
+    list : [],
+    currentSort : { field: null, direction:  'asc'},
+    template : null
+}
+function makeTableAfter(){
+    const list = afterBuffer.list;
+    //정렬
+    const sortField = afterBuffer.currentSort.field;
+    const sortDirection = afterBuffer.currentSort.direction;
+    if (sortField){
+        if (sortField == 'hts_kor_isnm'){
+            list.sort((a,b) => {
+                if (sortDirection == 'asc'){
+                    return a[sortField].localeCompare(b[sortField]);
+                }else{
+                    return b[sortField].localeCompare(a[sortField]);
+                }
+            });
+        }else{
+            list.sort((a,b) => {
+                if (sortDirection == 'asc'){
+                    return Number(a[sortField]) - Number(b[sortField]);
+                }else{
+                    return Number(b[sortField]) - Number(a[sortField]);
+                }
+            });
+        }
+    }
+    const template = afterBuffer.template;
+    const html = template({list: list});
+    $('#title').text('시간외호가잔량');
+    $('#result').html(html);
 
+    // 아이콘 설정
+    const $resultArea = $('#result').find('table thead tr');
+    $resultArea.find('.sort-title i').removeClass('bi-arrow-up bi-arrow-down');  // 모든 아이콘 제거
+    var currentIcon = afterBuffer.currentSort.direction === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down';
+    $resultArea.find('a[data-field="' + afterBuffer.currentSort.field + '"] i').addClass(currentIcon);    
+}
+function makeTableHoga(){
+    const list = hogaBuffer.list;
+    //정렬
+    const sortField = hogaBuffer.currentSort.field;
+    const sortDirection = hogaBuffer.currentSort.direction;
+    if (sortField){
+        if (sortField == 'hts_kor_isnm'){
+            list.sort((a,b) => {
+                if (sortDirection == 'asc'){
+                    return a[sortField].localeCompare(b[sortField]);
+                }else{
+                    return b[sortField].localeCompare(a[sortField]);
+                }
+            });
+        }else{
+            list.sort((a,b) => {
+                if (sortDirection == 'asc'){
+                    return Number(a[sortField]) - Number(b[sortField]);
+                }else{
+                    return Number(b[sortField]) - Number(a[sortField]);
+                }
+            });
+        }
+    }
+    const template = hogaBuffer.template;
+    const html = template({list: list});
+    $('#title').text('시간외호가잔량');
+    $('#result').html(html);
+
+    // 아이콘 설정
+    const $resultArea = $('#result').find('table thead tr');
+    $resultArea.find('.sort-title-hoga i').removeClass('bi-arrow-up bi-arrow-down');  // 모든 아이콘 제거
+    var currentIcon = hogaBuffer.currentSort.direction === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down';
+    $resultArea.find('a[data-field="' + hogaBuffer.currentSort.field + '"] i').addClass(currentIcon);    
+}
 $( document ).ready(function() {
     console.log( "ready!")
     $('#btnTimeoutHogaJanrang').on('click',async function(){
@@ -66,16 +145,16 @@ $( document ).ready(function() {
         }
         
         const template = await fetch_handlebar_and_compile('kis/after-hour-hogajanrang.html')
+        afterBuffer.template = template;
         postFetch(url, data)
             .then(data => {
                 console.log(data);
                 if (data.rt_cd != '0'){
                     $('#result').html(data.msg1);
                     return;
-                }                
-                const html = template({list: data.output});
-                $('#title').text('시간외호가잔량');
-                $('#result').html(html);
+                }
+                afterBuffer.list = data.output;
+                makeTableAfter();                
             })
             .catch(error => {
                 $('#result').html(error.message);
@@ -90,17 +169,16 @@ $( document ).ready(function() {
         }
         
         const template = await fetch_handlebar_and_compile('kis/quote-balance.html')
+        hogaBuffer.template = template;
         postFetch(url, data)
             .then(data => {
                 console.log(data);
-                debugger;
                 if (data.rt_cd != '0'){
                     $('#result').html(data.msg1);
                     return;
                 }
-                const html = template({list: data.output});
-                $('#title').text('호가잔량');
-                $('#result').html(html);
+                hogaBuffer.list = data.output;
+                makeTableHoga();
             })
             .catch(error => {
                 $('#result').html(error.message);
@@ -119,8 +197,24 @@ $( document ).ready(function() {
             console.error(error.message);
             showAlertError(error);
         });
-    });    
+    });
+    $('#result').on('click', '.sort-title', function() {
+        const fieldName = $(this).data('field');
+        console.log('sort:', fieldName);
+        var isAscending = afterBuffer.currentSort.field === fieldName && afterBuffer.currentSort.direction === 'asc';
+        afterBuffer.currentSort.direction = isAscending ? 'desc' : 'asc';
+        afterBuffer.currentSort.field = fieldName;
+        makeTableAfter();
+    });        
+    $('#result').on('click', '.sort-title-hoga', function() {
+        const fieldName = $(this).data('field');
+        console.log('sort:', fieldName);
+        var isAscending = hogaBuffer.currentSort.field === fieldName && hogaBuffer.currentSort.direction === 'asc';
+        hogaBuffer.currentSort.direction = isAscending ? 'desc' : 'asc';
+        hogaBuffer.currentSort.field = fieldName;
+        makeTableHoga();
+    });        
 });
 </script>
 {% endraw %}
-{% endblock %}
+{% endblock %}   

@@ -91,33 +91,3 @@ class Scheduler:
         except Exception as e:
             return {"error": str(e)}
     
-    # async def save_job_to_db(self, job_request: JobRequest):
-    #     logger.info(f"Job을 데이터베이스에 저장합니다. job_id: {job_request.job_id}")
-    #     job_data = job_request.model_dump()
-    #     job_data["func_name"] = job_request.job_name
-    #     #job = SchedulerJob(**job_data)
-    #     job = await Scheduler.find_one(SchedulerJob.job_id == job_data.job_id)
-    #     if job:
-    #         job.delete()
-
-    #     await SchedulerJob.insert_one(job_data)    
-        
-    #     #await SchedulerJob.replace_one({"job_id": job.job_id}, job.model_dump(), upsert=True)
-
-    # async def remove_job_from_db(self, job_id: str):
-    #     await SchedulerJob.find_one(SchedulerJob.job_id == job_id).delete()
-
-    # async def load_jobs_from_db(self):
-    #         logger.info("---> 스케줄러 Jobs를 데이터베이스에서 loading...")
-    #         # 현재 스케줄러의 모든 작업을 제거
-    #         self.scheduler.remove_all_jobs()
-
-    #         # 데이터베이스에서 작업을 로드하여 스케줄러에 추가
-    #         jobs = await SchedulerJob.find_all().to_list()
-    #         for job_data in jobs:
-    #             job = JobRequest(**job_data.model_dump())
-    #             func = globals().get(job.func_name)
-    #             if job.run_type == "cron":
-    #                 self.scheduler.add_job(func, CronTrigger.from_crontab(job.cron), id=job.job_id, args=job.args)
-    #             elif job.run_type == "date":
-    #                 self.scheduler.add_job(func, DateTrigger(run_date=job.run_date), id=job.job_id, args=job.args)

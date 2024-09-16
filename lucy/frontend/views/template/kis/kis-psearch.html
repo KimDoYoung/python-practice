@@ -46,8 +46,10 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="card-title text-primary">{{toggleCompanyCanvas this.code this.name}}</h5>
                     <div>
-                        <button class="btnBuy btn btn-danger" data-stk-code="{{this.code}}" data-stk-name="{{this.name}}">買</button>
-                        <button class="btnAddDanta btn btn-primary" data-stk-code="{{this.code}}" data-stk-name="{{this.name}}" title="관심 추가">+</button>
+                        <button class="btnBuy btn btn-danger btn-sm" data-stk-code="{{this.code}}" data-stk-name="{{this.name}}">買</button>
+                        <button class="btnAddDanta btn btn-warning btn-sm" data-stk-code="{{this.code}}" data-stk-name="{{this.name}}" title="{{this.name}} 관심 추가">+</button>
+                        <a href="/page?path=mystock/stock_detail&stk_code={{this.code}}" class="btn btn-primary btn-sm" title="{{this.name}} 상세보기" target="_blank"><i class="bi bi-eye"></i></a>
+
                     </div>
                 </div>
                 <div class="card-body">
