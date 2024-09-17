@@ -1,32 +1,32 @@
 {% raw %}
 <table class="table table-bordered table-hover table-sm">
-    <thead>
+    <thead class="table-success">
         <tr>
             <th>종목명</th>
+            <th class="text-center">종목코드</th>
             <th class="text-end">현재가</th>
-            <th>전일대비구분</th>
-            <th class="text-end">전일대비</th>
-            <th class="text-end">등락율</th>
             <th class="text-end">누적거래량</th>
             <th class="text-end">회전율</th>
             <th class="text-end">전일거래량</th>
             <th class="text-end">전일비</th>
-            <th>종목코드</th>
+            <th class="text-center">동작</th>
         </tr>
-    </thead>
-    <tbody>
+</thead>
+<tbody>
         {{#each list}}
         <tr>
-            <td>{{hname}}</td>
-            <td class="text-end">{{price}}</td>
-            <td>{{sign}}</td>
-            <td class="text-end">{{change}}</td>
-            <td class="text-end">{{diff}}</td>
-            <td class="text-end">{{volume}}</td>
+            <td>{{toggleCompanyCanvas shcode hname}}</td>
+            <td>{{goNaver shcode}}</td>
+            <td class="text-end">{{displayWon price}}</td>
+            <td class="text-end">{{displayWon volume}}</td>
             <td class="text-end">{{vol}}</td>
-            <td class="text-end">{{jnilvolume}}</td>
+            <td class="text-end">{{displayWon jnilvolume}}</td>
             <td class="text-end">{{bef_diff}}</td>
-            <td>{{shcode}}</td>
+            <td class="text-center">
+                <button class="btnAddAttension btn btn-warning btn-sm" data-stk-code="{{this.shcode}}" data-stk-name="{{this.hname}}" title="{{hname}} 관심추가"><i class="bi bi-plus"></i></button>
+                <a href="/page?path=mystock/stock_detail&stk_code={{this.shcode}}" class="btn btn-primary btn-sm" title="{{hname}} 상세보기" target="_blank"><i class="bi bi-eye"></i></a>                
+            </td>
+
         </tr>
         {{/each}}
     </tbody>

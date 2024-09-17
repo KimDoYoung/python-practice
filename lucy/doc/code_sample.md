@@ -33,13 +33,14 @@ create_billboard_candle_chart("offcanvas_daily_chart",columns, x_name)
     회사정보
     <td>{{toggleCompanyCanvas stck_shrn_iscd hts_kor_isnm}}</td>
     상세보기로 이동
-    <a href="/page?path=mystock/stock_detail&stk_code={{this.stk_code}}" class="btn btn-primary btn-sm" title="상세보기" target="_blank"><i class="bi bi-eye"></i></a>
+    
 ```
 
 ## 관심추가
 
 ```html
 <button class="btnAddAttension btn btn-warning btn-sm" data-stk-code="{{this.stk_code}}" data-stk-name="{{this.stk_name}}" title="관심..추가"><i class="bi bi-plus"></i></button>
+<a href="/page?path=mystock/stock_detail&stk_code={{this.stk_code}}" class="btn btn-primary btn-sm" title="상세보기" target="_blank"><i class="bi bi-eye"></i></a>
 
 ```
 

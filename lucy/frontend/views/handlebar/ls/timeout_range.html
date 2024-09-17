@@ -1,11 +1,11 @@
 {% raw %}
 <table class="table table-bordered table-hover table-sm">
-    <thead>
+    <thead class="table-success">
         <tr>
-            <th>종목코드</th>
             <th>한글명</th>
+            <th>종목코드</th>
             <th class="text-end">현재가</th>
-            <th>전일대비구분</th>
+            <th>구분</th>
             <th class="text-end">전일대비</th>
             <th class="text-end">등락율</th>
             <th class="text-end">누적거래량</th>
@@ -14,23 +14,28 @@
             <th class="text-end">매도호가</th>
             <th class="text-end">매수호가</th>
             <th class="text-end">누적거래대금</th>
+            <th class="text-center">동작</th>
         </tr>
     </thead>
     <tbody>
         {{#each list}}
         <tr>
-            <td>{{shcode}}</td>
-            <td>{{hname}}</td>
-            <td class="text-end">{{price}}</td>
-            <td>{{sign}}</td>
-            <td class="text-end">{{change}}</td>
+            <td>{{toggleCompanyCanvas shcode hname}}</td>
+            <td>{{goNaver shcode}}</td>
+            <td class="text-end">{{displayWon price}}</td>
+            <td>{{displaySign sign}}</td>
+            <td class="text-end">{{displayWon change}}</td>
             <td class="text-end">{{diff}}</td>
-            <td class="text-end">{{volume}}</td>
-            <td class="text-end">{{offerrem1}}</td>
-            <td class="text-end">{{bidrem1}}</td>
-            <td class="text-end">{{offerho1}}</td>
-            <td class="text-end">{{bidho1}}</td>
-            <td class="text-end">{{value}}</td>
+            <td class="text-end">{{displayWon volume}}</td>
+            <td class="text-end">{{displayWon offerrem1}}</td>
+            <td class="text-end">{{displayWon bidrem1}}</td>
+            <td class="text-end">{{displayWon offerho1}}</td>
+            <td class="text-end">{{displayWon bidho1}}</td>
+            <td class="text-end">{{displayWon value}}</td>
+            <td class="text-center">
+                <button class="btnAddAttension btn btn-warning btn-sm" data-stk-code="{{this.shcode}}" data-stk-name="{{this.hname}}" title="{{hname}} 관심추가"><i class="bi bi-plus"></i></button>
+                <a href="/page?path=mystock/stock_detail&stk_code={{this.shcode}}" class="btn btn-primary btn-sm" title="{{hname}} 상세보기" target="_blank"><i class="bi bi-eye"></i></a>                
+            </td>
         </tr>
         {{/each}}
     </tbody>
