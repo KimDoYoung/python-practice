@@ -132,15 +132,91 @@ Handlebars.registerHelper('addBgColor', function(value, className) {
 </script>
 {% raw %}
 <script>
-cacheBuffer = {
-    range: {
-        template: null,
-        list : null,
-    },
-}
+
 const templateCache = new TemplateCache();
+
+function createBuffer() {
+    return {
+        list: [],
+        currentSort: { field: null, direction: 'asc' },
+        template: null
+    };
+}
+
+let buffers = {}; // 빈 객체 선언
+buffers['range'] = createBuffer();
+buffers['volumn'] = createBuffer();
+buffers['rapidup'] = createBuffer();
+buffers['timeoutrange'] = createBuffer();
+buffers['timeoutvolume'] = createBuffer();
+buffers['expectfulfill'] = createBuffer();
+buffers['expectdanilgarange'] = createBuffer();
+buffers['purchasecost'] = createBuffer();
+
+function makeTable(buffer){
+    const list = buffer.list;
+    //sorting
+    const currentSort = buffer.currentSort;
+    const field = currentSort.field;
+    const direction = currentSort.direction;
+
+   //정렬
+    let fieldName = currentSort.field;
+    if(fieldName){
+        if(fieldName === 'hname'){
+            list.sort(function(a, b) {
+                let x = a[fieldName].toUpperCase();
+                let y = b[fieldName].toUpperCase();
+
+                if (x < y) return currentSort.direction === 'asc' ? -1 : 1;
+                if (x > y) return currentSort.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }else{
+            list.sort(function(a, b) {
+                let x = parseFloat(a[fieldName]);
+                let y = parseFloat(b[fieldName]);
+
+                if (x < y) return currentSort.direction === 'asc' ? -1 : 1;
+                if (x > y) return currentSort.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
+    }
+
+    //html 만들기
+    const template = buffer.template;
+    const html = template({ list: list });
+    $("#list-area").html(html);
+
+    // 아이콘 설정
+    const $resultArea = $('#result-area').find('table thead tr');
+    $resultArea.find('.sort-title i').removeClass('bi-arrow-up bi-arrow-down');  // 모든 아이콘 제거
+    var currentIcon = currentSort.direction === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down';
+    $resultArea.find('a[data-field="' + currentSort.field + '"] i').addClass(currentIcon);
+
+}
 $(document).ready(function () {
     console.log("ready!");
+    //타이틀 Sorting
+    $('#list-area').on("click", "[class^='sort-']", function () {
+        const sortName = $(this).attr('class').split('-')[1];
+        const field = $(this).data('field');
+        const buffer = buffers[sortName];
+        if (buffer.currentSort.field === field) {
+            if (buffer.currentSort.direction === 'asc') {
+                buffer.currentSort.direction = 'desc';
+            } else {
+                buffer.currentSort.direction = 'asc';
+            }
+        } else {
+            buffer.currentSort.field = field;
+            buffer.currentSort.direction = 'asc';
+        }
+        makeTable(buffer);
+
+    });
+
     $('#list-area').on("click", ".btnAddAttension", function() {
         //관심을 추가한다.
         const stk_code = $(this).data('stk-code');
@@ -170,15 +246,14 @@ $(document).ready(function () {
         // debugger;
         JuliaUtil.displayLoading(true);
         const template = await templateCache.get("ls/range.html");
-        postFetch(url, data)
-        .then((data) => {
-            
+        postFetch(url, data).then((data) => {
             JuliaUtil.displayLoading(false);
             console.log(data);
-            const html = template({ list: data.t1441OutBlock1 });
-            $("#list-area").html(html);
-        })
-        .catch((error) => {
+            const list = data.t1441OutBlock1;
+            buffers.range.list = list;
+            buffers.range.template = template;
+            makeTable(buffers.range);
+        }).catch((error) => {
             JuliaUtil.displayLoading(false);
             $("#list-area").html(error.message);
         });
@@ -199,16 +274,18 @@ $(document).ready(function () {
         // debugger;
         JuliaUtil.displayLoading(true);
         const template = await templateCache.get("ls/volumn.html");
-        postFetch(url, data)
-            .then((data) => {
-            JuliaUtil.displayLoading(false);
-            console.log(data);
-            const html = template({ list: data.t1452OutBlock1 });
-            $("#list-area").html(html);
-            })
-            .catch((error) => {
-            JuliaUtil.displayLoading(false);
-            $("#list-area").html(error.message);
+        postFetch(url, data).then((data) => {
+                JuliaUtil.displayLoading(false);
+                console.log(data);
+                const list = data.t1452OutBlock1;
+                buffers.volumn.list = list;
+                buffers.volumn.template = template;            
+                const html = template({ list: list });
+                makeTable(buffers.volumn);
+            
+            }).catch((error) => {
+                JuliaUtil.displayLoading(false);
+                $("#list-area").html(error.message);
             });
     });
     //3.전일대비거래급증
@@ -227,16 +304,16 @@ $(document).ready(function () {
         // debugger;
         JuliaUtil.displayLoading(true);
         const template = await templateCache.get("ls/rapid_up.html");
-        postFetch(url, data)
-            .then((data) => {
-            JuliaUtil.displayLoading(false);
-            console.log(data);
-            const html = template({ list: data.t1466OutBlock1 });
-            $("#list-area").html(html);
-            })
-            .catch((error) => {
-            JuliaUtil.displayLoading(false);
-            $("#list-area").html(error.message);
+        postFetch(url, data).then((data) => {
+                JuliaUtil.displayLoading(false);
+                console.log(data);
+                const list = data.t1466OutBlock1;
+                buffers.rapidup.list = list;
+                buffers.rapidup.template = template;
+                makeTable(buffers.rapidup);
+            }).catch((error) => {
+                JuliaUtil.displayLoading(false);
+                $("#list-area").html(error.message);
             });
     });
     //4.시간외등락율
@@ -255,16 +332,16 @@ $(document).ready(function () {
         // debugger;
         JuliaUtil.displayLoading(true);
         const template = await templateCache.get("ls/timeout_range.html");
-        postFetch(url, data)
-            .then((data) => {
-            JuliaUtil.displayLoading(false);
-            console.log(data);
-            const html = template({ list: data.t1481OutBlock1 });
-            $("#list-area").html(html);
-            })
-            .catch((error) => {
-            JuliaUtil.displayLoading(false);
-            $("#list-area").html(error.message);
+        postFetch(url, data).then((data) => {
+                JuliaUtil.displayLoading(false);
+                console.log(data);
+                const list = data.t1481OutBlock1;
+                buffers.timeoutrange.list = list;
+                buffers.timeoutrange.template = template;
+                makeTable(buffers.timeoutrange);
+            }).catch((error) => {
+                JuliaUtil.displayLoading(false);
+                $("#list-area").html(error.message);
             });
     });
     //5.시간외거래량
@@ -283,19 +360,14 @@ $(document).ready(function () {
         // debugger;
         JuliaUtil.displayLoading(true);
         const template = await templateCache.get("ls/timeout_volume.html");
-        postFetch(url, data)
-            .then((data) => {
+        postFetch(url, data).then((data) => {
                 JuliaUtil.displayLoading(false);
                 console.log(data);
                 const list = data.t1482OutBlock1;
-                if (list.length === 0) {
-                    $("#list-area").html("데이터가 없습니다.");
-                    return;
-                }
-                const html = template({ list: list });
-                $("#list-area").html(html);
-            })
-            .catch((error) => {
+                buffers.timeoutvolume.list = list;
+                buffers.timeoutvolume.template = template;
+                makeTable(buffers.timeoutvolume);
+            }).catch((error) => {
                 JuliaUtil.displayLoading(false);
                 $("#list-area").html(error.message);
             });
@@ -316,16 +388,16 @@ $(document).ready(function () {
         // debugger;
         JuliaUtil.displayLoading(true);
         const template = await templateCache.get("ls/expect_fulfill.html");
-        postFetch(url, data)
-            .then((data) => {
-            JuliaUtil.displayLoading(false);
-            console.log(data);
-            const html = template({ list: data.t1489OutBlock1 });
-            $("#list-area").html(html);
-            })
-            .catch((error) => {
-            JuliaUtil.displayLoading(false);
-            $("#list-area").html(error.message);
+        postFetch(url, data).then((data) => {
+                JuliaUtil.displayLoading(false);
+                console.log(data);
+                const list = data.t1489OutBlock1;
+                buffers.expectfulfill.list = list;
+                buffers.expectfulfill.template = template;
+                makeTable(buffers.expectfulfill);
+            }).catch((error) => {
+                JuliaUtil.displayLoading(false);
+                $("#list-area").html(error.message);
             });
     });
     //7.단일가예상등락율
@@ -344,16 +416,16 @@ $(document).ready(function () {
         // debugger;
         JuliaUtil.displayLoading(true);
         const template = await templateCache.get("ls/expect_danilga_range.html");
-        postFetch(url, data)
-            .then((data) => {
-            JuliaUtil.displayLoading(false);
-            console.log(data);
-            const html = template({ list: data.t1492OutBlock1 });
-            $("#list-area").html(html);
-            })
-            .catch((error) => {
-            JuliaUtil.displayLoading(false);
-            $("#list-area").html(error.message);
+        postFetch(url, data).then((data) => {
+                JuliaUtil.displayLoading(false);
+                console.log(data);
+                const list = data.t1492OutBlock1;
+                buffers.expectdanilgarange.list = list;
+                buffers.expectdanilgarange.template = template;
+                makeTable(buffers.expectdanilgarange);
+            }).catch((error) => {
+                JuliaUtil.displayLoading(false);
+                $("#list-area").html(error.message);
             });
     });
 
@@ -373,16 +445,16 @@ $(document).ready(function () {
         // debugger;
         JuliaUtil.displayLoading(true);
         const template = await templateCache.get("ls/purchase_cost.html");
-        postFetch(url, data)
-            .then((data) => {
-            JuliaUtil.displayLoading(false);
-            console.log(data);
-            const html = template({ list: data.t1463OutBlock1 });
-            $("#list-area").html(html);
-            })
-            .catch((error) => {
-            JuliaUtil.displayLoading(false);
-            $("#list-area").html(error.message);
+        postFetch(url, data).then((data) => {
+                JuliaUtil.displayLoading(false);
+                console.log(data);
+                const list = data.t1463OutBlock1;
+                buffers.purchasecost.list = list;
+                buffers.purchasecost.template = template;
+                makeTable(buffers.purchasecost);
+            }).catch((error) => {
+                JuliaUtil.displayLoading(false);
+                $("#list-area").html(error.message);
             });
     });
 });
