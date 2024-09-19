@@ -294,8 +294,13 @@ function init(){
                     item.diff = found.diff;         // 등락율
                     item.price = found.price;       // 현재가
                     item.sign = found.sign;         // 전일대비구분
-                    item.change = found.change;     // 전일대비
                     item.diff = found.diff;         // 등락율
+                    if (item.diff < 0) {
+                        item.change = found.change * -1;     // 전일대비
+                    }else{
+                        item.change = found.change;     // 전일대비
+                    }
+                    
                     item.volume = found.volume;     // 누적거래량
                     item.offerho = found.offerho;   // 매도호가
                     item.bidho = found.bidho;       // 매수호가
@@ -564,6 +569,20 @@ $( document ).ready(function() {
             showAlertError(error); 
         });
     });
+    // btnBuy구매 버튼 클릭
+    $('#mystock-result-area').on('click', '.btnBuy', function(e){
+        e.stopPropagation();
+        const stk_code = $(this).data('stk-code');
+        const stk_name = $(this).data('stk-name');
+        showBuySellCanvas('',stk_code, stk_name, "매수", 1, 0);
+    })
+    // btnSell판매 버튼 클릭
+    $('#mystock-result-area').on('click', '.btnSell', function(e){
+        e.stopPropagation();
+        const stk_code = $(this).data('stk-code');
+        const stk_name = $(this).data('stk-name');
+        showBuySellCanvas('',stk_code, stk_name, "매도", 1, 0);
+    })    
 });
 </script>
 {% endraw %}

@@ -9,9 +9,10 @@
             "type": "debugpy",
             "request": "launch",
             "program": "${file}",
-            "console": "externalTerminal",
+            "console": "integratedTerminal",
             "cwd" : "${fileDirname}",
-            "env": {"PYTHONPATH": "${workspaceFolder}"}            
+            "justMyCode": false,
+            // "env": {"PYTHONPATH": "${workspaceFolder}"}       
         },
         {
             "name": "Debug-Lucy",

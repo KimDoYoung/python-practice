@@ -38,13 +38,28 @@ def get_stock_info(stk_code: str):
     container_div = soup.find('div', id='tab_con1', class_='tab_con1')
     
     # 시가총액
-    market_cap = container_div.find('th', text='시가총액').find_next('td').get_text(separator='').strip()
+    market_cap = container_div.find('th', string='시가총액').find_next('td').get_text(separator='').strip()
 
     # 시가총액순위
-    market_cap_rank = container_div.find('a', text='시가총액순위').find_next('td').get_text(separator='').strip()
+    market_cap_rank = container_div.find('a', string='시가총액순위').find_next('td').get_text(separator='').strip()
 
     # 상장주식수
-    num_of_shares = container_div.find('th', text='상장주식수').find_next('td').get_text(separator='').strip()
+    num_of_shares = container_div.find('th', string='상장주식수').find_next('td').get_text(separator='').strip()
+
+
+    # # 1. pArea 영역을 먼저 찾기
+    # pArea = soup.find('div', id='pArea')
+
+    # # 2. pArea 내부에서 class="cmp-table-cell td0301"을 찾기
+    # table_cell = pArea.find('td', class_='cmp-table-cell td0301')
+
+    # # 3. EPS, BPS, PER, 업종PER, PBR, 현금배당수익률을 추출
+    # eps = table_cell.find('dt', string='EPS ').find('b', class_='num').text
+    # bps = table_cell.find('dt', string='BPS ').find('b', class_='num').text
+    # per = table_cell.find('dt', string='PER ').find('b', class_='num').text
+    # sector_per = table_cell.find('dt', string='업종PER ').find('b', class_='num').text
+    # pbr = table_cell.find('dt', string='PBR ').find('b', class_='num').text
+    # div_yield = table_cell.find('dt', string='현금배당수익률 ').find('b', class_='num').text
 
     stock_info = {
         'stk_code': stk_code,
@@ -53,5 +68,11 @@ def get_stock_info(stk_code: str):
         'market_cap': market_cap,
         'market_cap_rank': market_cap_rank,
         'num_of_shares': num_of_shares,
+        # 'EPS': eps,
+        # 'BPS': bps,
+        # 'PER': per,
+        # '업종PER': sector_per,
+        # 'PBR': pbr,
+        # '현금배당수익률': div_yield
     }
     return stock_info
