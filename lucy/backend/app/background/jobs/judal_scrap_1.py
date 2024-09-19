@@ -220,8 +220,14 @@ def scrap_judal():
     base_folder = create_base_folder(data_folder)
     # Send a GET request to the website
     url = "https://www.judal.co.kr/"
-    response = requests.get(url)
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
+    }
 
+    response = requests.get(url, headers=headers)    
+    #response = requests.get(url)
+    
+    logging.debug(f"Response status code:[ {response.status_code} ]")
     soup = BeautifulSoup(response.content, "html.parser")
     divs = soup.find_all('div', class_='list-group-item list-group-item-action disabled')
     if len(divs) == 2:
@@ -275,7 +281,7 @@ def scrap_judal():
         if url in scraped_urls:
             continue
 
-        response = requests.get(url)
+        response = requests.get(url, headers=headers)    
         soup = BeautifulSoup(response.content, "html.parser")
         table1 = soup.find('table', class_='table table-sm table-bordered table-hover align-middle small')
         
@@ -307,7 +313,13 @@ def scrap_judal():
 async def judal_main(arg: str = None):
     await MongoDb.initialize(config.DB_URL)
     # config_service = get_config_service()
+    logging.info("☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆")
+    logging.info("주달 Scrapping 시작")
+    logging.info("☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆")
     scrap_judal()
+    logging.info("☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆")
+    logging.info("주달 Scrapping 종료")
+    logging.info("☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆")
 
 
 if __name__ == "__main__":
