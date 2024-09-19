@@ -347,6 +347,7 @@ $( document ).ready(function() {
     //초기화
     init();
 
+    //타이틀 클릭 소팅
     $('#mystock-result-area').on('click', '.sort-title', function(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -358,6 +359,7 @@ $( document ).ready(function() {
         renderTable(current_lists);
     });
     
+    //매도/매수 금액 자동설정
     $('#mystock-result-area').on("click", ".btnBaseCostsAutoset", function(e) {
         e.stopPropagation();
         e.preventDefault();
@@ -369,6 +371,7 @@ $( document ).ready(function() {
         $(this).parent().find('.buyBaseCost').val(buy_cost);
         $(this).parent().find('.sellBaseCost').val(sell_cost);
     });
+    //매수/매도 기준가 저장
     $('#mystock-result-area').on("click", ".btnBaseCostsSave", function() {
         const url = '/api/v1/mystock/base-cost';
         const stk_code = $(this).data('stk-code');
@@ -408,6 +411,7 @@ $( document ).ready(function() {
             console.error(error.message);
         });
     });
+    //관심 등록
     $('#mystock-result-area').on("click", ".btnAddAttension", function() {
         //관심을 추가한다.
         const stk_code = $(this).data('stk-code');
@@ -421,10 +425,13 @@ $( document ).ready(function() {
             console.error(error.message);
         });
     });
+
+    //종목찾기 모달이 열릴 때 이벤트
     $('#stock-find-modal').on('show.bs.modal', function (event) {
         //  모달이 열릴 때 검색 필드에 자동 포커스를 줄 수 있습니다.
         $('#keyword').empty().focus();
     });    
+    //관심 추가
     $("#modal-result-area").on("click", ".btnAddAttension", function() {
         //관심을 추가한다.
         const stk_code = $(this).data('stk-code');
@@ -438,6 +445,7 @@ $( document ).ready(function() {
             console.error(error.message);
         });
     });
+    //모달창에서 엔터키를 누르면 검색버튼을 클릭한다.
     $('#keyword').on('keypress', function(event) {
         if (event.which === 13) {  // 13은 Enter 키의 키코드입니다.
             $('#btnModalSearch').click();  // 검색 버튼 클릭 이벤트 트리거
@@ -468,6 +476,7 @@ $( document ).ready(function() {
             console.error(error.message); 
         });
     });
+    //
     $('#btnModalClear').on('click', function(e){
         e.stopPropagation();
         e.preventDefault();
