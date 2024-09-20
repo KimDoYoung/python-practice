@@ -189,7 +189,8 @@
             list = gList.filter(item => {
                 return item.company.includes(filterKey);
             });
-        }else if (filterUnderwriter) {
+        }
+        if (filterUnderwriter) {
             $('#searchInput').val('')
             list = gList.filter(item => {
                 return item.offering.주간사_리스트.some(underwriter => {
@@ -261,24 +262,31 @@
                 $('#38-scrapping-time').text(scrappingTime);
             });
         }
+        //증권사 선택시
         $('#under-writer').on('change', function() {
+            const keyword = $('#searchInput').val();
             const underwriter = $(this).val();
-            drawCards(null, underwriter);
+            drawCards(keyword, underwriter);
         });
+        // 검색어 입력시
         $('#searchInput').on('input', function() {
-            const query = $(this).val().toLowerCase();
-            drawCards(query);
+            const keyword = $(this).val().toLowerCase();
+            const underwriter = $('#under-writer').val();
+            drawCards(keyword, underwriter);
         });
         // DEL 키를 캡처하여 입력 필드 내용 삭제
         $('#searchInput').on('keydown', function(e) {
             if (e.keyCode === 46) {  // DEL 키
                 $(this).val('');
-                drawCards();
+                const underwriter = $('#under-writer').val();
+                drawCards(null, underwriter);
             }
         });        
         $('#clearButton').on('click', function() {
             $('#searchInput').val('');
-            drawCards();
+            const keyword = $('#searchInput').val();
+            const underwriter = $('#under-writer').val();
+            drawCards(keyword, underwriter);
         });        
         initialize();
     });
