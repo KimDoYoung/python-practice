@@ -101,6 +101,7 @@
     </table>
 </script>
 <script id="fulfill-table-template" type="text/x-handlebars-template">
+    <!-- 체결결과 -->
     <h4>{{title}}</h4>
     <table class="table table-striped">
         <thead>
@@ -129,11 +130,19 @@
                 <td>{{ordno}}</td>
                 <td>{{hname}}</td>
                 <td>{{expcode}}</td>
-                <td>{{medosu}}</td>
+                {{#test "medosu == '매도'"}}
+                <td class="text-primary">{{medosu}}</td>
+                {{else}}
+                <td class="text-danger">{{medosu}}</td>
+                {{/test}}
                 <td class="text-end">{{displayWon qty}}</td>
                 <td class="text-end">{{displayWon price}}</td>
                 <td class="text-end">{{displayWon price1}}</td>
-                <td class="text-end">{{displayWon cheprice}}</td>
+                {{#test "medosu == '매도'"}}
+                <td class="text-end text-primary fw-bold">{{displayWon cheprice}}</td>
+                {{else}}
+                <td class="text-end text-danger fw-bold">{{displayWon cheprice}}</td>
+                {{/test}}
                 <td class="text-end">{{displayWon cheqty}}</td>
                 <td class="text-end">{{displayWon ordrem}}</td>
                 <!-- <td class="text-end">{{displayWon cfmqty}}</td> -->
@@ -196,30 +205,6 @@ Handlebars.registerHelper('fulfillTime', function(value) {
             console.error(error.message);
             showToastError(error);
         });        
-        // //현물계좌예수금 주문가능금액 총평가2
-        // getFetch('/api/v1/ls/order-possible-money').then(data => {
-        //     console.log('주문가능'); 
-        //     console.log(data);
-        // }).catch(error=> {
-        //     console.error(error.message); 
-        // });
-        // //계좌조회
-        // const url = '/api/v1/ls/jango2'
-        // getFetch(url).then(data => {
-        //     console.log(data)
-        //     const template = $('#jango2-table-template').html();
-        //     const templateScript = Handlebars.compile(template);
-        //     const html = templateScript({list: data.t0424OutBlock1});
-        //     $('#jango2-area').html(html);
-        //     const template1 = $('#summary-table-template').html();
-        //     const templateScript1 = Handlebars.compile(template1);
-        //     const html1 = templateScript1({item: data.t0424OutBlock});
-        //     $('#summary-area').html(html1);
-            
-        // }).catch(error => {
-        //     console.error(error.message)
-        // });
-
 
         // const url2 = '/api/v1/ls/fulfill-api-list';
         const url2 = '/api/v1/ls/fulfill-list';

@@ -20,7 +20,25 @@ docker cp ./initial_data.json lucy-mongo:/data/initial_data.json
 - stockdb.SchedulerJob.json
 - stockdb.Users.json
 
+- docker-compose build
+- db설정
+
 ```
+
+- 방화벽열기
+
+  ```
+    # FastAPI 포트 8000 열기
+    sudo firewall-cmd --zone=public --add-port=8000/tcp --permanent
+
+    # MongoDB 포트 27017 열기 (필요한 경우에만)
+    sudo firewall-cmd --zone=public --add-port=27017/tcp --permanent
+
+    # 방화벽 재시작
+    sudo firewall-cmd --reload
+  ```
+
+- 공유기 포트포워드
 
 ## 기술스택
 
@@ -178,3 +196,4 @@ logger.debug(...)
 
 1. 09:00에 시작한다.
 2. 15:30에 종료한다.
+
