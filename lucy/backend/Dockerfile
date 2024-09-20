@@ -5,7 +5,7 @@ FROM python:3.9-slim
 WORKDIR /app
 
 # 필요한 라이브러리 설치를 위해 requirements.txt 파일을 복사
-COPY backend/requirements.txt .
+COPY ./backend/requirements.txt .
 
 # 의존성 패키지 설치
 RUN pip install --no-cache-dir -r requirements.txt
