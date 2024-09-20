@@ -35,8 +35,9 @@ async def fetch_holidays(year, month):
     API_URL = 'http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo'
 
     user_service = get_user_service()
-    #TODO 사용자가 고정되는 것이 맞는가?
-    user = await user_service.get_1('kdy987')
+
+    default_user_id = config.DEFAULT_USER_ID
+    user = await user_service.get_1(default_user_id)
     if user:
         API_KEY = user.get_value_by_key('GODATA_DECODE')
 

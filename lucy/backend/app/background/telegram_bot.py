@@ -7,6 +7,8 @@ from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, Messa
 from telegram.error import BadRequest, TelegramError
 from backend.app.core.dependency import get_user_service
 from backend.app.core.logger import get_logger
+from backend.app.core.config import config
+
 logger = get_logger(__name__)
 
 TELEGRAM_BOT_TOKEN = None
@@ -17,7 +19,8 @@ polling_task = None
 async def initialize_telegram_bot():
     global TELEGRAM_BOT_TOKEN, TELEGRAM_USER_ID
     user_service = get_user_service()
-    user = await user_service.get_1('kdy987')  # await 추가
+    default_user_id = config.DEFAULT_USER_ID
+    user = await user_service.get_1(default_user_id)  # await 추가
     TELEGRAM_BOT_TOKEN = user.get_value_by_key("TELEGRAM_BOT_TOKEN")
     TELEGRAM_USER_ID = user.get_value_by_key("TELEGRAM_USER_ID")    
     logger.debug(f"TELEGRAM_BOT_TOKEN: {TELEGRAM_BOT_TOKEN}, TELEGRAM_USER_ID: {TELEGRAM_USER_ID}")

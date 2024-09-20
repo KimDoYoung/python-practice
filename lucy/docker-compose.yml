@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: lucy-backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongo
+    networks:
+      - lucy-network
+    environment:
+      - LUCY_MODE=real      
+    volumes:
+      - ./backend:/app
+
+  mongo:
+    image: mongo:4.4
+    container_name: lucy-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - lucy-network
+
+volumes:
+  mongo_data:
+
+networks:
+  lucy-network:
