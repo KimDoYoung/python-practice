@@ -73,149 +73,50 @@
                     <button id="test6">호가정보요청</button>
                     <button id="test7">호가정보취소</button>
                 </div>
-                
-
-            </div>
-            
+            </div>            
         </div>
         <div class="tab-pane fade" id="sell-buy-detail" role="tabpanel" aria-labelledby="sell-buy-detail-tab">
-            <div id="hoga-area" class="mt-3"></div>
+            <div id="hoga-area" class="mt-3">
+                111
+            </div>
+            <div id="buy-sell-area" class="m-2">
+            </div>
         </div>
     </div>
 
 {% raw %}
 <!--handlebar scripts-->
-<script id="capital-template" type="text/x-handlebars-template">
-<!-- 첫 번째 테이블 -->
-<table class="table table-striped table-bordered">
-    <thead>
-        <tr>
-            <th>전일 대비</th>
-            <th>전일 대비 부호</th>
-            <th>전일 대비율</th>
-            <th>주식 전일 종가</th>
-            <th>누적 거래량</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>{{prdy_vrss}}</td>
-            <td>{{prdy_vrss_sign}}</td>
-            <td>{{prdy_ctrt}}</td>
-            <td>{{stck_prdy_clpr}}</td>
-            <td>{{acml_vol}}</td>
-        </tr>
-    </tbody>
-</table>
-
-<!-- 두 번째 테이블 -->
-<table class="table table-striped table-bordered">
-    <thead>
-        <tr>
-            <th>누적 거래 대금</th>
-            <th>HTS 한글 종목명</th>
-            <th>주식 현재가</th>
-            <th>주식 단축 종목코드</th>
-            <th>전일 거래량</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>{{acml_tr_pbmn}}</td>
-            <td>{{hts_kor_isnm}}</td>
-            <td>{{stck_prpr}}</td>
-            <td>{{stck_shrn_iscd}}</td>
-            <td>{{prdy_vol}}</td>
-        </tr>
-    </tbody>
-</table>
-
-<!-- 세 번째 테이블 -->
-<table class="table table-striped table-bordered">
-    <thead>
-        <tr>
-            <th>상한가</th>
-            <th>하한가</th>
-            <th>시가</th>
-            <th>최고가</th>
-            <th>최저가</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>{{stck_mxpr}}</td>
-            <td>{{stck_llam}}</td>
-            <td>{{stck_oprc}}</td>
-            <td>{{stck_hgpr}}</td>
-            <td>{{stck_lwpr}}</td>
-        </tr>
-    </tbody>
-</table>
-
-<!-- 네 번째 테이블 -->
-<table class="table table-striped table-bordered">
-    <thead>
-        <tr>
-            <th>주식 전일 시가</th>
-            <th>주식 전일 최고가</th>
-            <th>주식 전일 최저가</th>
-            <th>매도호가</th>
-            <th>매수호가</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>{{stck_prdy_oprc}}</td>
-            <td>{{stck_prdy_hgpr}}</td>
-            <td>{{stck_prdy_lwpr}}</td>
-            <td>{{askp}}</td>
-            <td>{{bidp}}</td>
-        </tr>
-    </tbody>
-</table>
-
-<!-- 다섯 번째 테이블 -->
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>전일 대비 거래량</th>
-            <th>거래량 회전율</th>
-            <th>주식 액면가</th>
-            <th>상장 주수</th>
-            <th>자본금</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>{{prdy_vrss_vol}}</td>
-            <td>{{vol_tnrt}}</td>
-            <td>{{stck_fcam}}</td>
-            <td>{{lstn_stcn}}</td>
-            <td>{{cpfn}}</td>
-        </tr>
-    </tbody>
-</table>
-
-<!-- 여섯 번째 테이블 -->
-<table class="table table-striped table-bordered">
-    <thead>
-        <tr>
-            <th>시가총액</th>
-            <th>PER</th>
-            <th>EPS</th>
-            <th>PBR</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>{{hts_avls}}</td>
-            <td>{{per}}</td>
-            <td>{{eps}}</td>
-            <td>{{pbr}}</td>
-        </tr>
-    </tbody>
-</table>    
+<script id="buysell-template" type="text/x-handlebars-template">
+    <div style="width:400px">
+        <table class="table table-bordered table-sm">
+            <tr>
+                <th colspan="2">현재가</th>
+                <td colspan="3">{{displayWon current_cost}}</td>
+            </tr>
+            <tr>
+                <th>갯수</th>
+                <th class="text-end">구매가</th>
+                <th class="text-end">수수료+세금</th>
+                <th class="text-end">최종가격</th>
+                <th class="text-end">매수/매도</th>
+            </tr>
+            {{#each count_list}}
+            <tr>
+                <td class="fw-bold">{{this}}</td>
+                <td class="text-end">{{my_calc this "*" ../current_cost}}</td> <!-- 주식수 * 현재가 -->
+                <td class="text-end">{{my_calc (my_calc this "*" ../current_cost) "*" 0.002}}</td> <!-- 수수료 계산 -->
+                <td class="text-end fw-bold">{{my_calc (my_calc this "*" ../current_cost) "+" (my_calc (my_calc this "*" ../current_cost) "*" 0.002) }}</td> <!-- 수수료 계산 -->
+                <td class="text-end">
+                    <button class="btnBuy btn btn-danger btn-sm" data-qty="{{this}}" data-stk-code="{{../stk_code}}" data-stk-name="{{../stk_name}}" title="{{../stk_name}} 매수">買</button>
+                    <button class="btnSell btn btn-primary btn-sm"  data-qty="{{this}}" data-stk-code="{{../stk_code}}" data-stk-name="{{../stk_name}}" title="{{../stk_name}} 매도">賣</button>
+                </td>
+            </tr>
+            {{/each}}
+        </table>
+    </div>
 </script>
+
+
 <script id="naver-template" type="text/x-handlebars-template">
     <table>
         <tr>
@@ -268,12 +169,12 @@ function get_data_and_draw_chart(){
     const url = `/api/v1/kis/chart/${stk_code}/${startYmd}/${endYmd}/${period}`;
     getFetch(url).then(data => {
         console.log(data); 
-        let capital = data.output1;
-        //capital테이블들
-        let source = document.getElementById('capital-template').innerHTML;
-        let template = Handlebars.compile(source);
-        let html = template(capital);
-        $('#capital-area').html(html);
+        // let capital = data.output1;
+        // //capital테이블들
+        // let source = document.getElementById('capital-template').innerHTML;
+        // let template = Handlebars.compile(source);
+        // let html = template(capital);
+        // $('#capital-area').html(html);
         // debugger;
         let startYmd1 = startYmd.substring(0, 4) + '-' + startYmd.substring(4, 6) + '-' + startYmd.substring(6, 8);
         let endYmd1 = endYmd.substring(0, 4) + '-' + endYmd.substring(4, 6) + '-' + endYmd.substring(6, 8);
@@ -319,6 +220,28 @@ function initalize(){
     $('#FID_INPUT_DATE_1').val(startDay)
     $('#FID_INPUT_DATE_2').val(today)
     get_data_and_draw_chart();
+
+    //매수/매도표를 그린다.
+    const url_current_cost = `/api/v1/ls/current-cost/${current_stk_code}`;
+    getFetch(url_current_cost).then(data => {
+        const source = document.getElementById('buysell-template').innerHTML;
+        const template = Handlebars.compile(source);
+        const current_cost = data.t1102OutBlock.price;
+        const current_stk_code = data.t1102OutBlock.shcode;
+        const current_stk_name = data.t1102OutBlock.hname;
+        const current_data = {
+            current_cost:current_cost,
+            count_list:[1, 5, 10, 20, 30, 50, 100,200],
+            stk_code : current_stk_code,
+            stk_name : current_stk_name
+        }
+        const html = template(current_data);
+        document.getElementById('buy-sell-area').innerHTML = html;
+    }).catch(error=> {
+        console.error(error.message); 
+        showAlertError(error);
+    });
+
 }
 $( document ).ready(function() {
     console.log( "ready!")
@@ -335,7 +258,6 @@ $( document ).ready(function() {
     //     <button id="test3">주식현재가시세2</button>
     //     <button id="test4">국내주식 종목투자의견</button>
     //     <button id="test5">국내주식 증권사별 투자의견</button>
-   
     
     $('#apitest1').click(function(){
         const url = `/api/v1/kis/inquire-financial-statement/${current_stk_code}/1`;
@@ -346,6 +268,22 @@ $( document ).ready(function() {
             showToastError(error);
         });
     });
+    // btnBuy구매 버튼 클릭
+    $('#buy-sell-area').on('click', '.btnBuy', function(e){
+        e.stopPropagation();
+        const stk_code = $(this).data('stk-code');
+        const stk_name = $(this).data('stk-name');
+        const qty = $(this).data('qty');
+        showBuySellCanvas('',stk_code, stk_name, "매수", qty, 0);
+    })
+    // btnSell판매 버튼 클릭
+    $('#buy-sell-area').on('click', '.btnSell', function(e){
+        e.stopPropagation();
+        const stk_code = $(this).data('stk-code');
+        const stk_name = $(this).data('stk-name');
+        const qty = $(this).data('qty');
+        showBuySellCanvas('',stk_code, stk_name, "매도", qty, 0);
+    })    
 });
 </script>
 {% endraw %}

@@ -324,3 +324,42 @@
         );
     });
 
+
+    // my_eval 헬퍼: 수식을 처리하는 간단한 헬퍼 함수
+    // 주의 : 소숫점을 떼어냄, 결과에 콤마를 찍음
+    //{{my_calc this "*" ../current_cost}}
+    //{{my_calc (my_calc this "*" ../current_cost) "*" 0.002}}
+    //{{my_calc (my_calc this "*" ../current_cost) "+" (my_calc (my_calc this "*" ../current_cost) "*" 0.002) }}
+
+    Handlebars.registerHelper('my_calc', function(a, operator, b) {
+        // 콤마가 포함된 숫자를 처리하기 위해 콤마를 제거하고 숫자로 변환
+        let numA = typeof a === 'string' ? Number(a.replace(/,/g, '')) : a;
+        let numB = typeof b === 'string' ? Number(b.replace(/,/g, '')) : b;
+        
+        let result;
+        
+        // 연산자에 따른 계산
+        switch (operator) {
+            case '*':
+                result = numA * numB;
+                break;
+            case '+':
+                result = numA + numB;
+                break;
+            case '-':
+                result = numA - numB;
+                break;
+            case '/':
+                result = numB !== 0 ? numA / numB : 0;  // 0으로 나누기 방지
+                break;
+            default:
+                result = null;
+        }
+    
+        // 소수점 이하를 잘라내기 (Math.floor 또는 Math.round도 사용 가능)
+        result = Math.floor(result);  // 소수점 이하 버림
+    
+        // 최종 결과에 콤마 추가하여 반환
+        return result.toLocaleString();  // 콤마가 포함된 형식으로 반환
+    });
+    
