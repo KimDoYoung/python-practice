@@ -28,3 +28,4 @@ aiohttp
 scikit-learn
 pandas 
 openpyxl
+pydantic[email]
