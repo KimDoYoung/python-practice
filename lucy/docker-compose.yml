@@ -12,7 +12,7 @@ services:
       - lucy-network
     environment:
       - LUCY_MODE=real
-      - PYTHONPATH=../backend       
+      - PYTHONPATH=/backend       
     volumes:
       - ./backend:/app
 
