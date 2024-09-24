@@ -23,9 +23,18 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/root/fastapi-data/lucy/db
+      - /root/fastapi-data/kdydata:/data/import
     networks:
       - lucy-network
-
+    command: >
+      bash -c "
+      mongod --bind_ip_all &
+      sleep 5 &&
+      mongoimport --host localhost --db stockdb --collection Config --file /data/import/stockdb.Config.json --jsonArray &&
+      mongoimport --host localhost --db stockdb --collection SchedulerJob --file /data/import/stockdb.SchedulerJob.json --jsonArray &&
+      mongoimport --host localhost --db stockdb --collection Users --file /data/import/stockdb.Users.json --jsonArray &&
+      tail -f /dev/null
+      "
 volumes:
   mongo_data:
 
