@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   backend:
-    build: ./backend
+    build: .
     container_name: lucy-backend
     ports:
       - "8000:8000"
@@ -13,7 +13,8 @@ services:
     environment:
       - LUCY_MODE=real
     volumes:
-      - ./backend:/app/backend
+      - ./backend:/backend
+      - ./frontend:/frontend
 
   mongo:
     image: mongo:4.4
