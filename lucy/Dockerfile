@@ -1,5 +1,5 @@
-# 베이스 이미지로 Python 3.9 사용
-FROM python:3.9-slim
+# 베이스 이미지로3.10-slim 사용
+FROM python:3.10-slim
 
 RUN pip install --upgrade pip
 
