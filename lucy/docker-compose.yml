@@ -12,9 +12,9 @@ services:
       - lucy-network
     environment:
       - LUCY_MODE=real
-      - PYTHONPATH=/app/backend:/app
+      - PYTHONPATH=/backend
     volumes:
-      - ./backend:/app
+      - ./backend:/backend
 
   mongo:
     image: mongo:4.4
