@@ -22,6 +22,7 @@ lxml
 python-telegram-bot
 sympy
 pycryptodome
+websockets>=10.0
 websocket-client
 aiohttp
 scikit-learn
