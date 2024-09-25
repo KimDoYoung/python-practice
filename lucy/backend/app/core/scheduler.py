@@ -39,9 +39,8 @@ class Scheduler:
 
     def add_cron_job(self, func: Callable, cron: str, job_id: str,  args: tuple = (),  max_instances: int = 1) -> None:
         try:
-            logger.debug('add_cron_job 함수 실행:' + job_id)
             job = self.scheduler.add_job(func, CronTrigger.from_crontab(cron), id=job_id, args=args, max_instances=max_instances)
-            logger.debug('add_cron_job 함수 실행 완료:' + job_id)
+            logger.debug('add_cron_job 함수 추가 완료:' + job_id)
         except Exception as e:
             logger.error(f'Error adding job {job_id}: {e}', exc_info=True)
             return {"error": str(e)}   

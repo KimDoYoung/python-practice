@@ -17,7 +17,8 @@ services:
       - ./frontend:/frontend
       - /root/fastapi-data/lucy/log:/root/fastapi-data/lucy/log
       - /root/fastapi-data/lucy/data:/root/fastapi-data/lucy/data
-      - /root/fastapi-data/lucy/files:/root/fastapi-data/lucy/files      
+      - /root/fastapi-data/lucy/files:/root/fastapi-data/lucy/files
+      - /etc/localtime:/etc/localtime:ro  # 호스트 시간대 설정 마운트      
 
   mongo:
     image: mongo:4.4
@@ -27,6 +28,7 @@ services:
     volumes:
       - mongo_data:/root/fastapi-data/lucy/db
       - /root/fastapi-data/kdydata:/data/import
+      - /etc/localtime:/etc/localtime:ro  # 호스트 시간대 설정 마운트            
     networks:
       - lucy-network
     command: >
