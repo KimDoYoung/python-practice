@@ -24,6 +24,9 @@ services:
     volumes:
       - mongo_data:/root/fastapi-data/lucy/db
       - /root/fastapi-data/kdydata:/data/import
+      - /root/fastapi-data/lucy/log:/root/fastapi-data/lucy/log
+      - /root/fastapi-data/lucy/data:/root/fastapi-data/lucy/data
+      - /root/fastapi-data/lucy/files:/root/fastapi-data/lucy/files
     networks:
       - lucy-network
     command: >

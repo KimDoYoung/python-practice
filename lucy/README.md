@@ -22,8 +22,14 @@ docker cp ./initial_data.json lucy-mongo:/data/initial_data.json
 
 - docker-compose build
 - db설정
-
 ```
+
+## jskn에 배포
+
+- .env.real을 만들어야한다.
+- 초기 몽고db를 위한 json을 만들어야한다.
+- /root/fastapi-data/kdydata에 json파일3개, .env.real을 가져다 놓음
+- 몽고db의 id/pw을 넣어야하지 않나?
 
 - 방화벽열기
 
@@ -196,4 +202,3 @@ logger.debug(...)
 
 1. 09:00에 시작한다.
 2. 15:30에 종료한다.
-
