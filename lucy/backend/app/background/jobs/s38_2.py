@@ -521,7 +521,7 @@ def delete_ipo_38():
 
 def scrapping_38_fill_ipo_38(is_test = False) -> bool:
     ''' 38커뮤니케이션 사이트의 공모주 일정 2페이지를 스크래핑하여 데이터베이스에 넣는 함수'''
-    logging.info('Scraping started')
+    logging.info('38커뮤니케이션(IPO사이트) Scraping started')
     limit_count = 10000
     if is_test:
         limit_count = 2
@@ -563,7 +563,7 @@ def scrapping_38_fill_ipo_38(is_test = False) -> bool:
         driver.quit()
         return True
     except Exception as e:
-        logging.error('An error occurred in the main function: %s', e)
+        logging.error('An error occurred in the 38커뮤니케이션 Scraping  main function: %s', e)
         return False
     finally:
         logging.info('38커뮤니케이션 Scraping finished')
