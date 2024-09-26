@@ -15,9 +15,9 @@ services:
     volumes:
       - ./backend:/backend
       - ./frontend:/frontend
-      - /root/fastapi-data/lucy/log:/root/fastapi-data/lucy/log
-      - /root/fastapi-data/lucy/data:/root/fastapi-data/lucy/data
-      - /root/fastapi-data/lucy/files:/root/fastapi-data/lucy/files
+      - /home/kdy987/fastapi/lucy/log:/log
+      - /home/kdy987/fastapi/lucy/data:/data
+      - /home/kdy987/fastapi/lucy/files:/files
       - /etc/localtime:/etc/localtime:ro  # 호스트 시간대 설정 마운트      
 
   mongo:
@@ -26,7 +26,7 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - mongo_data:/root/fastapi-data/lucy/db
+      - /home/kdy987/fastapi/mongodb:/data/db
       - /root/fastapi-data/kdydata:/data/import
       - /etc/localtime:/etc/localtime:ro  # 호스트 시간대 설정 마운트            
     networks:
