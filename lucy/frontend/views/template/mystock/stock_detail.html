@@ -7,10 +7,10 @@
     <!-- Nav tabs -->
     <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="chart-basic-tab" data-bs-toggle="tab" data-bs-target="#chart-basic" type="button" role="tab" aria-controls="chart-basic" aria-selected="true">Home</button>
+            <button class="nav-link active" id="chart-basic-tab" data-bs-toggle="tab" data-bs-target="#chart-basic" type="button" role="tab" aria-controls="chart-basic" aria-selected="true">기본정보</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="sell-buy-detail-tab" data-bs-toggle="tab" data-bs-target="#sell-buy-detail" type="button" role="tab" aria-controls="sell-buy-detail" aria-selected="false">Profile</button>
+            <button class="nav-link" id="sell-buy-detail-tab" data-bs-toggle="tab" data-bs-target="#sell-buy-detail" type="button" role="tab" aria-controls="sell-buy-detail" aria-selected="false">매수/매도</button>
         </li>
     </ul>
 
@@ -69,7 +69,6 @@
                 <div id="company-summary" class="mt-3"></div>
                 <div id="capital-area" class="mt-3 d-none"></div>
                 <div>
-
                     <button id="test6">호가정보요청</button>
                     <button id="test7">호가정보취소</button>
                 </div>
@@ -88,30 +87,42 @@
 <!--handlebar scripts-->
 <script id="buysell-template" type="text/x-handlebars-template">
     <div style="width:400px">
-        <table class="table table-bordered table-sm">
+        <table id="tblBuy" class="table table-bordered table-hover table-sm">
             <tr>
                 <th colspan="2">현재가</th>
-                <td colspan="3">{{displayWon current_cost}}</td>
+                <td colspan="3" id="current_cost_in_table">{{displayWon current_cost}}</td>
             </tr>
             <tr>
-                <th>갯수</th>
-                <th class="text-end">구매가</th>
-                <th class="text-end">수수료+세금</th>
+                <th class="text-center">갯수</th>
+                <th class="text-end">매수가</th>
+                <th class="text-end">수수료</th>
                 <th class="text-end">최종가격</th>
-                <th class="text-end">매수/매도</th>
+                <th class="text-center">매수</th>
             </tr>
             {{#each count_list}}
             <tr>
-                <td class="fw-bold">{{this}}</td>
+                <td class="fw-bold text-center">{{this}}</td>
                 <td class="text-end">{{my_calc this "*" ../current_cost}}</td> <!-- 주식수 * 현재가 -->
                 <td class="text-end">{{my_calc (my_calc this "*" ../current_cost) "*" 0.002}}</td> <!-- 수수료 계산 -->
                 <td class="text-end fw-bold">{{my_calc (my_calc this "*" ../current_cost) "+" (my_calc (my_calc this "*" ../current_cost) "*" 0.002) }}</td> <!-- 수수료 계산 -->
-                <td class="text-end">
+                <td class="text-center">
                     <button class="btnBuy btn btn-danger btn-sm" data-qty="{{this}}" data-stk-code="{{../stk_code}}" data-stk-name="{{../stk_name}}" title="{{../stk_name}} 매수">買</button>
-                    <button class="btnSell btn btn-primary btn-sm"  data-qty="{{this}}" data-stk-code="{{../stk_code}}" data-stk-name="{{../stk_name}}" title="{{../stk_name}} 매도">賣</button>
+                    <!-- <button class="btnSell btn btn-primary btn-sm"  data-qty="{{this}}" data-stk-code="{{../stk_code}}" data-stk-name="{{../stk_name}}" title="{{../stk_name}} 매도">賣</button> -->
                 </td>
             </tr>
-            {{/each}}
+            {{/each}}            
+            <tr>
+                <td colspan="5"></td>
+            </tr>
+            <tr id="tr_custom">
+                <td><input type="number" id="qty" style="width:60px" placeholder="1" onchange="console.log($(this).val())"></td>
+                <td class="text-end text-primary"></td>
+                <td class="text-end text-primary"></td>
+                <td class="text-end text-primary"></td>
+                <td class="text-center">
+                    <button class="btnBuy custom btn btn-danger btn-sm"  data-stk-code="{{stk_code}}" data-stk-name="{{stk_name}}" title="{{../stk_name}} 매수">買</button>                    
+                </td>
+            </tr>
         </table>
     </div>
 </script>
@@ -246,18 +257,44 @@ function initalize(){
 $( document ).ready(function() {
     console.log( "ready!")
     current_stk_code = $('#current_stk_code').val();
-    initalize();
 
+    initalize();
+    //custom 매수의 갯수를 변경하면 매수금액을 계산한다.
+    $('#buy-sell-area').on("change", 'input', function(e){
+        e.stopPropagation();
+        let qty = $(this).val();
+        let current_cost = $('#tblBuy').find('#current_cost_in_table').text().replace(/,/g, '');
+        const $trCustom = $('#tblBuy').find('#tr_custom');
+        current_cost = Number(current_cost);
+        qty = Number(qty);
+        let cost1 = qty * current_cost;
+        let cost2 = cost1 + (cost1 * 0.002);
+        $trCustom.find('td').eq(1).text(cost1.toLocaleString())
+        $trCustom.find('td').eq(2).text((cost1 * 0.002).toLocaleString())
+        $trCustom.find('td').eq(3).text(cost2.toLocaleString())
+    });
+    //매수테이블 tr 클릭
+    $('#buy-sell-area').on("click", '#tblBuy tr', function(e){
+        e.stopPropagation();
+        let qty = $(this).find('td').eq(0).text();
+        if (qty == '') return;
+        let current_cost = $('#tblBuy').find('#current_cost_in_table').text().replace(/,/g, '');
+        const $trCustom = $('#tblBuy').find('#tr_custom');
+        current_cost = Number(current_cost);
+        qty = Number(qty);
+        let cost1 = qty * current_cost;
+        let cost2 = cost1 + (cost1 * 0.002);
+        $trCustom.find('input').val(qty);
+        $trCustom.find('td').eq(1).text(cost1.toLocaleString())
+        $trCustom.find('td').eq(2).text((cost1 * 0.002).toLocaleString())
+        $trCustom.find('td').eq(3).text(cost2.toLocaleString())
+    });
+    
     //챠트 조회
     $('#form1').submit(function(event){
         event.preventDefault();
         get_data_and_draw_chart();
     });
-    //     <button id="test1">주식현재가일자별</button>
-    //     <button id="test2">주식당일분봉조회</button>
-    //     <button id="test3">주식현재가시세2</button>
-    //     <button id="test4">국내주식 종목투자의견</button>
-    //     <button id="test5">국내주식 증권사별 투자의견</button>
     
     $('#apitest1').click(function(){
         const url = `/api/v1/kis/inquire-financial-statement/${current_stk_code}/1`;
@@ -271,6 +308,13 @@ $( document ).ready(function() {
     // btnBuy구매 버튼 클릭
     $('#buy-sell-area').on('click', '.btnBuy', function(e){
         e.stopPropagation();
+        if ($(this).hasClass('custom')){
+            const stk_code = $(this).data('stk-code');
+            const stk_name = $(this).data('stk-name');
+            const qty = $(this).closest('tr').find('input').val();
+            showBuySellCanvas('',stk_code, stk_name, "매수", qty, 0);
+            return;
+        }
         const stk_code = $(this).data('stk-code');
         const stk_name = $(this).data('stk-name');
         const qty = $(this).data('qty');
