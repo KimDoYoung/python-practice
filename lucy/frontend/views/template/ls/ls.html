@@ -94,6 +94,7 @@
                 <td class="text-center">
                     <button class="btn btn-sm btn-danger btnShowBuyCanvas" data-stk-code="{{expcode}}" data-stk-name="{{hname}}">매수</button>
                     <button class="btn btn-sm btn-primary btnShowSellCanvas"  data-stk-code="{{expcode}}" data-stk-name="{{hname}}" data-qty="{{mdposqt}}">매도</button>
+                    <a href="/page?path=mystock/stock_detail&stk_code={{expcode}}" class="btn btn-success btn-sm" title="{{hname}} 상세보기" target="_blank">상세</a>
                 </td>
             </tr>
             {{/each}}                
@@ -261,7 +262,7 @@ Handlebars.registerHelper('fulfillTime', function(value) {
             if (!confirmCancel) {
                 return;
             } 
-            debugger;
+            // debugger;
             const url = '/api/v1/ls/cancel-order';
             const org_ord_no = $(this).data('org-ord-no');
             const stk_code = $(this).data('stk-code');
