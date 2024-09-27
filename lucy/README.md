@@ -2,6 +2,18 @@
 
 ## 빌드
 
+### 고려할 점
+
+1. 몽고DB의 데이터는 volume으로 정의되어서  DB가 유지되어야한다.
+2. 몽코DB의 초기데이터들은 load되어야한다.
+3. Lucy가 사용하는 데이터들은 volume으로 정의되어서 유지되어야한다.
+4. Lucy로그는 tail -f로 모니터링되어야한다.
+5. 서버시간과 container안의 fastapi서버의 시간은 동기화되어야한다.
+   - scheduler가 제시간에 동작한다.
+6. container안에 chrome driver가 설치되어야 judal을 가져올 수 있다.
+7. 방화벽이 open되어야한다. 8000 서버, 27017 몽고는 보안상 오픈하지 않아야한다.
+   - 단 초기에 모니터링하기 위해서 오픈한다.
+
 - docker의 container로 실행한다.
 - backend/Dockerfile
 - docker-compose.yml
