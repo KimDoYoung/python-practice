@@ -420,12 +420,29 @@ const CalendarMaker = (function() {
         endYmd = addYmd(endYmd, 6 - endYoil);
         return [startYmd, endYmd];
     }
+    // startYmd와 endYmd 사이에서 각 날짜별로 이벤트갯수를 세어서 가장 높은 수를 리턴
+    const getMaxEventCount = function(startYmd, endYmd){
+        let maxCount = 0;
+        let ymd = startYmd;
+        while(ymd <= endYmd){
+            let eventCount = event_days.filter(event => event.ymd === ymd).length;
+            if(eventCount > maxCount){
+                maxCount = eventCount;
+            }
+            ymd = addYmd(ymd, 1);
+        }
+        return maxCount;
+    }
     // 주어진 년도와 월에 대한 달력 HTML을 생성하는 함수
     const calendarHtml = function(yyyy, mm) {
 		currentYear = yyyy;
 		currentMonth = mm;
         const [startYmd, endYmd] = startEndYmd(yyyy, mm); 
-
+        const maxEventCount = getMaxEventCount(startYmd, endYmd);
+        let heightStyle = ''; // 이벤트가 6개 이상일 경우 높이를 조절
+        if(maxEventCount >= 6){
+            heightStyle='style="min-height: 200px;"';
+        }
         let html = '<div class="row">';
         html += '<div class="col bg-light text-center text-danger week">일</div>';
         html += '<div class="col bg-light text-center week">월</div>';
@@ -442,11 +459,11 @@ const CalendarMaker = (function() {
         while (ymd <= endYmd) {
             if (i % 7 === 0) {
                 html += saveCloseDiv;
-                html += '<div class="row">';
+                html += '<div class="row"">';
                 saveCloseDiv = '</div>';
             }
             let isToday = (ymd === today) ? true: false;
-            let dayHtml = `<div class="col day ${isToday ? ' bg-today' : ''}" data-ymd="${ymd}" >`;
+            let dayHtml = `<div class="col day ${isToday ? ' bg-today' : ''}" data-ymd="${ymd}" ${heightStyle} >`;
             //일요일, 토요일, 휴일 날짜숫자 색상 변경
             let clsName = choice_day_number_class(i, ymd)
             dayHtml += `<span class="${clsName}">${Number(ymd.substring(6))}</span>`;
