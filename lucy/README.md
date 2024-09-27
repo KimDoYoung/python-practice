@@ -57,6 +57,7 @@ docker cp ./initial_data.json lucy-mongo:/data/initial_data.json
   ```
 
 - 공유기 포트포워드
+  8000, 27017 포트를 foreward해야 함.
 
 ## 기술스택
 
