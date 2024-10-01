@@ -172,10 +172,7 @@ function getCurrentCost() {
     if (current_lists.length == 0 || !$('#currentCostRefresh').is(':checked') || !isMarketTime()) {
         return;
     }
-    if($('#currentCostRefresh').is(':checked') == false){
-        if(intervalId) clearInterval(intervalId);
-        return;
-    }
+
     const stkCodes = current_lists.map(item => String(item.stk_code)).join('');
     const url = '/api/v1/mystock/current_costs/' + stkCodes;
     getFetch(url).then(data => {
@@ -195,9 +192,12 @@ function getCurrentCost() {
                 $('#mystock-result-area').find(`#change_${item.shcode}`).text(changeFormatted).removeClass('text-primary').addClass('text-danger');
                 $('#mystock-result-area').find(`#diff_${item.shcode}`).text(diffFormatted).removeClass('text-primary').addClass('text-danger');
             }
-            //$(`#cost_${item.stk_code}`).text(cost);
         });
-        
+        // 주기적으로 가져오기가 체크되어 있지 않으면 interval을 지운다.
+        if($('#currentCostRefresh').is(':checked') == false){
+        if(intervalId) clearInterval(intervalId);
+        return;
+    }
     }).catch(error=> {
         console.error(error.message);
         showAlertError(error); 
@@ -205,6 +205,9 @@ function getCurrentCost() {
 }
 //handlebar helper 로 html을 만든다
 function renderTable(list){
+    // 필터링 현재 선택된 radio로 필터
+    const selectedOptions = $('input[name=options]:checked').val();
+    list = list.filter(item => selectedOptions === 'ALL' || item.stk_types.includes(selectedOptions));
     //정렬
     let fieldName = currentSort.field;
     if(fieldName){
@@ -555,6 +558,7 @@ $( document ).ready(function() {
             const template = Handlebars.compile(document.getElementById('mystock-template').innerHTML);
             const html = template({list : data});
             $('#mystock-result-area').html(html);
+            getCurrentCost();
         }).catch(error=> {
             console.error(error.message); 
         });
