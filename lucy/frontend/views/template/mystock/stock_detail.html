@@ -75,16 +75,46 @@
             </div>            
         </div>
         <div class="tab-pane fade" id="sell-buy-detail" role="tabpanel" aria-labelledby="sell-buy-detail-tab">
-            <div id="hoga-area" class="mt-3">
-                111
-            </div>
-            <div id="buy-sell-area" class="m-2">
-            </div>
+            <div class="d-flex">
+                <div id="hoga-area" class="mt-3">
+                    111
+                </div>
+                <div id="buy-sell-area" class="m-2">
+                </div>
+                <div id="sell-cost-area" class="m-2">
+                </div>
+            </div>            
         </div>
     </div>
 
 {% raw %}
 <!--handlebar scripts-->
+<script id="sell-cost-template" type="text/x-handlebars-template">
+    <div style="width:400px">
+        <table id="tblSellCost" class="table table-bordered table-hover table-sm">
+            <tr>
+                <th>현재가</th>
+                <td id="current_cost_in_table">{{displayWon current_cost}}</td>
+                <th>갯수</th>
+                <td colspan="2"><input type="number" id="qty" style="width:60px" placeholder="1"></td>
+            </tr>
+            <tr>
+                <th class="text-end">매도가</th>
+                <th class="text-end">수수료</th>
+                <th class="text-end">최종가격</th>
+                <th class="text-center">매수</th>
+            </tr>
+            {{#each count_list}}
+            <tr>
+                <th class="text-end">{{this}}</th>
+                <th class="text-end"></th>
+                <th class="text-end">최종가격</th>
+                <th class="text-center">매수</th>
+            </tr>
+            {{/each}}
+        </table>
+    </div>
+</script>
 <script id="buysell-template" type="text/x-handlebars-template">
     <div style="width:400px">
         <table id="tblBuy" class="table table-bordered table-hover table-sm">
@@ -152,7 +182,21 @@
 <script>
 let current_stk_code =  undefined ; 
 let chart = undefined;
-
+function getStepWithCost(cost){
+    if(cost < 10000) return 10;
+    if(cost < 30000) return 100;
+    if(cost < 100000) return 200;
+    if(cost < 150000) return 300;
+    if(cost < 200000) return 500;
+    return 1000;
+}
+//핸들바 템플릿으로 html을 만들어서 리턴한다.
+function getHtmlWithTemplate(templateId, data){
+    const source = document.getElementById(templateId).innerHTML;
+    const template = Handlebars.compile(source);
+    const html = template(data);
+    return html;
+}
 function drawCandleChart(org_data, title){
     let columns = []
     let column1 = ['data1'];
@@ -180,13 +224,6 @@ function get_data_and_draw_chart(){
     const url = `/api/v1/kis/chart/${stk_code}/${startYmd}/${endYmd}/${period}`;
     getFetch(url).then(data => {
         console.log(data); 
-        // let capital = data.output1;
-        // //capital테이블들
-        // let source = document.getElementById('capital-template').innerHTML;
-        // let template = Handlebars.compile(source);
-        // let html = template(capital);
-        // $('#capital-area').html(html);
-        // debugger;
         let startYmd1 = startYmd.substring(0, 4) + '-' + startYmd.substring(4, 6) + '-' + startYmd.substring(6, 8);
         let endYmd1 = endYmd.substring(0, 4) + '-' + endYmd.substring(4, 6) + '-' + endYmd.substring(6, 8);
         let periodNames ={'D':'일봉', 'W':'주봉', 'M':'월봉', 'Y':'년봉'};
@@ -235,19 +272,27 @@ function initalize(){
     //매수/매도표를 그린다.
     const url_current_cost = `/api/v1/ls/current-cost/${current_stk_code}`;
     getFetch(url_current_cost).then(data => {
-        const source = document.getElementById('buysell-template').innerHTML;
-        const template = Handlebars.compile(source);
         const current_cost = data.t1102OutBlock.price;
         const current_stk_code = data.t1102OutBlock.shcode;
         const current_stk_name = data.t1102OutBlock.hname;
         const current_data = {
             current_cost:current_cost,
-            count_list:[1, 5, 10, 20, 30, 50, 100,200],
+            count_list:[1, 5, 10, 20, 30, 50, 100, 150, 200, 300],
             stk_code : current_stk_code,
             stk_name : current_stk_name
         }
-        const html = template(current_data);
+        let html = getHtmlWithTemplate('buysell-template', current_data);
         document.getElementById('buy-sell-area').innerHTML = html;
+        const step = getStepWithCost(current_cost);
+        //현재가격부터 step으로 증가하면서 10개
+        let count_list = [];
+        for (let i = 0; i < 10; i++) {
+            count_list.push(current_cost + (step * i));
+        }
+        current_data.count_list = count_list;
+        html = getHtmlWithTemplate('sell-cost-template', current_data);
+        document.getElementById('sell-cost-area').innerHTML = html;
+
     }).catch(error=> {
         console.error(error.message); 
         showAlertError(error);
@@ -260,7 +305,7 @@ $( document ).ready(function() {
 
     initalize();
     //custom 매수의 갯수를 변경하면 매수금액을 계산한다.
-    $('#buy-sell-area').on("change", 'input', function(e){
+    $('#buy-sell-area').on("change keyup", 'input', function(e){
         e.stopPropagation();
         let qty = $(this).val();
         let current_cost = $('#tblBuy').find('#current_cost_in_table').text().replace(/,/g, '');
