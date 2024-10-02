@@ -176,8 +176,8 @@ Handlebars.registerHelper('fulfillTime', function(value) {
     function initalize() {
         // 두 개의 비동기 요청을 병렬로 실행하고 결과를 기다립니다.
         Promise.all([
-            getFetch('/api/v1/ls/order-possible-money'), // 첫 번째 API 호출
-            getFetch('/api/v1/ls/jango2') // 두 번째 API 호출
+            getFetch('/api/v1/ls/order-possible-money'), // 계좌-현물계좌예수금 주문가능금액 총평가2
+            getFetch('/api/v1/ls/jango2') // 계좌
         ]).then(([orderPossibleMoneyData, jango2Data]) => {
             // 첫 번째 API 호출 결과
             console.log('주문가능');

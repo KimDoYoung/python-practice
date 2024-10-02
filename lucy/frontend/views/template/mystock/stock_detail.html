@@ -90,6 +90,7 @@
 {% raw %}
 <!--handlebar scripts-->
 <script id="sell-cost-template" type="text/x-handlebars-template">
+    <!-- 매도표 -->
     <div style="width:400px">
         <table id="tblSellCost" class="table table-bordered table-hover table-sm">
             <tr>
@@ -116,6 +117,7 @@
     </div>
 </script>
 <script id="buysell-template" type="text/x-handlebars-template">
+    <!-- 매수표 -->
     <div style="width:400px">
         <table id="tblBuy" class="table table-bordered table-hover table-sm">
             <tr>
@@ -145,7 +147,7 @@
                 <td colspan="5"></td>
             </tr>
             <tr id="tr_custom">
-                <td><input type="number" id="qty" style="width:60px" placeholder="1" onchange="console.log($(this).val())"></td>
+                <td><input type="number" id="qty" style="width:60px" placeholder="1" min="1"></td>
                 <td class="text-end text-primary"></td>
                 <td class="text-end text-primary"></td>
                 <td class="text-end text-primary"></td>

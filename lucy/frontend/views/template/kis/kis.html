@@ -30,6 +30,7 @@
             <tr class="table-warning">
                 <th>상품번호</th>
                 <th>상품명</th>
+                <th class="text-end">전일</th>
                 <th class="text-end">매입평균가격</th>
                 <th class="text-end">현재가</th>
                 <th class="text-end">1주당</th>
@@ -47,6 +48,11 @@
             <tr class="align-middle">
                 <td>{{goNaver pdno}}</td>
                 <td><a href="#" class="btnStockInfo" data-stk-code="{{pdno}}">{{toggleCompanyCanvas pdno prdt_name}}</a></td>
+                {{#test "Number(bfdy_cprs_icdc) > 0"}}
+                <td class="text-end text-danger">{{displayWon bfdy_cprs_icdc}}</td>
+                {{else}}
+                <td class="text-end text-primary">{{displayWon bfdy_cprs_icdc}}</td>
+                {{/test}}
                 <td class="text-end">{{displayWon pchs_avg_pric}}</td>
                 <td class="text-end">{{displayWon prpr}}</td>
                 {{#test "Number(pchs_avg_pric) > Number(prpr)"}}

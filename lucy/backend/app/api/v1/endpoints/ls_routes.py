@@ -24,6 +24,7 @@
     - /rank/expect-fulfill: [주식] 상위종목-예상체결량상위조회
     - /rank/expect-danilga-range: [주식] 상위종목-단일가예상등락율
     - /rank/purchase-cost: [주식] 상위종목-거래대금상위
+    - /order-possible-money: [주식] 계좌-현물계좌예수금 주문가능금액 총평가2
     
 
 작성자: 김도영
