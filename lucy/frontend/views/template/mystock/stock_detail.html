@@ -92,25 +92,30 @@
 <script id="sell-cost-template" type="text/x-handlebars-template">
     <!-- 매도표 -->
     <div style="width:400px">
+        <input type="hidden" id="sell-cost-current-cost" value="{{current_cost}}">
+        <input type="hidden" id="sell-cost-stk-code" value="{{stk_code}}">
+        <input type="hidden" id="sell-cost-stk-name" value="{{stk_name}}">
         <table id="tblSellCost" class="table table-bordered table-hover table-sm">
             <tr>
                 <th>현재가</th>
-                <td id="current_cost_in_table">{{displayWon current_cost}}</td>
+                <td id="current_cost_in_table_sell">{{displayWon current_cost}}</td>
                 <th>갯수</th>
-                <td colspan="2"><input type="number" id="qty" style="width:60px" placeholder="1"></td>
+                <td colspan="2"><input type="number" id="qty" style="width:60px" placeholder="{{qty}}" min="1" value="{{qty}}"></td>
             </tr>
             <tr>
                 <th class="text-end">매도가</th>
                 <th class="text-end">수수료</th>
                 <th class="text-end">최종가격</th>
-                <th class="text-center">매수</th>
+                <th class="text-center">동작</th>
             </tr>
-            {{#each count_list}}
+            {{#each list}}
             <tr>
-                <th class="text-end">{{this}}</th>
-                <th class="text-end"></th>
-                <th class="text-end">최종가격</th>
-                <th class="text-center">매수</th>
+                <td class="text-end">{{displayWon cost}}</td>
+                <td class="text-end">{{displayWon tax}}</td>
+                <td class="text-end">{{displayWon total_cost}}</td>
+                <td class="text-center">
+                    <button class="btnSell btn btn-primary btn-sm" data-qty="{{../qty}}" data-stk-code="{{../stk_code}}" data-stk-name="{{../stk_name}}" title="{{../stk_name}} 매도">売</button>
+                </td>
             </tr>
             {{/each}}
         </table>
@@ -139,7 +144,6 @@
                 <td class="text-end fw-bold">{{my_calc (my_calc this "*" ../current_cost) "+" (my_calc (my_calc this "*" ../current_cost) "*" 0.002) }}</td> <!-- 수수료 계산 -->
                 <td class="text-center">
                     <button class="btnBuy btn btn-danger btn-sm" data-qty="{{this}}" data-stk-code="{{../stk_code}}" data-stk-name="{{../stk_name}}" title="{{../stk_name}} 매수">買</button>
-                    <!-- <button class="btnSell btn btn-primary btn-sm"  data-qty="{{this}}" data-stk-code="{{../stk_code}}" data-stk-name="{{../stk_name}}" title="{{../stk_name}} 매도">賣</button> -->
                 </td>
             </tr>
             {{/each}}            
@@ -184,6 +188,31 @@
 <script>
 let current_stk_code =  undefined ; 
 let chart = undefined;
+
+function makeSellData(current_cost, qty, stk_code, stk_name){
+    let data = {
+        current_cost:current_cost,
+        qty:qty,
+        stk_code : stk_code,
+        stk_name : stk_name
+    }
+    let cost_list = [];
+    const step = getStepWithCost(current_cost);
+    let current_cost1 = current_cost * qty;
+    for (let i = 10; i >= 0; i--) {
+        let cost = current_cost1 + (step * i);
+        let tax = (cost * qty) * 0.002;
+        let total_cost = cost + tax;
+        cost_list.push({
+            cost:cost,
+            tax:tax,
+            total_cost:total_cost
+        });
+    }
+    data.list = cost_list;
+    return data;
+}
+
 function getStepWithCost(cost){
     if(cost < 10000) return 10;
     if(cost < 30000) return 100;
@@ -192,13 +221,7 @@ function getStepWithCost(cost){
     if(cost < 200000) return 500;
     return 1000;
 }
-//핸들바 템플릿으로 html을 만들어서 리턴한다.
-function getHtmlWithTemplate(templateId, data){
-    const source = document.getElementById(templateId).innerHTML;
-    const template = Handlebars.compile(source);
-    const html = template(data);
-    return html;
-}
+
 function drawCandleChart(org_data, title){
     let columns = []
     let column1 = ['data1'];
@@ -283,16 +306,12 @@ function initalize(){
             stk_code : current_stk_code,
             stk_name : current_stk_name
         }
-        let html = getHtmlWithTemplate('buysell-template', current_data);
+        let html = makeHtmlWithTemplateIdAndData('buysell-template', current_data);
         document.getElementById('buy-sell-area').innerHTML = html;
-        const step = getStepWithCost(current_cost);
-        //현재가격부터 step으로 증가하면서 10개
-        let count_list = [];
-        for (let i = 0; i < 10; i++) {
-            count_list.push(current_cost + (step * i));
-        }
-        current_data.count_list = count_list;
-        html = getHtmlWithTemplate('sell-cost-template', current_data);
+        //매도표 
+        let data1 = makeSellData(current_cost,1, current_stk_code, current_stk_name);
+        console.log(data1);
+        html = makeHtmlWithTemplateIdAndData('sell-cost-template', data1);
         document.getElementById('sell-cost-area').innerHTML = html;
 
     }).catch(error=> {
@@ -306,6 +325,18 @@ $( document ).ready(function() {
     current_stk_code = $('#current_stk_code').val();
 
     initalize();
+    //매도표의 갯수를 변경하면 매도금액을 계산한다.
+    $('#sell-cost-area').on('change keyup', 'input', function(e){
+        e.stopPropagation();
+        let qty = $(this).val();
+        let current_cost = $('#sell-cost-area').find('#sell-cost-current-cost').val();
+        let stk_code = $('#sell-cost-area').find('#sell-cost-stk-code').val();
+        let stk_name = $('#sell-cost-area').find('#sell-cost-stk-name').val();
+        let data1 = makeSellData(Number(current_cost),Number(qty), current_stk_code, current_stk_name);
+        console.log(data1);
+        html = makeHtmlWithTemplateIdAndData('sell-cost-template', data1);
+        document.getElementById('sell-cost-area').innerHTML = html;
+    });
     //custom 매수의 갯수를 변경하면 매수금액을 계산한다.
     $('#buy-sell-area').on("change keyup", 'input', function(e){
         e.stopPropagation();
