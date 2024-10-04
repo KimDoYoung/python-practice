@@ -1,2 +1,8 @@
+fastapi 
+uvicorn 
 pycryptodome
 PyJWT
+python-dotenv
+python-jose
+passlib
+sqlalchemy

@@ -4,6 +4,8 @@
 
 ```text
 1. 새로운 프로젝트 asset-api를 만들고 함.
+    - backend : restful api 로 서비스
+    - frontend : 사용자에게 key를 발급해 주고 확인하는 UI제공
 2. 프로젝트의 개요
     2.1 사용자들에게 접속키를 발급함.
     2.2.접속키를 발급한 사용자는 restful방식으로 데이터를 제공받음.
@@ -17,6 +19,7 @@
             2. postgresql
             3. async db 
             4. pytest
+            5. jinga2
 
         - frontend
             1. jquery 사용, ajax는 pure javascript의 fetch사용

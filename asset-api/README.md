@@ -11,11 +11,11 @@
 ```sql
 DROP TABLE IF EXISTS ifi01_company;
 CREATE TABLE IF NOT EXISTS ifi01_company  (
-    company_id BIGINT NOT NULL,             		-- 회사 ID (예: 회사 이름 또는 고유 식별자)
-    service_nm VARCHAR(100) NOT NULL,             	-- 서비스 명칭 (예: 서비스 이름 또는 고유 식별자)
-    start_ymd VARCHAR(8) NOT NULL,                	-- 서비스 시작 일자
+    company_id BIGINT NOT NULL,               -- 회사 ID (예: 회사 이름 또는 고유 식별자)
+    service_nm VARCHAR(100) NOT NULL,              -- 서비스 명칭 (예: 서비스 이름 또는 고유 식별자)
+    start_ymd VARCHAR(8) NOT NULL,                 -- 서비스 시작 일자
     end_ymd VARCHAR(8) NOT NULL DEFAULT '99991231', -- 서비스 종료 일자
-    app_key VARCHAR(64) NOT NULL,                 	-- 랜덤으로 생성된 appKey (회사에 제공한 고유 키)
+    app_key VARCHAR(64) NOT NULL,                  -- 랜덤으로 생성된 appKey (회사에 제공한 고유 키)
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- 레코드 생성 일자
     PRIMARY KEY(company_id, service_nm)
 );
@@ -65,3 +65,17 @@ KFS 서버는 요청이 들어오면, **app_key**를 기반으로 DB에서 해�
 조회한 company_id, service_nm, start_ymd 정보를 소스 코드에 저장된 암호화 키(예: 'kfs-restful-zaq1@WSX')를 사용해 AES 암호화하여 동적으로 app_secret_key를 생성합니다.
 생성된 app_secret_key와 **헤더로 전달된 app_secret_key**를 비교하여 일치하는지 검증합니다.
 검증이 성공하면, JWT(JSON Web Token) 기반의 Access Token을 발급하여 응답합니다.
+
+## 폴더구조
+
+```shell
+mkdir -p backend/app/api/v1/endpoints
+mkdir -p backend/app/core
+mkdir -p backend/app/domain
+mkdir -p backend/app/utils
+touch backend/main.py
+mkdir -p doc
+mkdir -p frontend/public
+mkdir -p frontend/views/common
+mkdir -p frontend/views/template
+```
