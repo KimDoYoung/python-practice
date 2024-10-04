@@ -1,3 +1,17 @@
+# security.py
+"""
+모듈 설명: 
+    - 보안 관련 모듈
+주요 기능:
+    - aes_encrypt : AES 암호화 함수, app_secret_key 생성용
+    - create_access_token : JWT 토큰 생성
+    - verify_access_token : JWT 토큰 검증
+    - get_current_company : 현재 회사 정보 반환
+
+작성자: 김도영
+작성일: 2024-10-04
+버전: 1.0
+"""
 import base64
 from datetime import datetime, timedelta
 import hashlib

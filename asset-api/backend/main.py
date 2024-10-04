@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from backend.app.core.logger import get_logger
 from backend.app.core.settings import config
+from jwtmiddleware import JWTAuthMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 
 logger = get_logger(__name__)
 
@@ -18,7 +20,19 @@ def set_middlewares(app: FastAPI):
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    
+
+def set_routes(app: FastAPI):
+    ''' 라우팅 설정 '''
+    pass
+def set_event_handlers(app: FastAPI):
+    ''' 이벤트 핸들러 설정 '''
+    pass
+def set_static_files(app: FastAPI):
+    ''' 정적 파일 설정 '''
+    pass
+def set_exception_handlers(app: FastAPI):
+    ''' 예외 처리 설정 '''
+        
 def create_app() -> FastAPI:
     ''' FastAPI 앱 생성 '''
     service_title = config.SERVICE_TITLE
@@ -38,5 +52,5 @@ if __name__ == "__main__":
     logger.info('------------------------------------------------')
     logger.info(f"{service_title} 서버 시작")
     logger.info('------------------------------------------------')
-    service_port = config.SEVICE_PORT
+    service_port = config.SERVICE_PORT
     uvicorn.run(app, host="0.0.0.0", port=service_port, reload=True)
