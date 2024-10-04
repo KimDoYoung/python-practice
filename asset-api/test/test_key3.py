@@ -6,7 +6,8 @@ import base64
 import hashlib
 
 # AES 암호화 함수 (app_secret_key 생성용)
-def aes_encrypt(key, data):
+def aes_encrypt(key:str, data:str) -> str:
+    '''AES 암호화 함수'''
     key = hashlib.sha256(key.encode('utf-8')).digest()[:32]
     cipher = AES.new(key, AES.MODE_ECB)
     padded_data = pad(data.encode('utf-8'), AES.block_size)

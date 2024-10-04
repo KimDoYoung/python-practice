@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS ifi01_company  (
 KFS가 제공하는 OpenAPI 서비스에 등록한 회사는 **app_key**와 **app_secret_key**를 발급받아야 합니다.
 이 문서에서는 미래에셋을 예시로 설명합니다.
 
-2. app_key 및 app_secret_key 발급
+1. app_key 및 app_secret_key 발급
 **app_key**는 랜덤한 64자 길이의 알파벳 및 숫자 조합으로 생성됩니다.
 **app_key**는 KFS의 데이터베이스(DB)에 저장되며, 각 회사에 고유한 키로 사용됩니다.
 **app_secret_key**는 **company_id + service_nm + start_ymd**를 AES 암호화하여 생성됩니다.
@@ -54,13 +54,13 @@ KFS가 제공하는 OpenAPI 서비스에 등록한 회사는 **app_key**와 **ap
 **app_secret_key**는 DB에 저장되지 않습니다.
 미래에셋은 API 사용을 위해 발급받은 **app_key**와 **app_secret_key**를 제공받습니다.
 
-3. 인증 요청 절차
+1. 인증 요청 절차
 미래에셋은 /auth URL로 접속하여 **app_key**와 **app_secret_key**를 HTTP 헤더에 포함해 요청을 보냅니다.
 헤더에는 다음과 같은 정보가 포함됩니다:
 app_key: 발급받은 64자리 랜덤 키
 app_secret_key: 발급받은 AES 암호화된 키
 
-4. 검증 및 토큰 발급 로직
+1. 검증 및 토큰 발급 로직
 KFS 서버는 요청이 들어오면, **app_key**를 기반으로 DB에서 해당 회사 정보를 조회합니다.
 조회한 company_id, service_nm, start_ymd 정보를 소스 코드에 저장된 암호화 키(예: 'kfs-restful-zaq1@WSX')를 사용해 AES 암호화하여 동적으로 app_secret_key를 생성합니다.
 생성된 app_secret_key와 **헤더로 전달된 app_secret_key**를 비교하여 일치하는지 검증합니다.
