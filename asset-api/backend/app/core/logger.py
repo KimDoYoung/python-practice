@@ -15,7 +15,7 @@ import os
 
 def get_logger(name):
     
-    from settings import config
+    from backend.app.core.settings import config
     
     logger = logging.getLogger(name)
     logger.setLevel(config.LOG_LEVEL)

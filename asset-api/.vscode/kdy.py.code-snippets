@@ -1,12 +1,4 @@
 {
-    // "Print to console": {
-    //     "prefix": "log11",
-    //     "body": [
-    //         "console.log('$1');",
-    //         "$2"
-    //     ],
-    //     "description": "Log output to console"
-    // }
     "logger" : {
         "prefix": "my_logger",
         "body":  [

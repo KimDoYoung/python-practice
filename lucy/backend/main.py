@@ -49,9 +49,6 @@ def create_app() -> FastAPI:
 
 def add_middlewares(app: FastAPI):
     ''' 미들웨어 설정 '''
-    # JWT 인증 미들웨어 등록
-    app.add_middleware(JWTAuthMiddleware)
-
     # CORS 설정
     app.add_middleware(
         CORSMiddleware,
@@ -59,7 +56,11 @@ def add_middlewares(app: FastAPI):
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
-    )
+    )    
+    # JWT 인증 미들웨어 등록
+    app.add_middleware(JWTAuthMiddleware)
+
+
 
 def add_routes(app: FastAPI):
     # API 라우터 포함

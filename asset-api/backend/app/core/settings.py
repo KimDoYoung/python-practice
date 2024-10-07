@@ -18,8 +18,8 @@ class Settings:
     def __init__(self):
         
         # PROFILE_NAME 환경변수를 읽어옴
-        self.PROFILE = os.getenv('AssetApi_Mode', 'local')
-        load_dotenv(dotenv_path=f'.env.{self.PROFILE}')
+        self.PROFILE_NAME = os.getenv('AssetApi_Mode', 'local')
+        load_dotenv(dotenv_path=f'.env.{self.PROFILE_NAME}')
         
         # SERVICE설정
         self.SERVICE_TITLE = os.getenv('SERVICE_TITLE', 'AssetApi-한국펀드서비스 OPENAPI')
@@ -47,5 +47,18 @@ class Settings:
 
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)
+    
+    def __str__(self):
+        ''' 서비스 설정 정보를 문자열로 반환 '''
+        s = "------------------------------------------------\n"
+        s = "설정값\n"
+        s = "------------------------------------------------\n"
+        s += f"SERVICE_TITLE: {self.SERVICE_TITLE}\n"
+        s += f"SERVICE_PORT: {self.SERVICE_PORT}\n"
+        s += f"DB_URL: {self.DB_URL}\n"
+        s += f"LOG_LEVEL: {self.LOG_LEVEL}\n"
+        s += f"LOG_FILE: {self.LOG_FILE}\n"
+        s += "------------------------------------------------\n"
+        return s
 
 config = Settings()

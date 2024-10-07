@@ -12,19 +12,17 @@
 작성일: 2024-10-04
 버전: 1.0
 """
-import base64
+import base64, hashlib
 from datetime import datetime, timedelta
-import hashlib
-from fastapi import HTTPException, Request
+from fastapi import HTTPException, Request, status
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad
 from jose import JWTError, jwt
 from typing import Optional
-from backend.app.core.settings import config
-from fastapi import status
 
+from backend.app.core.settings import config
 from backend.app.domain.company.company_service import get_company
-from database import get_session
+from backend.app.core.database import get_session
 
 
 # pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

@@ -6,3 +6,5 @@ python-dotenv
 python-jose
 passlib
 sqlalchemy
+jinja2
+asyncpg
