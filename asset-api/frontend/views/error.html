@@ -1,0 +1,30 @@
+{% extends "common/base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h4>Error</h4>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Status Code: <span id="status-code">{{ status_code }}</span></h5>
+                <p class="card-text">Detail: <span id="detail">{{ detail }}</span></p>
+                <div id="error-list">
+                    {% if errors %}
+                        <ul class="list-group mt-3">
+                            {% for error in errors %}
+                                <li class="list-group-item list-group-item-danger">{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <a href="/" class="btn btn-primary mt-3">Go to Homepage</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+
+{% endblock %}

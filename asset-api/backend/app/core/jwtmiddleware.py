@@ -16,7 +16,15 @@ from backend.app.core.security import verify_access_token
 
 class JWTAuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-
+        token = None
+        
+        # 요청 경로 확인
+        path = request.url.path
+        
+        # "/main" 경로일 때는 리다이렉트 하지 않도록 예외 처리
+        if path == "/main":
+            return await call_next(request)
+        
         # Authorization 헤더에서 토큰 추출
         auth_header = request.headers.get("Authorization")
         if auth_header and auth_header.startswith("Bearer "):
@@ -27,8 +35,8 @@ class JWTAuthMiddleware(BaseHTTPMiddleware):
                 verify_access_token(token)
                 response = await call_next(request)
             else:
-                return RedirectResponse(url="/login")
+                return RedirectResponse(url="/main")
         except HTTPException:
-            return RedirectResponse(url="/login")
+            return RedirectResponse(url="/main")
         
         return response

@@ -15,6 +15,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import HTMLResponse, JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from typing import Union
+from jinja2 import TemplateNotFound
 
 from backend.app.core.logger import get_logger
 from backend.app.core.template_engine import render_template
@@ -38,6 +39,19 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> Union[
 
 async def general_exception_handler(request: Request, exc: Exception) -> Union[JSONResponse, HTMLResponse]:
     """일반 예외 처리"""
+    if isinstance(exc, TemplateNotFound):
+        logger.error(f"템플릿을 찾을 수 없습니다: {exc}")
+        # 템플릿을 찾지 못했을 때 기본 HTML 페이지를 반환
+        context = {
+            "request": request.url.path,
+            "status_code": 500,
+            "detail": "템플릿을 찾을 수 없습니다.",
+            "server_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+        return HTMLResponse(
+            content="<h1>500 - Internal Server Error</h1><p>템플릿을 찾을 수 없습니다.</p>",
+            status_code=500
+        )    
     return await create_error_response(request, exc)
 
 async def custom_404_exception_handler(request: Request, exc: StarletteHTTPException) -> Union[JSONResponse, HTMLResponse]:

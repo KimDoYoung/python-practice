@@ -23,7 +23,7 @@
         "backend.main:app",
         "--reload",
         "--port",
-        "8000" // 원하는 포트 번호로 변경
+        "8008" // 원하는 포트 번호로 변경
       ],
       "jinja": true,
       "justMyCode": true,
