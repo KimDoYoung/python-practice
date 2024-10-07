@@ -21,6 +21,13 @@ class JWTAuthMiddleware(BaseHTTPMiddleware):
         # 요청 경로 확인
         path = request.url.path
         
+        STATIC_PATHS = ["/public", "/favicon.ico"]
+        print(request.url.path)
+        #if request.url.path in ["/login", "/logout"] or any(request.url.path.startswith(path) for path in STATIC_PATHS):    
+        if any(request.url.path.startswith(path) for path in STATIC_PATHS):    
+            response = await call_next(request)
+            return response        
+        
         # "/main" 경로일 때는 리다이렉트 하지 않도록 예외 처리
         if path == "/main":
             return await call_next(request)

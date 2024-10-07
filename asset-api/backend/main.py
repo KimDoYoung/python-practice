@@ -38,6 +38,10 @@ def set_static_files(app: FastAPI):
     ''' 정적 파일 설정 '''
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     static_files_path = os.path.join(BASE_DIR, 'frontend', 'public')
+    logger.info('------------------------------------------------')
+    logger.debug(f"BASE_DIR: {BASE_DIR}")
+    logger.debug(f"static_files_path: {static_files_path}")
+    logger.info('------------------------------------------------')
     app.mount("/public", StaticFiles(directory=static_files_path), name="public")
     
 def set_exception_handlers(app: FastAPI):

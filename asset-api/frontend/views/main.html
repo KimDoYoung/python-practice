@@ -1,1 +1,18 @@
-<h1>Asset-Api Main</h1>
+{% extends 'common/base.html' %}
+{% block style %}
+{% endblock %}
+{% block content %}
+<h1>asset-api</h1>
+{% raw %}
+<!--handlebar scripts-->
+{% endraw %}
+{% endblock %}
+{% block script %}
+{% raw %}
+<script>
+$( document ).ready(function() {
+    console.log( "ready!")
+});
+</script>
+{% endraw %}
+{% endblock %}
