@@ -16,7 +16,7 @@ import base64, hashlib
 from datetime import datetime, timedelta
 from fastapi import HTTPException, Request, status
 from Crypto.Cipher import AES
-from Crypto.Util.Padding import pad
+from Crypto.Util.Padding import pad, unpad
 from jose import JWTError, jwt
 from typing import Optional
 
@@ -41,6 +41,16 @@ def aes_encrypt( data:str) -> str:
     padded_data = pad(data.encode('utf-8'), AES.block_size)
     encrypted = cipher.encrypt(padded_data)
     return base64.b64encode(encrypted).decode('utf-8')
+
+# AES 복호화 함수 (확인용)
+def aes_decrypt(encrypted_data):
+    """AES 복호화 함수 (ECB 모드)"""
+    global_key = config.AES_GLOBAL_KEY
+    cipher = AES.new(global_key, AES.MODE_ECB)
+    decoded_encrypted_data = base64.b64decode(encrypted_data)  # base64 디코딩
+    decrypted = unpad(cipher.decrypt(decoded_encrypted_data), AES.block_size)  # 복호화 후 패딩 제거
+    return decrypted.decode('utf-8')
+
 
 def create_access_token(app_secret_key:str, company_id: int, service_id: str, start_date: str):
     """

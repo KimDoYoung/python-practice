@@ -1,0 +1,21 @@
+{% extends 'common/base.html' %}
+{% block style %}
+{% endblock %}
+{% block content %}
+<h1>서비스 키 발급 리스트</h1>
+<div>
+    <a href="/page?path=company/register" class="btn btn-primary">API Service 등록</a>
+</div>
+{% raw %}
+<!--handlebar scripts-->
+{% endraw %}
+{% endblock %}
+{% block script %}
+{% raw %}
+<script>
+$( document ).ready(function() {
+    console.log( "발급현황 ready!")
+});
+</script>
+{% endraw %}
+{% endblock %}

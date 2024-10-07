@@ -48,10 +48,11 @@ async def general_exception_handler(request: Request, exc: Exception) -> Union[J
             "detail": "템플릿을 찾을 수 없습니다.",
             "server_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
-        return HTMLResponse(
-            content="<h1>500 - Internal Server Error</h1><p>템플릿을 찾을 수 없습니다.</p>",
-            status_code=500
-        )    
+        # return HTMLResponse(
+        #     content="<h1>500 - Internal Server Error</h1><p>템플릿을 찾을 수 없습니다.</p>",
+        #     status_code=500
+        # )    
+        return HTMLResponse(content=render_template("error.html", context), status_code=context["status_code"])
     return await create_error_response(request, exc)
 
 async def custom_404_exception_handler(request: Request, exc: StarletteHTTPException) -> Union[JSONResponse, HTMLResponse]:

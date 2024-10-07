@@ -1,10 +1,8 @@
 
-from datetime import timedelta
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
+from fastapi import APIRouter, Query, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 
 from backend.app.core.template_engine import render_template
-from backend.app.core.settings import config
 from backend.app.core.logger import get_logger
 from backend.app.utils.misc_util import get_today
 
@@ -34,14 +32,9 @@ async def display_main(request: Request):
 @router.get("/page", response_class=HTMLResponse, include_in_schema=False)
 async def page(
     request: Request, 
-    path: str = Query(..., description="template폴더안의 html path"),
-    stk_code: str = Query(None, description="선택적 주식 코드")
+    path: str = Query(..., description="template폴더안의 html path")
 ):
     ''' path에 해당하는 페이지를 가져와서 보낸다. '''
-    
-    # 쿠키에서 stk_code를 가져오거나, 쿼리 파라미터로 전달된 stk_code를 사용
-    cookie_stk_code = request.cookies.get("stk_code")
-    stk_code = stk_code or cookie_stk_code    
 
     today = get_today()
     context = {

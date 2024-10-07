@@ -1,0 +1,57 @@
+{% extends 'common/base.html' %}
+{% block style %}
+{% endblock %}
+{% block content %}
+<h2 class="mb-4">서비스 받을 회사 등록 및 키 발급</h2>
+<div>
+    <form action="/submit-company" method="POST">
+        <!-- Company ID -->
+        <div class="mb-3">
+            <label for="company_id" class="form-label">Company ID</label>
+            <input type="number" class="form-control" id="company_id" name="company_id" placeholder="Enter Company ID" required>
+            <div class="form-text">Please enter a unique identifier for the company.</div>
+        </div>
+
+        <!-- Service Name (Select Box) -->
+        <div class="mb-3">
+            <label for="service_nm" class="form-label">Service Name</label>
+            <select class="form-select" id="service_nm" name="service_nm" required>
+                <option value="법률서비스">법률서비스</option>
+            </select>
+            <div class="form-text">Select the service provided by the company.</div>
+        </div>
+
+        <!-- Start Date -->
+        <div class="mb-3">
+            <label for="start_ymd" class="form-label">Start Date</label>
+            <input type="date" class="form-control" id="start_ymd" name="start_ymd" required>
+            <div class="form-text">Please select the service start date.</div>
+        </div>
+
+        <!-- End Date -->
+        <div class="mb-3">
+            <label for="end_ymd" class="form-label">End Date</label>
+            <input type="date" class="form-control" id="end_ymd" name="end_ymd" value="9999-12-31">
+            <div class="form-text">Select the service end date (default: no end date).</div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary">등록 및 키발급</button>
+    </form>
+
+</div>
+
+{% raw %}
+<!--handlebar scripts-->
+{% endraw %}
+{% endblock %}
+{% block script %}
+{% raw %}
+<script>
+$( document ).ready(function() {
+    console.log( "회사등록 ready!")
+    document.getElementById('start_ymd').valueAsDate = new Date();
+});
+</script>
+{% endraw %}
+{% endblock %}

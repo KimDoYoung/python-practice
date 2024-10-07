@@ -30,15 +30,16 @@ CREATE TABLE IF NOT EXISTS ifi01_company  (
 - 이하 **서비스에 등록한 회사**는 **미래에셋**으로 기술한다.
 - app_key는 랜덤한 알파벳숫자로 길이 64이다.
 - app_key는 db에 저장된다.
-- app_secret_key는 company_id + service_nm + start_ymd 를 aes암호화하여 생성한다.
-- 이때 암호화 키는 소스에 저장된다. (예 : 'kfs-restful-zaq1@WSX)
-- app_secret_key는 db에 저장되지 않는다.
+- app_secret_key는 app_key + company_id + service_nm + start_ymd 를 aes암호화하여 생성한다.
+- 이때 암호화에 사용되는 키는 env.profile에 저장되어 있다. (예 : 'kfs-restful-zaq1@WSX)
+- 생성된 app_secret_key는 db에 저장되지 않는다.
 - 미래에셋은 app_key와  app_secret_key를 제공받는다.
 - 미래에셋은 url /auth 에 접속한다. 이때 header에 제공받은 app_key와 app_secret_key를 함께 보낸다.
 - 검증 및 token발급로직에서 app_key로 db에서 검색한다.
-- 검색 후 company_id + service_nm + start_ymd 를 소스에 존재하는 암호화키로  aes암호화한다.
+- 검색 후 app_key+ company_id + service_nm + start_ymd 를 소스에 존재하는 암호화키로  aes암호화한다.
 - 그 결과와 header에서 보내 온 app_secret_key를 비교하여 검증한다.
 - 검증완료된 후 jwt key를 발급환다.
+- jwt key는 24시간 유효하다.
 
 ### API Key 발급 및 검증 문서
 
