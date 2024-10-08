@@ -55,6 +55,21 @@ async def general_exception_handler(request: Request, exc: Exception) -> Union[J
         return HTMLResponse(content=render_template("error.html", context), status_code=context["status_code"])
     return await create_error_response(request, exc)
 
+# 유효성 검사 에러 처리 핸들러 (Pydantic validation error)
+async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
+    """유효성 검사 실패 예외 처리"""
+    server_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    logger.error(f"유효성 검사 에러: {exc.errors()}")
+
+    context = {
+        "request": request.url.path,
+        "status_code": 422,
+        "detail": str(exc), #exc.errors(),
+        "server_time": server_time  # 항상 server_time을 추가
+    }
+
+    return JSONResponse(status_code=422, content=context)
+
 async def custom_404_exception_handler(request: Request, exc: StarletteHTTPException) -> Union[JSONResponse, HTMLResponse]:
     """404 예외 처리"""
     return await create_error_response(request, exc)

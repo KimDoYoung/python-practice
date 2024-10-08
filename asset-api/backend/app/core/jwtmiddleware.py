@@ -44,7 +44,7 @@ class JWTAuthMiddleware(BaseHTTPMiddleware):
         # 토큰 검증을 하지 않을 경로 목록 (정적 파일, 렌더링되는 HTML 페이지 등)
         STATIC_PATHS = ["/public", "/favicon.ico"]
         NO_AUTH_PATHS = ["/main", "/page"]  # JWT 검증을 하지 않는 페이지 경로
-        EXEMPT_IPS = ["192.168.1.100", "127.0.0.1"]  # 검증하지 않을 특정 IP 리스트
+        FREEPASS_IPS = ["192.168.1.100", "127.0.0.1"]  # 검증하지 않을 특정 IP 리스트
 
         # 정적 파일 및 토큰 검증이 필요 없는 경로 처리
         if any(path.startswith(static_path) for static_path in STATIC_PATHS) or any(path.startswith(no_auth_path) for no_auth_path in NO_AUTH_PATHS):
@@ -52,7 +52,7 @@ class JWTAuthMiddleware(BaseHTTPMiddleware):
             return response
         
         # 특정 IP에서 오는 요청에 대해서는 토큰 검증을 하지 않음
-        if client_ip in EXEMPT_IPS:
+        if client_ip in FREEPASS_IPS:
             logger.warning(f"Skipping JWT verification for IP(특정IP이므로 토근검증하지 않음): {client_ip}")
             response = await call_next(request)
             return response

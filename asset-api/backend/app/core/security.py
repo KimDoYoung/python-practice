@@ -14,6 +14,8 @@
 """
 import base64, hashlib
 from datetime import datetime, timedelta
+import random
+import string
 from fastapi import HTTPException, Request, status
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
@@ -24,28 +26,24 @@ from backend.app.core.settings import config
 from backend.app.domain.company.company_service import get_company
 from backend.app.core.database import get_session
 
+def generate_app_key(length: int = 64) -> str:
+    """랜덤으로 영문 대소문자와 숫자를 조합한 app_key 생성"""
+    characters = string.ascii_letters + string.digits  # 영문 대소문자 + 숫자
+    app_key = ''.join(random.choice(characters) for _ in range(length))  # length만큼 랜덤 생성
+    return app_key
 
-# pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-# def verify_password(plain_password, hashed_password):
-#     return pwd_context.verify(plain_password, hashed_password)
-
-# def get_password_hash(password):
-#     return pwd_context.hash(password)
-
-
-def aes_encrypt( data:str) -> str:
+def secret_key_encrypt(key:str, data:str) -> str:
     '''AES 암호화 함수, app_secret_key 생성용'''
-    global_key = config.AES_GLOBAL_KEY
+    global_key = key
     key = hashlib.sha256(global_key.encode('utf-8')).digest()[:32]
     cipher = AES.new(key, AES.MODE_ECB)
     padded_data = pad(data.encode('utf-8'), AES.block_size)
     encrypted = cipher.encrypt(padded_data)
     return base64.b64encode(encrypted).decode('utf-8')
 
-# AES 복호화 함수 (확인용)
-def aes_decrypt(encrypted_data):
+def secret_key_decrypt(key, encrypted_data):
     """AES 복호화 함수 (ECB 모드)"""
-    global_key = config.AES_GLOBAL_KEY
+    global_key = key
     cipher = AES.new(global_key, AES.MODE_ECB)
     decoded_encrypted_data = base64.b64decode(encrypted_data)  # base64 디코딩
     decrypted = unpad(cipher.decrypt(decoded_encrypted_data), AES.block_size)  # 복호화 후 패딩 제거

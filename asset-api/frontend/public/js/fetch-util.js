@@ -52,7 +52,11 @@ async function callLucyApi(url, method, data = null) {
             const contentType = response.headers.get('content-type');            
             if (contentType && contentType.includes('application/json')) {
                 const errorData = await response.json();
-                throw new LucyError(response.status, errorData.detail);
+                //errorData.detail이 배열이면 배열을 문자열로 변환
+                if (Array.isArray(errorData.detail)){
+                    errorData.detail = errorData.detail.join(', ');
+                }
+                throw new LucyError(response.status, errorData.detail, errorData.server_time);
             } else {
                 throw new LucyError(response.status, 'Unexpected response format');
             }            
@@ -66,7 +70,7 @@ async function callLucyApi(url, method, data = null) {
             alert("세션 종료되었습니다. 서버와의 통신이 원활하지 않습니다. 다시 로그인해주세요.");
             window.location.href = '/login';
         }else{
-            throw new LucyError(500, errorStr);
+            throw new LucyError(error.status, error.message, error.server_time);
         }
     }
 }

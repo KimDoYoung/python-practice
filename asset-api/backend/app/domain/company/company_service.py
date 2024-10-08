@@ -16,13 +16,12 @@
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.app.domain.company.company_model import Company
-
+from backend.app.domain.company.company_model import CompanyModel
 
 # 회사 정보 생성 (Insert)
 async def create_company(db: AsyncSession, company_data: dict):
     ''' 회사 정보 생성 insert동작'''
-    new_company = Company(**company_data)
+    new_company = CompanyModel(**company_data)
     db.add(new_company)
     await db.commit()
     await db.refresh(new_company)
@@ -32,7 +31,7 @@ async def create_company(db: AsyncSession, company_data: dict):
 async def get_company(db: AsyncSession, company_id: int, service_nm: str):
     ''' 회사 정보 조회 By company_id, service_nm '''
     result = await db.execute(
-        select(Company).where(Company.company_id == company_id, Company.service_nm == service_nm)
+        select(CompanyModel).where(CompanyModel.company_id == company_id, CompanyModel.service_nm == service_nm)
     )
     return result.scalar_one_or_none()
 
@@ -40,7 +39,7 @@ async def get_company(db: AsyncSession, company_id: int, service_nm: str):
 async def get_company_by_app_key(db: AsyncSession, app_key: str):
     ''' 회사 정보 조회 By app_key '''
     result = await db.execute(
-        select(Company).where(Company.app_key == app_key)
+        select(CompanyModel).where(CompanyModel.app_key == app_key)
     )
     return result.scalar_one_or_none()
 
@@ -63,3 +62,13 @@ async def delete_company(db: AsyncSession, company_id: int, service_nm: str):
         await db.delete(company)
         await db.commit()
     return company
+
+# async def generate_app_secret_key(company):
+#     ''' app_secret_key 생성 '''
+#     from backend.app.core.security import aes_encrypt
+#     app_key = company.app_key
+#     company_id = str(company.company_id)
+#     service_nm = company.service_nm
+#     start_ymd = company.start_ymd
+#     app_secret_key = aes_encrypt(app_key, f"{company_id}|{service_nm}|{start_ymd}")
+#     return app_secret_key

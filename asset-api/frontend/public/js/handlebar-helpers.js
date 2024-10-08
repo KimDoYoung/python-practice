@@ -2,7 +2,7 @@
  * handlebar-helpers 
  */
 //핸들바 템플릿으로 html을 만들어서 리턴한다.
-function makeHtmlWithTemplateIdAndData(templateId, data) {
+function makeHtmlWithTemplate(templateId, data) {
     const template = document.getElementById(templateId).innerHTML;
     const compiledTemplate = Handlebars.compile(template);
     return compiledTemplate(data);
