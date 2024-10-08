@@ -6,7 +6,7 @@ from backend.app.core.logger import get_logger
 from backend.app.domain.company.company_schema import CompanyRequest, CompanyResponse
 from backend.app.core.database import get_session
 from backend.app.core.security import generate_app_key, secret_key_encrypt
-from backend.app.domain.company.company_service import create_company, get_all_companies
+from backend.app.domain.company.company_service import create_company, delete_company, get_all_companies
 logger = get_logger(__name__)
 
 router = APIRouter()
@@ -18,6 +18,13 @@ async def list(db: AsyncSession = Depends(get_session)):
     
     # SQLAlchemy 모델을 Pydantic 모델로 변환
     return [CompanyResponse.model_validate(company) for company in company_list]
+
+@router.delete("/delete/{company_id}/{service_nm}",  response_model=CompanyResponse)
+async def delete(company_id:int, service_nm:str, db: AsyncSession = Depends(get_session)):
+    ''' 회사 정보 삭제 '''
+    logger.debug(f"회사 정보 삭제: {company_id}, {service_nm}")
+    deleted_company = await delete_company(db, company_id, service_nm)
+    return CompanyResponse.model_validate(deleted_company)
     
 
 @router.post("/register",  response_model=CompanyResponse)

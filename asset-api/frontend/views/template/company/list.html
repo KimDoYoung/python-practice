@@ -31,7 +31,7 @@
                 <td>{{end_ymd}}</td>
                 <td>{{app_key}}</td>
                 <td>{{created_at}}</td>
-                <td><button class="btnDelete btn btn-danger" data-company-id="{{company_id}}">삭제</button></td>
+                <td><button class="btnDelete btn btn-danger" data-company-id="{{company_id}}" data-service-nm="{{service_nm}}">삭제</button></td>
             </tr>
             {{/each}}
         </tbody>
@@ -58,7 +58,21 @@ $( document ).ready(function() {
     initialize();
 
     $("result-area").on("click", ".btnDelete", function() {
-        alert("두 번째 버튼을 클릭했습니다.");
+        console.log("delete button clicked");
+        const company_id = $(this).data('company-id');
+        const service_nm = $(this).data('service-nm');
+
+        if( confirm(`${company_id}-${service_nm} 삭제하시겠습니까?`) == false) {
+            return;
+        }
+
+        const url = `/api/v1/company/delete/${company_id}/${service_nm}`;
+        deleteFetch(url,{}).then(data => {
+            console.log(data); 
+            initialize();
+        }).catch(error=> {
+            console.error(error.message); 
+        });
     });
     
 });
