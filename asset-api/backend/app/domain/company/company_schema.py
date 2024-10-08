@@ -1,4 +1,5 @@
 
+from datetime import datetime
 from pydantic import BaseModel, Field
 from typing import Optional
 
@@ -13,3 +14,7 @@ class CompanyRequest(BaseModel):
 class CompanyResponse(CompanyRequest):
     app_key: Optional[str] = Field(None, max_length=64)
     app_secret_key: Optional[str] = Field(None, max_length=64)
+    created_at: Optional[datetime] 
+    # Pydantic v2 방식으로 변경
+    class Config:
+        from_attributes = True  # SQLAlchemy 모델을 Pydantic으로 변환 가능하게 설정    

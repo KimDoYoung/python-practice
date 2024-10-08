@@ -6,17 +6,61 @@
 <div>
     <a href="/page?path=company/register" class="btn btn-primary">API Service 등록</a>
 </div>
-<div id="list-area"></div>
+<div id="result-area"></div>
 {% raw %}
 <!--handlebar scripts-->
-
+<script id="list-template" type="text/x-handlebars-template">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>회사 ID</th>
+                <th>서비스명</th>
+                <th>시작일</th>
+                <th>종료일</th>
+                <th>APP KEY</th>
+                <th>발급일시</th>
+                <th>삭제</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each list}}
+            <tr>
+                <td>{{company_id}}</td>
+                <td>{{service_nm}}</td>
+                <td>{{start_ymd}}</td>
+                <td>{{end_ymd}}</td>
+                <td>{{app_key}}</td>
+                <td>{{created_at}}</td>
+                <td><button class="btnDelete btn btn-danger" data-company-id="{{company_id}}">삭제</button></td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</script>
 {% endraw %}
 {% endblock %}
 {% block script %}
 {% raw %}
 <script>
+
 $( document ).ready(function() {
+    function initialize() {
+        getFetch('/api/v1/company').then(data => {
+            console.log(data); 
+            const html = makeHtmlWithTemplate('list-template', {list:data});
+            $('#result-area').html(html);
+        }).catch(error=> {
+            console.error(error.message);
+            showAlertError(error);
+        });
+    }
     console.log( "발급현황 ready!")
+    initialize();
+
+    $("result-area").on("click", ".btnDelete", function() {
+        alert("두 번째 버튼을 클릭했습니다.");
+    });
+    
 });
 </script>
 {% endraw %}

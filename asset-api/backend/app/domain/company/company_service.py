@@ -13,10 +13,19 @@
 작성일: 2024-10-04
 버전: 1.0
 """
+from typing import List
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.domain.company.company_model import CompanyModel
+
+# 회사 목록 조회
+async def get_all_companies(db: AsyncSession)->List[CompanyModel]:
+    ''' 회사 목록 조회 '''
+    result = await db.execute(
+        select(CompanyModel).order_by(CompanyModel.created_at.desc())
+    )
+    return result.scalars().all()
 
 # 회사 정보 생성 (Insert)
 async def create_company(db: AsyncSession, company_data: dict):

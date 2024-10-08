@@ -1,14 +1,24 @@
 
+from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.app.core.logger import get_logger
-from backend.app.domain.company.company_model import CompanyModel
 from backend.app.domain.company.company_schema import CompanyRequest, CompanyResponse
 from backend.app.core.database import get_session
 from backend.app.core.security import generate_app_key, secret_key_encrypt
+from backend.app.domain.company.company_service import create_company, get_all_companies
 logger = get_logger(__name__)
 
 router = APIRouter()
+
+@router.get("/",  response_model=List[CompanyResponse])
+async def list(db: AsyncSession = Depends(get_session)):
+    ''' 회사 목록 조회, 발급일 역순으로 정렬 '''
+    company_list = await get_all_companies(db)  # 비동기 함수 호출 시 await 사용
+    
+    # SQLAlchemy 모델을 Pydantic 모델로 변환
+    return [CompanyResponse.model_validate(company) for company in company_list]
+    
 
 @router.post("/register",  response_model=CompanyResponse)
 async def register(company: CompanyRequest, db: AsyncSession = Depends(get_session)):
@@ -18,19 +28,9 @@ async def register(company: CompanyRequest, db: AsyncSession = Depends(get_sessi
     data = f"{company.company_id}|{company.service_nm}|{company.start_ymd}"
     app_secret_key = secret_key_encrypt(app_key, data)
 
-    # SQLAlchemy 객체로 데이터베이스에 저장
-    new_company = CompanyModel(
-        company_id=company.company_id,
-        service_nm=company.service_nm,
-        start_ymd=company.start_ymd,
-        end_ymd=company.end_ymd,
-        app_key=app_key
-    )
-
-    # DB에 추가
-    db.add(new_company)
-    db.commit()
-    db.refresh(new_company)
+    dict = company.model_dump()
+    dict.update({'app_key': app_key})
+    new_company = await create_company(db, dict)
 
     # 응답으로 Pydantic CompanyResponse 모델 반환
     resp = CompanyResponse(
