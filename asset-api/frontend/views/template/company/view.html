@@ -1,0 +1,66 @@
+{% extends 'common/base.html' %}
+{% block style %}
+{% endblock %}
+{% block content %}
+<div id="result-area">
+<input type="hidden" id="param_company_id" value="{{company_id}}">
+<input type="hidden" id="param_service_id" value="{{service_id}}">
+</div>
+{% raw %}
+<!--handlebar scripts-->
+<script id="issue-template" type="text/x-handlebars-template">
+    <h2 class="mb-4">OPEN API 발급현황(DB저장된 내용)</h2>
+    <div class="mb-3">
+        <label for="company_id" class="form-label">Company ID</label>
+        <input type="text" class="form-control" id="company_id" name="company_id" value="{{company_id}}" readonly>
+    <div>
+    <div class="mb-3">
+        <label for="service_id" class="form-label">Service ID</label>
+        <input type="text" class="form-control" id="service_id" name="service_id" value="{{service_id}}" readonly>
+    <div>
+    <div class="mb-3">
+        <label for="start_ymd" class="form-label">Start date</label>
+        <input type="date" class="form-control" id="start_ymd" name="start_ymd" value="{{start_ymd}}"  >
+    <div>
+    <div class="mb-3">
+        <label for="end_ymd" class="form-label">End date</label>
+        <input type="date" class="form-control" id="end_ymd" name="end_ymd" value="{{end_ymd}}" >
+    <div>
+    <div class="mb-3">
+        <label for="app_key" class="form-label">APP KEY</label>
+        <input type="text" class="form-control" id="app_key" name="app_key" value="{{app_key}}" readonly>
+    <div>
+    <div class="mb-3">
+        <label for="created_at" class="form-label">Create date time</label>
+        <input type="text" class="form-control" id="created_at" name="created_at" value="{{created_at}}" readonly>
+    <div>
+    <div>
+        <button class="btn btn-primary">APP & SECRET KEY 재발급</button>
+        <button class="btn btn-success">토큰 발급 테스트</button>
+    </div>
+</script>
+{% endraw %}
+{% endblock %}
+{% block script %}
+{% raw %}
+<script>
+$( document ).ready(function() {
+    const company_id = $('#param_company_id').val();
+    const service_id = $('#param_service_id').val();
+
+    function initialize(){
+        const url = `/api/v1/company/info/${company_id}/${service_id}`;
+        getFetch(url).then(data => {
+            console.log(data); 
+            data.start_ymd = data.start_ymd.substring(0, 4)+'-'+data.start_ymd.substring(4, 6)+'-'+data.start_ymd.substring(6, 8);
+            data.end_ymd = data.end_ymd.substring(0, 4)+'-'+data.end_ymd.substring(4, 6)+'-'+data.end_ymd.substring(6, 8);
+
+            const html = makeHtmlWithTemplate('issue-template', data);
+            $('#result-area').html(html);
+        });
+    }
+    initialize();
+});
+</script>
+{% endraw %}
+{% endblock %}
