@@ -17,7 +17,7 @@ class CompanyModel(Base):
     __tablename__ = "ifi01_company"
 
     company_id = Column(BigInteger, primary_key=True)
-    service_nm = Column(String(100), primary_key=True)
+    service_id = Column(String(100), primary_key=True)
     start_ymd = Column(String(8), nullable=False)
     end_ymd = Column(String(8), default='99991231', nullable=False)
     app_key = Column(String(64), nullable=False)

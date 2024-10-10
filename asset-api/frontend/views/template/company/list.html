@@ -13,25 +13,30 @@
     <table class="table table-striped">
         <thead>
             <tr>
+                <th>순번</th>
                 <th>회사 ID</th>
                 <th>서비스명</th>
                 <th>시작일</th>
                 <th>종료일</th>
                 <th>APP KEY</th>
                 <th>발급일시</th>
-                <th>삭제</th>
+                <th>동작</th>
             </tr>
         </thead>
         <tbody>
             {{#each list}}
             <tr>
+                <td>{{inc @index}}</td>
                 <td>{{company_id}}</td>
-                <td>{{service_nm}}</td>
-                <td>{{start_ymd}}</td>
-                <td>{{end_ymd}}</td>
-                <td>{{app_key}}</td>
+                <td>{{service_id}}</td>
+                <td>{{displayYmd start_ymd}}</td>
+                <td>{{displayYmd end_ymd}}</td>
+                <td>{{truncate app_key 10}}</td>
                 <td>{{created_at}}</td>
-                <td><button class="btnDelete btn btn-danger" data-company-id="{{company_id}}" data-service-nm="{{service_nm}}">삭제</button></td>
+                <td>
+                    <button class="btnDelete btn btn-danger" data-company-id="{{company_id}}" data-service-nm="{{service_id}}">삭제</button>
+                    <!-- <a class="btn btn-success" href="/page?path=company/token_test&app_key={{app_key}}">Token테스트</a> -->
+                </td>
             </tr>
             {{/each}}
         </tbody>
@@ -42,13 +47,17 @@
 {% block script %}
 {% raw %}
 <script>
-
+let gList = [];
 $( document ).ready(function() {
+    function makeTable(){
+        const html = makeHtmlWithTemplate('list-template', {list:gList});
+        $('#result-area').html(html);
+    }
     function initialize() {
         getFetch('/api/v1/company').then(data => {
             console.log(data); 
-            const html = makeHtmlWithTemplate('list-template', {list:data});
-            $('#result-area').html(html);
+            gList = data;
+            makeTable();
         }).catch(error=> {
             console.error(error.message);
             showAlertError(error);
@@ -57,16 +66,28 @@ $( document ).ready(function() {
     console.log( "발급현황 ready!")
     initialize();
 
-    $("result-area").on("click", ".btnDelete", function() {
+    $("#result-area").on("click", ".btnTokenTest", function() {
+        const url = '/company';
+        const company_id = $(this).data('company-id');
+        const service_id = $(this).data('service-nm');
+        const start_ymd = $(this).data('start-ymd');
+        const data = { company_id : company_id, service_id : service_id, start_ymd : start_ymd};
+        postFetch(url, data).then(data => {
+            console.log(data);
+        }).catch(error=> {
+            console.error(error.message);
+        });
+    });
+    $("#result-area").on("click", ".btnDelete", function() {
         console.log("delete button clicked");
         const company_id = $(this).data('company-id');
-        const service_nm = $(this).data('service-nm');
+        const service_id = $(this).data('service-nm');
 
-        if( confirm(`${company_id}-${service_nm} 삭제하시겠습니까?`) == false) {
+        if( confirm(`${company_id}-${service_id} 삭제하시겠습니까?`) == false) {
             return;
         }
 
-        const url = `/api/v1/company/delete/${company_id}/${service_nm}`;
+        const url = `/api/v1/company/delete/${company_id}/${service_id}`;
         deleteFetch(url,{}).then(data => {
             console.log(data); 
             initialize();

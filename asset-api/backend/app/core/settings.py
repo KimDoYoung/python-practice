@@ -35,7 +35,7 @@ class Settings:
         self.DB_URL = f"postgresql+asyncpg://{db_username}:{db_password}@{db_host}:{db_port}/{db_name}"
 
         # JWT and Security
-        self.AES_GLOBAL_KEY = os.getenv('AES_GLOBAL_KEY','kfs_assetapi_zaq1@WSX')   
+        self.ACCESS_TOKEN_EXPIRE_HOURS = os.getenv('ACCESS_TOKEN_EXPIRE_HOURS', 24)   
 
         # 로그 설정
         self.LOG_LEVEL = os.getenv('LOG_LEVEL', 'DEBUG')

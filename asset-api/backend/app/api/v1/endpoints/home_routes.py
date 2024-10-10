@@ -34,13 +34,19 @@ async def page(
     request: Request, 
     path: str = Query(..., description="template폴더안의 html path")
 ):
-    ''' path에 해당하는 페이지를 가져와서 보낸다. '''
+    ''' path에 해당하는 페이지를 가져와서 쿼리 파라미터와 함께 렌더링한다.  '''
 
     today = get_today()
+    # 추가적인 모든 쿼리 파라미터를 가져옴 (딕셔너리 형태로 변환)
+    query_params = dict(request.query_params)
+
+    # 'path'는 쿼리 파라미터에서 제외하고 context에 추가
+    query_params.pop('path', None)    
     context = {
         "request": request, 
         "today" : today,
         "page_path": path, 
+        **query_params  # 모든 추가적인 쿼리 파라미터를 context에 포함
     }
     # id = ipo_calendar 와 같은 형식이고 이를 분리한다.
     template_path = path.lstrip('/') 

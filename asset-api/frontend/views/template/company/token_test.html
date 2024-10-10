@@ -1,0 +1,76 @@
+{% extends 'common/base.html' %}
+{% block style %}
+{% endblock %}
+{% block content %}
+<h1>Token 발급 테스트</h1>
+<div>
+    <form action="">
+        <div class="mb-3">
+            <label for="app_key" class="form-label">APP KEY</label>
+            <input type="text" class="form-control" id="app_key" name="app_key" placeholder="APP KEY" value="{{app_key}}" required>
+        </div>
+        <div  class="mb-3">
+        <label for="app_secret_key" class="form-label">APP SECRET KEY</label>
+        <input type="text" class="form-control" id="app_secret_key" name="app_secret_key" placeholder="APP SECRET KEY" value="{{app_secret_key}}">
+        </div>
+        <div  class="mb-3">
+            <button type="submit" class="btn btn-primary">Token 발급 테스트</button>
+        </div>
+    </form>
+</div>
+<div id="result-area"></div>
+{% raw %}
+<!--handlebar scripts-->
+<script id="register-result-template" type="text/x-handlebars-template">
+    <table>
+        <tr>
+            <th>APP KEY</th>
+            <td>{{app_key}}</td>
+        </tr>
+        <tr>
+            <th>company_id</th>
+            <td>{{company_id}}</td>
+        </tr>
+        <tr>
+            <th>service_id</th>
+            <td>{{service_id}}</td>
+        </tr>
+        <tr>
+            <th>start_ymd</th>
+            <td>{{start_ymd}}</td>
+        </tr>
+        <tr>
+            <th>end_ymd</th>
+            <td>{{end_ymd}}</td>
+        </tr>
+        <tr>
+            <th>TOKEN</th>
+            <td>{{token}}</td>      
+        </tr>
+    </table>
+</script>
+{% endraw %}
+{% endblock %}
+{% block script %}
+{% raw %}
+<script>
+$( document ).ready(function() {
+    console.log( "ready!")
+    //subtmit event
+    $('form').submit(function(e){
+        e.preventDefault();
+        const app_key = $('#app_key').val();
+        const app_secret_key  = $('#app_secret_key').val();
+        console.log(app_key, app_secret_key);
+        const url = '/api/v1/auth/token';
+        const data = { app_key : app_key, app_secret_key : app_secret_key};
+        postFetch(url, data).then(data => {
+            console.log(data);
+        }).catch(error=> {
+            console.error(error.message);
+        });   
+    });
+});
+</script>
+{% endraw %}
+{% endblock %}

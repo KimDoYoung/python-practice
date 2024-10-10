@@ -1,8 +1,50 @@
+/* 
+handlebar-helpers.py
+
+모듈 설명: 
+    - 핸들바와 관련된 함수와 helper함수들
+    - makeHtmlWithTemplate: 핸들바 템플릿으로 html을 만들어서 리턴한다.
+
+Helper함수들:
+    - inc: 사용자 함수 inc 등록
+    - formatComma: 숫자에 콤마 추가
+    - formatYmdHms: date는 JavaScript Date 객체여야 함
+    - formatDateString: dateStr은 "Jan 01, 2020 12:00:00 PM" 형식
+    - humanFileSize: 파일 사이즈를 사람이 인식하기 쉽게 표시
+    - t: javascript문법으로 논리식을 판별
+    - test: 논리식을 판별
+    - displayRate: 소숫점 2자리까지만 표시
+    - displayYmd: 20200101 -> 2020-01-01
+    - displayYmdAd: 20200101 -> 2020-01-01
+    - naverUrl: 네이버 주식페이지로 이동
+    - displayJoEok: 12345 -> 1조 2345억으로 변경
+    - displayWon: 숫자를 천 단위로 콤마를 찍어서 문자열로 변환
+    - displayPercent: 소수점 둘째 자리까지 반올림
+    - displayTime: 입력에서 숫자만 추출
+    - goNaver: 네이버 주식페이지로 이동
+    - displaySign: 상한, 상승, 보합, 하한, 하락
+    - judang_plus_minus: 주당차이 value1 평균매입가격, value2 현재가
+    - displayFmt: 숫자를 특정 포맷에 맞게 출력
+    - numberFmt: 숫자를 특정 포맷에 맞게 출력
+    - displayCha: 주당차이를 계산하여 표시
+    - toggleCompanyCanvas: 회사정보 canvas를 보여주는 함수
+    - my_calc: 수식을 처리하는 간단한 헬퍼 함수
+
+작성자: 김도영
+작성일: 2024-10-10
+버전: 1.0
+*/
+
 /**
  * handlebar-helpers 
  */
 //핸들바 템플릿으로 html을 만들어서 리턴한다.
 function makeHtmlWithTemplate(templateId, data) {
+    const elm = document.getElementById(templateId)
+    if(elm == null){
+        console.error("makeHtmlWithTemplate: " + templateId + " is null");
+        throw new Error("makeHtmlWithTemplate: " + templateId + " is null");
+    }
     const template = document.getElementById(templateId).innerHTML;
     const compiledTemplate = Handlebars.compile(template);
     return compiledTemplate(data);
@@ -368,4 +410,18 @@ Handlebars.registerHelper('my_calc', function(a, operator, b) {
 
     // 최종 결과에 콤마 추가하여 반환
     return result.toLocaleString();  // 콤마가 포함된 형식으로 반환
+});
+
+/**
+ * 긴 문자를 줄여서 보이기 위한 헬퍼 함수
+ */
+Handlebars.registerHelper('truncate', function(text, length) {
+    // 기본값으로 10을 사용하고, 전달된 length 값이 있으면 사용
+    length = length || 10;
+    
+    // 문자열이 지정된 길이보다 길면 자르고, 그렇지 않으면 그대로 반환
+    if (text.length > length) {
+        return text.substring(0, length) + '...';
+    }
+    return text;
 });

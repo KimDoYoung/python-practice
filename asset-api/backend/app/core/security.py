@@ -13,7 +13,7 @@
 버전: 1.0
 """
 import base64, hashlib
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import random
 import string
 from fastapi import HTTPException, Request, status
@@ -50,7 +50,7 @@ def secret_key_decrypt(key, encrypted_data):
     return decrypted.decode('utf-8')
 
 
-def create_access_token(app_secret_key:str, company_id: int, service_id: str, start_date: str):
+def create_access_token(app_secret_key:str, company_id: int, service_id: str, start_ymd: str, end_ymd: str) -> str:
     """
     JWT 토큰 생성
     :param data: 토큰에 포함할 추가 데이터 (예: 사용자 정보 등)
@@ -60,20 +60,21 @@ def create_access_token(app_secret_key:str, company_id: int, service_id: str, st
     :param expires_delta: 토큰 만료 시간 (기본값은 설정 파일에서 가져옴)
     :return: 생성된 JWT 토큰
     """
-    ACCESS_TOKEN_EXPIRE_HOURS = config.ACCESS_TOKEN_EXPIRE_HOURS
-    
+    ACCESS_TOKEN_EXPIRE_HOURS = int(config.ACCESS_TOKEN_EXPIRE_HOURS)
     # 만료 시간 설정
-    current_time = datetime.datetime.now(datetime.timezone.utc)
+    current_time = datetime.now(timezone.utc)
     expire = current_time + timedelta(hours=ACCESS_TOKEN_EXPIRE_HOURS)
     # JWT에 담을 클레임 (payload)
     payload = {
         "company_id": company_id,
         "service_id": service_id,
-        "start_date": start_date,
+        "start_ymd": start_ymd,
+        "end_ymd" : end_ymd,
         "exp": expire
     }
-
-    token = jwt.encode(payload, app_secret_key, algorithms=['HS256'])  # JWT 생성
+    # app_secret_key를 시크릿 키로 사용하여 JWT 생성
+    #token = jwt.encode(payload, app_secret_key, algorithms=['HS256'])  # JWT 생성
+    token = jwt.encode(payload, app_secret_key, algorithm='HS256')
     
     return token
 
@@ -87,6 +88,7 @@ def verify_access_token(token: str, app_secret_key: str):
         raise HTTPException(status_code=401, detail="Token expired")
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token")
+        
 
 # JWT 토큰을 받기 위한 OAuth2PasswordBearer 설정
 # oauth2_scheme = OAuth2PasswordBearer(tokenUrl=ACCESS_TOKEN_NAME)
@@ -116,7 +118,7 @@ async def get_current_company(request: Request) -> dict:
         if info is None:
             raise credentials_exception
         #{company_id}|{service_id}|{start_date}
-        company_id, service_id, start_date = info.split("|")
+        company_id, service_id = info.split("|")
         
     except JWTError:
         raise credentials_exception

@@ -42,7 +42,7 @@ async function callLucyApi(url, method, data = null) {
         if (response.status === 401) {
             console.error('세션이 만료되었습니다.');
             // 사용자에게 로그인 페이지로 리다이렉트하도록 처리
-            window.location.href = '/login';
+            window.location.href = '/';
             return;
         }
 
@@ -68,7 +68,7 @@ async function callLucyApi(url, method, data = null) {
         let errorStr = error.toString();
         if (errorStr.includes('SyntaxError: Unexpected end of JSON input')) {
             alert("세션 종료되었습니다. 서버와의 통신이 원활하지 않습니다. 다시 로그인해주세요.");
-            window.location.href = '/login';
+            window.location.href = '/';
         }else{
             throw new LucyError(error.status, error.message, error.server_time);
         }
