@@ -11,7 +11,7 @@
             });
         $('.toast').toast('show');
     }
-    //alsert 에러메세지 표시
+    //alert 에러메세지 표시
     function showAlertError(error, stopAutoHide = false) {
         const statusCode = error.status;
         const detail = error.detail || error.message;
@@ -24,4 +24,13 @@
                 $alert.addClass('d-none');
             }, 5000);
         }
+    }
+    //alert 에러메세지 표시
+    function showAlertMessage(message) {
+        const $alert = $('#alertMessageArea')
+        $alert.find('#alertMessage').text(message);
+        $alert.removeClass('d-none');
+        setTimeout(() => {
+            $alert.addClass('d-none');
+        }, 5000);
     }

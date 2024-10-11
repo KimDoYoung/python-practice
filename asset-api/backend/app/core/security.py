@@ -19,7 +19,7 @@ import string
 from fastapi import HTTPException, Request, status
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
-from jose import JWTError, jwt
+from jose import ExpiredSignatureError, JWTError, jwt
 from typing import Optional
 
 from backend.app.core.settings import config
@@ -84,12 +84,35 @@ def verify_access_token(token: str):
     try:
         jwt_secret_key = config.JWT_SECRET_KEY
         payload = jwt.decode(token, jwt_secret_key, algorithms=['HS256'])
-        return payload
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token expired")
-    except jwt.InvalidTokenError:
-        raise HTTPException(status_code=401, detail="Invalid token")
+
+        if not is_date_valid(payload['start_ymd'], payload['end_ymd']):
+            raise HTTPException(status_code=401, detail="Invalid date, service date over")
         
+        return payload
+    # 서명이 만료된 경우
+    except ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    
+    # JWT 관련 오류는 모두 JWTError로 처리
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    
+def is_date_valid(start_ymd: str, end_ymd: str):
+    '''날짜 유효성 검증, 오늘이 시작일과 종료일 사이에 있는지 확인'''
+    current_time = datetime.now(timezone.utc)
+    # 입력받은 날짜를 UTC의 aware datetime 객체로 변환
+    start_time = datetime.strptime(start_ymd, '%Y%m%d').replace(tzinfo=timezone.utc)
+    end_time = datetime.strptime(end_ymd, '%Y%m%d').replace(tzinfo=timezone.utc)
+    if current_time < start_time or current_time > end_time:
+        return False
+    return True
+
+# async def company_exist_check(company_id: int, service_id: str):
+#     '''회사 정보 존재 여부 확인'''
+#     company = await get_company(company_id, service_id)
+#     if company is None:
+#         return False
+#     return True        
 
 # JWT 토큰을 받기 위한 OAuth2PasswordBearer 설정
 # oauth2_scheme = OAuth2PasswordBearer(tokenUrl=ACCESS_TOKEN_NAME)
