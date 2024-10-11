@@ -64,13 +64,16 @@
         </tr>
         <tr>
             <th>APP KEY</th>
-            <td>{{app_key}}</td>
+            <td id="app_key">{{app_key}}</td>
         </tr>
         <tr>
             <th>APP SECRET KEY</th>
-            <td>{{app_secret_key}}</td>
+            <td id="app_secret_key">{{app_secret_key}}</td>
         </tr>
     </table>
+    <div class="mt-3">
+        <button id="btnClipboard" class="btn btn-secondary">Copy to clipboard</button>
+    </div>
     <div class="mt-5 bg-warning">
         <ul>
             <li><strong>APP KEY와 APP SECRET KEY</strong>는 웹상에서 또는 허가받지 않은 인원에 대해서 <strong>노출되지 않게 주의</strong>해 주십시오.</li>
@@ -132,6 +135,14 @@ $( document ).ready(function() {
             console.error(error);
             showAlertError(error, true);
         });
+    });
+    //clipboard 버튼 클릭 이벤트 처리
+    $('#display-area').on("click", "#btnClipboard", function(e) {
+        e.preventDefault();
+        const app_key = $('#app_key').text();
+        const app_secret_key = $('#app_secret_key').text();
+        const text = `APP KEY : [${app_key}]\nAPP SECRET KEY : [${app_secret_key}]`;
+        copyToClipboard(text, "APP KEY & SECRET KEY 복사 완료");
     });
     $('#display-area').on("click", "#btnTokenTest", function(e) {
         e.preventDefault();

@@ -413,16 +413,17 @@ const unsecuredCopyToClipboard = (text) => { const textArea = document.createEle
  * Check if using HTTPS and navigator.clipboard is available
  * Then uses standard clipboard API, otherwise uses fallback
 */
-const copyToClipboard = (content) => {
+const copyToClipboard = (content, msg='클립보드로 복사되었습니다.') => {
     var isShowAlert = true;
+    var bootbox = false;
     if (window.isSecureContext && navigator.clipboard) {
-    navigator.clipboard.writeText(content)
+        navigator.clipboard.writeText(content)
         .then(() => {
             if(isShowAlert){
                 if(bootbox){
                     bootbox.alert("Table data has been copied to the clipboard.<br/>You can paste it in Excel");
                 }else{
-                    alert("Table data has been copied to the clipboard.\nYou can paste it in Excel");
+                    alert(msg);
                 }
             }
 		})

@@ -2,9 +2,12 @@
 {% block style %}
 {% endblock %}
 {% block content %}
+<div>
+    <input type="hidden" id="param_company_id" value="{{company_id}}">
+    <input type="hidden" id="param_service_id" value="{{service_id}}">    
+</div>
 <div id="result-area">
-<input type="hidden" id="param_company_id" value="{{company_id}}">
-<input type="hidden" id="param_service_id" value="{{service_id}}">
+
 </div>
 {% raw %}
 <!--handlebar scripts-->
@@ -13,30 +16,36 @@
     <div class="mb-3">
         <label for="company_id" class="form-label">Company ID</label>
         <input type="text" class="form-control" id="company_id" name="company_id" value="{{company_id}}" readonly>
-    <div>
+    </div>
     <div class="mb-3">
         <label for="service_id" class="form-label">Service ID</label>
         <input type="text" class="form-control" id="service_id" name="service_id" value="{{service_id}}" readonly>
-    <div>
+    </div>
     <div class="mb-3">
         <label for="start_ymd" class="form-label">Start date</label>
         <input type="date" class="form-control" id="start_ymd" name="start_ymd" value="{{start_ymd}}"  >
-    <div>
+    </div>
     <div class="mb-3">
         <label for="end_ymd" class="form-label">End date</label>
         <input type="date" class="form-control" id="end_ymd" name="end_ymd" value="{{end_ymd}}" >
-    <div>
+    </div>
     <div class="mb-3">
         <label for="app_key" class="form-label">APP KEY</label>
         <input type="text" class="form-control" id="app_key" name="app_key" value="{{app_key}}" readonly>
-    <div>
+    </div>
+    <div class="mb-3">
+        <label for="app_secret_key" class="form-label">APP SECRET KEY</label>
+        <input type="text" class="form-control" id="app_secret_key" name="app_secret_key" value="{{app_secret_key}}" readonly>
+        <p class="text-danger fst-italic">APP SECRET KEY는 db에 저장되어 있지 않습니다</p>
+    </div>
     <div class="mb-3">
         <label for="created_at" class="form-label">Create date time</label>
         <input type="text" class="form-control" id="created_at" name="created_at" value="{{created_at}}" readonly>
-    <div>
-    <div>
-        <button class="btn btn-primary">APP & SECRET KEY 재발급</button>
-        <button class="btn btn-success">토큰 발급 테스트</button>
+    </div>
+    <div class="mt-2">
+        <button id="btnReRegister" class="btn btn-primary">APP & SECRET KEY 재발급</button>
+        <button id="btnClipboard" class="btn btn-success">Copy to clipboard</button>
+        <button class="btn btn-secondary" onclick="location.href='/page?path=company/list'">리스트로 이동</button>
     </div>
 </script>
 {% endraw %}
@@ -60,6 +69,36 @@ $( document ).ready(function() {
         });
     }
     initialize();
+    //copy to clipboard
+    $("#result-area").on("click", "#btnClipboard", function() {
+        const app_key = $('#app_key').val();
+        const app_secret_key = $('#app_secret_key').val();
+        const text = `APP KEY : [${app_key}]\nAPP SECRET KEY : [${app_secret_key}]`;
+        copyToClipboard(text, "APP KEY & SECRET KEY 복사 완료");
+    });
+    $("#result-area").on("click", "#btnReRegister", function() {
+        //APP KEY & SECRET KEY 재발급
+        const url = `/api/v1/company/re-register`;
+        const company_id = $('#company_id').val();
+        const service_id = $('#service_id').val();
+        const start_ymd = $('#start_ymd').val().replace(/\D/g, '');
+        const end_ymd = $('#end_ymd').val().replace(/\D/g, '');
+
+        const data = {
+            company_id : company_id,
+            service_id : service_id,
+            start_ymd : start_ymd,
+            end_ymd : end_ymd
+        }
+        postFetch(url, data).then(response => {
+            console.log(response);
+            initialize();
+        }).catch(error => {
+            console.error(error);
+            showAlertError(error, true);
+        });
+        
+    });
 });
 </script>
 {% endraw %}

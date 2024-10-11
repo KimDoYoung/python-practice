@@ -13,6 +13,7 @@
 작성일: 2024-10-04
 버전: 1.0
 """
+from datetime import datetime, timezone
 from typing import List
 from fastapi import HTTPException
 from sqlalchemy.future import select
@@ -76,6 +77,7 @@ async def update_company(db: AsyncSession, company_id: int, service_id: str, upd
     if company:
         for key, value in update_data.items():
             setattr(company, key, value)
+        company.updated_at = datetime.now(timezone.utc)
         await db.commit()
         await db.refresh(company)
     return company

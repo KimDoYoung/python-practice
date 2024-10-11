@@ -20,7 +20,7 @@ from backend.app.core.logger import get_logger
 from backend.app.domain.company.company_schema import CompanyRequest, CompanyResponse
 from backend.app.core.database import get_session
 from backend.app.core.security import generate_app_key, secret_key_encrypt
-from backend.app.domain.company.company_service import create_company, delete_company, get_all_companies, get_company
+from backend.app.domain.company.company_service import create_company, delete_company, get_all_companies, get_company, update_company
 logger = get_logger(__name__)
 
 router = APIRouter()
@@ -35,8 +35,10 @@ async def list(db: AsyncSession = Depends(get_session)):
 
 @router.get("/info/{company_id}/{service_id}",  response_model=CompanyResponse)
 async def info(company_id: int, service_id:str,  db: AsyncSession = Depends(get_session)):
-    ''' 1개의 회사정보찾기 '''
+    ''' 1개의 회사정보찾기-view '''
     company = await get_company(db, company_id, service_id)
+    app_secret_key = secret_key_encrypt(company.app_key, f"{company.company_id}|{company.service_id}|{company.start_ymd}")
+    company.app_secret_key = app_secret_key
     return CompanyResponse.model_validate(company)
 
 
@@ -50,7 +52,7 @@ async def delete(company_id:int, service_id:str, db: AsyncSession = Depends(get_
 
 @router.post("/register",  response_model=CompanyResponse)
 async def register(company: CompanyRequest, db: AsyncSession = Depends(get_session)):
-    ''' 회사정보에 기반하여 app_key, secret_key를 만들고 Db에 저장한다. '''
+    ''' 회사정보에 기반하여 app_key, secret_key를 만들고 Db에 Insert한다. '''
     # app_key와 app_secret_key 생성 (고유한 값으로)
     app_key = generate_app_key()
     data = f"{company.company_id}|{company.service_id}|{company.start_ymd}"
@@ -72,3 +74,28 @@ async def register(company: CompanyRequest, db: AsyncSession = Depends(get_sessi
     )
     logger.info(f"새로운 회사 등록: {resp}")
     return resp
+
+@router.post("/re-register",  response_model=CompanyResponse)
+async def register(company: CompanyRequest, db: AsyncSession = Depends(get_session)):
+    '''재등록-회사정보에 기반하여 app_key, secret_key를 만들고 Db에 Update '''
+    # app_key와 app_secret_key 생성 (고유한 값으로)
+    app_key = generate_app_key()
+    data = f"{company.company_id}|{company.service_id}|{company.start_ymd}"
+    app_secret_key = secret_key_encrypt(app_key, data)
+
+    dict = company.model_dump()
+    dict.update({'app_key': app_key})
+    updated_company = await update_company(db,company.company_id,company.service_id, dict)
+
+    # 응답으로 Pydantic CompanyResponse 모델 반환
+    resp = CompanyResponse(
+        company_id=updated_company.company_id,
+        service_id=updated_company.service_id,
+        start_ymd=updated_company.start_ymd,
+        end_ymd=updated_company.end_ymd,
+        app_key=app_key,
+        app_secret_key=app_secret_key,  # 실제로는 앱 시크릿을 노출하지 않는 게 좋음
+        created_at=updated_company.created_at
+    )
+    logger.info(f"업데이트 회사 : {resp}")
+    return resp    

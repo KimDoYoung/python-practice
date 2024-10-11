@@ -7,7 +7,6 @@
 작성일: 2024-10-10
 버전: 1.0
 """
-from typing import Optional
 from pydantic import BaseModel, Field, field_validator
 
 # jwt 토큰 발급 요청 시 사용하는 모델
@@ -29,3 +28,13 @@ class AuthResponse(BaseModel):
     start_ymd: str
     end_ymd:str
     token:str
+
+class AuthPayload(BaseModel):
+    company_id: int
+    service_id: str
+    start_ymd: str
+    end_ymd:str
+    exp: int
+
+class Authtoken(BaseModel):
+    token: str

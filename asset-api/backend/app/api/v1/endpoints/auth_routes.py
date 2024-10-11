@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException
 from backend.app.core.logger import get_logger
-from backend.app.domain.auth.auth_schema import AuthRequest, AuthResponse
+from backend.app.domain.auth.auth_schema import AuthPayload, AuthRequest, AuthResponse, Authtoken
 from backend.app.core.database import get_session
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,11 +12,11 @@ logger = get_logger(__name__)
 
 router = APIRouter()
 
-async def test_token(auth_resp, app_secret_key):
+async def test_token(auth_resp):
     ''' JWT 토큰 검증 '''
     try:
-        logger.debug(f"Verifying token: {auth_resp.token} with secret: {app_secret_key}")
-        payload = verify_access_token(auth_resp.token, app_secret_key)
+        logger.debug(f"Verifying token: {auth_resp.token}")
+        payload = verify_access_token(auth_resp.token)
         logger.debug(f"Token verified successfully: {payload}")
         
         if payload['company_id'] != auth_resp.company_id:
@@ -35,7 +35,7 @@ async def test_token(auth_resp, app_secret_key):
         return '토큰발급 테스트 - 올바르지 않은 토큰'
 
 @router.post("/token",  response_model=AuthResponse)
-async def auth(req: AuthRequest, db: AsyncSession = Depends(get_session)):
+async def generate_token(req: AuthRequest, db: AsyncSession = Depends(get_session)):
     ''' app key, secret key로 회사 정보 조회 후 token 발급, 토큰 검증 '''
     logger.debug(f"Auth request: APP_KEY: {req.app_key}\nAPP_SECRET_KEY: {req.app_secret_key}")
     company = await get_company_by_app_key(db, req.app_key)
@@ -52,7 +52,7 @@ async def auth(req: AuthRequest, db: AsyncSession = Depends(get_session)):
     if app_secret_key != app_secret_key_for_check:
         raise HTTPException(status_code=401, detail="Unauthorized secret key is not correct")
     
-    token = create_access_token(app_secret_key, company.company_id, company.service_id, company.start_ymd, company.end_ymd) 
+    token = create_access_token(company.company_id, company.service_id, company.start_ymd, company.end_ymd) 
     
     auth_resp = AuthResponse(
         company_id=company.company_id,
@@ -62,7 +62,7 @@ async def auth(req: AuthRequest, db: AsyncSession = Depends(get_session)):
         token=token
     )
     # 발급한 토큰을 테스트해 봄
-    check_msg = await test_token(auth_resp, app_secret_key)
+    check_msg = await test_token(auth_resp)
     if check_msg != 'OK':
         raise HTTPException(status_code=403, detail=check_msg)
         
@@ -71,5 +71,16 @@ async def auth(req: AuthRequest, db: AsyncSession = Depends(get_session)):
     logger.info("-------------------------------------------------")
     return auth_resp
     
-    
-    
+
+@router.post("/token/verify",  response_model=AuthPayload)
+async def verify(authToken: Authtoken, db: AsyncSession = Depends(get_session)):    
+    ''' app key, secret key로 회사 정보 조회 후 token 발급, 토큰 검증 ''' 
+    payload = verify_access_token(authToken.token)
+    authpayload = AuthPayload(
+        company_id=payload['company_id'],
+        service_id=payload['service_id'],
+        start_ymd=payload['start_ymd'],
+        end_ymd=payload['end_ymd'],
+        exp=payload['exp']
+    )
+    return authpayload

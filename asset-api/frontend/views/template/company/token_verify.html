@@ -1,0 +1,85 @@
+{% extends 'common/base.html' %}
+{% block style %}
+{% endblock %}
+{% block content %}
+<h2>토큰검증</h2>
+<div class="mb-3">
+    <label for="app_key" class="form-label">APP KEY</label>
+    <input type="text" class="form-control" id="app_key" name="app_key" value="{{app_key}}" >
+</div>
+<div class="mb-3">
+    <label for="app_secret_key" class="form-label">APP SECRET KEY</label>
+    <input type="text" class="form-control" id="app_secret_key" name="app_secret_key" value="{{app_secret_key}}" >
+</div>
+<div class="mb-3">
+    <button id="btnGenerateToken" class="btn btn-primary">토큰발행</button>
+</div>
+<div class="mb-3">
+    <label for="token" class="form-label">발행된 토큰</label>
+    <input type="text" class="form-control" id="token" name="token" value="{{token}}" readonly>
+</div>
+<div class="mb-3">
+    <button id="btnTokenVerify" class="btn btn-primary">토큰검증</button>
+</div>
+<div id="token-result" class="mb-3">
+
+</div>    
+
+{% raw %}
+<!--handlebar scripts-->
+<script id="token-verify-template" type="text/x-handlebars-template">
+    <div class="alert alert-success" role="alert">
+        <p>company id : {{company_id}}</p>
+        <p>service id : {{service_id}}</p>
+        <p>date  : {{displayYmd start_ymd}} ~ {{displayYmd end_ymd}}</p>
+        <p>expire date time: {{exp}}</p>
+    </div>
+</script>
+{% endraw %}
+{% endblock %}
+{% block script %}
+{% raw %}
+<script>
+$( document ).ready(function() {
+    console.log( "토큰 검증 ready!")
+    $('#btnGenerateToken').on('click', function(){
+        console.log('토큰발행 버튼 클릭');
+        const url = '/api/v1/auth/token';
+        const app_key = $('#app_key').val();
+        const app_secret_key = $('#app_secret_key').val();
+        if(app_key == '' || app_secret_key == ''){
+            alert('APP KEY와 APP SECRET KEY를 입력해주세요.');
+            return;
+        }
+        const data = { app_key : app_key, app_secret_key : app_secret_key};
+        postFetch(url, data).then(data => {
+            console.log(data);
+            $('#token').val(data.token);
+        }).catch(error=> {
+            console.error(error.message);
+            showAlertError(error, true);
+        });
+    });
+    $('#btnTokenVerify').on('click', function(){
+        console.log('토큰검증 버튼 클릭');
+        const url = '/api/v1/auth/token/verify';
+        const token = $('#token').val();
+        if(token == ''){
+            alert('토큰을 입력해주세요.');
+            return;
+        }
+        const data = { token : token};
+        postFetch(url, data).then(data => {
+            console.log(data);
+            data.exp = new Date(data.exp * 1000).toLocaleString();
+            const html = makeHtmlWithTemplate('token-verify-template', data);
+            $('#token-result').html(html);
+        }).catch(error=> {
+            console.error(error.message);
+            showAlertError(error, true);
+        });
+    })
+});
+</script>
+{% endraw %}
+{% endblock %}

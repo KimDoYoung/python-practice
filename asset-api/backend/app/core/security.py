@@ -50,7 +50,7 @@ def secret_key_decrypt(key, encrypted_data):
     return decrypted.decode('utf-8')
 
 
-def create_access_token(app_secret_key:str, company_id: int, service_id: str, start_ymd: str, end_ymd: str) -> str:
+def create_access_token(company_id: int, service_id: str, start_ymd: str, end_ymd: str) -> str:
     """
     JWT 토큰 생성
     :param data: 토큰에 포함할 추가 데이터 (예: 사용자 정보 등)
@@ -73,16 +73,17 @@ def create_access_token(app_secret_key:str, company_id: int, service_id: str, st
         "exp": expire
     }
     # app_secret_key를 시크릿 키로 사용하여 JWT 생성
-    #token = jwt.encode(payload, app_secret_key, algorithms=['HS256'])  # JWT 생성
-    token = jwt.encode(payload, app_secret_key, algorithm='HS256')
+    jwt_secret_key = config.JWT_SECRET_KEY
+    token = jwt.encode(payload, jwt_secret_key, algorithm='HS256')
     
     return token
 
 
-def verify_access_token(token: str, app_secret_key: str):
+def verify_access_token(token: str):
     '''JWT 토큰을 검증, payload 반환'''
     try:
-        payload = jwt.decode(token, app_secret_key, algorithms=['HS256'])
+        jwt_secret_key = config.JWT_SECRET_KEY
+        payload = jwt.decode(token, jwt_secret_key, algorithms=['HS256'])
         return payload
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")

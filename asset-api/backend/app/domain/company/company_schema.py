@@ -1,3 +1,13 @@
+# company_schema.py
+"""
+모듈 설명: 
+    - company 도메인의 스키마를 정의하는 모듈
+    - Pydantic을 사용하여 데이터 검증 및 타입 힌트를 제공   
+
+작성자: 김도영
+작성일: 2024-10-11
+버전: 1.0
+"""
 
 from datetime import datetime
 from pydantic import BaseModel, Field
