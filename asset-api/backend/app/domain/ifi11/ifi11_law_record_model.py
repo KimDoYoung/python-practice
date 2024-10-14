@@ -1,5 +1,9 @@
 from sqlalchemy import Column, Numeric, String, DateTime, Date
-from app.core.database import Base
+from sqlalchemy.ext.declarative import declarative_base
+from backend.app.core.database import metadata
+
+Base = declarative_base(metadata=metadata)
+
 
 class Ifi11LawRecord(Base):
     __tablename__ = 'ifi11_law_record'

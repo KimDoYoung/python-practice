@@ -1,5 +1,8 @@
 from sqlalchemy import Column, Numeric, String, Text
-from app.core.database import Base
+from sqlalchemy.ext.declarative import declarative_base
+from backend.app.core.database import metadata
+
+Base = declarative_base(metadata=metadata)
 
 class Ifi95ConfigFile(Base):
     __tablename__ = 'ifi95_config_file'

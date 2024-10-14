@@ -5,7 +5,7 @@ from backend.app.domain.auth.auth_schema import AuthPayload, AuthRequest, AuthRe
 from backend.app.core.database import get_session
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.app.domain.company.company_service import get_company_by_app_key
+from backend.app.domain.ifi01.ifi01_company_api_service import get_company_by_app_key
 from backend.app.core.security import create_access_token, secret_key_encrypt, verify_access_token
 
 logger = get_logger(__name__)

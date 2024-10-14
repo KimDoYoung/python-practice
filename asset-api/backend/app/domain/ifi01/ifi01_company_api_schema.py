@@ -15,6 +15,7 @@ class Ifi01CompanyApiCreate(Ifi01CompanyApiBase):
 class Ifi01CompanyApiResponse(Ifi01CompanyApiBase):
     ifi01_company_api_id: int
     ifi01_created_date: Optional[datetime] = None
+    ifi01_app_secret_key: Optional[str] = None
 
     class Config:
         model_config = {

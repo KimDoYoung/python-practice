@@ -1,4 +1,3 @@
-# logger.py
 """
 모듈 설명: 
     - 로그 모듈을 정의
@@ -22,7 +21,7 @@ def get_logger(name):
     LOG_FILE = config.LOG_FILE
 
     if not logger.handlers:
-        # 일별 로그 회전. 매일 자정에 로그를 회전시키고, 최대 7일간 로그를 보관합니다.
+        # 로그 디렉토리가 없으면 생성
         log_dir = os.path.dirname(LOG_FILE)
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)
@@ -32,9 +31,12 @@ def get_logger(name):
             LOG_FILE, when="midnight", interval=1, backupCount=365, encoding="utf-8"
         )
         file_handler.suffix = "%Y-%m-%d"  # 로그 파일에 날짜 추가 (YYYY-MM-DD 형식)
-        file_handler.extMatch = r"^\d{4}-\d{2}-\d{2}$"  # 날짜에 맞는 형식 정의
+        
+        # 로그 포맷 설정
         formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
         file_handler.setFormatter(formatter)
+        
+        # 핸들러 추가
         logger.addHandler(file_handler)
 
         # 로컬 환경일 경우 콘솔에도 로그 출력

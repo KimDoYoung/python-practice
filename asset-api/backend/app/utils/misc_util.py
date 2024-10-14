@@ -25,3 +25,7 @@ def get_today():
 def only_number(s:str):
     ''' 숫자만 추출 '''
     return ''.join(filter(str.isdigit, s))
+
+def toYmd(d:datetime)->str:
+    ''' datetime 객체를 yyyymmdd 문자열로 변환 '''
+    return d.strftime('%Y%m%d')

@@ -1,5 +1,9 @@
 from sqlalchemy import Column, Numeric, Date, String, DateTime
-from app.core.database import Base
+from sqlalchemy.ext.declarative import declarative_base
+from backend.app.core.database import metadata
+
+Base = declarative_base(metadata=metadata)
+
 
 class Ifi01CompanyApi(Base):
     __tablename__ = 'ifi01_company_api'

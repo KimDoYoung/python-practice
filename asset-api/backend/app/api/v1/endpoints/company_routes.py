@@ -17,85 +17,95 @@ from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.app.core.logger import get_logger
-from backend.app.domain.company.company_schema import CompanyRequest, CompanyResponse
 from backend.app.core.database import get_session
 from backend.app.core.security import generate_app_key, secret_key_encrypt
-from backend.app.domain.company.company_service import create_company, delete_company, get_all_companies, get_company, update_company
+from backend.app.domain.ifi01.ifi01_company_api_schema import Ifi01CompanyApiCreate, Ifi01CompanyApiResponse
+from backend.app.domain.ifi01.ifi01_company_api_service import Ifi01CompanyApiService
 logger = get_logger(__name__)
 
 router = APIRouter()
 
-@router.get("/",  response_model=List[CompanyResponse])
+@router.get("/",  response_model=List[Ifi01CompanyApiResponse])
 async def list(db: AsyncSession = Depends(get_session)):
-    ''' 회사 목록 조회, 발급일 역순으로 정렬 '''
-    company_list = await get_all_companies(db)  # 비동기 함수 호출 시 await 사용
+    ''' ifi01 회사 목록 조회-view '''
+    service = Ifi01CompanyApiService(db)
+    company_list = await service.get_company_all()
     
     # SQLAlchemy 모델을 Pydantic 모델로 변환
-    return [CompanyResponse.model_validate(company) for company in company_list]
+    return [Ifi01CompanyApiResponse.model_validate(company) for company in company_list]
 
-@router.get("/info/{company_id}/{service_id}",  response_model=CompanyResponse)
-async def info(company_id: int, service_id:str,  db: AsyncSession = Depends(get_session)):
+@router.get("/info/{company_api_id}",  response_model=Ifi01CompanyApiResponse)
+async def info(company_api_id: int,  db: AsyncSession = Depends(get_session)):
     ''' 1개의 회사정보찾기-view '''
-    company = await get_company(db, company_id, service_id)
-    app_secret_key = secret_key_encrypt(company.app_key, f"{company.company_id}|{company.service_id}|{company.start_ymd}")
-    company.app_secret_key = app_secret_key
-    return CompanyResponse.model_validate(company)
+    service = Ifi01CompanyApiService(db)
+    company = await service.get_company_api(company_api_id)
+    app_secret_key = secret_key_encrypt(company.ifi01_app_key, f"{company.ifi01_company_id}|{company.ifi01_config_api_id}|{company.ifi01_start_date}")
+    resp = Ifi01CompanyApiResponse.model_validate(company)
+    resp.ifi01_app_secret_key = app_secret_key
+    return resp
 
 
-@router.delete("/delete/{company_id}/{service_id}",  response_model=CompanyResponse)
-async def delete(company_id:int, service_id:str, db: AsyncSession = Depends(get_session)):
+@router.delete("/delete/{company_api_id}",  response_model=Ifi01CompanyApiResponse)
+async def delete(company_api_id:int,  db: AsyncSession = Depends(get_session)):
     ''' 회사 정보 삭제 '''
-    logger.debug(f"회사 정보 삭제: {company_id}, {service_id}")
-    deleted_company = await delete_company(db, company_id, service_id)
-    return CompanyResponse.model_validate(deleted_company)
+    service = Ifi01CompanyApiService(db)
+    logger.debug(f"회사 정보 삭제: {company_api_id}")
+    deleted_company = await service.delete_company_api(company_api_id)
+    resp =  Ifi01CompanyApiResponse.model_validate(deleted_company)
+    return resp
     
 
-@router.post("/register",  response_model=CompanyResponse)
-async def register(company: CompanyRequest, db: AsyncSession = Depends(get_session)):
+@router.post("/register",  response_model=Ifi01CompanyApiResponse)
+async def register(company: Ifi01CompanyApiCreate, db: AsyncSession = Depends(get_session)):
     ''' 회사정보에 기반하여 app_key, secret_key를 만들고 Db에 Insert한다. '''
     # app_key와 app_secret_key 생성 (고유한 값으로)
+    service = Ifi01CompanyApiService(db)
     app_key = generate_app_key()
-    data = f"{company.company_id}|{company.service_id}|{company.start_ymd}"
+    data = f"{company.ifi01_company_id}|{company.ifi01_config_api_id}|{company.ifi01_start_date}"
     app_secret_key = secret_key_encrypt(app_key, data)
 
     dict = company.model_dump()
-    dict.update({'app_key': app_key})
-    new_company = await create_company(db, dict)
+    dict.update({'ifi01_app_key': app_key})
+    new_company = await service.create_company_api(db, dict)
 
     # 응답으로 Pydantic CompanyResponse 모델 반환
-    resp = CompanyResponse(
-        company_id=new_company.company_id,
-        service_id=new_company.service_id,
-        start_ymd=new_company.start_ymd,
-        end_ymd=new_company.end_ymd,
-        app_key=app_key,
-        app_secret_key=app_secret_key,  # 실제로는 앱 시크릿을 노출하지 않는 게 좋음
-        created_at=new_company.created_at
+    resp = Ifi01CompanyApiResponse (
+        ifi01_company_api_id=new_company.ifi01_company_api_id,
+        ifi01_company_id=new_company.ifi01_company_id,
+        ifi01_config_api_id=new_company.ifi01_config_api_id,
+        ifi01_start_date=new_company.ifi01_start_date,
+        ifi01_close_date=new_company.ifi01_close_date,
+        ifi01_app_key=app_key,
+        ifi01_app_secret_key=app_secret_key,
+        ifi01_created_date=new_company.ifi01_created_date
     )
+
     logger.info(f"새로운 회사 등록: {resp}")
     return resp
 
-@router.post("/re-register",  response_model=CompanyResponse)
-async def register(company: CompanyRequest, db: AsyncSession = Depends(get_session)):
+@router.post("/re-register",  response_model=Ifi01CompanyApiResponse)
+async def register(company: Ifi01CompanyApiCreate, db: AsyncSession = Depends(get_session)):
     '''재등록-회사정보에 기반하여 app_key, secret_key를 만들고 Db에 Update '''
     # app_key와 app_secret_key 생성 (고유한 값으로)
+    service = Ifi01CompanyApiService(db)
     app_key = generate_app_key()
-    data = f"{company.company_id}|{company.service_id}|{company.start_ymd}"
+    data = f"{company.ifi01_company_id}|{company.ifi01_config_api_id}|{company.ifi01_start_date}"
     app_secret_key = secret_key_encrypt(app_key, data)
 
     dict = company.model_dump()
-    dict.update({'app_key': app_key})
-    updated_company = await update_company(db,company.company_id,company.service_id, dict)
+    dict.update({'ifi01_app_key': app_key})
+    updated_company = await service.update_company_api(db,company.ifi01_company_api_id, dict)
 
     # 응답으로 Pydantic CompanyResponse 모델 반환
-    resp = CompanyResponse(
-        company_id=updated_company.company_id,
-        service_id=updated_company.service_id,
-        start_ymd=updated_company.start_ymd,
-        end_ymd=updated_company.end_ymd,
-        app_key=app_key,
-        app_secret_key=app_secret_key,  # 실제로는 앱 시크릿을 노출하지 않는 게 좋음
-        created_at=updated_company.created_at
+    resp = Ifi01CompanyApiResponse(
+        ifi01_company_api_id=updated_company.ifi01_company_api_id,
+        ifi01_company_id=updated_company.ifi01_company_id,
+        ifi01_config_api_id=updated_company.ifi01_config_api_id,
+        ifi01_start_date=updated_company.ifi01_start_date,
+        ifi01_close_date=updated_company.ifi01_close_date,
+        ifi01_app_key=app_key,
+        ifi01_app_secret_key=app_secret_key,
+        ifi01_created_date=updated_company.ifi01_created_date
     )
     logger.info(f"업데이트 회사 : {resp}")
     return resp    

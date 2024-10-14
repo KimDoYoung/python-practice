@@ -23,8 +23,7 @@ from jose import ExpiredSignatureError, JWTError, jwt
 from typing import Optional
 
 from backend.app.core.settings import config
-from backend.app.domain.company.company_service import get_company
-from backend.app.core.database import get_session
+from backend.app.utils.misc_util import toYmd
 
 def generate_app_key(length: int = 64) -> str:
     """랜덤으로 영문 대소문자와 숫자를 조합한 app_key 생성"""
@@ -50,7 +49,7 @@ def secret_key_decrypt(key, encrypted_data):
     return decrypted.decode('utf-8')
 
 
-def create_access_token(company_id: int, service_id: str, start_ymd: str, end_ymd: str) -> str:
+def create_access_token(company_api_id: int, company_id: int, config_api_id: int, start_date: datetime, end_date: datetime) -> str:
     """
     JWT 토큰 생성
     :param data: 토큰에 포함할 추가 데이터 (예: 사용자 정보 등)
@@ -66,10 +65,11 @@ def create_access_token(company_id: int, service_id: str, start_ymd: str, end_ym
     expire = current_time + timedelta(hours=ACCESS_TOKEN_EXPIRE_HOURS)
     # JWT에 담을 클레임 (payload)
     payload = {
+        "company_api_id": company_api_id,
         "company_id": company_id,
-        "service_id": service_id,
-        "start_ymd": start_ymd,
-        "end_ymd" : end_ymd,
+        "config_api_id": config_api_id,
+        "start_ymd": toYmd(start_date),
+        "end_ymd" : toYmd(end_date),
         "exp": expire
     }
     # app_secret_key를 시크릿 키로 사용하여 JWT 생성
@@ -135,22 +135,24 @@ async def get_current_company(request: Request) -> dict:
 
     if token is None:
         raise credentials_exception
-
+    company_dict = {}
     try:
         payload = verify_access_token(token)
         info: str = payload.get("service_info")
         if info is None:
             raise credentials_exception
         #{company_id}|{service_id}|{start_date}
-        company_id, service_id = info.split("|")
-        
+        company_api_id,company_id,config_api_id,start_date,end_date,exp   = info.split("|")
+        company_dict = {
+            "company_api_id": company_api_id,
+            "company_id": company_id,
+            "config_api_id": config_api_id,
+            "start_ymd": start_date,
+            "end_ymd": end_date,
+            "exp": exp
+        }
+
     except JWTError:
         raise credentials_exception
-
-    current_company = await get_company(get_session(),company_id,service_id)
-    if current_company is None:
-        raise credentials_exception
-    
-    company_dict = current_company.to_dict()
 
     return company_dict
