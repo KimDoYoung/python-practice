@@ -1,3 +1,4 @@
+from typing import List
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -44,7 +45,7 @@ class Ifi01CompanyApiService:
         return result.scalar_one_or_none()
 
     # 회사 API 리스트 가져오기
-    async def get_company_all(self):
+    async def get_company_all(self)->List[Ifi01CompanyApi]:
         '''모든 회사 API 리스트 가져오기 입력날짜의 역순으로 가져온다'''
         stmt = select(Ifi01CompanyApi).order_by(Ifi01CompanyApi.ifi01_created_date.desc())
         result = await self.db.execute(stmt)

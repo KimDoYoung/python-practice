@@ -5,7 +5,7 @@ from backend.app.domain.auth.auth_schema import AuthPayload, AuthRequest, AuthRe
 from backend.app.core.database import get_session
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.app.domain.ifi01.ifi01_company_api_service import get_company_by_app_key
+from backend.app.domain.ifi01.ifi01_company_api_service import Ifi01CompanyApiService
 from backend.app.core.security import create_access_token, secret_key_encrypt, verify_access_token
 
 logger = get_logger(__name__)
@@ -38,7 +38,8 @@ async def test_token(auth_resp):
 async def generate_token(req: AuthRequest, db: AsyncSession = Depends(get_session)):
     ''' app key, secret key로 회사 정보 조회 후 token 발급, 토큰 검증 '''
     logger.debug(f"Auth request: APP_KEY: {req.app_key}\nAPP_SECRET_KEY: {req.app_secret_key}")
-    company = await get_company_by_app_key(db, req.app_key)
+    service = Ifi01CompanyApiService(db)
+    company = await service.get_company_by_app_key(db, req.app_key)
     # 회사 정보가 없으면 404 에러
     if not company:
         raise HTTPException(status_code=404, detail="Company not found")
