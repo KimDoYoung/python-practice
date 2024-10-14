@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from app.models import Diary
-from app.schemas import DiaryRequest, DiaryResponse
+from app.domain.diary.diary_model import Diary
+from app.domain.diary.diary_schema import DiaryRequest, DiaryResponse
 
 class DiaryService:
     def __init__(self, db: Session):
@@ -16,13 +16,13 @@ class DiaryService:
         self.db.add(new_diary)
         await self.db.commit()
         await self.db.refresh(new_diary)
-        return DiaryResponse.from_orm(new_diary)
+        return DiaryResponse.model_validate(new_diary)
 
     # Read
     async def get_diary(self, ymd: str) -> DiaryResponse | None:
         diary = await self.db.query(Diary).filter(Diary.ymd == ymd).first()
         if diary:
-            return DiaryResponse.from_orm(diary)
+            return DiaryResponse.model_validate(diary)
         return None
 
     # Update
@@ -33,7 +33,7 @@ class DiaryService:
             diary.summary = diary_data.summary
             await self.db.commit()
             await self.db.refresh(diary)
-            return DiaryResponse.from_orm(diary)
+            return DiaryResponse.model_validate(diary)
         return None
 
     # Delete
