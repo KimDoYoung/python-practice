@@ -1,9 +1,10 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 from app.domain.diary.diary_model import Diary
 from app.domain.diary.diary_schema import DiaryRequest, DiaryResponse
 
 class DiaryService:
-    def __init__(self, db: Session):
+    def __init__(self, db: AsyncSession):
         self.db = db
 
     # Create
@@ -20,14 +21,16 @@ class DiaryService:
 
     # Read
     async def get_diary(self, ymd: str) -> DiaryResponse | None:
-        diary = await self.db.query(Diary).filter(Diary.ymd == ymd).first()
+        result = await self.db.execute(select(Diary).filter(Diary.ymd == ymd))
+        diary = result.scalar_one_or_none()  # 일치하는 첫 번째 결과를 가져옴
         if diary:
             return DiaryResponse.model_validate(diary)
         return None
 
     # Update
     async def update_diary(self, ymd: str, diary_data: DiaryRequest) -> DiaryResponse | None:
-        diary = await self.db.query(Diary).filter(Diary.ymd == ymd).first()
+        result = await self.db.execute(select(Diary).filter(Diary.ymd == ymd))
+        diary = result.scalar_one_or_none()
         if diary:
             diary.content = diary_data.content
             diary.summary = diary_data.summary
@@ -38,7 +41,8 @@ class DiaryService:
 
     # Delete
     async def delete_diary(self, ymd: str) -> bool:
-        diary = await self.db.query(Diary).filter(Diary.ymd == ymd).first()
+        result = await self.db.execute(select(Diary).filter(Diary.ymd == ymd))
+        diary = result.scalar_one_or_none()
         if diary:
             await self.db.delete(diary)
             await self.db.commit()

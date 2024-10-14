@@ -12,9 +12,9 @@ router = APIRouter()
 
 # 일기 작성
 @router.post("/", response_model=DiaryResponse)
-async def create_diary(diary_data: DiaryRequest, db: Session = Depends(get_session)):
+async def create_diary(diary_req: DiaryRequest, db: Session = Depends(get_session)):
     service = DiaryService(db)
-    return await service.create_diary(diary_data)
+    return await service.create_diary(diary_req)
 
 # 특정 일자 일기 조회
 @router.get("/{ymd}", response_model=DiaryResponse)
