@@ -3,6 +3,7 @@ from sqlalchemy import MetaData
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from app.core.settings import config
+from typing import AsyncGenerator
 
 # 비동기 데이터베이스 연결
 database = Database(config.DATABASE_URL)
@@ -17,7 +18,6 @@ async_session = sessionmaker(
     bind=engine, class_=AsyncSession, expire_on_commit=False
 )
 
-# 비동기 데이터베이스 세션 제공
-async def get_session():
+async def get_session() -> AsyncGenerator[AsyncSession, None]:
     async with async_session() as session:
         yield session
