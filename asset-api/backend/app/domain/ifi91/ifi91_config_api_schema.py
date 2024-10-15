@@ -22,6 +22,5 @@ class Ifi91ConfigApiResponse(Ifi91ConfigApiBase):
     ifi91_config_api_id: int
 
     class Config:
-        model_config = {
-            'from_attributes': True  # ORM 모드 활성화
-        }
+        from_attributes = True  # orm_mode 대신 사용됨
+        orm_mode = True

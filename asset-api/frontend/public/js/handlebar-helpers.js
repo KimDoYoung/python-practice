@@ -418,7 +418,7 @@ Handlebars.registerHelper('my_calc', function(a, operator, b) {
 Handlebars.registerHelper('truncate', function(text, length) {
     // 기본값으로 10을 사용하고, 전달된 length 값이 있으면 사용
     length = length || 10;
-    
+    if(!text) return "";
     // 문자열이 지정된 길이보다 길면 자르고, 그렇지 않으면 그대로 반환
     if (text.length > length) {
         return text.substring(0, length) + '...';

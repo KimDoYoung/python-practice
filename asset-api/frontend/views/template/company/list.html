@@ -14,8 +14,8 @@
         <thead>
             <tr>
                 <th>순번</th>
-                <th>회사 ID</th>
-                <th>서비스명</th>
+                <th>회사 Id</th>
+                <th>서비스Id</th>
                 <th>시작일</th>
                 <th>종료일</th>
                 <th>APP KEY</th>
@@ -27,15 +27,16 @@
             {{#each list}}
             <tr>
                 <td>{{inc @index}}</td>
-                <td>{{company_id}}</td>
-                <td>{{service_id}}</td>
-                <td>{{displayYmd start_ymd}}</td>
-                <td>{{displayYmd end_ymd}}</td>
-                <td>{{truncate app_key 10}}</td>
-                <td>{{created_at}}</td>
+                <td>{{ifi01_company_id}}</td>
+                <td>{{ifi01_config_api_id}}</td>
+                <td>{{ifi01_start_date}}</td>
+                <td>{{ifi01_close_date}}</td>
+                <td>{{truncate ifi01_app_key 10}}</td>
+                <td>{{ifi01_created_date}}</td>
                 <td>
-                    <button class="btnDelete btn btn-danger" data-company-id="{{company_id}}" data-service-nm="{{service_id}}">삭제</button>
-                    <a class="btn btn-success" href="/page?path=company/view&company_id={{company_id}}&service_id={{service_id}}">상세</a>
+                    <button class="btnDelete btn btn-danger" data-company-api-id="{{ifi01_company_api_id}}"
+                         data-company-id="{{ifi01_company_id}}" data-config-api-id="{{ifi01_config_api_id}}">삭제</button>
+                    <a class="btn btn-success" href="/page?path=company/view&ifi01_company_api_id={{ifi01_company_api_id}}">상세</a>
                     <!-- <a class="btn btn-success" href="/page?path=company/token_test&app_key={{app_key}}">Token테스트</a> -->
                 </td>
             </tr>
@@ -82,13 +83,13 @@ $( document ).ready(function() {
     $("#result-area").on("click", ".btnDelete", function() {
         console.log("delete button clicked");
         const company_id = $(this).data('company-id');
-        const service_id = $(this).data('service-nm');
+        const service_id = $(this).data('config-api-id');
 
         if( confirm(`${company_id}-${service_id} 삭제하시겠습니까?`) == false) {
             return;
         }
-
-        const url = `/api/v1/company/delete/${company_id}/${service_id}`;
+        const company_api_id = $(this).data('company-api-id');
+        const url = `/api/v1/company/delete/${company_api_id}`;
         deleteFetch(url,{}).then(data => {
             console.log(data); 
             initialize();

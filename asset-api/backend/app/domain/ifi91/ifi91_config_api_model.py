@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Numeric, String, Text
+from sqlalchemy import BigInteger, Column, String, Text
 from sqlalchemy.ext.declarative import declarative_base
 from backend.app.core.database import metadata
 
@@ -7,8 +7,8 @@ Base = declarative_base(metadata=metadata)
 class Ifi91ConfigApi(Base):
     __tablename__ = 'ifi91_config_api'
 
-    ifi91_config_api_id = Column(Numeric, primary_key=True, comment='API관리ID(PK)')
-    ifi91_config_id = Column(Numeric, nullable=False, comment='I/F설정정보ID')
+    ifi91_config_api_id = Column(BigInteger, primary_key=True, comment='API관리ID(PK)')
+    ifi91_config_id = Column(BigInteger, nullable=False, comment='I/F설정정보ID')
     ifi91_service_type = Column(String(3), nullable=True, comment='서비스구분')
     ifi91_api_nm = Column(String(100), nullable=True, comment='API명')
     ifi91_path = Column(String(100), nullable=True, comment='Path')

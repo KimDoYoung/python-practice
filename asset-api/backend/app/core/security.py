@@ -23,7 +23,6 @@ from jose import ExpiredSignatureError, JWTError, jwt
 from typing import Optional
 
 from backend.app.core.settings import config
-from backend.app.utils.misc_util import toYmd
 
 def generate_app_key(length: int = 64) -> str:
     """랜덤으로 영문 대소문자와 숫자를 조합한 app_key 생성"""
@@ -49,7 +48,7 @@ def secret_key_decrypt(key, encrypted_data):
     return decrypted.decode('utf-8')
 
 
-def create_access_token(company_api_id: int, company_id: int, config_api_id: int, start_date: datetime, end_date: datetime) -> str:
+def create_access_token(company_api_id:int, company_id: int, config_api_id: int, start_date: str, end_date: str) -> str:
     """
     JWT 토큰 생성
     :param data: 토큰에 포함할 추가 데이터 (예: 사용자 정보 등)
@@ -64,12 +63,14 @@ def create_access_token(company_api_id: int, company_id: int, config_api_id: int
     current_time = datetime.now(timezone.utc)
     expire = current_time + timedelta(hours=ACCESS_TOKEN_EXPIRE_HOURS)
     # JWT에 담을 클레임 (payload)
+    start_date_ymd = start_date.replace('-', '')
+    end_date_ymd = end_date.replace('-', '')
     payload = {
         "company_api_id": company_api_id,
         "company_id": company_id,
         "config_api_id": config_api_id,
-        "start_ymd": toYmd(start_date),
-        "end_ymd" : toYmd(end_date),
+        "start_ymd": start_date_ymd,
+        "end_ymd": end_date_ymd,
         "exp": expire
     }
     # app_secret_key를 시크릿 키로 사용하여 JWT 생성

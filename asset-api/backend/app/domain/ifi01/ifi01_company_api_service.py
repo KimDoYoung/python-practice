@@ -16,14 +16,18 @@ class Ifi01CompanyApiService:
         return result.scalar()
 
     # 회사 API 정보를 생성하는 함수
-    async def create_company_api(self, company_api_data: Ifi01CompanyApiCreate):
+    async def create_company_api(self, data: dict):
         # ifi01_company_api_id를 데이터베이스 함수에서 가져옴
         company_api_id = await self.generate_company_api_id()
 
         # 새로운 Ifi01CompanyApi 객체 생성
         new_company_api = Ifi01CompanyApi(
-            ifi01_company_api_id=company_api_id,
-             **company_api_data.model_dump(exclude_unset=True)  # model_dump로 변경
+            ifi01_company_api_id = company_api_id,
+            ifi01_company_id = data['ifi01_company_id'],
+            ifi01_config_api_id = data['ifi01_config_api_id'],
+            ifi01_start_date = data['ifi01_start_date'],
+            ifi01_close_date = data['ifi01_close_date'],
+            ifi01_app_key = data['ifi01_app_key']
         )
         
         # 데이터베이스에 저장

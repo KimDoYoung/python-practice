@@ -39,13 +39,13 @@ async def generate_token(req: AuthRequest, db: AsyncSession = Depends(get_sessio
     ''' app key, secret key로 회사 정보 조회 후 token 발급, 토큰 검증 '''
     logger.debug(f"Auth request: APP_KEY: {req.app_key}\nAPP_SECRET_KEY: {req.app_secret_key}")
     service = Ifi01CompanyApiService(db)
-    company = await service.get_company_by_app_key(db, req.app_key)
+    company = await service.get_company_by_app_key(req.app_key)
     # 회사 정보가 없으면 404 에러
     if not company:
         raise HTTPException(status_code=404, detail="Company not found")
     
     app_secret_key = req.app_secret_key
-    data = f"{company.company_id}|{company.service_id}|{company.start_ymd}"
+    data = f"{company.ifi01_company_id}|{company.ifi01_config_api_id}|{company.ifi01_start_date}"
     
     app_secret_key_for_check = secret_key_encrypt(req.app_key, data)
     
@@ -53,13 +53,14 @@ async def generate_token(req: AuthRequest, db: AsyncSession = Depends(get_sessio
     if app_secret_key != app_secret_key_for_check:
         raise HTTPException(status_code=401, detail="Unauthorized secret key is not correct")
     
-    token = create_access_token(company.company_id, company.service_id, company.start_ymd, company.end_ymd) 
+    token = create_access_token(company.ifi01_company_api_id, company.ifi01_company_id, company.ifi01_config_api_id, str(company.ifi01_start_date), str(company.ifi01_close_date)) 
     
     auth_resp = AuthResponse(
-        company_id=company.company_id,
-        service_id=company.service_id,
-        start_ymd=company.start_ymd,
-        end_ymd = company.end_ymd,
+        company_api_id=company.ifi01_company_api_id,
+        company_id=company.ifi01_company_id,
+        service_id=company.ifi01_config_api_id,
+        start_ymd=company.ifi01_start_date,
+        end_ymd = company.ifi01_close_date,
         token=token
     )
     # 발급한 토큰을 테스트해 봄

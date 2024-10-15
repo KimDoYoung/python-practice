@@ -23,6 +23,7 @@ class AuthRequest(BaseModel):
         return v
     
 class AuthResponse(BaseModel):
+    company_api_id : int
     company_id: int
     service_id: str
     start_ymd: str
@@ -30,6 +31,7 @@ class AuthResponse(BaseModel):
     token:str
 
 class AuthPayload(BaseModel):
+    company_api_id : int
     company_id: int
     service_id: str
     start_ymd: str

@@ -15,3 +15,4 @@ class Ifi01CompanyApi(Base):
     ifi01_close_date = Column(Date, nullable=True, comment='서비스 종료일자')
     ifi01_app_key = Column(String(64), nullable=True, comment='랜덤으로 생성된 appKey (회사에 제공한 고유 키)')
     ifi01_created_date = Column(DateTime, nullable=True, comment='레코드 생성 일자')
+    ifi01_update_date = Column(DateTime, nullable=True, comment='레코드 수정 일자')

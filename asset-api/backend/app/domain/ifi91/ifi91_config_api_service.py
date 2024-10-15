@@ -22,7 +22,7 @@ class Ifi91ConfigApiService:
         return result.scalar_one_or_none()
 
     # API 리스트 가져오기
-    async def get_apis(self):
+    async def get_all(self):
         stmt = select(Ifi91ConfigApi)
         result = await self.db.execute(stmt)
         return result.scalars().all()
