@@ -31,7 +31,7 @@
         <!-- End Date -->
         <div class="mb-3">
             <label for="ifi01_close_date" class="form-label">End Date</label>
-            <input type="date" class="form-control" id="ifi01_close_date" name="ifi01_close_date" value="9999-12-31">
+            <input type="date" class="form-control" id="ifi01_close_date" name="ifi01_close_date" value="9999-12-30">
             <div class="form-text fst-italic">Select the service end date (default: no end date).</div>
         </div>
 
@@ -46,6 +46,10 @@
 <!--handlebar scripts-->
 <script id="register-result-template" type="text/x-handlebars-template">
     <table>
+        <tr>
+            <th>회사 API ID</th>
+            <td>{{ifi01_company_api_id}}</td>
+        </tr>
         <tr>
             <th>회사 ID</th>
             <td>{{ifi01_company_id}}</td>
@@ -96,16 +100,19 @@
     <div class="m-2">토큰으로 해석</div>
     <table class="table">
         <tr>
-            <th>Company Id</th><td>{{ifi01_company_id}}</td>
+            <th>Company API Id</th><td>{{company_api_id}}</td>
         </tr>
         <tr>
-            <th>Service Id</th><td>{{ifi01_config_api_id}}</td>
+            <th>Company Id</th><td>{{company_id}}</td>
         </tr>
         <tr>
-            <th>Start date</th><td>{{ifi01_start_date}}</td>
+            <th>Service Id</th><td>{{config_api_id}}</td>
         </tr>
         <tr>
-            <th>End date</th><td>{{ifi01_close_date}}</td>
+            <th>Start date</th><td>{{start_date}}</td>
+        </tr>
+        <tr>
+            <th>Close date</th><td>{{close_date}}</td>
         </tr>
     </table>
 </script>

@@ -18,14 +18,16 @@ async def test_token(auth_resp):
         logger.debug(f"Verifying token: {auth_resp.token}")
         payload = verify_access_token(auth_resp.token)
         logger.debug(f"Token verified successfully: {payload}")
-        
+
+        if payload['company_api_id'] != auth_resp.company_api_id:
+            return '토큰발급 테스트 - 올바르지 않은 토큰(회사ID)'
         if payload['company_id'] != auth_resp.company_id:
             return '토큰발급 테스트 - 올바르지 않은 토큰(회사ID)'
-        if payload['service_id'] != auth_resp.service_id:
+        if payload['config_api_id'] != auth_resp.config_api_id:
             return '토큰발급 테스트 - 올바르지 않은 토큰(서비스ID)'
-        if payload['start_ymd'] != auth_resp.start_ymd:
+        if payload['start_date'] != auth_resp.start_date:
             return '토큰발급 테스트 - 올바르지 않은 토큰(시작일)'
-        if payload['end_ymd'] != auth_resp.end_ymd:
+        if payload['close_date'] != auth_resp.close_date:
             return '토큰발급 테스트 - 올바르지 않은 토큰(종료일)'
         if datetime.now(timezone.utc).timestamp() > payload['exp']:
             return '토큰발급 테스트 - 만료된 토큰'
@@ -56,11 +58,11 @@ async def generate_token(req: AuthRequest, db: AsyncSession = Depends(get_sessio
     token = create_access_token(company.ifi01_company_api_id, company.ifi01_company_id, company.ifi01_config_api_id, str(company.ifi01_start_date), str(company.ifi01_close_date)) 
     
     auth_resp = AuthResponse(
-        company_api_id=company.ifi01_company_api_id,
-        company_id=company.ifi01_company_id,
-        service_id=company.ifi01_config_api_id,
-        start_ymd=company.ifi01_start_date,
-        end_ymd = company.ifi01_close_date,
+        company_api_id=str(company.ifi01_company_api_id),
+        company_id=str(company.ifi01_company_id),
+        config_api_id=str(company.ifi01_config_api_id),
+        start_date=str(company.ifi01_start_date).replace('-', ''),
+        close_date = str(company.ifi01_close_date).replace('-', ''),
         token=token
     )
     # 발급한 토큰을 테스트해 봄
@@ -79,10 +81,11 @@ async def verify(authToken: Authtoken, db: AsyncSession = Depends(get_session)):
     ''' app key, secret key로 회사 정보 조회 후 token 발급, 토큰 검증 ''' 
     payload = verify_access_token(authToken.token)
     authpayload = AuthPayload(
+        company_api_id = payload['company_api_id'],
         company_id=payload['company_id'],
-        service_id=payload['service_id'],
-        start_ymd=payload['start_ymd'],
-        end_ymd=payload['end_ymd'],
+        config_api_id=payload['config_api_id'],
+        start_date=payload['start_date'],
+        close_date=payload['close_date'],
         exp=payload['exp']
     )
     return authpayload

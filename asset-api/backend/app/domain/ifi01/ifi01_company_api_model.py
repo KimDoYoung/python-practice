@@ -4,7 +4,6 @@ from backend.app.core.database import metadata
 
 Base = declarative_base(metadata=metadata)
 
-
 class Ifi01CompanyApi(Base):
     __tablename__ = 'ifi01_company_api'
 

@@ -20,6 +20,7 @@
                 <th>종료일</th>
                 <th>APP KEY</th>
                 <th>발급일시</th>
+                <th>최종수정일시</th>
                 <th>동작</th>
             </tr>
         </thead>
@@ -33,9 +34,10 @@
                 <td>{{ifi01_close_date}}</td>
                 <td>{{truncate ifi01_app_key 10}}</td>
                 <td>{{ifi01_created_date}}</td>
+                <td>{{ifi01_update_date}}</td>
                 <td>
                     <button class="btnDelete btn btn-danger" data-company-api-id="{{ifi01_company_api_id}}"
-                         data-company-id="{{ifi01_company_id}}" data-config-api-id="{{ifi01_config_api_id}}">삭제</button>
+                        data-company-id="{{ifi01_company_id}}" data-config-api-id="{{ifi01_config_api_id}}">삭제</button>
                     <a class="btn btn-success" href="/page?path=company/view&ifi01_company_api_id={{ifi01_company_api_id}}">상세</a>
                     <!-- <a class="btn btn-success" href="/page?path=company/token_test&app_key={{app_key}}">Token테스트</a> -->
                 </td>
@@ -80,6 +82,7 @@ $( document ).ready(function() {
             console.error(error.message);
         });
     });
+    //삭제버튼
     $("#result-area").on("click", ".btnDelete", function() {
         console.log("delete button clicked");
         const company_id = $(this).data('company-id');

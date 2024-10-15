@@ -13,6 +13,7 @@
 작성일: 2024-10-10
 버전: 1.0
 """
+from datetime import datetime
 from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -92,8 +93,8 @@ async def register(company: Ifi01CompanyApiCreate, db: AsyncSession = Depends(ge
     logger.info(f"새로운 회사 등록: {resp}")
     return resp
 
-@router.post("/re-register",  response_model=Ifi01CompanyApiResponse)
-async def register(company: Ifi01CompanyApiCreate, db: AsyncSession = Depends(get_session)):
+@router.post("/re-register/{company_api_id}",  response_model=Ifi01CompanyApiResponse)
+async def register(company_api_id:int, company: Ifi01CompanyApiCreate, db: AsyncSession = Depends(get_session)):
     '''재등록-회사정보에 기반하여 app_key, secret_key를 만들고 Db에 Update '''
     # app_key와 app_secret_key 생성 (고유한 값으로)
     service = Ifi01CompanyApiService(db)
@@ -102,8 +103,12 @@ async def register(company: Ifi01CompanyApiCreate, db: AsyncSession = Depends(ge
     app_secret_key = secret_key_encrypt(app_key, data)
 
     dict = company.model_dump()
+    dict.update({'ifi01_company_api_id': company_api_id})
     dict.update({'ifi01_app_key': app_key})
-    updated_company = await service.update_company_api(db,company.ifi01_company_api_id, dict)
+    dict.update({'ifi01_app_secret_key': app_secret_key})
+    dict.update({'ifi01_update_date': datetime.now()})
+    logger.info(f"업데이트 회사 정보: {dict}")
+    updated_company = await service.update_company_api(company_api_id, dict)
 
     # 응답으로 Pydantic CompanyResponse 모델 반환
     resp = Ifi01CompanyApiResponse(
@@ -114,7 +119,8 @@ async def register(company: Ifi01CompanyApiCreate, db: AsyncSession = Depends(ge
         ifi01_close_date=updated_company.ifi01_close_date,
         ifi01_app_key=app_key,
         ifi01_app_secret_key=app_secret_key,
-        ifi01_created_date=updated_company.ifi01_created_date
+        ifi01_created_date=updated_company.ifi01_created_date,
+        ifi01_update_date =  updated_company.ifi01_update_date
     )
     logger.info(f"업데이트 회사 : {resp}")
     return resp    
