@@ -29,7 +29,7 @@
             <tr>
                 <td>{{inc @index}}</td>
                 <td>{{ifi01_company_id}}</td>
-                <td>{{ifi01_config_api_id}}</td>
+                <td>{{ifi01_config_api_nm}}</td>
                 <td>{{ifi01_start_date}}</td>
                 <td>{{ifi01_close_date}}</td>
                 <td>{{truncate ifi01_app_key 10}}</td>
@@ -57,15 +57,38 @@ $( document ).ready(function() {
         const html = makeHtmlWithTemplate('list-template', {list:gList});
         $('#result-area').html(html);
     }
-    function initialize() {
-        getFetch('/api/v1/company').then(data => {
-            console.log(data); 
-            gList = data;
+    async function initialize() {
+        try {
+            debugger;
+            // 먼저 /api/v1/services 호출
+            const servicesData = await getFetch('/api/v1/company/services');
+            console.log('Services Data:', servicesData);
+            gServiceCodes = servicesData;  // gServiceCodes 배열에 저장
+
+            // services API가 완료된 후 /api/v1/company 호출
+            const companyData = await getFetch('/api/v1/company');
+            console.log('Company Data:', companyData);
+            gList = companyData;  // gList에 저장
+            //gList를 돌면서 ifi01_config_api_id에 해당하는 서비스명을 찾아서 ifi01_service_nm에 저장 
+            gList.forEach(item => {
+                const service = gServiceCodes.find(service => service.ifi91_config_api_id === item.ifi01_config_api_id);
+                item.ifi01_config_api_nm = service ? service.ifi91_api_nm : '';
+            });   
+            // 테이블 생성 함수 호출
             makeTable();
-        }).catch(error=> {
+        } catch (error) {
+            // 에러 처리
             console.error(error.message);
             showAlertError(error);
-        });
+        }
+        // getFetch('/api/v1/company').then(data => {
+        //     console.log(data); 
+        //     gList = data;
+        //     makeTable();
+        // }).catch(error=> {
+        //     console.error(error.message);
+        //     showAlertError(error);
+        // });
     }
     console.log( "발급현황 ready!")
     initialize();

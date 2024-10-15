@@ -134,8 +134,8 @@ $( document ).ready(function() {
             //data에 있는 서비스 목록을 option으로 만들어서 select box에 추가한다.
             service_list = [];
             data.forEach(service => {
-                $('#ifi01_config_api_id').append(`<option value="${service.ifi91_config_id}">${service.ifi91_api_nm}</option>`);
-                service_list.push({ifi91_config_id:service.ifi91_config_id, ifi91_api_nm:service.ifi91_api_nm});
+                $('#ifi01_config_api_id').append(`<option value="${service.ifi91_config_api_id}">${service.ifi91_api_nm}</option>`);
+                service_list.push({ifi91_config_id:service.ifi91_config_api_id, ifi91_api_nm:service.ifi91_api_nm});
             });
 
         }).catch(error=> {
