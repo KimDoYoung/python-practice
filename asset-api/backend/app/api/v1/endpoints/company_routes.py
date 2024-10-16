@@ -20,10 +20,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.app.core.logger import get_logger
 from backend.app.core.database import get_session
 from backend.app.core.security import generate_app_key, secret_key_encrypt
-from backend.app.domain.ifi01.ifi01_company_api_schema import Ifi01CompanyApiCreate, Ifi01CompanyApiResponse
-from backend.app.domain.ifi01.ifi01_company_api_service import Ifi01CompanyApiService
-from backend.app.domain.ifi91.ifi91_config_api_schema import Ifi91ConfigApiResponse
-from backend.app.domain.ifi91.ifi91_config_api_service import Ifi91ConfigApiService
+from backend.app.domain.ifi.ifi01.ifi01_company_api_schema import Ifi01CompanyApiCreate, Ifi01CompanyApiResponse
+from backend.app.domain.ifi.ifi01.ifi01_company_api_service import Ifi01CompanyApiService
+from backend.app.domain.ifi.ifi91.ifi91_config_api_schema import Ifi91ConfigApiResponse
+from backend.app.domain.ifi.ifi91.ifi91_config_api_service import Ifi91ConfigApiService
 logger = get_logger(__name__)
 
 router = APIRouter()

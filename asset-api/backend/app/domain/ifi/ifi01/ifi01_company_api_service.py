@@ -3,7 +3,7 @@ from typing import List
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from backend.app.domain.ifi01.ifi01_company_api_model import Ifi01CompanyApi
+from backend.app.domain.ifi.ifi01.ifi01_company_api_model import Ifi01CompanyApi
 from backend.app.core.logger import get_logger
 
 logger = get_logger(__name__)

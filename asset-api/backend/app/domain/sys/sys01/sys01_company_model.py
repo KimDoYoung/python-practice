@@ -1,0 +1,51 @@
+from sqlalchemy import Column, String, BigInteger,  DateTime
+from sqlalchemy.ext.declarative import declarative_base
+
+Base = declarative_base()
+
+class Sys01Company(Base):
+    __tablename__ = 'sys01_company'
+    
+    sys01_company_id = Column(BigInteger, primary_key=True)
+    sys01_company_nm = Column(String(400), nullable=False)
+    sys01_biz_no = Column(String(20), unique=True, nullable=False)
+    sys01_office_tel_no = Column(String(20))
+    sys01_emgrcy_passwd = Column(String(20))
+    sys01_office_fax_no = Column(String(20))
+    sys01_zip_cd = Column(String(10))
+    sys01_zip_addr = Column(String(400))
+    sys01_zip_detail = Column(String(400))
+    sys01_loc_nm = Column(String(40))
+    sys01_anniv_date = Column(DateTime)
+    sys01_note = Column(String(1000))
+    sys01_mail_info = Column(String(20))
+    sys01_mobile_tel_no = Column(String(20))
+    sys01_email_addr = Column(String(20))
+    sys01_start_date = Column(DateTime)
+    sys01_close_date = Column(DateTime)
+    sys01_use_yn = Column(String(10))
+    sys01_emp_info = Column(String(400))
+    sys01_cont_type = Column(String(100))
+    sys01_main_image_id = Column(BigInteger)
+    sys01_cycle_time = Column(String(10), default='60')
+    sys01_leave_yn = Column(String(10))
+    sys01_leave_month_cd = Column(String(2))
+    sys01_leave_form_cd = Column(String(2))
+    sys01_icam_company_cd = Column(String(8))
+    sys01_ast_manager_auto_yn = Column(String(5))
+    sys01_appr_step_lock_yn = Column(String(5))
+    sys01_account_close_month = Column(String(2))
+    sys01_leave_compulsion_rt = Column(BigInteger)
+    sys01_ics_check_cycle_type = Column(String(1))
+    sys01_tax_type = Column(String(1))
+    sys01_company_rep_nm = Column(String(20))
+    sys01_mail_log_yn = Column(String(5))
+    sys01_ics_comply_cycle_type = Column(String(1))
+    sys01_dcr_numbering_cd = Column(String(1))
+    sys01_dcr_detail_use_yn = Column(String(5))
+    sys01_apr_manager_info_yn = Column(String(5))
+    sys01_notice_date = Column(DateTime)
+    sys01_owner_capital_apply_cd = Column(String(2))
+    sys01_ics_guide_yn = Column(String(5))
+
+
