@@ -1,12 +1,14 @@
-{% extends 'common/base.html' %}
+{% extends 'common/base_fluid.html' %}
 {% block style %}
 {% endblock %}
 {% block content %}
-<h1>서비스 키 발급 리스트</h1>
-<div>
-    <a href="/page?path=company/register" class="btn btn-primary">API Service 등록</a>
+<div class="mx-5">
+    <h1>서비스 키 발급 리스트</h1>
+    <div>
+        <a href="/page?path=company/register" class="btn btn-primary">API Service 등록</a>
+    </div>
+    <div id="result-area"></div>
 </div>
-<div id="result-area"></div>
 {% raw %}
 <!--handlebar scripts-->
 <script id="list-template" type="text/x-handlebars-template">
@@ -15,6 +17,7 @@
             <tr>
                 <th>순번</th>
                 <th>회사 Id</th>
+                <th>회사명</th>
                 <th>서비스Id</th>
                 <th>시작일</th>
                 <th>종료일</th>
@@ -29,7 +32,8 @@
             <tr>
                 <td>{{inc @index}}</td>
                 <td>{{ifi01_company_id}}</td>
-                <td>{{ifi01_config_api_nm}}</td>
+                <td>{{sys01_company_nm}}</td>
+                <td>{{ifi01_service_nm}}</td>
                 <td>{{ifi01_start_date}}</td>
                 <td>{{ifi01_close_date}}</td>
                 <td>{{truncate ifi01_app_key 10}}</td>
@@ -75,8 +79,8 @@ $( document ).ready(function() {
             }
             //gList를 돌면서 ifi01_service_cd에 해당하는 서비스명을 찾아서 ifi01_service_nm에 저장 
             gList.forEach(item => {
-                const service = gServiceCodes.find(service => service.ifi91_config_api_id === item.sys09_code);
-                item.ifi01_config_api_nm = service ? service.sys09_name : '';
+                const service = gServiceCodes.find(service => service.ifi91_service_cd === item.sys09_code);
+                item.ifi01_service_nm = service ? service.sys09_name : '';
             });   
             // 테이블 생성 함수 호출
             makeTable();
@@ -87,7 +91,7 @@ $( document ).ready(function() {
         }
         // getFetch('/api/v1/company').then(data => {
         //     console.log(data); 
-        //     gList = data;
+        //     gList = data;se
         //     makeTable();
         // }).catch(error=> {
         //     console.error(error.message);

@@ -12,47 +12,72 @@
 <!--handlebar scripts-->
 <script id="issue-template" type="text/x-handlebars-template">
     <h2 class="mb-4">OPEN API 발급현황(DB저장된 내용)</h2>
-    <div class="mb-3">
-        <label for="ifi01_company_api_id" class="form-label">Company API ID</label>
-        <input type="text" class="form-control" id="ifi01_company_api_id" name="ifi01_company_api_id" value="{{ifi01_company_api_id}}" readonly>
+    <div class="row">
+        <div class="col-12 mb-3">
+            <label for="ifi01_company_api_id" class="form-label text-primary">Company API ID</label>
+            <input type="text" class="form-control" id="ifi01_company_api_id" name="ifi01_company_api_id" value="{{ifi01_company_api_id}}" readonly>
+        </div>
     </div>
-    <div class="mb-3">
-        <label for="ifi01_company_id" class="form-label">Company ID</label>
-        <input type="text" class="form-control" id="ifi01_company_id" name="ifi01_company_id" value="{{ifi01_company_id}}" readonly>
+    <div class="row">
+        <div class="col-6 mb-3">
+            <label for="ifi01_company_id" class="form-label text-primary">Company ID</label>
+            <input type="text" class="form-control" id="ifi01_company_id" name="ifi01_company_id" value="{{ifi01_company_id}}" readonly>
+        </div>
+        
+        <div class="col-6 mb-3">
+            <label for="sys01_company_nm" class="form-label text-primary">Company Name</label>
+            <input type="text" class="form-control" id="sys01_company_nm" name="sys01_company_nm" value="{{sys01_company_nm}}" readonly>
+        </div>
     </div>
-    <div class="mb-3">
-        <label for="ifi01_service_cd" class="form-label">Service ID</label>
-        <input type="text" class="form-control" id="ifi01_service_cd" name="ifi01_service_cd" value="{{ifi01_service_cd}}" readonly>
+    <div class="row">
+        <div class="col-6 mb-3">
+            <label for="ifi01_service_cd" class="form-label text-primary">Service ID</label>
+            <input type="text" class="form-control" id="ifi01_service_cd" name="ifi01_service_cd" value="{{ifi01_service_cd}}" readonly>
+        </div>
+        <div class="col-6 mb-3">
+            <label for="ifi01_service_nm" class="form-label text-primary">Service Name</label>
+            <input type="text" class="form-control" id="ifi01_service_nm" name="ifi01_service_nm" value="{{ifi01_service_nm}}" readonly>
+        </div>
     </div>
-    <div class="mb-3">
-        <label for="ifi01_start_date" class="form-label">Start date</label>
-        <input type="date" class="form-control" id="ifi01_start_date" name="ifi01_start_date" value="{{ifi01_start_date}}"  >
+    <div class="row">
+        <div class="col-6 mb-3">
+            <label for="ifi01_start_date" class="form-label text-primary">Start date</label>
+            <input type="date" class="form-control" id="ifi01_start_date" name="ifi01_start_date" value="{{ifi01_start_date}}"  >
+        </div>
+        <div class="col-6 mb-3">
+            <label for="ifi01_close_date" class="form-label text-primary">Close date</label>
+            <input type="date" class="form-control" id="ifi01_close_date" name="ifi01_close_date" value="{{ifi01_close_date}}" >
+        </div>
     </div>
-    <div class="mb-3">
-        <label for="ifi01_close_date" class="form-label">End date</label>
-        <input type="date" class="form-control" id="ifi01_close_date" name="ifi01_close_date" value="{{ifi01_close_date}}" >
+    <div class="row">
+        <div class="col-12 mb-3">
+            <label for="ifi01_app_key" class="form-label text-primary">APP KEY</label>
+            <input type="text" class="form-control" id="ifi01_app_key" name="ifi01_app_key" value="{{ifi01_app_key}}" readonly>
+        </div>
     </div>
-    <div class="mb-3">
-        <label for="ifi01_app_key" class="form-label">APP KEY</label>
-        <input type="text" class="form-control" id="ifi01_app_key" name="ifi01_app_key" value="{{ifi01_app_key}}" readonly>
+    <div class="row">
+        <div class="col-12 mb-3">
+            <label for="ifi01_app_secret_key" class="form-label text-primary">APP SECRET KEY</label>
+            <input type="text" class="form-control" id="ifi01_app_secret_key" name="ifi01_app_secret_key" value="{{ifi01_app_secret_key}}" readonly>
+            <p class="text-danger fst-italic">APP SECRET KEY는 db에 저장되어 있지 않습니다</p>
+        </div>
     </div>
-    <div class="mb-3">
-        <label for="ifi01_app_secret_key" class="form-label">APP SECRET KEY</label>
-        <input type="text" class="form-control" id="ifi01_app_secret_key" name="ifi01_app_secret_key" value="{{ifi01_app_secret_key}}" readonly>
-        <p class="text-danger fst-italic">APP SECRET KEY는 db에 저장되어 있지 않습니다</p>
+    <div class="row">
+        <div class="col-6 mb-3">
+            <label for="ifi01_created_date" class="form-label text-primary">Create date time</label>
+            <input type="text" class="form-control" id="ifi01_created_date" name="ifi01_created_date" value="{{ifi01_created_date}}" readonly>
+        </div>
+        <div class="col-6 mb-3">
+            <label for="ifi01_update_date" class="form-label text-primary">Update date time</label>
+            <input type="text" class="form-control" id="ifi01_update_date" name="ifi01_update_date" value="{{ifi01_update_date}}" readonly>
+        </div>
     </div>
-    <div class="mb-3">
-        <label for="ifi01_created_date" class="form-label">Create date time</label>
-        <input type="text" class="form-control" id="ifi01_created_date" name="ifi01_created_date" value="{{ifi01_created_date}}" readonly>
-    </div>
-    <div class="mb-3">
-        <label for="ifi01_update_date" class="form-label">Update date time</label>
-        <input type="text" class="form-control" id="ifi01_update_date" name="ifi01_update_date" value="{{ifi01_update_date}}" readonly>
-    </div>
-    <div class="mt-2">
-        <button id="btnReRegister" class="btn btn-primary">APP & SECRET KEY 재발급</button>
-        <button id="btnClipboard" class="btn btn-success">Copy to clipboard</button>
-        <button class="btn btn-secondary" onclick="location.href='/page?path=company/list'">리스트로 이동</button>
+    <div class="row">
+        <div class="col-12 mt-2">
+            <button id="btnReRegister" class="btn btn-primary">APP & SECRET KEY 재발급</button>
+            <button id="btnClipboard" class="btn btn-success">Copy to clipboard</button>
+            <button class="btn btn-secondary" onclick="location.href='/page?path=company/list'">리스트로 이동</button>
+        </div>
     </div>
 </script>
 {% endraw %}
@@ -75,13 +100,14 @@ $( document ).ready(function() {
         });
     }
     initialize();
-    //copy to clipboard
+    //copy to clipboard 클립보드 복사
     $("#result-area").on("click", "#btnClipboard", function() {
         const app_key = $('#ifi01_app_key').val();
         const app_secret_key = $('#ifi01_app_secret_key').val();
         const text = `APP KEY : [${app_key}]\nAPP SECRET KEY : [${app_secret_key}]`;
         copyToClipboard(text, "APP KEY & SECRET KEY 복사 완료");
     });
+    //키재발급
     $("#result-area").on("click", "#btnReRegister", function() {
         //APP KEY & SECRET KEY 재발급
         const ifi01_company_api_id = $('#ifi01_company_api_id').val();

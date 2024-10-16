@@ -1,10 +1,12 @@
 from datetime import datetime
 from typing import List
-from sqlalchemy import text
+from sqlalchemy import func, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from backend.app.domain.ifi.ifi01.ifi01_company_api_model import Ifi01CompanyApi
 from backend.app.core.logger import get_logger
+from backend.app.domain.ifi.ifi01.ifi01_company_api_schema import Ifi01CompanyApiResponse
+from backend.app.domain.sys.sys01.sys01_company_model import Sys01Company
 
 logger = get_logger(__name__)
 
@@ -65,11 +67,33 @@ class Ifi01CompanyApiService:
         return result.scalar_one_or_none()
 
     # 회사 API 리스트 가져오기
-    async def get_company_all(self)->List[Ifi01CompanyApi]:
-        '''모든 회사 API 리스트 가져오기 입력날짜의 역순으로 가져온다'''
-        stmt = select(Ifi01CompanyApi).order_by(Ifi01CompanyApi.ifi01_created_date.desc())
+    # async def get_company_all(self)->List[Ifi01CompanyApi]:
+    #     '''모든 회사 API 리스트 가져오기 입력날짜의 역순으로 가져온다'''
+    #     stmt = select(Ifi01CompanyApi).order_by(Ifi01CompanyApi.ifi01_created_date.desc())
+    #     result = await self.db.execute(stmt)
+    #     return result.scalars().all()
+    
+    async def get_company_all(self) -> List[Ifi01CompanyApiResponse]:
+        stmt = (
+            select(
+                Ifi01CompanyApi,
+                func.coalesce(Sys01Company.sys01_company_nm, '').label("sys01_company_name")
+            )
+            .outerjoin(Sys01Company, Ifi01CompanyApi.ifi01_company_id == Sys01Company.sys01_company_id)
+            .order_by(Ifi01CompanyApi.ifi01_created_date.desc())
+        )
+        
         result = await self.db.execute(stmt)
-        return result.scalars().all()
+        company_apis = result.all()
+
+        # Ifi01CompanyApi 객체와 회사명을 Pydantic 모델로 반환
+        return [
+            Ifi01CompanyApiResponse(
+                **row.Ifi01CompanyApi.__dict__,
+                sys01_company_nm=row.sys01_company_name
+            ) for row in company_apis
+        ]       
+        
     
     # 회사 API 삭제
     # async def delete_company_api(self, company_api_id: int):

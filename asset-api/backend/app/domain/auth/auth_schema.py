@@ -25,7 +25,7 @@ class AuthRequest(BaseModel):
 class AuthResponse(BaseModel):
     company_api_id : str
     company_id: str
-    config_api_id: str
+    service_cd: str
     start_date: str
     close_date:str
     token:str
@@ -33,7 +33,7 @@ class AuthResponse(BaseModel):
 class AuthPayload(BaseModel):
     company_api_id : str
     company_id: str
-    config_api_id: str
+    service_cd: str
     start_date: str
     close_date:str
     exp: int

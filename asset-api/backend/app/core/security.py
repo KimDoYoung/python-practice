@@ -48,7 +48,7 @@ def secret_key_decrypt(key, encrypted_data):
     return decrypted.decode('utf-8')
 
 
-def create_access_token(company_api_id:int, company_id: int, config_api_id: int, start_date: str, end_date: str) -> str:
+def create_access_token(company_api_id:int, company_id: int, service_cd: int, start_date: str, end_date: str) -> str:
     """
     JWT 토큰 생성
     :param data: 토큰에 포함할 추가 데이터 (예: 사용자 정보 등)
@@ -68,7 +68,7 @@ def create_access_token(company_api_id:int, company_id: int, config_api_id: int,
     payload = {
         "company_api_id": str(company_api_id),
         "company_id": str(company_id),
-        "config_api_id": str(config_api_id),
+        "service_cd": str(service_cd),
         "start_date": start_date_ymd,
         "close_date": end_date_ymd,
         "exp": expire
@@ -143,11 +143,11 @@ async def get_current_company(request: Request) -> dict:
         if info is None:
             raise credentials_exception
         #{company_id}|{service_id}|{start_date}
-        company_api_id,company_id,config_api_id,start_date,close_date,exp   = info.split("|")
+        company_api_id,company_id,service_cd,start_date,close_date,exp   = info.split("|")
         company_dict = {
             "company_api_id": company_api_id,
             "company_id": company_id,
-            "config_api_id": config_api_id,
+            "service_cd": service_cd,
             "start_date": start_date,
             "close_date": close_date,
             "exp": exp

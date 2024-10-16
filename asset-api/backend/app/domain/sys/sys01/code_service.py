@@ -21,3 +21,19 @@ class CodeService:
         codes = result.scalars().all()
 
         return codes
+    
+    async def get_name(self, category: str, detail_code: str) -> str:
+        # sys08_code_kind에서 주어진 category를 찾기 위한 서브쿼리
+        subquery = select(Sys08CodeKind.sys08_code_kind_id).filter(Sys08CodeKind.sys08_kind_cd == category).scalar_subquery()
+
+        # sys09_code에서 sys08_code_kind_id와 detail_code로 sys09_name 찾기
+        result = await self.db.execute(
+            select(Sys09Code.sys09_name).filter(
+                Sys09Code.sys09_code_kind_id.in_(subquery),
+                Sys09Code.sys09_code == detail_code
+            )
+        )
+
+        # 첫 번째 결과를 문자열로 반환
+        sys09_name = result.scalar()
+        return sys09_name if sys09_name else ""

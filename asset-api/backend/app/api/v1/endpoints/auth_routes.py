@@ -23,7 +23,7 @@ async def test_token(auth_resp):
             return '토큰발급 테스트 - 올바르지 않은 토큰(회사ID)'
         if payload['company_id'] != auth_resp.company_id:
             return '토큰발급 테스트 - 올바르지 않은 토큰(회사ID)'
-        if payload['config_api_id'] != auth_resp.config_api_id:
+        if payload['service_cd'] != auth_resp.service_cd:
             return '토큰발급 테스트 - 올바르지 않은 토큰(서비스ID)'
         if payload['start_date'] != auth_resp.start_date:
             return '토큰발급 테스트 - 올바르지 않은 토큰(시작일)'
@@ -60,7 +60,7 @@ async def generate_token(req: AuthRequest, db: AsyncSession = Depends(get_sessio
     auth_resp = AuthResponse(
         company_api_id=str(company.ifi01_company_api_id),
         company_id=str(company.ifi01_company_id),
-        config_api_id=str(company.ifi01_service_cd),
+        service_cd=str(company.ifi01_service_cd),
         start_date=str(company.ifi01_start_date).replace('-', ''),
         close_date = str(company.ifi01_close_date).replace('-', ''),
         token=token
@@ -83,7 +83,7 @@ async def verify(authToken: Authtoken, db: AsyncSession = Depends(get_session)):
     authpayload = AuthPayload(
         company_api_id = payload['company_api_id'],
         company_id=payload['company_id'],
-        config_api_id=payload['config_api_id'],
+        service_cd=payload['service_cd'],
         start_date=payload['start_date'],
         close_date=payload['close_date'],
         exp=payload['exp']

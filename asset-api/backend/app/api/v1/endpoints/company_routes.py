@@ -24,6 +24,7 @@ from backend.app.domain.ifi.ifi01.ifi01_company_api_schema import Ifi01CompanyAp
 from backend.app.domain.ifi.ifi01.ifi01_company_api_service import Ifi01CompanyApiService
 from backend.app.domain.sys.sys01.code_service import CodeService
 from backend.app.domain.sys.sys01.sys01_company_schema import Sys09CodeResponse
+from backend.app.domain.sys.sys01.sys01_company_service import Sys01CompanyService
 
 logger = get_logger(__name__)
 
@@ -34,9 +35,7 @@ async def list(db: AsyncSession = Depends(get_session)):
     ''' ifi01 회사 목록 조회-view '''
     service = Ifi01CompanyApiService(db)
     company_list = await service.get_company_all()
-    
-    # SQLAlchemy 모델을 Pydantic 모델로 변환
-    return [Ifi01CompanyApiResponse.model_validate(company) for company in company_list]
+    return company_list
 
 @router.get("/info/{company_api_id}",  response_model=Ifi01CompanyApiResponse)
 async def info(company_api_id: int,  db: AsyncSession = Depends(get_session)):
@@ -46,6 +45,16 @@ async def info(company_api_id: int,  db: AsyncSession = Depends(get_session)):
     app_secret_key = secret_key_encrypt(company.ifi01_app_key, f"{company.ifi01_company_id}|{company.ifi01_service_cd}|{company.ifi01_start_date}")
     resp = Ifi01CompanyApiResponse.model_validate(company)
     resp.ifi01_app_secret_key = app_secret_key
+    
+    #회사명조회
+    company_service = Sys01CompanyService(db)
+    sys01_company  = await company_service.get(company.ifi01_company_id)
+    resp.sys01_company_nm =  sys01_company.sys01_company_nm if sys01_company else ""
+    #Service Name조회
+    code_service = CodeService(db)
+    service_nm = await code_service.get_name('ApiServiceCode',company.ifi01_service_cd)
+    resp.ifi01_service_nm = service_nm
+    
     return resp
 
 
@@ -79,11 +88,20 @@ async def register(company: Ifi01CompanyApiCreate, db: AsyncSession = Depends(ge
     dict.update({'ifi01_app_key': app_key})
     new_company = await service01.create_company_api(dict)
 
-    # 응답으로 Pydantic CompanyResponse 모델 반환
+    # 회사명 조회
+    company_service = Sys01CompanyService(db)
+    sys01_company  = await company_service.get(new_company.ifi01_company_id)
+    company_name = sys01_company.sys01_company_nm if sys01_company else ""
+    #Service Name조회
+    code_service = CodeService(db)
+    service_nm = await code_service.get_name('ApiServiceCode',company.ifi01_service_cd)
+    
     resp = Ifi01CompanyApiResponse (
         ifi01_company_api_id=new_company.ifi01_company_api_id,
         ifi01_company_id=new_company.ifi01_company_id,
+        sys01_company_nm = company_name,
         ifi01_service_cd=new_company.ifi01_service_cd,
+        ifi01_service_nm=service_nm,
         ifi01_start_date=new_company.ifi01_start_date,
         ifi01_close_date=new_company.ifi01_close_date,
         ifi01_app_key=app_key,
@@ -111,6 +129,7 @@ async def register(company_api_id:int, company: Ifi01CompanyApiCreate, db: Async
     logger.info(f"업데이트 회사 정보: {dict}")
     updated_company = await service.update_company_api(company_api_id, dict)
 
+
     # 응답으로 Pydantic CompanyResponse 모델 반환
     resp = Ifi01CompanyApiResponse(
         ifi01_company_api_id=updated_company.ifi01_company_api_id,
@@ -123,5 +142,17 @@ async def register(company_api_id:int, company: Ifi01CompanyApiCreate, db: Async
         ifi01_created_date=updated_company.ifi01_created_date,
         ifi01_update_date =  updated_company.ifi01_update_date
     )
+    #회사명조회
+    company_service = Sys01CompanyService(db)
+    sys01_company  = await company_service.get(updated_company.ifi01_company_id)
+    company_nm = sys01_company.sys01_company_nm if sys01_company else ""
+    resp.sys01_company_nm = company_nm
+    
+    #Service Name조회
+    code_service = CodeService(db)
+    service_nm = await code_service.get_name('ApiServiceCode',company.ifi01_service_cd)
+    resp.ifi01_service_nm = service_nm
+    
     logger.info(f"업데이트 회사 : {resp}")
+    
     return resp    
