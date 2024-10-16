@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from backend.app.domain.ifi96.ifi96_file_layout_model import Ifi96FileLayout
-from backend.app.domain.ifi96.ifi96_file_layout_schema import Ifi96FileLayoutCreate
+from backend.app.domain.ifi.ifi96.ifi96_file_layout_model import Ifi96FileLayout
+from backend.app.domain.ifi.ifi96.ifi96_file_layout_schema import Ifi96FileLayoutCreate
 
 class Ifi96FileLayoutService:
     def __init__(self, db: AsyncSession):

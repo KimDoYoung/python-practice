@@ -71,7 +71,7 @@ class Sys09CodeCreate(Sys09CodeBase):
 class Sys09CodeUpdate(Sys09CodeBase):
     pass  # 코드 업데이트 시 필요한 스키마
 
-class Sys09CodeOut(Sys09CodeBase):
+class Sys09CodeResponse(Sys09CodeBase):
     sys09_code_id: int  # 코드 ID (응답 시 포함되는 필드)
 
     class Config:

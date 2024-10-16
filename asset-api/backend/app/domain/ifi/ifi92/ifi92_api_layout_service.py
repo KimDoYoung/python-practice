@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from backend.app.domain.ifi92.ifi92_api_layout_model import Ifi92ApiLayout
-from backend.app.domain.ifi92.ifi92_api_layout_schema import Ifi92ApiLayoutCreate
+from backend.app.domain.ifi.ifi92.ifi92_api_layout_model import Ifi92ApiLayout
+from backend.app.domain.ifi.ifi92.ifi92_api_layout_schema import Ifi92ApiLayoutCreate
 
 class Ifi92ApiLayoutService:
     def __init__(self, db: AsyncSession):

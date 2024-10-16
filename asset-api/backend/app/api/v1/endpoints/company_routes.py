@@ -22,8 +22,9 @@ from backend.app.core.database import get_session
 from backend.app.core.security import generate_app_key, secret_key_encrypt
 from backend.app.domain.ifi.ifi01.ifi01_company_api_schema import Ifi01CompanyApiCreate, Ifi01CompanyApiResponse
 from backend.app.domain.ifi.ifi01.ifi01_company_api_service import Ifi01CompanyApiService
-from backend.app.domain.ifi.ifi91.ifi91_config_api_schema import Ifi91ConfigApiResponse
-from backend.app.domain.ifi.ifi91.ifi91_config_api_service import Ifi91ConfigApiService
+from backend.app.domain.sys.sys01.code_service import CodeService
+from backend.app.domain.sys.sys01.sys01_company_schema import Sys09CodeResponse
+
 logger = get_logger(__name__)
 
 router = APIRouter()
@@ -57,12 +58,12 @@ async def delete(company_api_id:int,  db: AsyncSession = Depends(get_session)):
     resp =  Ifi01CompanyApiResponse.model_validate(deleted_company)
     return resp
     
-@router.get("/services",  response_model=List[Ifi91ConfigApiResponse])
-async def services(db: AsyncSession = Depends(get_session)):
-    ''' 서비스 목록 조회-view '''
-    service = Ifi91ConfigApiService(db)
-    services = await service.get_all()
-    return [Ifi91ConfigApiResponse.model_validate(service) for service in services]
+@router.get("/code/{category}",  response_model=List[Sys09CodeResponse])
+async def services(category:str, db: AsyncSession = Depends(get_session)):
+    ''' 코드 서비스 목록 조회-view '''
+    service = CodeService(db)
+    code_list = await service.get_code_by_category(category)
+    return [Sys09CodeResponse.model_validate(code) for code in code_list]
 
 
 @router.post("/register",  response_model=Ifi01CompanyApiResponse)

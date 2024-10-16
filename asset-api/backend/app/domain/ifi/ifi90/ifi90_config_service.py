@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from backend.app.domain.ifi90.ifi90_config_model import Ifi90Config
-from backend.app.domain.ifi90.ifi90_config_schema import Ifi90ConfigCreate
+from backend.app.domain.ifi.ifi90.ifi90_config_model import Ifi90Config
+from backend.app.domain.ifi.ifi90.ifi90_config_schema import Ifi90ConfigCreate
 
 class Ifi90ConfigService:
     def __init__(self, db: AsyncSession):

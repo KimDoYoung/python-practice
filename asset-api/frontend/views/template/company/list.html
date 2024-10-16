@@ -61,7 +61,7 @@ $( document ).ready(function() {
         try {
             debugger;
             // 먼저 /api/v1/services 호출
-            const servicesData = await getFetch('/api/v1/company/services');
+            const servicesData = await getFetch('/api/v1/company/code/ApiServiceCode');
             console.log('Services Data:', servicesData);
             gServiceCodes = servicesData;  // gServiceCodes 배열에 저장
 
@@ -69,10 +69,14 @@ $( document ).ready(function() {
             const companyData = await getFetch('/api/v1/company');
             console.log('Company Data:', companyData);
             gList = companyData;  // gList에 저장
+            if( gList.length == 0) {
+                showAlertMessage('조회된 데이터가 없습니다');
+                return;
+            }
             //gList를 돌면서 ifi01_service_cd에 해당하는 서비스명을 찾아서 ifi01_service_nm에 저장 
             gList.forEach(item => {
-                const service = gServiceCodes.find(service => service.ifi91_config_api_id === item.ifi01_service_cd);
-                item.ifi01_config_api_nm = service ? service.ifi91_api_nm : '';
+                const service = gServiceCodes.find(service => service.ifi91_config_api_id === item.sys09_code);
+                item.ifi01_config_api_nm = service ? service.sys09_name : '';
             });   
             // 테이블 생성 함수 호출
             makeTable();

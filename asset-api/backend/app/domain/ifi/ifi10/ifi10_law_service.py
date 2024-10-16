@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from backend.app.domain.ifi10.ifi10_law_model import Ifi10Law
-from backend.app.domain.ifi10.ifi10_law_schema import Ifi10LawCreate
+from backend.app.domain.ifi.ifi10.ifi10_law_model import Ifi10Law
+from backend.app.domain.ifi.ifi10.ifi10_law_schema import Ifi10LawCreate
 
 class Ifi10LawService:
     def __init__(self, db: AsyncSession):

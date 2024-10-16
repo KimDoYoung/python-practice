@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from backend.app.domain.ifi11.ifi11_law_record_model import Ifi11LawRecord
-from backend.app.domain.ifi11.ifi11_law_record_schema import Ifi11LawRecordCreate
+from backend.app.domain.ifi.ifi11.ifi11_law_record_model import Ifi11LawRecord
+from backend.app.domain.ifi.ifi11.ifi11_law_record_schema import Ifi11LawRecordCreate
 
 class Ifi11LawRecordService:
     def __init__(self, db: AsyncSession):

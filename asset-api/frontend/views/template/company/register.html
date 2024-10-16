@@ -127,15 +127,15 @@ $( document ).ready(function() {
     document.getElementById('ifi01_start_date').valueAsDate = new Date();
     function initialize() {
         //서비스 목록을 가져온다.
-        getFetch('/api/v1/company/services').then(data => {
+        getFetch('/api/v1/company/code/ApiServiceCode').then(data => {
             console.log(data);
             //#ifi01_service_cd의 옵션을 모두 지우고 새로운 옵션을 추가한다.
             $('#ifi01_service_cd').empty();
             //data에 있는 서비스 목록을 option으로 만들어서 select box에 추가한다.
             service_list = [];
             data.forEach(service => {
-                $('#ifi01_service_cd').append(`<option value="${service.ifi91_config_api_id}">${service.ifi91_api_nm}</option>`);
-                service_list.push({ifi91_config_id:service.ifi91_config_api_id, ifi91_api_nm:service.ifi91_api_nm});
+                $('#ifi01_service_cd').append(`<option value="${service.sys09_code}">${service.sys09_name}</option>`);
+                service_list.push({ifi91_config_id:service.sys09_code, ifi91_api_nm:service.sys09_name});
             });
 
         }).catch(error=> {
