@@ -3,13 +3,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.domain.ifi.ifi10.ifi10_law_model import Ifi10Law
 from backend.app.domain.ifi.ifi10.ifi10_law_schema import Ifi10LawResponse
-from backend.app.domain.service.law.law_schema import Law010_Response
+from backend.app.domain.service.law.law_schema import Law010_Request, Law010_Response
 
 class LawService:
     def __init__(self, db: AsyncSession):
         self.db = db
     
-async def run_r010(self, start_idx: int, limit: int) -> Law010_Response:
+async def run_r010(self, req: Law010_Request) -> Law010_Response:
+    
+    start_idx = req.conti_start_idx
+    limit = req.conti_limit
+    conti_yn = req.conti_yn # 연속 조회 여부 쓸데가 없네.
     # limit + 1개만큼 조회해서 추가 데이터 존재 여부 확인 (exists_yn)
     stmt = (
         select(Ifi10Law)
