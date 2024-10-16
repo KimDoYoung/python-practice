@@ -4,7 +4,7 @@ from typing import Optional
 
 class Ifi01CompanyApiBase(BaseModel):
     ifi01_company_id: int
-    ifi01_config_api_id: int
+    ifi01_service_cd: str
     ifi01_start_date: Optional[date] = None
     ifi01_close_date: Optional[date] = None
     ifi01_app_key: Optional[str] = None

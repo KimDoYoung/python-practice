@@ -37,7 +37,7 @@
                 <td>{{ifi01_update_date}}</td>
                 <td>
                     <button class="btnDelete btn btn-danger" data-company-api-id="{{ifi01_company_api_id}}"
-                        data-company-id="{{ifi01_company_id}}" data-config-api-id="{{ifi01_config_api_id}}">삭제</button>
+                        data-company-id="{{ifi01_company_id}}" data-config-api-id="{{ifi01_service_cd}}">삭제</button>
                     <a class="btn btn-success" href="/page?path=company/view&ifi01_company_api_id={{ifi01_company_api_id}}">상세</a>
                     <!-- <a class="btn btn-success" href="/page?path=company/token_test&app_key={{app_key}}">Token테스트</a> -->
                 </td>
@@ -69,9 +69,9 @@ $( document ).ready(function() {
             const companyData = await getFetch('/api/v1/company');
             console.log('Company Data:', companyData);
             gList = companyData;  // gList에 저장
-            //gList를 돌면서 ifi01_config_api_id에 해당하는 서비스명을 찾아서 ifi01_service_nm에 저장 
+            //gList를 돌면서 ifi01_service_cd에 해당하는 서비스명을 찾아서 ifi01_service_nm에 저장 
             gList.forEach(item => {
-                const service = gServiceCodes.find(service => service.ifi91_config_api_id === item.ifi01_config_api_id);
+                const service = gServiceCodes.find(service => service.ifi91_config_api_id === item.ifi01_service_cd);
                 item.ifi01_config_api_nm = service ? service.ifi91_api_nm : '';
             });   
             // 테이블 생성 함수 호출

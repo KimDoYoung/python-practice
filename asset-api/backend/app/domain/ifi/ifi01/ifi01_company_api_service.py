@@ -39,7 +39,7 @@ class Ifi01CompanyApiService:
         new_company_api = Ifi01CompanyApi(
             ifi01_company_api_id = company_api_id,
             ifi01_company_id = data['ifi01_company_id'],
-            ifi01_config_api_id = data['ifi01_config_api_id'],
+            ifi01_service_cd = data['ifi01_service_cd'],
             ifi01_start_date = data['ifi01_start_date'],
             ifi01_close_date = data['ifi01_close_date'],
             ifi01_app_key = data['ifi01_app_key'],

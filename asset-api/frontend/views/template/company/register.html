@@ -14,8 +14,8 @@
 
         <!-- Service Name (Select Box) -->
         <div class="mb-3">
-            <label for="ifi01_config_api_id" class="form-label">Service Id</label>
-            <select class="form-select" id="ifi01_config_api_id" name="ifi01_config_api_id" required>
+            <label for="ifi01_service_cd" class="form-label">Service Id</label>
+            <select class="form-select" id="ifi01_service_cd" name="ifi01_service_cd" required>
                 <option value="법률서비스">법률서비스</option>
             </select>
             <div class="form-text fst-italic">Select the service provided by the company.</div>
@@ -56,7 +56,7 @@
         </tr>
         <tr>
             <th>서비스명</th>
-            <td>{{ifi01_config_api_id}}</td>
+            <td>{{ifi01_service_cd}}</td>
         </tr>
         <tr>
             <th>시작일</th>
@@ -129,12 +129,12 @@ $( document ).ready(function() {
         //서비스 목록을 가져온다.
         getFetch('/api/v1/company/services').then(data => {
             console.log(data);
-            //#ifi01_config_api_id의 옵션을 모두 지우고 새로운 옵션을 추가한다.
-            $('#ifi01_config_api_id').empty();
+            //#ifi01_service_cd의 옵션을 모두 지우고 새로운 옵션을 추가한다.
+            $('#ifi01_service_cd').empty();
             //data에 있는 서비스 목록을 option으로 만들어서 select box에 추가한다.
             service_list = [];
             data.forEach(service => {
-                $('#ifi01_config_api_id').append(`<option value="${service.ifi91_config_api_id}">${service.ifi91_api_nm}</option>`);
+                $('#ifi01_service_cd').append(`<option value="${service.ifi91_config_api_id}">${service.ifi91_api_nm}</option>`);
                 service_list.push({ifi91_config_id:service.ifi91_config_api_id, ifi91_api_nm:service.ifi91_api_nm});
             });
 
@@ -148,11 +148,11 @@ $( document ).ready(function() {
     $('form').submit(function(e){
         e.preventDefault();
         var ifi01_company_id = $('#ifi01_company_id').val();
-        var ifi01_config_api_id = $('#ifi01_config_api_id').val();
+        var ifi01_service_cd = $('#ifi01_service_cd').val();
         var ifi01_start_date = $('#ifi01_start_date').val();
         var ifi01_close_date = $('#ifi01_close_date').val();
         const url = '/api/v1/company/register';
-        const data = { ifi01_company_id : ifi01_company_id, ifi01_config_api_id : ifi01_config_api_id, ifi01_start_date : ifi01_start_date, ifi01_close_date : ifi01_close_date};
+        const data = { ifi01_company_id : ifi01_company_id, ifi01_service_cd : ifi01_service_cd, ifi01_start_date : ifi01_start_date, ifi01_close_date : ifi01_close_date};
         console.log(data)
         postFetch(url, data).then(response => {
             console.log(response);

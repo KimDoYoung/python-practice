@@ -47,7 +47,7 @@ async def generate_token(req: AuthRequest, db: AsyncSession = Depends(get_sessio
         raise HTTPException(status_code=404, detail="Company not found")
     
     app_secret_key = req.app_secret_key
-    data = f"{company.ifi01_company_id}|{company.ifi01_config_api_id}|{company.ifi01_start_date}"
+    data = f"{company.ifi01_company_id}|{company.ifi01_service_cd}|{company.ifi01_start_date}"
     
     app_secret_key_for_check = secret_key_encrypt(req.app_key, data)
     
@@ -55,12 +55,12 @@ async def generate_token(req: AuthRequest, db: AsyncSession = Depends(get_sessio
     if app_secret_key != app_secret_key_for_check:
         raise HTTPException(status_code=401, detail="Unauthorized secret key is not correct")
     
-    token = create_access_token(company.ifi01_company_api_id, company.ifi01_company_id, company.ifi01_config_api_id, str(company.ifi01_start_date), str(company.ifi01_close_date)) 
+    token = create_access_token(company.ifi01_company_api_id, company.ifi01_company_id, company.ifi01_service_cd, str(company.ifi01_start_date), str(company.ifi01_close_date)) 
     
     auth_resp = AuthResponse(
         company_api_id=str(company.ifi01_company_api_id),
         company_id=str(company.ifi01_company_id),
-        config_api_id=str(company.ifi01_config_api_id),
+        config_api_id=str(company.ifi01_service_cd),
         start_date=str(company.ifi01_start_date).replace('-', ''),
         close_date = str(company.ifi01_close_date).replace('-', ''),
         token=token

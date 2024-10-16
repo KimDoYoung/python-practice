@@ -42,7 +42,7 @@ async def info(company_api_id: int,  db: AsyncSession = Depends(get_session)):
     ''' 1개의 회사정보찾기-view '''
     service = Ifi01CompanyApiService(db)
     company = await service.get_company_api(company_api_id)
-    app_secret_key = secret_key_encrypt(company.ifi01_app_key, f"{company.ifi01_company_id}|{company.ifi01_config_api_id}|{company.ifi01_start_date}")
+    app_secret_key = secret_key_encrypt(company.ifi01_app_key, f"{company.ifi01_company_id}|{company.ifi01_service_cd}|{company.ifi01_start_date}")
     resp = Ifi01CompanyApiResponse.model_validate(company)
     resp.ifi01_app_secret_key = app_secret_key
     return resp
@@ -71,7 +71,7 @@ async def register(company: Ifi01CompanyApiCreate, db: AsyncSession = Depends(ge
     # app_key와 app_secret_key 생성 (고유한 값으로)
     service01 = Ifi01CompanyApiService(db)
     app_key = generate_app_key()
-    data = f"{company.ifi01_company_id}|{company.ifi01_config_api_id}|{company.ifi01_start_date}"
+    data = f"{company.ifi01_company_id}|{company.ifi01_service_cd}|{company.ifi01_start_date}"
     app_secret_key = secret_key_encrypt(app_key, data)
 
     dict = company.model_dump()
@@ -82,7 +82,7 @@ async def register(company: Ifi01CompanyApiCreate, db: AsyncSession = Depends(ge
     resp = Ifi01CompanyApiResponse (
         ifi01_company_api_id=new_company.ifi01_company_api_id,
         ifi01_company_id=new_company.ifi01_company_id,
-        ifi01_config_api_id=new_company.ifi01_config_api_id,
+        ifi01_service_cd=new_company.ifi01_service_cd,
         ifi01_start_date=new_company.ifi01_start_date,
         ifi01_close_date=new_company.ifi01_close_date,
         ifi01_app_key=app_key,
@@ -99,7 +99,7 @@ async def register(company_api_id:int, company: Ifi01CompanyApiCreate, db: Async
     # app_key와 app_secret_key 생성 (고유한 값으로)
     service = Ifi01CompanyApiService(db)
     app_key = generate_app_key()
-    data = f"{company.ifi01_company_id}|{company.ifi01_config_api_id}|{company.ifi01_start_date}"
+    data = f"{company.ifi01_company_id}|{company.ifi01_service_cd}|{company.ifi01_start_date}"
     app_secret_key = secret_key_encrypt(app_key, data)
 
     dict = company.model_dump()
@@ -114,7 +114,7 @@ async def register(company_api_id:int, company: Ifi01CompanyApiCreate, db: Async
     resp = Ifi01CompanyApiResponse(
         ifi01_company_api_id=updated_company.ifi01_company_api_id,
         ifi01_company_id=updated_company.ifi01_company_id,
-        ifi01_config_api_id=updated_company.ifi01_config_api_id,
+        ifi01_service_cd=updated_company.ifi01_service_cd,
         ifi01_start_date=updated_company.ifi01_start_date,
         ifi01_close_date=updated_company.ifi01_close_date,
         ifi01_app_key=app_key,

@@ -21,8 +21,8 @@
         <input type="text" class="form-control" id="ifi01_company_id" name="ifi01_company_id" value="{{ifi01_company_id}}" readonly>
     </div>
     <div class="mb-3">
-        <label for="ifi01_config_api_id" class="form-label">Service ID</label>
-        <input type="text" class="form-control" id="ifi01_config_api_id" name="ifi01_config_api_id" value="{{ifi01_config_api_id}}" readonly>
+        <label for="ifi01_service_cd" class="form-label">Service ID</label>
+        <input type="text" class="form-control" id="ifi01_service_cd" name="ifi01_service_cd" value="{{ifi01_service_cd}}" readonly>
     </div>
     <div class="mb-3">
         <label for="ifi01_start_date" class="form-label">Start date</label>
@@ -87,14 +87,14 @@ $( document ).ready(function() {
         const ifi01_company_api_id = $('#ifi01_company_api_id').val();
         const url = `/api/v1/company/re-register/${ifi01_company_api_id}`;
         const ifi01_company_id = $('#ifi01_company_id').val();
-        const ifi01_config_api_id = $('#ifi01_config_api_id').val();
+        const ifi01_service_cd = $('#ifi01_service_cd').val();
         const ifi01_start_date = $('#ifi01_start_date').val();
         const ifi01_close_date = $('#ifi01_close_date').val();
         const ifi01_created_date = $('#ifi01_created_date').val();
 
         const data = {
             ifi01_company_id : ifi01_company_id,
-            ifi01_config_api_id : ifi01_config_api_id,
+            ifi01_service_cd : ifi01_service_cd,
             ifi01_start_date: ifi01_start_date,
             ifi01_close_date : ifi01_close_date
         }
