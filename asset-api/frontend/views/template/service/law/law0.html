@@ -1,0 +1,34 @@
+{% extends 'common/base.html' %}
+{% block style %}
+{% endblock %}
+{% block content %}
+<h1>법률서비스-테스트</h1>
+<button id="btnR010" class="btn btn-primary">/api/v1/law/r010</button>
+<div id="result-area">
+    <textarea name="result-textarea" id="result-textarea" cols="120" rows="10"></textarea>
+</div>
+{% raw %}
+<!--handlebar scripts-->
+{% endraw %}
+{% endblock %}
+{% block script %}
+{% raw %}
+<script>
+$( document ).ready(function() {
+    console.log( "ready!")
+    $("#btnR010").click(function(){
+        console.log("btnR010 clicked")
+        const url = "/api/v1/law/r010";
+        getFetch(url).then(data => {
+            console.log(data);
+            $("#result-textarea").val(JSON.stringify(data, null, 2));
+        }).catch(error=> {
+            console.error(error.message); 
+            showAlertError(error);
+            
+        });
+    });
+});
+</script>
+{% endraw %}
+{% endblock %}
