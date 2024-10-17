@@ -124,11 +124,13 @@ class LawService:
         return field_mapping
 
     async def run_r011_all(self, req: Law011_Request) -> Law010_Response:
+        start_ymd = req.modi_start_date
+        end_ymd = req.modi_end_date
         subquery = (
             select(Ifi11LawRecord.ifi11_class_tree_cd, Ifi11LawRecord.ifi11_deadline_id)
             .where(
                 Ifi11LawRecord.ifi11_dml_type.notin_(['DELETE']),
-                Ifi11LawRecord.ifi11_dml_date.between(func.to_date('20241001', 'YYYYMMDD'), func.to_date('20241101', 'YYYYMMDD'))
+                Ifi11LawRecord.ifi11_dml_date.between(func.to_date(start_ymd, 'YYYYMMDD'), func.to_date(end_ymd, 'YYYYMMDD'))
             )
             .subquery()
         )
@@ -165,11 +167,13 @@ class LawService:
     async def run_r011_paging(self, req: Law011_Request) -> Law010_Response:
         start_idx = req.conti_start_idx
         limit = req.conti_limit
+        start_ymd = req.modi_start_date
+        end_ymd = req.modi_end_date
         subquery = (
             select(Ifi11LawRecord.ifi11_class_tree_cd, Ifi11LawRecord.ifi11_deadline_id)
             .where(
                 Ifi11LawRecord.ifi11_dml_type.notin_(['DELETE']),
-                Ifi11LawRecord.ifi11_dml_date.between(func.to_date('20241001', 'YYYYMMDD'), func.to_date('20241101', 'YYYYMMDD'))
+                Ifi11LawRecord.ifi11_dml_date.between(func.to_date(start_ymd, 'YYYYMMDD'), func.to_date(end_ymd, 'YYYYMMDD'))
             )
             .subquery()
         )
