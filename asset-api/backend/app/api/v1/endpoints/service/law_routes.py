@@ -108,4 +108,6 @@ async def r011(
 
     logger.debug("======================================")
     logger.debug(f"Modified resp: {response_data}")
-    logger.debug("======================================")    
+    logger.debug("======================================") 
+    
+    return response_data    

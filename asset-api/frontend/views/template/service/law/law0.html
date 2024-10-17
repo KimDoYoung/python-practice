@@ -13,21 +13,74 @@
 </ul>
 <div class="tab-content" id="lawTabContent">
     <div class="tab-pane fade show active" id="tabR010" role="tabpanel" aria-labelledby="tab1-tab">
-
+        <!-- 법규정보 r010 탭영역 -->
         <div id="param-area-r010" class="mt-3 mb-3">
-            <!-- Tab 영역 태그는 ul이고 클래스는 nav와 nav-tabs를 설정한다. -->
-        
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="options-r010" id="allYes-r010" value="Y">
+                <label class="form-check-label" for="allYes-r010">전체 Y</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="options-r010" id="pagingNo-r010" value="N" checked>
+                <label class="form-check-label" for="pagingNo-r010">페이징 N</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <label for="start_idx_r010" class="form-label">Start Index</label>
+                <input type="number" id="start_idx_r010" class="form-control" value="0" step="1">
+            </div>
+            <div class="form-check form-check-inline">
+                <label for="limit_r010" class="form-label">Limit(조회갯수)</label>
+                <input type="number" id="limit_r010" class="form-control" value="10" step="5">
+            </div>
+        </div> <!-- param 영역 끝-->
+        <div id="button-area-r010">
+            url :<input type="text" id="url-r010" style="width:500px">
+            <button id="btnR010" class="btn btn-primary mb-3">/api/v1/law/r010</button>
         </div>
-        <button id="btnR010" class="btn btn-primary mb-3">/api/v1/law/r010</button>
         <div id="result-area-r010">
-            <textarea name="result-textarea-r010" id="result-textarea-r010" cols="120" rows="10"></textarea>
+            <textarea name="result-textarea-r010" id="result-textarea-r010" cols="120" rows="25"></textarea>
         </div>
         
     </div>
     <div class="tab-pane fade mb-3" id="tabR011" role="tabpanel" aria-labelledby="tab2-tab">
-        <button id="btnR011" class="btn btn-primary mt-3 mb-3">/api/v1/law/r011</button>
+        <!-- 변경법규정보 r011 탭영역 -->
+        <div id="param-area-r011" class="mt-3 mb-3">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="options-r011" id="allYes-r011" value="Y">
+                <label class="form-check-label" for="allYes-r011">전체 Y</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="options-r011" id="pagingNo-r011" value="N" checked>
+                <label class="form-check-label" for="pagingNo-r011">페이징 N</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <label for="start_idx_r011" class="form-label">Start Index</label>
+                <input type="number" id="start_idx_r011" class="form-control" value="0" step="1">
+            </div>
+            <div class="form-check form-check-inline">
+                <label for="limit_r011" class="form-label">Limit(조회갯수)</label>
+                <input type="number" id="limit_r011" class="form-control" value="10" step="5">
+            </div>
+
+            <div class="row">
+                <!-- 시작일자 -->
+                <div class="col-md-6">
+                  <label for="start_date" class="form-label">시작일자</label>
+                  <input type="date" id="start_date" class="form-control">
+                </div>
+            
+                <!-- 종료일자 (기본값: 오늘 날짜) -->
+                <div class="col-md-6">
+                  <label for="end_date" class="form-label">종료일자</label>
+                  <input type="date" id="end_date" class="form-control">
+                </div>
+              </div>            
+        </div>
+        <div id="button-area-r011">
+            <input type="text" id="url-r011" style="width:800px">
+            <button id="btnR011" class="btn btn-primary mt-3 mb-3">/api/v1/law/r011</button>
+        </div>
         <div id="result-area-r011">
-            <textarea name="result-textarea-r011" id="result-textarea-r011" cols="120" rows="10"></textarea>
+            <textarea name="result-textarea-r011" id="result-textarea-r011" cols="120" rows="25"></textarea>
         </div>
     </div>
 </div>
@@ -41,9 +94,72 @@
 <script>
 $( document ).ready(function() {
     console.log( "ready!")
+    function getTodayDate() {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    // 종료일자의 기본값을 오늘 날짜로 설정
+    document.getElementById('end_date').value = getTodayDate();    
+    document.getElementById('start_date').value = getTodayDate();    
+    makeUrl_r010();
+    makeUrl_r011();
+
+    //r010  전체Y 선택시 start_idx_r010, limit_r010 비활성화
+    $("input[name='options-r010']").change(function() {
+        console.log("Radio button options-r010 changed");
+        if (this.value === 'Y') {
+            $("#start_idx_r010").prop('disabled', true);
+            $("#limit_r010").prop('disabled', true);
+        } else {
+            $("#start_idx_r010").prop('disabled', false);
+            $("#limit_r010").prop('disabled', false);
+        }
+        makeUrl_r010();
+    });
+    //r011  전체Y 선택시 start_idx_r011, limit_r011 비활성화
+    $("input[name='options-r011']").change(function() {
+        console.log("Radio button options-r011 changed");
+        if (this.value === 'Y') {
+            $("#start_idx_r011").prop('disabled', true);
+            $("#limit_r011").prop('disabled', true);
+        } else {
+            $("#start_idx_r011").prop('disabled', false);
+            $("#limit_r011").prop('disabled', false);
+        }
+        makeUrl_r011();
+    });
+
+    function makeUrl_r010(){
+        const all_yn = $("input[name='options-r010']:checked").val();
+        const start_idx = $("#start_idx_r010").val();
+        const limit = $("#limit_r010").val();
+        const url = `/api/v1/law/r010?all_yn=${all_yn}&conti_start_idx=${start_idx}&conti_limit=${limit}`;
+        $('#url-r010').val(url);
+    }
+    function makeUrl_r011(){
+        const all_yn = $("input[name='options-r011']:checked").val();
+        const start_idx = $("#start_idx_r011").val();
+        const limit = $("#limit_r011").val();
+        const start_date = $("#start_date").val().replace(/-/g, '');
+        const end_date = $("#end_date").val().replace(/-/g, '');
+        const url = `/api/v1/law/r011?all_yn=${all_yn}&conti_start_idx=${start_idx}&conti_limit=${limit}&start_date=${start_date}&end_date=${end_date}`;
+        $('#url-r011').val(url);
+    }
+
+    $('#start_idx_r010, #limit_r010').change(function(){
+        makeUrl_r010();
+    });
+    $('#start_idx_r011, #limit_r011').change(function(){
+        makeUrl_r011();
+    });
     $("#btnR010").click(function(){
         console.log("btnR010 clicked")
-        const url = "/api/v1/law/r010";
+        let url = $('#url-r010').val();
+        $('#req-url-r010').text(url);
         getFetch(url).then(data => {
             console.log(data);
             $("#result-textarea-r010").val(JSON.stringify(data, null, 2));
@@ -54,8 +170,8 @@ $( document ).ready(function() {
         });
     });
     $('#btnR011').click(function(){
-        console.log("btnR011 clicked")
-        const url = "/api/v1/law/r011";
+        console.log("btnR011 clicked")        
+        const url = $('#url-r011').val();
         getFetch(url).then(data => {
             console.log(data);
             $("#result-textarea-r011").val(JSON.stringify(data, null, 2));

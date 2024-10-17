@@ -13,10 +13,6 @@ class LawService:
 
     async def run_r010_all(self, req: Law010_Request) -> Law010_Response:
         ''' r010 법큐정보 조회 (전체) '''
-        all_yn = req.all_yn # 전체조회
-        if all_yn == "Y":
-            return await self.run_r010_all(req)
-        # limit + 1개만큼 조회해서 추가 데이터 존재 여부 확인 (exists_yn)
         stmt = (
             select(Ifi10Law)
             .order_by(Ifi10Law.ifi10_law_cd, Ifi10Law.ifi10_deadline_id)  # 정렬 조건
@@ -204,7 +200,7 @@ class LawService:
             law_response.exists_yn = "N"
 
         if rows:
-            law_response.conti_last_idx =  len(rows) - 1
+            law_response.conti_last_idx =  start_idx + len(rows) - 1
 
         # 조회된 데이터를 Ifi10Law_Response로 변환하여 output에 추가
         law_response.output = [Ifi10Law_Response(**row.__dict__) for row in rows]
