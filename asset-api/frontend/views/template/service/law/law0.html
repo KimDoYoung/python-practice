@@ -3,10 +3,35 @@
 {% endblock %}
 {% block content %}
 <h1>법률서비스-테스트</h1>
-<button id="btnR010" class="btn btn-primary">/api/v1/law/r010</button>
-<div id="result-area">
-    <textarea name="result-textarea" id="result-textarea" cols="120" rows="10"></textarea>
+<ul class="nav nav-tabs" id="lawTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="tab1-tab" data-bs-toggle="tab" data-bs-target="#tabR010" type="button" role="tab" aria-controls="tab1" aria-selected="true">법규정보</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab2-tab" data-bs-toggle="tab" data-bs-target="#tabR011" type="button" role="tab" aria-controls="tab2" aria-selected="false">변경법규</button>
+    </li>
+</ul>
+<div class="tab-content" id="lawTabContent">
+    <div class="tab-pane fade show active" id="tabR010" role="tabpanel" aria-labelledby="tab1-tab">
+
+        <div id="param-area-r010" class="mt-3 mb-3">
+            <!-- Tab 영역 태그는 ul이고 클래스는 nav와 nav-tabs를 설정한다. -->
+        
+        </div>
+        <button id="btnR010" class="btn btn-primary mb-3">/api/v1/law/r010</button>
+        <div id="result-area-r010">
+            <textarea name="result-textarea-r010" id="result-textarea-r010" cols="120" rows="10"></textarea>
+        </div>
+        
+    </div>
+    <div class="tab-pane fade mb-3" id="tabR011" role="tabpanel" aria-labelledby="tab2-tab">
+        <button id="btnR011" class="btn btn-primary mt-3 mb-3">/api/v1/law/r011</button>
+        <div id="result-area-r011">
+            <textarea name="result-textarea-r011" id="result-textarea-r011" cols="120" rows="10"></textarea>
+        </div>
+    </div>
 </div>
+
 {% raw %}
 <!--handlebar scripts-->
 {% endraw %}
@@ -21,7 +46,19 @@ $( document ).ready(function() {
         const url = "/api/v1/law/r010";
         getFetch(url).then(data => {
             console.log(data);
-            $("#result-textarea").val(JSON.stringify(data, null, 2));
+            $("#result-textarea-r010").val(JSON.stringify(data, null, 2));
+        }).catch(error=> {
+            console.error(error.message); 
+            showAlertError(error);
+            
+        });
+    });
+    $('#btnR011').click(function(){
+        console.log("btnR011 clicked")
+        const url = "/api/v1/law/r011";
+        getFetch(url).then(data => {
+            console.log(data);
+            $("#result-textarea-r011").val(JSON.stringify(data, null, 2));
         }).catch(error=> {
             console.error(error.message); 
             showAlertError(error);

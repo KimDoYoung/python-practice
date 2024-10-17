@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import Optional
 from decimal import Decimal
 
-class Ifi10LawResponse(BaseModel):
+class Ifi10Law_Response(BaseModel):
     ifi10_law_id: Decimal  # 법규정보ID(PK)
     ifi10_law_cd: Optional[str]  # 법규코드(ics01_class_tree_cd)
     ifi10_law_nm: Optional[str]  # 법규명
@@ -28,5 +28,5 @@ class Ifi10LawResponse(BaseModel):
     ifi10_deadline_id: Optional[Decimal]  # 기한ID(sch03_deadline_id)
 
     class Config:
-        orm_mode = True  # 반드시 orm_mode를 활성화해야 함
+        orm_mode = True  # 반드시 orm_mode 활성화
         from_attributes = True  # from_orm 사용을 위한 설정 추가
