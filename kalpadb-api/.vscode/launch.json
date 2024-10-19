@@ -15,12 +15,12 @@
             // "env": {"PYTHONPATH": "${workspaceFolder}"}       
         },
         {
-            "name": "Debug-Lucy",
+            "name": "Api-server",
             "type": "debugpy",
             "request": "launch",
             "module": "uvicorn",
             "args": [
-                "main:app",
+                "app.main:app",
                 "--reload",
                 "--port", 
                 "8088" // 원하는 포트 번호로 변경

@@ -13,5 +13,7 @@ class DiaryResponse(BaseModel):
     content: str | None = None  # 내용
     summary: str | None = None  # 요약
 
-    class Config:
-        orm_mode = True  # ORM과의 호환을 위해 설정
+    model_config = {
+        'from_attributes': True  # ORM 모드 활성화
+    }
+

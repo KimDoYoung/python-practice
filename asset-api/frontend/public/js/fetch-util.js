@@ -21,7 +21,11 @@ class LucyError extends Error {
  * @param {Object} [data] - 요청에 포함할 데이터 (옵션)
  * @returns {Promise<Object>} - 응답 데이터
  */
-async function callLucyApi(url, method, data = null) {
+async function callLucyApi(url, method, data = null, jwt_token=null) {
+    
+    if (jwt_token) {
+        localStorage.setItem('lucy_token', jwt_token);
+    }
     const token = localStorage.getItem('lucy_token');
 
     try {
@@ -81,8 +85,8 @@ async function callLucyApi(url, method, data = null) {
  * @param {string} url - 요청할 URL
  * @returns {Promise<Object>} - 응답 데이터
  */
-async function getFetch(url) {
-    return callLucyApi(url, 'GET');
+async function getFetch(url, token=null) {
+    return callLucyApi(url, 'GET', null, token);
 }
 
 /**
@@ -92,8 +96,8 @@ async function getFetch(url) {
  * @param {Object} data - 요청에 포함할 데이터
  * @returns {Promise<Object>} - 응답 데이터
  */
-async function postFetch(url, data) {
-    return callLucyApi(url, 'POST', data);
+async function postFetch(url, data, token=null) {
+    return callLucyApi(url, 'POST', data, token);
 }
 
 /**
@@ -103,8 +107,8 @@ async function postFetch(url, data) {
  * @param {Object} data - 요청에 포함할 데이터
  * @returns {Promise<Object>} - 응답 데이터
  */
-async function putFetch(url, data) {
-    return callLucyApi(url, 'PUT', data);
+async function putFetch(url, data, token=null) {
+    return callLucyApi(url, 'PUT', data, token);
 }
 
 /**
@@ -114,8 +118,8 @@ async function putFetch(url, data) {
  * @param {Object} data - 요청에 포함할 데이터
  * @returns {Promise<Object>} - 응답 데이터
  */
-async function deleteFetch(url, data) {
-    return callLucyApi(url, 'DELETE', data);
+async function deleteFetch(url, data, token=null) {
+    return callLucyApi(url, 'DELETE', data, token);
 }
 
 /**

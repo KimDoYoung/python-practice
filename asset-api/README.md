@@ -4,6 +4,14 @@
 
 - api.kfs.co.kr/asset-erp/v1/get-auth
 
+## 코드
+
+```sql
+select * from sys09_code 
+where sys09_code_kind_id in ( select sys08_code_kind_id from sys08_code_kind 
+                               where sys08_kind_cd = 'ApiServiceCode');
+```
+
 ## table
 
 - localhost, kdy987/kalpa987! 로 접속 테스트

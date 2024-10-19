@@ -33,6 +33,7 @@ def set_routes(app: FastAPI):
 def set_event_handlers(app: FastAPI):
     ''' 이벤트 핸들러 설정 '''
     pass
+    
 def set_static_files(app: FastAPI):
     ''' 정적 파일 설정 '''
     pass

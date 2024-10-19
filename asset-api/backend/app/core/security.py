@@ -23,8 +23,6 @@ from jose import ExpiredSignatureError, JWTError, jwt
 from typing import Optional
 
 from backend.app.core.settings import config
-from backend.app.domain.company.company_service import get_company
-from backend.app.core.database import get_session
 
 def generate_app_key(length: int = 64) -> str:
     """랜덤으로 영문 대소문자와 숫자를 조합한 app_key 생성"""
@@ -50,7 +48,7 @@ def secret_key_decrypt(key, encrypted_data):
     return decrypted.decode('utf-8')
 
 
-def create_access_token(company_id: int, service_id: str, start_ymd: str, end_ymd: str) -> str:
+def create_access_token(company_api_id:int, company_id: int, service_cd: int, start_date: str, end_date: str) -> str:
     """
     JWT 토큰 생성
     :param data: 토큰에 포함할 추가 데이터 (예: 사용자 정보 등)
@@ -65,11 +63,14 @@ def create_access_token(company_id: int, service_id: str, start_ymd: str, end_ym
     current_time = datetime.now(timezone.utc)
     expire = current_time + timedelta(hours=ACCESS_TOKEN_EXPIRE_HOURS)
     # JWT에 담을 클레임 (payload)
+    start_date_ymd = start_date.replace('-', '')
+    end_date_ymd = end_date.replace('-', '')
     payload = {
-        "company_id": company_id,
-        "service_id": service_id,
-        "start_ymd": start_ymd,
-        "end_ymd" : end_ymd,
+        "company_api_id": str(company_api_id),
+        "company_id": str(company_id),
+        "service_cd": str(service_cd),
+        "start_date": start_date_ymd,
+        "close_date": end_date_ymd,
         "exp": expire
     }
     # app_secret_key를 시크릿 키로 사용하여 JWT 생성
@@ -85,7 +86,7 @@ def verify_access_token(token: str):
         jwt_secret_key = config.JWT_SECRET_KEY
         payload = jwt.decode(token, jwt_secret_key, algorithms=['HS256'])
 
-        if not is_date_valid(payload['start_ymd'], payload['end_ymd']):
+        if not is_date_valid(payload['start_date'], payload['close_date']):
             raise HTTPException(status_code=401, detail="Invalid date, service date over")
         
         return payload
@@ -97,12 +98,12 @@ def verify_access_token(token: str):
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
     
-def is_date_valid(start_ymd: str, end_ymd: str):
+def is_date_valid(start_date: str, close_date: str):
     '''날짜 유효성 검증, 오늘이 시작일과 종료일 사이에 있는지 확인'''
     current_time = datetime.now(timezone.utc)
     # 입력받은 날짜를 UTC의 aware datetime 객체로 변환
-    start_time = datetime.strptime(start_ymd, '%Y%m%d').replace(tzinfo=timezone.utc)
-    end_time = datetime.strptime(end_ymd, '%Y%m%d').replace(tzinfo=timezone.utc)
+    start_time = datetime.strptime(start_date, '%Y%m%d').replace(tzinfo=timezone.utc)
+    end_time = datetime.strptime(close_date, '%Y%m%d').replace(tzinfo=timezone.utc)
     if current_time < start_time or current_time > end_time:
         return False
     return True
@@ -135,22 +136,24 @@ async def get_current_company(request: Request) -> dict:
 
     if token is None:
         raise credentials_exception
-
+    company_dict = {}
     try:
         payload = verify_access_token(token)
         info: str = payload.get("service_info")
         if info is None:
             raise credentials_exception
         #{company_id}|{service_id}|{start_date}
-        company_id, service_id = info.split("|")
-        
+        company_api_id,company_id,service_cd,start_date,close_date,exp   = info.split("|")
+        company_dict = {
+            "company_api_id": company_api_id,
+            "company_id": company_id,
+            "service_cd": service_cd,
+            "start_date": start_date,
+            "close_date": close_date,
+            "exp": exp
+        }
+
     except JWTError:
         raise credentials_exception
-
-    current_company = await get_company(get_session(),company_id,service_id)
-    if current_company is None:
-        raise credentials_exception
-    
-    company_dict = current_company.to_dict()
 
     return company_dict

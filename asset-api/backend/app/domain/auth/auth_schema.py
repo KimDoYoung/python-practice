@@ -21,19 +21,21 @@ class AuthRequest(BaseModel):
         if not v or v.strip() == '':
             raise ValueError(f'{field.name} cannot be empty')
         return v
-    
+
 class AuthResponse(BaseModel):
-    company_id: int
-    service_id: str
-    start_ymd: str
-    end_ymd:str
+    company_api_id : str
+    company_id: str
+    service_cd: str
+    start_date: str
+    close_date:str
     token:str
 
 class AuthPayload(BaseModel):
-    company_id: int
-    service_id: str
-    start_ymd: str
-    end_ymd:str
+    company_api_id : str
+    company_id: str
+    service_cd: str
+    start_date: str
+    close_date:str
     exp: int
 
 class Authtoken(BaseModel):

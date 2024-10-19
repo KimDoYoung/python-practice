@@ -3,8 +3,7 @@
 {% endblock %}
 {% block content %}
 <div>
-    <input type="hidden" id="param_company_id" value="{{company_id}}">
-    <input type="hidden" id="param_service_id" value="{{service_id}}">    
+    <input type="hidden" id="param_ifi01_company_api_id" value="{{ifi01_company_api_id}}">
 </div>
 <div id="result-area">
 
@@ -13,39 +12,72 @@
 <!--handlebar scripts-->
 <script id="issue-template" type="text/x-handlebars-template">
     <h2 class="mb-4">OPEN API 발급현황(DB저장된 내용)</h2>
-    <div class="mb-3">
-        <label for="company_id" class="form-label">Company ID</label>
-        <input type="text" class="form-control" id="company_id" name="company_id" value="{{company_id}}" readonly>
+    <div class="row">
+        <div class="col-12 mb-3">
+            <label for="ifi01_company_api_id" class="form-label text-primary">Company API ID</label>
+            <input type="text" class="form-control" id="ifi01_company_api_id" name="ifi01_company_api_id" value="{{ifi01_company_api_id}}" readonly>
+        </div>
     </div>
-    <div class="mb-3">
-        <label for="service_id" class="form-label">Service ID</label>
-        <input type="text" class="form-control" id="service_id" name="service_id" value="{{service_id}}" readonly>
+    <div class="row">
+        <div class="col-6 mb-3">
+            <label for="ifi01_company_id" class="form-label text-primary">Company ID</label>
+            <input type="text" class="form-control" id="ifi01_company_id" name="ifi01_company_id" value="{{ifi01_company_id}}" readonly>
+        </div>
+        
+        <div class="col-6 mb-3">
+            <label for="sys01_company_nm" class="form-label text-primary">Company Name</label>
+            <input type="text" class="form-control" id="sys01_company_nm" name="sys01_company_nm" value="{{sys01_company_nm}}" readonly>
+        </div>
     </div>
-    <div class="mb-3">
-        <label for="start_ymd" class="form-label">Start date</label>
-        <input type="date" class="form-control" id="start_ymd" name="start_ymd" value="{{start_ymd}}"  >
+    <div class="row">
+        <div class="col-6 mb-3">
+            <label for="ifi01_service_cd" class="form-label text-primary">Service ID</label>
+            <input type="text" class="form-control" id="ifi01_service_cd" name="ifi01_service_cd" value="{{ifi01_service_cd}}" readonly>
+        </div>
+        <div class="col-6 mb-3">
+            <label for="ifi01_service_nm" class="form-label text-primary">Service Name</label>
+            <input type="text" class="form-control" id="ifi01_service_nm" name="ifi01_service_nm" value="{{ifi01_service_nm}}" readonly>
+        </div>
     </div>
-    <div class="mb-3">
-        <label for="end_ymd" class="form-label">End date</label>
-        <input type="date" class="form-control" id="end_ymd" name="end_ymd" value="{{end_ymd}}" >
+    <div class="row">
+        <div class="col-6 mb-3">
+            <label for="ifi01_start_date" class="form-label text-primary">Start date</label>
+            <input type="date" class="form-control" id="ifi01_start_date" name="ifi01_start_date" value="{{ifi01_start_date}}"  >
+        </div>
+        <div class="col-6 mb-3">
+            <label for="ifi01_close_date" class="form-label text-primary">Close date</label>
+            <input type="date" class="form-control" id="ifi01_close_date" name="ifi01_close_date" value="{{ifi01_close_date}}" >
+        </div>
     </div>
-    <div class="mb-3">
-        <label for="app_key" class="form-label">APP KEY</label>
-        <input type="text" class="form-control" id="app_key" name="app_key" value="{{app_key}}" readonly>
+    <div class="row">
+        <div class="col-12 mb-3">
+            <label for="ifi01_app_key" class="form-label text-primary">APP KEY</label>
+            <input type="text" class="form-control" id="ifi01_app_key" name="ifi01_app_key" value="{{ifi01_app_key}}" readonly>
+        </div>
     </div>
-    <div class="mb-3">
-        <label for="app_secret_key" class="form-label">APP SECRET KEY</label>
-        <input type="text" class="form-control" id="app_secret_key" name="app_secret_key" value="{{app_secret_key}}" readonly>
-        <p class="text-danger fst-italic">APP SECRET KEY는 db에 저장되어 있지 않습니다</p>
+    <div class="row">
+        <div class="col-12 mb-3">
+            <label for="ifi01_app_secret_key" class="form-label text-primary">APP SECRET KEY</label>
+            <input type="text" class="form-control" id="ifi01_app_secret_key" name="ifi01_app_secret_key" value="{{ifi01_app_secret_key}}" readonly>
+            <p class="text-danger fst-italic">APP SECRET KEY는 db에 저장되어 있지 않습니다</p>
+        </div>
     </div>
-    <div class="mb-3">
-        <label for="created_at" class="form-label">Create date time</label>
-        <input type="text" class="form-control" id="created_at" name="created_at" value="{{created_at}}" readonly>
+    <div class="row">
+        <div class="col-6 mb-3">
+            <label for="ifi01_created_date" class="form-label text-primary">Create date time</label>
+            <input type="text" class="form-control" id="ifi01_created_date" name="ifi01_created_date" value="{{ifi01_created_date}}" readonly>
+        </div>
+        <div class="col-6 mb-3">
+            <label for="ifi01_update_date" class="form-label text-primary">Update date time</label>
+            <input type="text" class="form-control" id="ifi01_update_date" name="ifi01_update_date" value="{{ifi01_update_date}}" readonly>
+        </div>
     </div>
-    <div class="mt-2">
-        <button id="btnReRegister" class="btn btn-primary">APP & SECRET KEY 재발급</button>
-        <button id="btnClipboard" class="btn btn-success">Copy to clipboard</button>
-        <button class="btn btn-secondary" onclick="location.href='/page?path=company/list'">리스트로 이동</button>
+    <div class="row">
+        <div class="col-12 mt-2">
+            <button id="btnReRegister" class="btn btn-primary">APP & SECRET KEY 재발급</button>
+            <button id="btnClipboard" class="btn btn-success">Copy to clipboard</button>
+            <button class="btn btn-secondary" onclick="location.href='/page?path=company/list'">리스트로 이동</button>
+        </div>
     </div>
 </script>
 {% endraw %}
@@ -54,41 +86,43 @@
 {% raw %}
 <script>
 $( document ).ready(function() {
-    const company_id = $('#param_company_id').val();
-    const service_id = $('#param_service_id').val();
+    const ifi01_company_api_id = $('#param_ifi01_company_api_id').val();
 
     function initialize(){
-        const url = `/api/v1/company/info/${company_id}/${service_id}`;
+        const url = `/api/v1/company/info/${ifi01_company_api_id}`;
         getFetch(url).then(data => {
             console.log(data); 
-            data.start_ymd = data.start_ymd.substring(0, 4)+'-'+data.start_ymd.substring(4, 6)+'-'+data.start_ymd.substring(6, 8);
-            data.end_ymd = data.end_ymd.substring(0, 4)+'-'+data.end_ymd.substring(4, 6)+'-'+data.end_ymd.substring(6, 8);
+            // data.start_ymd = data.start_ymd.substring(0, 4)+'-'+data.start_ymd.substring(4, 6)+'-'+data.start_ymd.substring(6, 8);
+            // data.end_ymd = data.end_ymd.substring(0, 4)+'-'+data.end_ymd.substring(4, 6)+'-'+data.end_ymd.substring(6, 8);
 
             const html = makeHtmlWithTemplate('issue-template', data);
             $('#result-area').html(html);
         });
     }
     initialize();
-    //copy to clipboard
+    //copy to clipboard 클립보드 복사
     $("#result-area").on("click", "#btnClipboard", function() {
-        const app_key = $('#app_key').val();
-        const app_secret_key = $('#app_secret_key').val();
+        const app_key = $('#ifi01_app_key').val();
+        const app_secret_key = $('#ifi01_app_secret_key').val();
         const text = `APP KEY : [${app_key}]\nAPP SECRET KEY : [${app_secret_key}]`;
         copyToClipboard(text, "APP KEY & SECRET KEY 복사 완료");
     });
+    //키재발급
     $("#result-area").on("click", "#btnReRegister", function() {
         //APP KEY & SECRET KEY 재발급
-        const url = `/api/v1/company/re-register`;
-        const company_id = $('#company_id').val();
-        const service_id = $('#service_id').val();
-        const start_ymd = $('#start_ymd').val().replace(/\D/g, '');
-        const end_ymd = $('#end_ymd').val().replace(/\D/g, '');
+        const ifi01_company_api_id = $('#ifi01_company_api_id').val();
+        const url = `/api/v1/company/re-register/${ifi01_company_api_id}`;
+        const ifi01_company_id = $('#ifi01_company_id').val();
+        const ifi01_service_cd = $('#ifi01_service_cd').val();
+        const ifi01_start_date = $('#ifi01_start_date').val();
+        const ifi01_close_date = $('#ifi01_close_date').val();
+        const ifi01_created_date = $('#ifi01_created_date').val();
 
         const data = {
-            company_id : company_id,
-            service_id : service_id,
-            start_ymd : start_ymd,
-            end_ymd : end_ymd
+            ifi01_company_id : ifi01_company_id,
+            ifi01_service_cd : ifi01_service_cd,
+            ifi01_start_date: ifi01_start_date,
+            ifi01_close_date : ifi01_close_date
         }
         postFetch(url, data).then(response => {
             console.log(response);

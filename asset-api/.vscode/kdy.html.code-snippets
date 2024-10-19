@@ -72,5 +72,47 @@
             "{% endraw %}",
             "{% endblock %}",            
         ]
-    }
+    },
+    "부트스트랩 tab":{
+        "prefix":"myTab",
+        "body":[
+        "<ul class=\"nav nav-tabs\" id=\"lawTab\" role=\"tablist\">",
+        "<li class=\"nav-item\" role=\"presentation\">",
+        "<button class=\"nav-link active\" id=\"tab1-tab\" data-bs-toggle=\"tab\" data-bs-target=\"#tabR010\" type=\"button\" role=\"tab\" aria-controls=\"tab1\" aria-selected=\"true\">법규정보</button>",
+        "</li>",
+        "<li class=\"nav-item\" role=\"presentation\">",
+        "<button class=\"nav-link\" id=\"tab2-tab\" data-bs-toggle=\"tab\" data-bs-target=\"#tabR011\" type=\"button\" role=\"tab\" aria-controls=\"tab2\" aria-selected=\"false\">변경법규</button>",
+        "</li>",
+        "</ul>",
+        "<div class=\"tab-content\" id=\"lawTabContent\">",
+        "<div class=\"tab-pane fade show active\" id=\"tabR010\" role=\"tabpanel\" aria-labelledby=\"tab1-tab\">",
+        "<div id=\"param-area-r010\" class=\"mt-5 mb-3\">",
+        "<!-- Tab 영역 태그는 ul이고 클래스는 nav와 nav-tabs를 설정한다. -->",
+        "</div>",
+        "<button id=\"btnR010\" class=\"btn btn-primary mb-3\">/api/v1/law/r010</button>",
+        "<div id=\"result-area-r010\">",
+        "<textarea name=\"result-textarea-r010\" id=\"result-textarea-r010\" cols=\"120\" rows=\"10\"></textarea>",
+        "</div>",
+        "</div>",
+        "<div class=\"tab-pane fade\" id=\"tabR011\" role=\"tabpanel\" aria-labelledby=\"tab2-tab\">",
+        "Content for Tab 2",
+        "</div>",
+        "</div>"
+        ],
+        "description":"부트스트랩 tab HTML만들기"
+    },
+    "부트스트랩 radio Horizontal":{
+        "prefix":"myRadio1",
+        "body":[
+        "<div class=\"form-check form-check-inline\">",
+        "<input class=\"form-check-input\" type=\"radio\" name=\"options-r010\" id=\"allYes-r010\" value=\"Y\">",
+        "<label class=\"form-check-label\" for=\"allYes-r010\">전체 Y</label>",
+        "</div>",
+        "<div class=\"form-check form-check-inline\">",
+        "<input class=\"form-check-input\" type=\"radio\" name=\"options-r010\" id=\"pagingNo-r010\" value=\"N\">",
+        "<label class=\"form-check-label\" for=\"pagingNo-r010\">페이징 N</label>",
+        "</div>"
+        ],
+        "description":"부트스트랩 radio Horizontal"
+    }    
 }

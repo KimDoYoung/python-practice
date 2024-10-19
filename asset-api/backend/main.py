@@ -9,6 +9,7 @@ from backend.app.core.jwtmiddleware import JWTAuthMiddleware
 from backend.app.api.v1.endpoints.home_routes import router as home_router
 from backend.app.api.v1.endpoints.company_routes import router as company_router
 from backend.app.api.v1.endpoints.auth_routes import router as auth_router
+from backend.app.api.v1.endpoints.service.law_routes import router as law_router
 
 logger = get_logger(__name__)
 
@@ -34,6 +35,8 @@ def set_routes(app: FastAPI):
     app.include_router(home_router) # 화면
     app.include_router(company_router, prefix="/api/v1/company", tags=["company"])
     app.include_router(auth_router, prefix="/api/v1/auth", tags=["auth"])
+    # service들
+    app.include_router(law_router, prefix="/api/v1/law", tags=["law"])
     
 def set_event_handlers(app: FastAPI):
     ''' 이벤트 핸들러 설정 '''

@@ -1,12 +1,14 @@
-{% extends 'common/base.html' %}
+{% extends 'common/base_fluid.html' %}
 {% block style %}
 {% endblock %}
 {% block content %}
-<h1>서비스 키 발급 리스트</h1>
-<div>
-    <a href="/page?path=company/register" class="btn btn-primary">API Service 등록</a>
+<div class="mx-5">
+    <h1>서비스 키 발급 리스트</h1>
+    <div>
+        <a href="/page?path=company/register" class="btn btn-primary">API Service 등록</a>
+    </div>
+    <div id="result-area"></div>
 </div>
-<div id="result-area"></div>
 {% raw %}
 <!--handlebar scripts-->
 <script id="list-template" type="text/x-handlebars-template">
@@ -14,12 +16,14 @@
         <thead>
             <tr>
                 <th>순번</th>
-                <th>회사 ID</th>
-                <th>서비스명</th>
+                <th>회사 Id</th>
+                <th>회사명</th>
+                <th>서비스Id</th>
                 <th>시작일</th>
                 <th>종료일</th>
                 <th>APP KEY</th>
                 <th>발급일시</th>
+                <th>최종수정일시</th>
                 <th>동작</th>
             </tr>
         </thead>
@@ -27,15 +31,18 @@
             {{#each list}}
             <tr>
                 <td>{{inc @index}}</td>
-                <td>{{company_id}}</td>
-                <td>{{service_id}}</td>
-                <td>{{displayYmd start_ymd}}</td>
-                <td>{{displayYmd end_ymd}}</td>
-                <td>{{truncate app_key 10}}</td>
-                <td>{{created_at}}</td>
+                <td>{{ifi01_company_id}}</td>
+                <td>{{sys01_company_nm}}</td>
+                <td>{{ifi01_service_nm}}</td>
+                <td>{{ifi01_start_date}}</td>
+                <td>{{ifi01_close_date}}</td>
+                <td>{{truncate ifi01_app_key 10}}</td>
+                <td>{{ifi01_created_date}}</td>
+                <td>{{ifi01_update_date}}</td>
                 <td>
-                    <button class="btnDelete btn btn-danger" data-company-id="{{company_id}}" data-service-nm="{{service_id}}">삭제</button>
-                    <a class="btn btn-success" href="/page?path=company/view&company_id={{company_id}}&service_id={{service_id}}">상세</a>
+                    <button class="btnDelete btn btn-danger" data-company-api-id="{{ifi01_company_api_id}}"
+                        data-company-id="{{ifi01_company_id}}" data-config-api-id="{{ifi01_service_cd}}">삭제</button>
+                    <a class="btn btn-success" href="/page?path=company/view&ifi01_company_api_id={{ifi01_company_api_id}}">상세</a>
                     <!-- <a class="btn btn-success" href="/page?path=company/token_test&app_key={{app_key}}">Token테스트</a> -->
                 </td>
             </tr>
@@ -54,15 +61,42 @@ $( document ).ready(function() {
         const html = makeHtmlWithTemplate('list-template', {list:gList});
         $('#result-area').html(html);
     }
-    function initialize() {
-        getFetch('/api/v1/company').then(data => {
-            console.log(data); 
-            gList = data;
+    async function initialize() {
+        try {
+            debugger;
+            // 먼저 /api/v1/services 호출
+            const servicesData = await getFetch('/api/v1/company/code/ApiServiceCode');
+            console.log('Services Data:', servicesData);
+            gServiceCodes = servicesData;  // gServiceCodes 배열에 저장
+
+            // services API가 완료된 후 /api/v1/company 호출
+            const companyData = await getFetch('/api/v1/company');
+            console.log('Company Data:', companyData);
+            gList = companyData;  // gList에 저장
+            if( gList.length == 0) {
+                showAlertMessage('조회된 데이터가 없습니다');
+                return;
+            }
+            //gList를 돌면서 ifi01_service_cd에 해당하는 서비스명을 찾아서 ifi01_service_nm에 저장 
+            gList.forEach(item => {
+                const service = gServiceCodes.find(service => service.ifi91_service_cd === item.sys09_code);
+                item.ifi01_service_nm = service ? service.sys09_name : '';
+            });   
+            // 테이블 생성 함수 호출
             makeTable();
-        }).catch(error=> {
+        } catch (error) {
+            // 에러 처리
             console.error(error.message);
             showAlertError(error);
-        });
+        }
+        // getFetch('/api/v1/company').then(data => {
+        //     console.log(data); 
+        //     gList = data;se
+        //     makeTable();
+        // }).catch(error=> {
+        //     console.error(error.message);
+        //     showAlertError(error);
+        // });
     }
     console.log( "발급현황 ready!")
     initialize();
@@ -79,16 +113,17 @@ $( document ).ready(function() {
             console.error(error.message);
         });
     });
+    //삭제버튼
     $("#result-area").on("click", ".btnDelete", function() {
         console.log("delete button clicked");
         const company_id = $(this).data('company-id');
-        const service_id = $(this).data('service-nm');
+        const service_id = $(this).data('config-api-id');
 
         if( confirm(`${company_id}-${service_id} 삭제하시겠습니까?`) == false) {
             return;
         }
-
-        const url = `/api/v1/company/delete/${company_id}/${service_id}`;
+        const company_api_id = $(this).data('company-api-id');
+        const url = `/api/v1/company/delete/${company_api_id}`;
         deleteFetch(url,{}).then(data => {
             console.log(data); 
             initialize();

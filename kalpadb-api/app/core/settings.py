@@ -26,11 +26,11 @@ class Settings:
         self.SERVICE_PORT = os.getenv('SERVICE_PORT', 8088)
         
         # DB 설정
-        self.DATABASE_URL = os.getenv('SERVICE_PORT', "")
+        self.DATABASE_URL = os.getenv('DATABASE_URL', "")
 
         # 로그 설정
         self.LOG_LEVEL = os.getenv('LOG_LEVEL', 'DEBUG')
-        self.LOG_FILE = os.getenv('LOG_FILE', 'c:/tmp/logs/assetapi/AssetApi_Mode.log')
+        self.LOG_FILE = os.getenv('LOG_FILE', 'c:/tmp/logs/kalpadbapi/kalpadb_api.log')
 
 
         # 로그 디렉토리 생성
