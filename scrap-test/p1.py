@@ -84,13 +84,19 @@ def get_hrefs(url):
     
     print(df['leech'].dtype)
     print("------------------------------------------------")
-    print(df[['leech', 'name']])
+    print(df[['leech', 'seed', 'name']])
     print("------------------------------------------------")
     # 공백 제거
     df['leech'] = df['leech'].str.strip()
-    # 특정 패턴의 문자열을 대체
     df['leech'] = df['leech'].apply(lambda x: re.sub(r'[^0-9]', '', x) if isinstance(x, str) else x)
     df['leech'] = pd.to_numeric(df['leech'], errors='coerce')
+
+    df['seed'] = df['seed'].str.strip()
+    df['seed'] = df['seed'].apply(lambda x: re.sub(r'[^0-9]', '', x) if isinstance(x, str) else x)
+    df['seed'] = pd.to_numeric(df['seed'], errors='coerce')
+
+
+
     # print(df['leech'].dtype)
     # print(df[['leech', 'name']])
 
@@ -98,7 +104,8 @@ def get_hrefs(url):
     #print(df[['leech', 'name']])
     # NaN 값을 포함하는 행 제거
     #df = df.dropna(subset=['leech'])    
-    df = df[df['leech'] >= 100]
+    # df = df[(df['leech'] >= 100) | (df['seed'] >= 100)]
+    df = df[ (df['leech'] + df['seed']) >= 100]
     # print(df[['leech', 'name']])
     # print(df['href'].to_list())
     # href_array = df['href'].to_list()
@@ -113,7 +120,7 @@ def main():
     baseUrl = os.getenv('P_URL')
 
     df_all = pd.DataFrame()
-    for i in range(0, 2):
+    for i in range(0, 3):
         url = f"{baseUrl}/search.php?q=user:Cristie65:{i}"
         new_df = get_hrefs(url)
         df_all = pd.concat([df_all, new_df], ignore_index=True)
