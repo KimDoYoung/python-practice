@@ -1,0 +1,102 @@
+{% extends 'common/base.html' %}
+{% block style %}
+<style>
+</style>
+{% endblock %}
+
+{% block content %}
+<section id="ipo-list" class="container">
+    <div id="button-area">
+        <a href="/scheduler/add" class="btn btn-primary">스케줄러 추가</a>
+        <a href="#" data-program-id="/api/v1/scheduler/run/scrap_judal" class="btnRun btn btn-success">주달Scrapping</a>
+        <a href="#" data-program-id="/api/v1/scheduler/run/site38_work" class="btnRun btn btn-warning">커뮤니케이션38(IPO) Scrapping</a>
+    </div>
+    <div id="table-area"></div>
+</section>
+{% raw %} 
+<script id="scheduler-table" type="text/x-handlebars-template">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Job Id</th>
+                <th scope="col">Job Name</th>
+                <th scope="col">Type</th>
+                <th scope="col">Run Time Or Cron</th>
+                <th scope="col">Func Name</th>
+                <th scope="col">Arguments</th>
+                <th scope="col">Running</th>
+                <th scope="col">Next Run Time</th>
+            </tr>
+        </thead>
+        <tbody>    
+    {{#each list}}
+    <tr>
+        <!-- job_list: [{'job_id': 'test_job', 'job_name': 'test1', 'job_type': 'cron', 'run_type': 'cron', 'func_name': 'test1', 
+        'args': ['Hello, World!'], 'cron': '*/5 * * * *', 'run_date': None, 'id': '6659b2d42d947ba0391d6b4d', 'is_running': True, 'next_run_time': '2024-05-31 20:51:00+09:00'} -->
+        
+        <td>{{inc @index}}</td>
+        <td>{{job_id}}</td>
+        <td>{{job_name}}</td>
+        <td>{{job_type}}/{{run_type}}</td>
+        <td>
+            {{#test "run_type == 'cron'" }}
+                {{cron}}
+            {{else}}
+                {{run_date}}
+            {{/test}}
+        </td>
+        <td>{{func_name}}</td>
+        <td>{{args}}</td>
+        <td>{{is_running}}</td>
+        <td>{{next_run_time}}</td>
+        <td>삭제</td>
+    </tr>
+    {{/each}}
+        </tbody>
+    </table>
+</script>
+{% endraw %}
+{% endblock %}
+
+
+
+{% block script %}
+{% raw %}
+<script>
+    $( document ).ready(function() {
+        console.log('scheduler list.... ');
+        async function initialize() {
+            getFetch('/api/v1/scheduler').then(data => {
+                console.log(data);
+                var source = $('#scheduler-table').html();
+                var template = Handlebars.compile(source);
+
+                var html = template({list: data});
+
+                $('#table-area').html(html);
+            });
+        }
+        initialize();
+        $('.btnRun').on('click', function(){
+            var programId = $(this).data('program-id');
+            console.log('programId: ', programId);
+            $.ajax({
+                url: programId,
+                type: 'GET',
+                success: function(data) {
+                    console.log('data: ', data);
+                    alert('성공');
+                },
+                error: function(err) {
+                    console.log('err: ', err);
+                    alert('실패' + err);
+                }
+            });
+        
+        })
+    });
+    </script>	
+    
+{% endraw %}
+{% endblock %}

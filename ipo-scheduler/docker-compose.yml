@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    container_name: ipo-scheduler
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongo
+    networks:
+      - ipo-network
+    environment:
+      - IPO_MODE=real
+    volumes:
+      - ./backend:/backend
+      - ./frontend:/frontend
+      - /home/kdy987/fastapi/ipo-scheduler/log:/log
+      - /etc/localtime:/etc/localtime:ro  # 호스트 시간대 설정 마운트      
+    restart: always  # 서버 재시작 시 항상 컨테이너를 재시작
+
+  mongo:
+    image: mongo:4.4
+    container_name: ipo-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - /home/kdy987/fastapi/mongodb:/data/db
+      - /root/fastapi-data/kdydata:/data/import
+      - /etc/localtime:/etc/localtime:ro  # 호스트 시간대 설정 마운트            
+    networks:
+      - ipo-network
+    command: >
+      bash -c "
+      mongod --bind_ip_all &
+      sleep 5 &&
+      if ! mongo stockdb --eval 'db.Config.findOne()'; then
+        mongoimport --host localhost --db stockdb --collection Config --file /data/import/stockdb.Config.json --jsonArray &&
+        mongoimport --host localhost --db stockdb --collection SchedulerJob --file /data/import/stockdb.SchedulerJob.json --jsonArray &&
+        mongoimport --host localhost --db stockdb --collection Users --file /data/import/stockdb.Users.json --jsonArray
+      fi &&
+      tail -f /dev/null
+      "
+    restart: always  # 서버 재시작 시 항상 컨테이너를 재시작  
+volumes:
+  mongo_data:
+
+networks:
+  ipo-network:

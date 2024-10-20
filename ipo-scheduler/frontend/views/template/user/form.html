@@ -1,0 +1,179 @@
+{% extends 'common/base.html' %}
+{% block style %}
+<style>
+</style>
+{% endblock %}
+
+{% block content %}
+<section id="list" class="container">
+    <h2 class="fw-bold">사용자정보</h2>
+    <form id="user-form">
+        <div class="row">
+            <div class="col-md-4">
+                <h4>기본정보</h4>
+                <div class="mb-3">
+                    <label for="user_id" class="form-label fw-bold">User ID</label>
+                    <input type="text" class="form-control" id="user_id" name="user_id" required readonly>
+                </div>
+        
+                <div class="mb-3">
+                    <label for="user_name" class="form-label  fw-bold">User Name</label>
+                    <input type="text" class="form-control" id="user_name" name="user_name" required>
+                </div>
+        
+                <div class="mb-3">
+                    <label for="email" class="form-label fw-bold">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+        
+                <div class="mb-3">
+                    <label for="password" class="form-label fw-bold">Password</label>
+                    <input type="password" class="form-control" id="password" name="password">
+                </div>                        
+            </div>
+            <div class="col-md-4" id="additional-attributes">
+            </div>
+            <div class="col-md-4" id="accounts">
+            </div>
+        </div> 
+        <div id="error-area" class="text-danger p-3 mt-3"></div>       
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>    
+</section>
+{% raw %} 
+<script id="keyvalue-list-template" type="text/x-handlebars-template">
+    <h4>키-값</h4>
+    {{#each list}}
+    <div class="mb-1">
+        <label for="{{key}}" class="form-label fw-bold">{{key}}<label>
+        <input type="text" class="form-control ms-2" data-key="{{key}}" id="{{key}}" name="{{key}}" value="{{value}}" required>
+    </div>
+    {{/each}}
+</script>
+<script id="keyvalue-list-template" type="text/x-handlebars-template">
+    <h4>키-값</h4>
+    {{#each list}}
+    <div class="mb-1">
+        <label for="{{key}}" class="form-label fw-bold">{{key}}<label>
+        <input type="text" class="form-control ms-2" data-key="{{key}}" id="{{key}}" name="{{key}}" value="{{value}}" required>
+    </div>
+    {{/each}}
+</script>
+<script id="accounts-template" type="text/x-handlebars-template">
+    <div id="account-{{abbr}}" data-abbr="{{abbr}}" class="account-div">
+        <h4>{{abbr}}</h4>
+        <div class="mb-1">
+            <label for="{{abbr}}_account_no" class="form-label fw-bold">Account No<label>
+            <input type="text" class="form-control ms-2"  id="{{abbr}}_account_no"  value="{{account_no}}" required>
+        </div>
+        <div class="mb-1">
+            <label for="{{abbr}}_account_pw" class="form-label fw-bold">Account Pw<label>
+            <input type="text" class="form-control ms-2"  id="{{abbr}}_account_pw"  value="{{account_pw}}" required>
+        </div>
+        <div class="mb-1">
+            <label for="{{abbr}}_hts_id" class="form-label fw-bold">HTS Id<label>
+            <input type="text" class="form-control ms-2"  id="{{abbr}}_hts_id"  value="{{hts_id}}" required>
+        </div>
+        {{#each key_values}}
+        <div class="mb-1">
+            <label for="{{key}}" class="form-label fw-bold">{{key}}<label>
+            <input type="text" class="form-control ms-2 account-key-value" data-key="{{key}}" id="{{key}}" name="{{key}}" value="{{value}}" required>
+        </div>
+        {{/each}}
+    </div>
+</script>
+{% endraw %}
+{% endblock %}
+
+{% block script %}
+{% raw %}
+<script>
+    function get_value_from_keyvalues(keyvalues, key) {
+        for (let i = 0; i < keyvalues.length; i++) {
+            if (keyvalues[i].key === key) {
+                return keyvalues[i].value;
+            }
+        }
+        return '';
+    }
+        
+    $( document ).ready(function() {
+        console.log('ready.... ');
+        const user_id = $('#logout').data('user-id');
+        const url = '/api/v1/user/'+user_id;
+        getFetch(url).then(data => {
+            $('#user_id').val(data.user_id);
+            $('#user_name').val(data.user_name);
+            $('#email').val(data.email);
+            $('#password').val(data.password);
+            
+            const source = $('#keyvalue-list-template').html();
+            const template = Handlebars.compile(source);
+            const html = template({list: data.key_values});
+            $('#additional-attributes').html(html);
+            debugger;
+            const accounts = data.accounts;
+            const accounts_source = $('#accounts-template').html();
+            const accounts_template = Handlebars.compile(accounts_source);
+            let accounts_html = '';
+            for (let i = 0; i < accounts.length; i++) {
+                const account = accounts[i];
+                const html = accounts_template(account);
+                accounts_html += html;
+            }
+            $('#accounts').html(accounts_html);
+
+        }).catch(error=> {
+            console.error(error.message); 
+        });
+    
+        $('#user-form').submit(function(e) {
+            e.preventDefault();
+            const user_id = $('#user_id').val();
+            const user_name = $('#user_name').val();
+            const email = $('#email').val();
+            const password = $('#password').val();
+            const key_values = [];
+            $('#additional-attributes input').each(function() {
+                const key = $(this).data('key');
+                const value = $(this).val();
+                key_values.push({key: key, value: value});
+            });
+            let accounts = [];
+            $('#accounts div.account-div').each(function() {
+                const abbr = $(this).data('abbr');
+                const account_no = $('#'+abbr+'_account_no').val();
+                const account_pw = $('#'+abbr+'_account_pw').val();
+                const hts_id = $('#'+abbr+'_hts_id').val();
+                const key_values = [];
+                $(this).find('input.account-key-value').each(function() {
+                    const key = $(this).data('key');
+                    const value = $(this).val();
+                    key_values.push({key: key, value: value});
+                });
+                accounts.push({abbr: abbr, account_no: account_no, account_pw: account_pw, hts_id: hts_id, key_values: key_values});
+            });
+            const data = {
+                user_id: user_id,
+                user_name: user_name,
+                email: email,
+                password: password,
+                key_values: key_values,
+                accounts: accounts
+            };
+            debugger;
+            console.log(data);
+            const url = '/api/v1/user/'+user_id;
+            putFetch(url, data).then(response => {
+                alert('수정되었습니다.');
+                window.location.href = 'page?path=user/form';
+            }).catch(error=> {
+                console.error('Error:', error.message);
+                $('#error-area').html('수정에 실패했습니다. 다시 시도해 주세요.' + error.message);
+
+            });
+        });
+});
+    </script>	    
+{% endraw %}
+{% endblock %}

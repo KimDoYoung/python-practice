@@ -1,0 +1,131 @@
+{% extends 'common/base.html' %}
+{% block style %}
+<link rel="stylesheet" href="/public/css/calendar.css">
+{% endblock %}
+
+{% block content %}
+<section id="calendar-area" class="container">
+    <div id="headerCalendar" class="mt-5 text-center d-flex align-items-center">
+        <!-- <a href="#" id="prevYear" class="text-decoration-none border-icon"  title="prev year"><i class="bi bi-caret-left-fill"></i></a> -->
+        <a href="#" id="prevMonth"  class="text-decoration-none  border-icon mx-2" title="prev month"><i class="bi bi-caret-left"></i></a>
+        <h3 class="d-inline"><span id="currentYyyy"></span>년 <span id="currentMm"></span>월</h3>
+        <a href="#" id="nextMonth" class="text-decoration-none  border-icon mx-2"  title="next month"><i class="bi bi-caret-right"></i></a>
+        <!-- <a href="#" id="nextYear" class="text-decoration-none  border-icon me-2" title="next year"><i class="bi bi-caret-right-fill"></i></a> -->
+        <a href="#" id="todayYearMonth" class="text-decoration-none  border-icon me-2" title="today"><i class="bi bi-calendar-check today-icon" title="오늘"></i></a>
+        <a href="#" id="printToImage" class="text-decoration-none  border-icon me-2" title="save as image"><i class="bi bi-file-earmark-image"></i></a>
+        <a href="/page?path=ipo/ipo-card"  class="text-decoration-none  border-icon me-2" title="목록으로 보기">
+            <i class="bi bi-list"></i>
+        </a>
+        <a href="/page?path=ipo/history"class="text-decoration-none  border-icon me-2" title="과거데이터 기록">
+            <i class="bi bi-clipboard-data"></i>
+        </a>
+    </div>
+    <div id="mainCalendar" class="mt-2 mb-5"></div>
+</section>
+{% endblock %}
+
+{% block script %}
+{% raw %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="/public/js/calendar-utility.js"></script>
+<script>
+
+    async function fetchDataAndDrawCalendar(yyyy, mm) {
+        try {
+            // 두 개의 fetchData 호출을 동시에 실행하고, 모두 완료될 때까지 기다림
+            let yyyymm = yyyy + '' + (mm < 10 ? '0' + mm : mm);
+            const [startYmd, endYmd] = CalendarMaker.startEndYmd(yyyy, mm);
+
+            const [holidays,ipoDays] = await Promise.all([
+                getFetch('/api/v1/eventdays/calendar/' + startYmd + '/' + endYmd),
+                getFetch('/api/v1/ipo/calendar/' + startYmd + '/' + endYmd)
+            ]);
+            
+            console.log(holidays);
+            console.log(ipoDays);
+            const holidaysY = holidays
+                .filter(item => item.isHoliday === "Y")
+                .map(item => ({
+                    name: item.dateName,
+                    ymd: item.locdate
+                }));
+            // 두 개의 데이터가 모두 준비되면 drawCalendar를 호출
+            drawCalendar(yyyy, mm, holidaysY, ipoDays);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    } 
+    function drawCalendar(yyyy,mm, holidays,eventDays){
+            $('#currentYyyy').text(yyyy);
+            $('#currentMm').text(mm);
+            CalendarMaker.setHolidays(holidays);
+            CalendarMaker.setEventDays(eventDays);
+            var html = CalendarMaker.calendarHtml(yyyy, mm);
+            $('#mainCalendar').html(html);
+            $('#mainCalendar').find('.week').addClass('calendar-border-week');
+            $('#mainCalendar').find('.day').addClass('calendar-border-day');
+       
+            $('#mainCalendar').on('click', '.day', function(e) {
+                // 클릭 이벤트 핸들러 로직
+                e.stopPropagation();
+                console.log($(this).data('ymd'));
+            });
+    }       
+    $( document ).ready(function() {
+        console.log('calendar.... ');
+
+        
+        $("#prevMonth").on('click', function(){
+            let ym = CalendarMaker.currentYearMonth();
+            ym  = CalendarMaker.prevYearMonth(ym[0], ym[1]);
+            fetchDataAndDrawCalendar(ym[0], ym[1]);
+        });
+        $("#prevYear").on('click', function(){
+            let ym = CalendarMaker.currentYearMonth();
+            fetchDataAndDrawCalendar(ym[0]-1, ym[1]);		
+        });
+        $("#nextMonth").on('click', function(){
+            let ym = CalendarMaker.currentYearMonth();
+            ym  = CalendarMaker.nextYearMonth(ym[0], ym[1]);
+            fetchDataAndDrawCalendar(ym[0], ym[1]);
+        });
+        $("#nextYear").on('click', function(){
+            let ym = CalendarMaker.currentYearMonth();
+            fetchDataAndDrawCalendar(ym[0]+1, ym[1]);					
+        });
+        $('#todayYearMonth').on('click', function(){
+            let today = new Date();
+            let y = today.getFullYear();
+            let m= today.getMonth() + 1;
+            fetchDataAndDrawCalendar(y,m);
+        });
+        // 달력을 이미지로 저장함.
+        $('#printToImage').on('click', function(){
+            const yyyy = $('#currentYyyy').text();
+            const mm = $('#currentMm').text();
+            $('#mainCalendar').prepend(`<h1 id="tempHeader" class="text-center">${yyyy}.${mm}</h1>`);
+            html2canvas(document.querySelector("#mainCalendar")).then(canvas => {
+                // 캡처된 이미지 데이터를 URL로 변환
+                var imgData = canvas.toDataURL("image/png");
+
+                // 가상의 링크를 생성하여 이미지 다운로드
+                var link = document.createElement('a');
+                link.href = imgData;
+                link.download = 'calendar.png';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);           
+            });
+            $('#tempHeader').remove();
+        });
+        // 달력 호출 
+        var date = new Date();
+        var yyyy = date.getFullYear();
+        var mm = date.getMonth() + 1; 
+        fetchDataAndDrawCalendar(yyyy, mm);
+
+    });
+    </script>	
+    
+{% endraw %}
+{% endblock %}

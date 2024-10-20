@@ -1,0 +1,56 @@
+/* 매수/매도 div의 바탕색 */
+.bg-buy {
+    background-color: #eb9999;
+}
+.bg-sell {
+    background-color: rgb(83, 146, 241);
+}
+.small-font1{
+    font-size: 0.8em;
+    color :rgb(47, 47, 225)
+}
+.small-font2{
+    font-size: 0.8em;
+    color :black
+}
+
+.card-ipo h6 {
+    font-size: 0.9em;
+    color: #15055c;
+    font-weight: bold;
+}
+.naver-info-close-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    color: #333;
+}
+
+.naver-info-box {
+    width: 50%;
+    position: absolute;
+    z-index: 1000;
+    display: none;
+    background-color: #f8f9fa;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    background-color: #aea6a6;
+}
+.height40 {
+    height: 800px;
+}
+/* companycanvas-link 스타일 */
+.companycanvas-link {
+    color: #003366; /* 짙은 청색 */
+    text-decoration: none; /* 밑줄 제거 */
+}
+
+/* 마우스를 올렸을 때 스타일 (hover 효과) */
+.companycanvas-link:hover {
+    color: #002244; /* 더 짙은 청색으로 변경 */
+    text-decoration: underline; /* 밑줄 추가 (선택 사항) */
+}

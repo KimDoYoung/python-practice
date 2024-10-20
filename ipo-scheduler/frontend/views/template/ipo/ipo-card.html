@@ -1,0 +1,297 @@
+{% extends 'common/base.html' %}
+{% block style %}
+<style>
+        .search-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .clear-button {
+            position: absolute;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #e9ecef;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.2em;
+            cursor: pointer;
+        }
+        .not-spec-header {
+            background-color: #f4ebc7; /* 원하는 색상으로 변경 */
+        }   
+</style>
+{% endblock %}
+
+{% block content %}
+<section id="ipo-list" class="container">
+    <h1>공모주 목록</h1>
+    <div class="my-2 row">
+        <div class="row align-items-center">
+            <div class="col-auto">
+                <a href="https://www.38.co.kr/html/fund/index.htm?o=k" target="_blank">커뮤니케이션38</a>
+            </div>
+            <div class="col-auto">
+                스크랩 시각: <span class="badge bg-success" id="38-scrapping-time"></span>
+            </div>
+            <div class="col-auto">
+                <a href="/page?path=ipo/calendar" title="달력으로 보기" class="mx-2"><i class="bi bi-calendar-week"></i></a>
+            </div>
+            <div class="col-auto search-container">
+                <input type="text" id="searchInput" class="form-control rounded-pill" placeholder="Search...">
+                <button id="clearButton" class="clear-button" title="DEL - 지우기">&times;</button>
+            </div>
+            <div class="col-auto">
+                <select name="under-writer" id="under-writer" class="form-select"></select>
+            </div>
+            <div class="col-auto">
+                <a href="/page?path=ipo/history" class="btn btn-warning" title="IPO 과거데이터">IPO 과거데이터</a>
+            </div>
+        </div>
+    </div>
+    <div id="table-area"></div>
+</section>
+
+{% raw %} 
+<script id="ipo-table" type="text/x-handlebars-template">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">종목명</th>
+                <th scope="col">종류</th>
+                <th scope="col">일자</th>
+            </tr>
+        </thead>
+        <tbody>    
+    {{#each list}}
+    <tr>
+        <td>{{@index}}</td>
+        <td><a href="{{scrap_url}}" target="_blank">{{name}}</a></td>
+        <td>{{stock_type}}/{{market_type}}</td>
+        <td>
+            {{#if days.청약일}}
+            <span class="badge bg-primary" title="청약일">{{displayYmd days.청약일}}</span>
+            {{/if}}
+            {{#if days.납입일}}
+            <span class="badge bg-secondary" title="납입일">{{displayYmd days.납입일}}</span>
+            {{/if}}
+            {{#if days.환불일}}
+            <span class="badge bg-secondary" title="환불일">{{displayYmd days.환불일}}</span>
+            {{/if}}
+            {{#if days.상장일}}
+            <span class="badge bg-danger" title="상장일">{{displayYmd days.상장일}}</span>
+            {{/if}}
+        </td>
+    </tr>
+    {{/each}}
+        </tbody>
+    </table>
+</script>
+<script id="ipo-card" type="text/x-handlebars-template">
+<!-- Ipo Card -->
+<div class="row">
+    {{#each list}}
+    <div class="card-ipo col-lg-3 col-md-4 col-sm-6 mb-4">
+        <div class="card mb-4">
+            {{#test "/스팩\d{1,3}/.test(name) == false"}}
+            <div class="card-header not-spec-header">
+            {{else}}
+            <div class="card-header">
+            {{/test}}
+                <h5 class="card-title">
+                    <strong><a href="{{scrap_url}}" target="_blank">{{name}}</a> </strong> {{anchorHome hp_url}}<br> 
+                </h5>
+                <span class="small-font1">{{stock_type}}/{{market_type}} ({{stock_code}})</span><br>
+                <span class="small-font1">{{category}}</span> 
+            </div>
+            <div class="card-body">
+                <h6 class="mb-1">공모현황</h6>
+                <ul>
+                    <li><strong>총공모 주식수:</strong> {{displayWon offering.총공모주식수 }}</li>
+                    <li><strong>액면가:</strong> {{displayWon offering.액면가 }}</li>
+                    <li><strong>확정공모가:</strong>{{#if offering.확정공모가}} {{displayWon offering.확정공모가 }} {{else}} - {{/if}}</li>
+                </ul>
+                <h6 class="mb-1">주간사-청약한도</h6>
+                <ul>
+                    {{#each offering.주간사_리스트 }}
+                    <li>{{ 주간사 }} : {{ displayWon 청약한도 }}</li>
+                    {{/each}}
+                </ul>
+                <h6 class="mb-1">일정</h6>
+                <!-- <div> -->
+                    {{#ifFuture days.청약일}}
+                    <span class="badge bg-primary" title="청약일">{{displayYmdAd days.청약일}}</span>
+                    {{/ifFuture}}
+                    {{#ifFuture days.납입일}}
+                    <span class="badge bg-secondary" title="납입일">{{displayYmdAd days.납입일}}</span>
+                    {{/ifFuture}}
+                    {{#ifFuture days.환불일}}
+                    <span class="badge bg-secondary" title="환불일">{{displayYmdAd days.환불일}}</span>
+                    {{/ifFuture}}
+                    {{#ifFuture days.상장일}}
+                    <span class="badge bg-danger" title="상장일">{{displayYmdAd days.상장일}}</span>
+                    {{/ifFuture}}            
+                <!-- </div> -->
+                {{#test "/스팩\d{1,3}/.test(name) == false"}}
+                <h6 class="mb-1 mt-1">예측</h6>
+                <ul>
+                    <li><strong>매출액:</strong> {{eval_data.매출액}}억</li>
+                    <li><strong>순이익:</strong> {{eval_data.순이익}}억</li>
+                    <li><strong>기관경쟁률:</strong> {{eval_data.기관경쟁률}}</li>
+                    <li><strong>의무보유확약:</strong> {{eval_data.의무보유확약}}%</li>
+                    {{#if expect_cost}}
+                    <li><strong>예상체결가:</strong><span style="color:red;font-weight: bolder;"> {{displayWon expect_cost}}</span></li>
+                    {{/if}}
+                </ul>
+                {{/test}}
+            </div>
+        </div>
+    </div>
+    {{/each}}
+</div>
+</script>
+
+{% endraw %}
+{% endblock %}
+
+
+
+{% block script %}
+{% raw %}
+<script src="/public/js/ipo_helper.js"></script>
+<script>
+    let gList = [];
+    // ISO문자열을 보기좋게 '2024-06-11T22:47:35.376869' -> '2024-06-11 22:47:35'
+    function formatDateString(isoString) {
+        // 문자열을 Date 객체로 변환
+        const date = new Date(isoString);
+
+        // 날짜와 시간을 각각 분리하여 형식화
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 1을 더합니다.
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+
+        // 원하는 형식으로 문자열을 구성
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    }
+    function drawCards(filterKey, filterUnderwriter) {
+        let list = gList;
+
+        if (filterKey) {
+            $('#under-writer').val('')
+            list = gList.filter(item => {
+                return item.company.includes(filterKey);
+            });
+        }
+        if (filterUnderwriter) {
+            $('#searchInput').val('')
+            list = gList.filter(item => {
+                return item.offering.주간사_리스트.some(underwriter => {
+                    return underwriter.주간사 === filterUnderwriter;
+                });
+            });
+        }
+
+        var source = $('#ipo-card').html();
+        var template = Handlebars.compile(source);
+
+        var html = template({list: list});
+
+        $('#table-area').html(html);
+    }
+    function fill_Underwriter() {
+        const list = gList;
+        const uniqueUnderwriters = new Set();
+
+        list.forEach(item => {
+            item.offering.주간사_리스트.forEach(underwriter => {
+                uniqueUnderwriters.add(underwriter.주간사);
+            });
+        }); 
+        const underwriterArray = Array.from(uniqueUnderwriters);
+        underwriterArray.sort();
+
+        const $underwriterSelect = $('#under-writer');
+        const $option = $('<option>').val('').text('전체');
+        $underwriterSelect.append($option);
+        underwriterArray.forEach(underwriter => {
+            const $option = $('<option>').val(underwriter).text(underwriter);
+            $underwriterSelect.append($option);
+        });        
+
+    }
+    $( document ).ready(function() {
+        console.log('ipo list.... ');
+        async function initialize() {
+
+            getFetch('/api/v1/ipo').then(data => {
+                console.log(data);
+
+                let newList = data.map(item => {
+                    const regex = /(.+)-(.+)-(.+)\((.+)\)/;
+                    const match = item.title.match(regex);
+                    if (match) {
+                        return {
+                            ...item,
+                            company: match[1],
+                            stock_type: match[2],
+                            market_type: match[3],
+                            stock_code: match[4]
+                        };
+                    } else {
+                        return item;
+                    }
+                });
+
+                console.log(newList);
+                gList = newList;
+                fill_Underwriter();
+                drawCards();
+                $('#searchInput').focus();
+            });
+            getFetch('/api/v1/config/38-scrapping-time').then(data => {
+                console.log(data);
+                const scrappingTime = formatDateString(data.value);
+                $('#38-scrapping-time').text(scrappingTime);
+            });
+        }
+        //증권사 선택시
+        $('#under-writer').on('change', function() {
+            const keyword = $('#searchInput').val();
+            const underwriter = $(this).val();
+            drawCards(keyword, underwriter);
+        });
+        // 검색어 입력시
+        $('#searchInput').on('input', function() {
+            const keyword = $(this).val().toLowerCase();
+            const underwriter = $('#under-writer').val();
+            drawCards(keyword, underwriter);
+        });
+        // DEL 키를 캡처하여 입력 필드 내용 삭제
+        $('#searchInput').on('keydown', function(e) {
+            if (e.keyCode === 46) {  // DEL 키
+                $(this).val('');
+                const underwriter = $('#under-writer').val();
+                drawCards(null, underwriter);
+            }
+        }); 
+        // 지우기 버튼 클릭시       
+        $('#clearButton').on('click', function() {
+            $('#searchInput').val('');
+            const keyword = $('#searchInput').val();
+            const underwriter = $('#under-writer').val();
+            drawCards(keyword, underwriter);
+        });        
+        initialize();
+    });
+    </script>	
+    
+{% endraw %}
+{% endblock %}

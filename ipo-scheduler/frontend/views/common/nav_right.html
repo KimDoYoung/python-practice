@@ -1,0 +1,20 @@
+<ul class="navbar-nav ms-auto">
+    <li class="nav-item">
+        <a href="/page?path=mystock/mystock" class="nav-link text-danger"><i class="bi bi-star-fill"></i></a>
+    </li>
+    <li class="nav-item">
+        <a href="/page?path={{page_path}}" class="nav-link text-primary"><i class="bi bi-arrow-clockwise"></i>새로고침</a>
+    </li>
+    <li class="nav-item">
+        <span class="nav-link text-primary">{{today}} </span>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/page?path=config/config"><i class="bi bi-gear"></i></a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/page?path=user/form" data-user-id="{{user_id}}" id="username" title="{{user_name}}"><i class="bi bi-person-fill-gear"></i></a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#" id="logout"  data-user-id="{{user_id}}" title="{{user_name}} 로그아웃"><i class="bi bi-box-arrow-right"></i></a>
+    </li>
+</ul>
