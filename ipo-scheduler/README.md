@@ -5,9 +5,33 @@
 - 데이타베이스명을 ipo-scheduer로 함.
 - export IPO_SCHEDULER_MODE=real 로 서버에서 설정
 - jskn의 몽고db는 docker로 실행됨
+
   ```shell
   docker run -d --name mongodb-container -p 27017:27017 -v /home/kdy987/fastapi/mongodb:/data/db mongo:4.4
   ```
+
+## docker commands
+
+1. jskn의 /root/python-practice/ipo-scheduler밑에 소스가 있음.
+
+```shell
+cd python-practice/ipo-scheduler
+git pull
+docker-compose down 
+docker-compose up --build -d
+```
+
+2. 참고 commands
+
+```shell
+docker ps
+docker-compose ps
+docker-compose logs backend
+docker-compose logs mongo
+docker exec -it ipo-scheduler /bin/bash
+docker exec -it mongo /bin/bash
+```
+
 ## 빌드
 
 ### 고려할 점
