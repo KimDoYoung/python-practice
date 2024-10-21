@@ -11,7 +11,7 @@ services:
     networks:
       - ipo-network
     environment:
-      - IPO_MODE=real
+      - IPO_SCHEDULER_MODE=real
     volumes:
       - ./backend:/backend
       - ./frontend:/frontend
@@ -26,7 +26,7 @@ services:
       - "27017:27017"
     volumes:
       - /home/kdy987/fastapi/mongodb:/data/db
-      - /root/fastapi-data/kdydata:/data/import
+      - /home/kdy987/fastapi/kdydata:/data/import
       - /etc/localtime:/etc/localtime:ro  # 호스트 시간대 설정 마운트            
     networks:
       - ipo-network
@@ -34,10 +34,13 @@ services:
       bash -c "
       mongod --bind_ip_all &
       sleep 5 &&
-      if ! mongo stockdb --eval 'db.Config.findOne()'; then
-        mongoimport --host localhost --db stockdb --collection Config --file /data/import/stockdb.Config.json --jsonArray &&
-        mongoimport --host localhost --db stockdb --collection SchedulerJob --file /data/import/stockdb.SchedulerJob.json --jsonArray &&
-        mongoimport --host localhost --db stockdb --collection Users --file /data/import/stockdb.Users.json --jsonArray
+      if ! mongo ipo-scheduler --eval 'db.Config.findOne()'; then
+        mongoimport --host localhost --db ipo-scheduler --collection Config --file /data/import/Config.json --jsonArray &&
+        mongoimport --host localhost --db ipo-scheduler --collection SchedulerJob --file /data/import/SchedulerJob.json --jsonArray &&
+        mongoimport --host localhost --db ipo-scheduler --collection Users --file /data/import/Users.json --jsonArray
+        mongoimport --host localhost --db ipo-scheduler --collection EventDays --file /data/import/EventDays.json --jsonArray
+        mongoimport --host localhost --db ipo-scheduler --collection Ipo --file /data/import/Ipo.json --jsonArray
+        mongoimport --host localhost --db ipo-scheduler --collection IpoHistory --file /data/import/IpoHistory.json --jsonArray
       fi &&
       tail -f /dev/null
       "
