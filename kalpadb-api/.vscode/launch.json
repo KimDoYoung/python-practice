@@ -15,7 +15,7 @@
             // "env": {"PYTHONPATH": "${workspaceFolder}"}       
         },
         {
-            "name": "Api-server",
+            "name": "Api-Server",
             "type": "debugpy",
             "request": "launch",
             "module": "uvicorn",
