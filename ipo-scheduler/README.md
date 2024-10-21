@@ -3,7 +3,11 @@
 - ipo_scheduler에서 불필요한 것들 제거, ipo관련된 것들만 남김
 - 포트를 8881로 변경함
 - 데이타베이스명을 ipo-scheduer로 함.
-
+- export IPO_SCHEDULER_MODE=real 로 서버에서 설정
+- jskn의 몽고db는 docker로 실행됨
+  ```shell
+  docker run -d --name mongodb-container -p 27017:27017 -v /home/kdy987/fastapi/mongodb:/data/db mongo:4.4
+  ```
 ## 빌드
 
 ### 고려할 점
