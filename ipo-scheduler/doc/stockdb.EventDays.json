@@ -1,0 +1,348 @@
+[{
+  "_id": {
+    "$oid": "664c5154e429f93565d1c9e7"
+  },
+  "locdate": "20240101",
+  "dateKind": "01",
+  "dateName": "1월1일",
+  "isHoliday": "Y",
+  "seq": "1"
+},
+{
+  "_id": {
+    "$oid": "664c5155e429f93565d1c9ee"
+  },
+  "locdate": "20240209",
+  "dateKind": "01",
+  "dateName": "설날",
+  "isHoliday": "Y",
+  "seq": "1"
+},
+{
+  "_id": {
+    "$oid": "664c5155e429f93565d1c9f0"
+  },
+  "locdate": "20240210",
+  "dateKind": "01",
+  "dateName": "설날",
+  "isHoliday": "Y",
+  "seq": "1"
+},
+{
+  "_id": {
+    "$oid": "664c5155e429f93565d1c9f2"
+  },
+  "locdate": "20240211",
+  "dateKind": "01",
+  "dateName": "설날",
+  "isHoliday": "Y",
+  "seq": "1"
+},
+{
+  "_id": {
+    "$oid": "664c5155e429f93565d1c9f4"
+  },
+  "locdate": "20240212",
+  "dateKind": "01",
+  "dateName": "대체공휴일(설날)",
+  "isHoliday": "Y",
+  "seq": "1"
+},
+{
+  "_id": {
+    "$oid": "664c5155e429f93565d1c9fb"
+  },
+  "locdate": "20240301",
+  "dateKind": "01",
+  "dateName": "삼일절",
+  "isHoliday": "Y",
+  "seq": "1"
+},
+{
+  "_id": {
+    "$oid": "664c5155e429f93565d1ca02"
+  },
+  "locdate": "20240410",
+  "dateKind": "01",
+  "dateName": "국회의원선거",
+  "isHoliday": "Y",
+  "seq": "1"
+},
+{
+  "_id": {
+    "$oid": "664c5155e429f93565d1ca09"
+  },
+  "locdate": "20240505",
+  "dateKind": "01",
+  "dateName": "어린이날",
+  "isHoliday": "Y",
+  "seq": "1"
+},
+{
+  "_id": {
+    "$oid": "664c5155e429f93565d1ca0b"
+  },
+  "locdate": "20240506",
+  "dateKind": "01",
+  "dateName": "대체공휴일(어린이날)",
+  "isHoliday": "Y",
+  "seq": "1"
+},
+{
+  "_id": {
+    "$oid": "664c5155e429f93565d1ca0d"
+  },
+  "locdate": "20240515",
+  "dateKind": "01",
+  "dateName": "부처님오신날",
+  "isHoliday": "Y",
+  "seq": "1"
+},
+{
+  "_id": {
+    "$oid": "664c5156e429f93565d1ca14"
+  },
+  "locdate": "20240606",
+  "dateKind": "01",
+  "dateName": "현충일",
+  "isHoliday": "Y",
+  "seq": "1"
+},
+{
+  "_id": {
+    "$oid": "664c5156e429f93565d1ca1b"
+  },
+  "locdate": "20240815",
+  "dateKind": "01",
+  "dateName": "광복절",
+  "isHoliday": "Y",
+  "seq": "1"
+},
+{
+  "_id": {
+    "$oid": "664c5157e429f93565d1ca24"
+  },
+  "locdate": "20240916",
+  "dateKind": "01",
+  "dateName": "추석",
+  "isHoliday": "Y",
+  "seq": 1,
+  "isMoon": false,
+  "repeat": null
+},
+{
+  "_id": {
+    "$oid": "664c5157e429f93565d1ca26"
+  },
+  "locdate": "20240917",
+  "dateKind": "01",
+  "dateName": "추석",
+  "isHoliday": "Y",
+  "seq": 1,
+  "isMoon": false,
+  "repeat": null
+},
+{
+  "_id": {
+    "$oid": "664c5157e429f93565d1ca28"
+  },
+  "locdate": "20240918",
+  "dateKind": "01",
+  "dateName": "추석",
+  "isHoliday": "Y",
+  "seq": 1,
+  "isMoon": false,
+  "repeat": null
+},
+{
+  "_id": {
+    "$oid": "664c5158e429f93565d1ca2f"
+  },
+  "locdate": "20241003",
+  "dateKind": "01",
+  "dateName": "개천절",
+  "isHoliday": "Y",
+  "seq": 1,
+  "isMoon": false,
+  "repeat": null
+},
+{
+  "_id": {
+    "$oid": "664c5158e429f93565d1ca31"
+  },
+  "locdate": "20241009",
+  "dateKind": "01",
+  "dateName": "한글날",
+  "isHoliday": "Y",
+  "seq": 1,
+  "isMoon": false,
+  "repeat": null
+},
+{
+  "_id": {
+    "$oid": "664c5158e429f93565d1ca38"
+  },
+  "locdate": "20241225",
+  "dateKind": "01",
+  "dateName": "기독탄신일",
+  "isHoliday": "Y",
+  "seq": 1,
+  "isMoon": false,
+  "repeat": null
+},
+{
+  "_id": {
+    "$oid": "66556f886394e9fcb4908040"
+  },
+  "locdate": "2024-05-20",
+  "dateKind": "01",
+  "dateName": "Test Event",
+  "isHoliday": "N",
+  "seq": null,
+  "isMoon": false,
+  "repeat": null
+},
+{
+  "_id": {
+    "$oid": "66556fd86394e9fcb4908041"
+  },
+  "locdate": "2024-05-20",
+  "dateKind": "01",
+  "dateName": "Test Event",
+  "isHoliday": "N",
+  "seq": null,
+  "isMoon": false,
+  "repeat": null
+},
+{
+  "_id": {
+    "$oid": "66ed0956bee7af15a14e073d"
+  },
+  "locdate": "20241001",
+  "dateKind": "01",
+  "dateName": "임시공휴일",
+  "isHoliday": "Y",
+  "seq": 2,
+  "isMoon": false,
+  "repeat": null
+},
+{
+  "_id": {
+    "$oid": "66ed095cbee7af15a14e073e"
+  },
+  "locdate": "20250101",
+  "dateKind": "01",
+  "dateName": "1월1일",
+  "isHoliday": "Y",
+  "seq": 1,
+  "isMoon": false,
+  "repeat": null
+},
+{
+  "_id": {
+    "$oid": "66ed095cbee7af15a14e073f"
+  },
+  "locdate": "20250128",
+  "dateKind": "01",
+  "dateName": "설날",
+  "isHoliday": "Y",
+  "seq": 1,
+  "isMoon": false,
+  "repeat": null
+},
+{
+  "_id": {
+    "$oid": "66ed095cbee7af15a14e0740"
+  },
+  "locdate": "20250129",
+  "dateKind": "01",
+  "dateName": "설날",
+  "isHoliday": "Y",
+  "seq": 1,
+  "isMoon": false,
+  "repeat": null
+},
+{
+  "_id": {
+    "$oid": "66ed095cbee7af15a14e0741"
+  },
+  "locdate": "20250130",
+  "dateKind": "01",
+  "dateName": "설날",
+  "isHoliday": "Y",
+  "seq": 1,
+  "isMoon": false,
+  "repeat": null
+},
+{
+  "_id": {
+    "$oid": "66ed0960bee7af15a14e0742"
+  },
+  "locdate": "20250301",
+  "dateKind": "01",
+  "dateName": "삼일절",
+  "isHoliday": "Y",
+  "seq": 1,
+  "isMoon": false,
+  "repeat": null
+},
+{
+  "_id": {
+    "$oid": "66ed0960bee7af15a14e0743"
+  },
+  "locdate": "20250303",
+  "dateKind": "01",
+  "dateName": "대체공휴일",
+  "isHoliday": "Y",
+  "seq": 1,
+  "isMoon": false,
+  "repeat": null
+},
+{
+  "_id": {
+    "$oid": "66ed0964bee7af15a14e0744"
+  },
+  "locdate": "20250505",
+  "dateKind": "01",
+  "dateName": "부처님오신날",
+  "isHoliday": "Y",
+  "seq": 2,
+  "isMoon": false,
+  "repeat": null
+},
+{
+  "_id": {
+    "$oid": "66ed0965bee7af15a14e0745"
+  },
+  "locdate": "20250506",
+  "dateKind": "01",
+  "dateName": "대체공휴일",
+  "isHoliday": "Y",
+  "seq": 1,
+  "isMoon": false,
+  "repeat": null
+},
+{
+  "_id": {
+    "$oid": "66ed0967bee7af15a14e0746"
+  },
+  "locdate": "20250606",
+  "dateKind": "01",
+  "dateName": "현충일",
+  "isHoliday": "Y",
+  "seq": 1,
+  "isMoon": false,
+  "repeat": null
+},
+{
+  "_id": {
+    "$oid": "66ed096bbee7af15a14e0747"
+  },
+  "locdate": "20250815",
+  "dateKind": "01",
+  "dateName": "광복절",
+  "isHoliday": "Y",
+  "seq": 1,
+  "isMoon": false,
+  "repeat": null
+}]

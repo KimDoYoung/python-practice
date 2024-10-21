@@ -49,7 +49,7 @@ docker cp ./initial_data.json ipo_scheduler-mongo:/data/initial_data.json
 
 - 방화벽열기
 
-  ```
+  ```shell
     # FastAPI 포트 8000 열기
     sudo firewall-cmd --zone=public --add-port=8000/tcp --permanent
 

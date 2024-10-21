@@ -1,0 +1,330 @@
+[{
+  "_id": {
+    "$oid": "66a2376260e0d3e7cc5e645c"
+  },
+  "Company": "노브랜드",
+  "FinalOfferingPrice": 14000,
+  "InstitutionalSubscriptionRatio": 1075.61,
+  "LockupAgreement": 4.51,
+  "MaxValue": 67800,
+  "MultipleVariable": 4.8428571428571425,
+  "NetIncome": 293.46,
+  "Notes": "매출액이 5천억이상이며 순이이익 300억 규모로 상장할 만한 회사이다. 2일에 걸쳐서 상승했다.",
+  "Revenue": 5529,
+  "StkCode": "145170"
+},
+{
+  "_id": {
+    "$oid": "66a239bb60e0d3e7cc5e645d"
+  },
+  "Company": "그리드위즈",
+  "FinalOfferingPrice": 40000,
+  "InstitutionalSubscriptionRatio": 124.6,
+  "LockupAgreement": 0.95,
+  "MaxValue": 82000,
+  "MultipleVariable": 2.05,
+  "NetIncome": -0.3,
+  "Notes": "",
+  "Revenue": 1321,
+  "StkCode": "453450"
+},
+{
+  "_id": {
+    "$oid": "66a23a4b60e0d3e7cc5e645e"
+  },
+  "Company": "라메디텍",
+  "FinalOfferingPrice": 16000,
+  "InstitutionalSubscriptionRatio": 1115.44,
+  "LockupAgreement": 9.93,
+  "MaxValue": 54000,
+  "MultipleVariable": 3.375,
+  "NetIncome": -33.4,
+  "Notes": "상장일 초반에 급격히 오르다가 바로 폭포수처럼 떨어졌다.",
+  "Revenue": 20,
+  "StkCode": "462510"
+},
+{
+  "_id": {
+    "$oid": "66a23afe60e0d3e7cc5e645f"
+  },
+  "Company": "씨어스테크놀로지",
+  "FinalOfferingPrice": 17000,
+  "InstitutionalSubscriptionRatio": 1084.39,
+  "LockupAgreement": 2.06,
+  "MaxValue": 34000,
+  "MultipleVariable": 2,
+  "NetIncome": -79.88,
+  "Notes": "매출액에 11억인데, 순이익은 -80억 거의 쓰레기 회사인데 상장을 시킨다. 한번도 오르지 못하고 바로 계속 떨어짐.",
+  "Revenue": 11,
+  "StkCode": "458870"
+},
+{
+  "_id": {
+    "$oid": "66a23b7e60e0d3e7cc5e6460"
+  },
+  "Company": "한중엔시에스",
+  "FinalOfferingPrice": 30000,
+  "InstitutionalSubscriptionRatio": 725.94,
+  "LockupAgreement": 12.44,
+  "MaxValue": 54000,
+  "MultipleVariable": 1.8,
+  "NetIncome": -202.64,
+  "Notes": "장시작 직후 조금 오르다가 급격히 떨어지기 시작.",
+  "Revenue": 885,
+  "StkCode": "107640"
+},
+{
+  "_id": {
+    "$oid": "66a23bf360e0d3e7cc5e6461"
+  },
+  "Company": "하이젠알앤엠",
+  "FinalOfferingPrice": 7000,
+  "InstitutionalSubscriptionRatio": 1099.21,
+  "LockupAgreement": 11.8,
+  "MaxValue": 18940,
+  "MultipleVariable": 2.7057142857142855,
+  "NetIncome": 377,
+  "Notes": "",
+  "Revenue": 870,
+  "StkCode": "160190"
+},
+{
+  "_id": {
+    "$oid": "66a23c3160e0d3e7cc5e6462"
+  },
+  "Company": "에이치브이엠",
+  "FinalOfferingPrice": 18000,
+  "InstitutionalSubscriptionRatio": 837.2,
+  "LockupAgreement": 0,
+  "MaxValue": 31750,
+  "MultipleVariable": 1.7638888888888888,
+  "NetIncome": -4.26,
+  "Notes": "계속 떨어지다.",
+  "Revenue": 354,
+  "StkCode": "295310"
+},
+{
+  "_id": {
+    "$oid": "66a23c7460e0d3e7cc5e6463"
+  },
+  "Company": "에스오에스랩",
+  "FinalOfferingPrice": 11500,
+  "InstitutionalSubscriptionRatio": 1072.3,
+  "LockupAgreement": 4.19,
+  "MaxValue": 21100,
+  "MultipleVariable": 1.8347826086956522,
+  "NetIncome": -203.14,
+  "Notes": "",
+  "Revenue": 23,
+  "StkCode": "464080"
+},
+{
+  "_id": {
+    "$oid": "66a2f9fd3722f6851ba8208d"
+  },
+  "Company": "이노스페이스",
+  "FinalOfferingPrice": 43300,
+  "InstitutionalSubscriptionRatio": 598.87,
+  "LockupAgreement": 1.99,
+  "MaxValue": 46050,
+  "MultipleVariable": 1.0635103926096998,
+  "NetIncome": -243.42,
+  "Notes": "",
+  "Revenue": 2,
+  "StkCode": "462350"
+},
+{
+  "_id": {
+    "$oid": "66a2fa263722f6851ba8208e"
+  },
+  "Company": "하스",
+  "FinalOfferingPrice": 16000,
+  "InstitutionalSubscriptionRatio": 946.4,
+  "LockupAgreement": 6.36,
+  "MaxValue": 29550,
+  "MultipleVariable": 1.846875,
+  "NetIncome": 26.43,
+  "Notes": "",
+  "Revenue": 149,
+  "StkCode": "450330"
+},
+{
+  "_id": {
+    "$oid": "66a2fa4d3722f6851ba8208f"
+  },
+  "Company": "시프트업",
+  "FinalOfferingPrice": 60000,
+  "InstitutionalSubscriptionRatio": 225.94,
+  "LockupAgreement": 32.98,
+  "MaxValue": 89500,
+  "MultipleVariable": 1.4916666666666667,
+  "NetIncome": -71.33,
+  "Notes": "",
+  "Revenue": 660,
+  "StkCode": "462870"
+},
+{
+  "_id": {
+    "$oid": "66a2fa813722f6851ba82090"
+  },
+  "Company": "엑셀세라퓨틱스",
+  "FinalOfferingPrice": 10000,
+  "InstitutionalSubscriptionRatio": 1233.8,
+  "LockupAgreement": 4.5,
+  "MaxValue": 12900,
+  "MultipleVariable": 1.29,
+  "NetIncome": -83.42,
+  "Notes": "",
+  "Revenue": 10,
+  "StkCode": "373110"
+},
+{
+  "_id": {
+    "$oid": "66a73f4e6b64a5dcfe262855"
+  },
+  "Company": "산일전기",
+  "FinalOfferingPrice": 35000,
+  "InstitutionalSubscriptionRatio": 413.86,
+  "LockupAgreement": 42.37,
+  "MaxValue": 61300,
+  "MultipleVariable": 1.7514285714285713,
+  "NetIncome": 390.51,
+  "Notes": "",
+  "Revenue": 2145.38,
+  "StkCode": "062040"
+},
+{
+  "_id": {
+    "$oid": "66a9ec66f19376ad8a4737e3"
+  },
+  "Company": "피앤에스미캐닉스",
+  "FinalOfferingPrice": 22000,
+  "InstitutionalSubscriptionRatio": 986.08,
+  "LockupAgreement": 5.6,
+  "MaxValue": 32750,
+  "MultipleVariable": 1.4886363636363635,
+  "NetIncome": 15.03,
+  "Notes": "",
+  "Revenue": 52.15,
+  "StkCode": "460940"
+},
+{
+  "_id": {
+    "$oid": "66babb1bf8507438dded4cd4"
+  },
+  "Company": "뱅크웨어글로벌",
+  "FinalOfferingPrice": 16000,
+  "InstitutionalSubscriptionRatio": 155.74,
+  "LockupAgreement": 1.52,
+  "MaxValue": 19800,
+  "MultipleVariable": 1.2375,
+  "NetIncome": -115.29,
+  "Notes": "",
+  "Revenue": 728.95,
+  "StkCode": "199480"
+},
+{
+  "_id": {
+    "$oid": "66cd32be023f7cb308b3a54d"
+  },
+  "Company": "유라클",
+  "FinalOfferingPrice": 21000,
+  "InstitutionalSubscriptionRatio": 1065.86,
+  "LockupAgreement": 0.55,
+  "MaxValue": 33000,
+  "MultipleVariable": 1.5714285714285714,
+  "NetIncome": 20.98,
+  "Notes": "",
+  "Revenue": 485.81,
+  "StkCode": "088340"
+},
+{
+  "_id": {
+    "$oid": "66cd33a2023f7cb308b3a54e"
+  },
+  "Company": " 전진건설로봇(구.전진중공업)",
+  "FinalOfferingPrice": 16500,
+  "InstitutionalSubscriptionRatio": 870.2,
+  "LockupAgreement": 8.79,
+  "MaxValue": 28900,
+  "MultipleVariable": 1.7515151515151515,
+  "NetIncome": 289.48,
+  "Notes": "",
+  "Revenue": 1583.7,
+  "StkCode": "079900"
+},
+{
+  "_id": {
+    "$oid": "66cd351b023f7cb308b3a54f"
+  },
+  "Company": "넥스트바이오메디컬",
+  "FinalOfferingPrice": 29000,
+  "InstitutionalSubscriptionRatio": 356.95,
+  "LockupAgreement": 2.18,
+  "MaxValue": 29539,
+  "MultipleVariable": 1.0185862068965517,
+  "NetIncome": -57.32,
+  "Notes": "",
+  "Revenue": 279.5,
+  "StkCode": "389650"
+},
+{
+  "_id": {
+    "$oid": "66cd3586023f7cb308b3a550"
+  },
+  "Company": "케이쓰리아이",
+  "FinalOfferingPrice": 15500,
+  "InstitutionalSubscriptionRatio": 239.23,
+  "LockupAgreement": 1.03,
+  "MaxValue": 15950,
+  "MultipleVariable": 1.0290322580645161,
+  "NetIncome": 14.91,
+  "Notes": "",
+  "Revenue": 107.41,
+  "StkCode": "431190"
+},
+{
+  "_id": {
+    "$oid": "66cd360f023f7cb308b3a551"
+  },
+  "Company": "티디에스팜",
+  "FinalOfferingPrice": 13000,
+  "InstitutionalSubscriptionRatio": 1331.2,
+  "LockupAgreement": 4.23,
+  "MaxValue": 52000,
+  "MultipleVariable": 4,
+  "NetIncome": 34.56,
+  "Notes": "",
+  "Revenue": 255.88,
+  "StkCode": "464280"
+},
+{
+  "_id": {
+    "$oid": "66cd3682023f7cb308b3a552"
+  },
+  "Company": "엠83",
+  "FinalOfferingPrice": 16000,
+  "InstitutionalSubscriptionRatio": 1024.72,
+  "LockupAgreement": 0.75,
+  "MaxValue": 54800,
+  "MultipleVariable": 3.425,
+  "NetIncome": 56.82,
+  "Notes": "",
+  "Revenue": 421.13,
+  "StkCode": "476080"
+},
+{
+  "_id": {
+    "$oid": "66cd36eb023f7cb308b3a553"
+  },
+  "Company": "이엔셀",
+  "FinalOfferingPrice": 15300,
+  "InstitutionalSubscriptionRatio": 949.3,
+  "LockupAgreement": 0.24,
+  "MaxValue": 45800,
+  "MultipleVariable": 2.9934640522875817,
+  "NetIncome": -455.67,
+  "Notes": "",
+  "Revenue": 73.67,
+  "StkCode": "456070"
+}]
