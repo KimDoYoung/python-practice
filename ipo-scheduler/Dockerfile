@@ -1,3 +1,7 @@
+# ----------------------------------------------------
+# Dockerfile for ipo-scheduler
+# ----------------------------------------------------
+
 # 베이스 이미지로3.10-slim 사용
 FROM python:3.12-slim
 
@@ -33,4 +37,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 
 # FastAPI 실행 (main.py에서 FastAPI 객체를 정의했을 때의 파일 경로)
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8881", "--log-level", "debug"]
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000", "--log-level", "debug"]
