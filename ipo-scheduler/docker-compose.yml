@@ -37,9 +37,9 @@ services:
       if ! mongo ipo-scheduler --eval 'db.Config.findOne()'; then
         mongoimport --host localhost --db ipo-scheduler --collection Config --file /data/import/Config.json --jsonArray &&
         mongoimport --host localhost --db ipo-scheduler --collection SchedulerJob --file /data/import/SchedulerJob.json --jsonArray &&
-        mongoimport --host localhost --db ipo-scheduler --collection Users --file /data/import/Users.json --jsonArray
-        mongoimport --host localhost --db ipo-scheduler --collection EventDays --file /data/import/EventDays.json --jsonArray
-        mongoimport --host localhost --db ipo-scheduler --collection Ipo --file /data/import/Ipo.json --jsonArray
+        mongoimport --host localhost --db ipo-scheduler --collection Users --file /data/import/Users.json --jsonArray &&
+        mongoimport --host localhost --db ipo-scheduler --collection EventDays --file /data/import/EventDays.json --jsonArray &&
+        mongoimport --host localhost --db ipo-scheduler --collection Ipo --file /data/import/Ipo.json --jsonArray &&
         mongoimport --host localhost --db ipo-scheduler --collection IpoHistory --file /data/import/IpoHistory.json --jsonArray
       fi &&
       tail -f /dev/null

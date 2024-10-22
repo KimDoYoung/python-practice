@@ -19,6 +19,14 @@ cd python-practice/ipo-scheduler
 git pull
 docker-compose down 
 docker-compose up --build -d
+
+docker-compose down
+docker-compose build --no-cache
+docker-compose up -d
+
+docker-compose down
+docker network prune
+docker-compose up -d
 ```
 
 2. 참고 commands
@@ -30,7 +38,15 @@ docker-compose logs backend
 docker-compose logs mongo
 docker exec -it ipo-scheduler /bin/bash
 docker exec -it mongo /bin/bash
+
+docker logs ipo-mongo
+docker logs ipo-scheduler
+
+# 메모리 확보
+docker builder prune --all
 ```
+
+
 
 ## 빌드
 
