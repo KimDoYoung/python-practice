@@ -84,7 +84,7 @@ async def startup_event():
     mongodb_url = config.DB_URL 
     db_name = config.DB_NAME
     logger.info('---------------------------------')
-    logger.info(f"MongoDB 연결: {mongodb_url}/{db_name}")
+    logger.info(f"MongoDB 연결: {mongodb_url}{db_name}")
     logger.info('---------------------------------')
     await MongoDb.initialize(mongodb_url)
     

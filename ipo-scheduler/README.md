@@ -1,7 +1,7 @@
 # IPO-scheduler
 
 - ipo_scheduler에서 불필요한 것들 제거, ipo관련된 것들만 남김
-- 포트를 8881로 변경함
+- 포트를 8000 변경함
 - 데이타베이스명을 ipo-scheduer로 함.
 - export IPO_SCHEDULER_MODE=real 로 서버에서 설정
 - jskn의 몽고db는 docker로 실행됨
