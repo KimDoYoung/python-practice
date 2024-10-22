@@ -1,7 +1,9 @@
-from sqlalchemy import Column, String, DateTime, CHAR
+from sqlalchemy import DECIMAL, Column, Integer, String, DateTime, CHAR
 from sqlalchemy.sql import func
-from app.core.database import Base  # Base는 SQLAlchemy 모델의 부모 클래스
+from app.core.database import metadata
+from sqlalchemy.ext.declarative import declarative_base
 
+Base = declarative_base(metadata=metadata)
 class ApNode(Base):
     __tablename__ = 'ap_node'
 
@@ -17,10 +19,6 @@ class ApNode(Base):
     create_dt = Column(DateTime, default=func.now(), comment='생성일시')
     modify_dt = Column(DateTime, nullable=True, comment='수정일시')
     upload_id = Column(String(20), nullable=True, comment='업로드 사용자id')
-
-from sqlalchemy import Column, String, DateTime, DECIMAL, Integer
-from sqlalchemy.sql import func
-from app.core.database import Base
 
 class ApFile(Base):
     __tablename__ = 'ap_file'

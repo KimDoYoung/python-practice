@@ -28,7 +28,7 @@ def set_middlewares(app: FastAPI):
 
 def set_routes(app: FastAPI):
     ''' 라우팅 설정 '''
-    app.include_router(diary_router, prefix="/api/v1/diary", tags=["company"])
+    app.include_router(diary_router, prefix="/api/v1", tags=["diary"])
     
 def set_event_handlers(app: FastAPI):
     ''' 이벤트 핸들러 설정 '''
