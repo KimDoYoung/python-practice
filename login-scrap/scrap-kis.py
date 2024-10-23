@@ -264,5 +264,4 @@ print(page_source)
 
 # 20초뒤에 브라우저 닫기
 time.sleep(20)
-# 8. 브라우저 닫기
 driver.quit()
