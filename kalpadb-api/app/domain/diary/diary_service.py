@@ -55,7 +55,7 @@ class DiaryService:
 
     # Delete
     async def delete_diary(self, ymd: str) -> bool:
-        ''' 일기 1개를 삭제 일기가 존재하지 않거나 삭제 실패시 false를, 삭제를 하면 true를 반환 '''
+        ''' 일기 1개를 삭제 일기가 존재하지 않거나 삭제 실패시 false를, 삭제를 하면 true를 반환, 이미지 match_file_var도 삭제 '''
         try:
             # Diary 삭제 대상 조회
             result = await self.db.execute(select(Diary).filter(Diary.ymd == ymd))
