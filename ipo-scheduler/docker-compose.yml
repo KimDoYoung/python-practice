@@ -39,7 +39,7 @@ services:
       # MongoDB가 준비될 때까지 대기
       until mongo --host localhost --eval 'print(\"MongoDB is ready\")'; do
           sleep 5;
-      done;
+      done
 
       echo 'MongoDB 기동 완료. Import 시작...';
 
