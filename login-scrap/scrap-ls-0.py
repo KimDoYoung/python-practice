@@ -34,25 +34,6 @@ try:
         print("로그인 링크가 나타났습니다. 클릭합니다.")
         login_element.click()
         time.sleep(5)
-        # 첫 번째 프레임(index 0)으로 전환, 그리고 input#userId가 나타날 때까지 대기
-        user_id_input = WebDriverWait(driver, 30).until(
-            EC.frame_to_be_available_and_switch_to_it(0)  # 인덱스로 첫 번째 프레임 전환
-        )
-        
-        # input#userId가 나타날 때까지 기다리기
-        user_id_input = WebDriverWait(driver, 30).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, "input#userId"))
-        )
-        print("input#userId를 찾았습니다.")
-        
-        # 아이디 입력
-        user_id_input.send_keys("kdy8017")
-        
-        # 비밀번호 입력란 찾기 및 비밀번호 입력
-        passwd_input = WebDriverWait(driver, 30).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, "input#passwd"))
-        )
-        passwd_input.send_keys("8118kdy")
 
         # 2. 모든 iframe 탐색
         frames = driver.find_elements(By.TAG_NAME, "iframe")
