@@ -32,11 +32,6 @@ services:
       - ipo-network
     command: >
       bash -c "
-      # Lock 파일이 있으면 삭제
-      if [ -f /data/db/mongod.lock ]; then
-          rm /data/db/mongod.lock
-          echo 'Removed mongod.lock'
-      fi
 
       # MongoDB 실행
       mongod --bind_ip_all & 
