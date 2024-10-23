@@ -15,6 +15,7 @@ async def create_diary(diary_data: DiaryRequest, db: AsyncSession = Depends(get_
 # Get diary by ymd
 @router.get("/diary/{ymd}", response_model=DiaryListResponse)
 async def get_diary(ymd: str, db: AsyncSession = Depends(get_session)):
+    ''' diary 1개 조회, 달려있는 이미지 리스트도 함께 조회 '''
     service = DiaryService(db)
     diary = await service.get_diary(ymd)
     if not diary:
@@ -47,6 +48,7 @@ async def update_diary(ymd: str, diary_data: DiaryRequest, db: AsyncSession = De
 # Delete diary
 @router.delete("/diary/{ymd}", response_model=bool)
 async def delete_diary(ymd: str, db: AsyncSession = Depends(get_session)):
+    ''' 일지 1개를 삭제 '''
     service = DiaryService(db)
     success = await service.delete_diary(ymd)
     if not success:

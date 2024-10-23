@@ -28,7 +28,8 @@ class ApNodeFileService:
         return result.first()
 
     # match_file_var로 매칭된 파일 조회
-    async def get_file_by_match(self, tbl: str, id: str):
+    async def get_file_by_match(self, tbl: str, id: str) -> list[ApFile]:
+        ''' match_file_var로 매칭된 파일 조회 '''
         stmt = (
             select(ApFile)
             .join(MatchFileVar, ApFile.node_id == MatchFileVar.node_id)

@@ -16,3 +16,23 @@ pip install -r requirements.txt
 export Kalpadb_api_mode=local
 uvicorn app.main:app --reload
 ```
+
+## Diary
+
+- List
+
+```sql
+select 
+ A.ymd
+ ,A.summary
+ ,A.content
+ ,GROUP_CONCAT(concat(C.saved_dir_name,'/', C.saved_file_name) order by concat(C.saved_dir_name,'/', C.saved_file_name)   SEPARATOR ', ') as files
+from dairy A 
+left outer join match_file_var B
+ on  A.ymd = B.id and B.tbl ='dairy'
+left outer join ap_file C 
+ on B.node_id  = C.node_id
+where A.ymd between '20240101' and '20241231'
+group by A.ymd, A.summary, A.content
+order by A.ymd
+```
