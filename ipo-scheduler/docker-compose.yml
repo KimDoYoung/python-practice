@@ -32,27 +32,17 @@ services:
       - ipo-network
     command: >
         bash -c "
-        mongod --bind_ip_all &
-        sleep 10;
-        if ! mongo ipo-scheduler --eval 'db.Config.findOne()'; then
-            mongoimport --host localhost --db ipo-scheduler --collection Config --file /data/import/Config.json --jsonArray;
-            echo 'Config collection import 완료';
-            
-            mongoimport --host localhost --db ipo-scheduler --collection SchedulerJob --file /data/import/SchedulerJob.json --jsonArray;
-            echo 'SchedulerJob collection import 완료';
-            
-            mongoimport --host localhost --db ipo-scheduler --collection Users --file /data/import/Users.json --jsonArray;
-            echo 'Users collection import 완료';
-            
-            mongoimport --host localhost --db ipo-scheduler --collection EventDays --file /data/import/EventDays.json --jsonArray;
-            echo 'EventDays collection import 완료';
-            
-            mongoimport --host localhost --db ipo-scheduler --collection Ipo --file /data/import/Ipo.json --jsonArray;
-            echo 'Ipo collection import 완료';
-            
-            mongoimport --host localhost --db ipo-scheduler --collection IpoHistory --file /data/import/IpoHistory.json --jsonArray;
-            echo 'IpoHistory collection import 완료';
-        fi;
+        mongod --bind_ip_all & 
+        until mongo --host localhost --eval 'print(\"MongoDB is ready\")'; do
+            sleep 5;
+        done;
+        echo 'MongoDB 기동 완료. Import 시작...';
+        mongoimport --host localhost --db ipo-scheduler --collection Config --file /data/import/Config.json --jsonArray || echo 'Config import 실패';
+        mongoimport --host localhost --db ipo-scheduler --collection SchedulerJob --file /data/import/SchedulerJob.json --jsonArray || echo 'SchedulerJob import 실패';
+        mongoimport --host localhost --db ipo-scheduler --collection Users --file /data/import/Users.json --jsonArray || echo 'Users import 실패';
+        mongoimport --host localhost --db ipo-scheduler --collection EventDays --file /data/import/EventDays.json --jsonArray || echo 'EventDays import 실패';
+        mongoimport --host localhost --db ipo-scheduler --collection Ipo --file /data/import/Ipo.json --jsonArray || echo 'Ipo import 실패';
+        mongoimport --host localhost --db ipo-scheduler --collection IpoHistory --file /data/import/IpoHistory.json --jsonArray || echo 'IpoHistory import 실패';
         tail -f /dev/null
         "
     restart: always  # 서버 재시작 시 항상 컨테이너를 재시작  
