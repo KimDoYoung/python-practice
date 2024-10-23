@@ -45,8 +45,6 @@ services:
       tail -f /dev/null
       "
     restart: always  # 서버 재시작 시 항상 컨테이너를 재시작  
-volumes:
-  mongo_data:
 
 networks:
   ipo-network:
