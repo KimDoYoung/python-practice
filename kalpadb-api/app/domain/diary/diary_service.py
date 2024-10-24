@@ -1,10 +1,14 @@
 from sqlalchemy import asc, desc, func, literal_column  
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from app.core.util import saved_path_to_url
 from app.domain.diary.diary_model import Diary
 from app.domain.diary.diary_schema import DiaryRequest, DiaryListResponse
 from app.domain.filenode.filenode_model import ApFile, MatchFileVar
+from app.domain.filenode.filenode_service import ApNodeFileService
+from app.core.logger import get_logger
 
+logger = get_logger(__name__)
 class DiaryService:
     def __init__(self, db: AsyncSession):
         self.db = db
@@ -25,6 +29,14 @@ class DiaryService:
     async def get_diary(self, ymd: str) -> DiaryListResponse | None:
         result = await self.db.execute(select(Diary).filter(Diary.ymd == ymd))
         diary = result.scalar_one_or_none()  # 일치하는 첫 번째 결과를 가져옴
+        if not diary:
+            return None
+        fileService = ApNodeFileService(self.db)
+        file_list = await fileService.get_file_by_match('dairy', ymd)
+        if file_list:
+            image_paths = [f"{imgfile.saved_dir_name}/{imgfile.saved_file_name}" for imgfile in file_list]
+            diary.attachments = saved_path_to_url( ','.join(image_paths) )
+
         if diary:
             return DiaryListResponse.model_validate(diary)
         return None
@@ -43,18 +55,43 @@ class DiaryService:
 
     # Delete
     async def delete_diary(self, ymd: str) -> bool:
-        result = await self.db.execute(select(Diary).filter(Diary.ymd == ymd))
-        diary = result.scalar_one_or_none()
-        if diary:
+        ''' 일기 1개를 삭제 일기가 존재하지 않거나 삭제 실패시 false를, 삭제를 하면 true를 반환, 이미지 match_file_var도 삭제 '''
+        try:
+            # Diary 삭제 대상 조회
+            result = await self.db.execute(select(Diary).filter(Diary.ymd == ymd))
+            diary = result.scalar_one_or_none()
+
+            if not diary:
+                return False  # Diary가 없으면 False 반환
+
+            # MatchFileVar 삭제 (MatchFileVar에 데이터가 있을 수도, 없을 수도 있음)
+            result = await self.db.execute(
+                select(MatchFileVar).filter(MatchFileVar.tbl == 'dairy', MatchFileVar.id == ymd)
+            )
+            match_file_vars = result.scalars().all()
+
+            if match_file_vars:
+                # MatchFileVar 레코드 삭제
+                for match_file_var in match_file_vars:
+                    await self.db.delete(match_file_var)
+
+            # Diary 레코드 삭제
             await self.db.delete(diary)
+
+            # 트랜잭션 커밋
             await self.db.commit()
+
             return True
-        return False
+
+        except Exception as e:
+            await self.db.rollback()
+            logger.info(f"일기 삭제 중 오류가 발생했습니다: {e}")
+            return False
 
     async def get_diaries(
         self, start_ymd: str, end_ymd: str, start_index: int, limit: int, order: str, summary_only: bool = False
     ) -> dict:
-        ''' 조회 이미지 포함 '''
+        ''' Paging 이미지 포함 '''
         # 정렬 순서 설정
         sort_order = asc(Diary.ymd) if order == 'asc' else desc(Diary.ymd)
         
@@ -88,17 +125,6 @@ class DiaryService:
         diaries = diaries[:limit]  # 실제 데이터는 limit만큼만 사용
         last_index = start_index + len(diaries)
 
-        # files 경로를 변환하는 함수
-        def convert_to_url(files_str):
-            base_url = "http://jskn.iptime.org:6789/uploaded/"
-            if not files_str:
-                return None
-            # 파일 경로를 쉼표로 나눈 후, /home/kdy987/www/ 부분을 제거하고 URL로 변환
-            files = files_str.split(",")
-            # 빈 문자열을 제거하고 경로를 변환하여 리스트에 추가
-            return [base_url + file.strip().replace("/home/kdy987/www/uploaded/", "") 
-                    for file in files if file.strip()]
-
         # 데이터 처리
         if summary_only:
             data = [{"ymd": diary.ymd, "summary": diary.summary} for diary in diaries]
@@ -106,7 +132,7 @@ class DiaryService:
             data = []
             for diary in diaries:
                 # files를 URL 리스트로 변환
-                attachments = convert_to_url(diary.files)
+                attachments = saved_path_to_url(diary.files)
 
                 # Pydantic 모델로 변환
                 diary_response = DiaryListResponse(
