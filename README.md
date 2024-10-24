@@ -27,4 +27,7 @@
 9. lucy : 자동단타머신
 10. stock-api : multi user, multi account 주식거래 
 11. movie_review : kalpadb의 movie_review의 내요을 html로 뽑아냄
-
+12. kalpadb-api : kalpadb mariadb를 위한 fastapi restful api service
+13. login-scrap : LS증권, KIS증권 로그인해서 scrapping
+14. asset-api : asset erp 용 법률정보 서비스를 위한 fastapi restful api
+15. ipo-scheduler :  lucy에서 ipo 달력과 상세를 떼어내어서 jskn에서 서비스 
