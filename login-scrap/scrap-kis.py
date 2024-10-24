@@ -17,6 +17,7 @@ driver = webdriver.Chrome(service=service)
 url = 'https://securities.koreainvestment.com/main/member/login/login.jsp'
 driver.get(url)
 
+time.sleep(5)
 # "ID로그인" 탭 클릭
 tab_selector = '//div[@class="tab_content" and @data-tab="tab05"]'
 WebDriverWait(driver, 10).until(
@@ -149,7 +150,9 @@ try:
         WebDriverWait(driver, 10).until(EC.staleness_of(old_table))
 
         
-        # 테이블이 로드될 때까지 대기 (id="view01")
+        print('------------------------------------------------------------')
+        print('전체계좌 조회를 수행합니다.')
+        print('------------------------------------------------------------')            
         table = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.ID, "view01"))  # 테이블이 페이지에 로드될 때까지 대기
         )
@@ -157,7 +160,7 @@ try:
         # 테이블이 정상적으로 로드되면 HTML 출력
         print("테이블이 로드되었습니다.")
         table_html = table.get_attribute('outerHTML')
-        print(table_html)
+        #print(table_html)
         
         # BeautifulSoup으로 HTML 파싱
         soup = BeautifulSoup(table_html, 'html.parser')
@@ -191,7 +194,9 @@ try:
 
         # DataFrame 출력
         print(df) 
-            # DataFrame을 CSV 파일로 저장
+        print('------------------------------------------------------------')
+        print('result.csv 파일에 저장합니다')
+        print('------------------------------------------------------------')            
         df.to_csv('result.csv', index=False, encoding='utf-8-sig')
         # 페이지 업데이트를 위한 대기
         #time.sleep(10)  # 서버에서 데이터를 받아오는 시간을 충분히 줌 (명시적 대기를 권장)
@@ -205,6 +210,9 @@ try:
         #    f.write(page_source)
         
         # 로그아웃 버튼이 로드될 때까지 대기 (클래스 이름으로 찾기)
+        print('------------------------------------------------------------')
+        print('로그아웃을 수행합니다.')
+        print('------------------------------------------------------------')
         logout_button = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.XPATH, "//a[contains(@class, 'btn_logout')]"))
         )
@@ -221,7 +229,7 @@ except Exception as e:
     print("오류 발생:", e)
 
 print("기다렸다가.... 종료합니다....")
-time.sleep(30)
+time.sleep(10)
 driver.quit()
 exit()
 
