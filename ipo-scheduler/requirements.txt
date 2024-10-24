@@ -21,3 +21,4 @@ scikit-learn
 sympy
 chromedriver-autoinstaller
 selenium
+lxml
