@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ipo-scheduler manual</title>
+</head>
+<style>
+    .container {
+        margin: 0 auto;
+        width: 80%;
+    }
+    .warning {
+        color: rgb(149, 66, 66);
+    }
+    .summary {
+        border: 1px solid black;
+        padding: 10px;
+        margin: 20px;
+        background-color: #ebebbd;
+        border-radius: 10px;
+    }
+</style>
+<body>
+    <div class="container">
+        <h1>개요</h1>
+        <div class="summary">
+            <ul>
+                <li>공모주 일정을 매일 38커뮤니케이션 사이트에서 Scraping하여 데이터를 저장하고, 사용자가 조회할 수 있도록 하는 웹사이트입니다</li>
+                <li>가져온 데이터를 달력과 박스형태로 표현합니다 </li>
+                <li>최고예상체결가를 산정합니다(현재는 공식으로 산정. 추후 인공지능기법으로 구현할 예정임)</li>
+                <li>지난 데이터 즉 현재가 10월이라면 8월이나 9월초의 데이터는 삭제합니다.</li>
+            </ul>
+        </div>
+        <h1>사용법</h1>    
+        <h2>1. 접속 및 로그인</h2>
+        <ul>
+            <li><a href="http://jskn.iptime.org:8000" target="_blank">http://jskn.iptime.org:8000</a> 에 접속</li>
+            <li>로그인</li>
+            <ul>
+                <li>아이디: kdy987</li>
+                <li>비밀번호: 1111</li>
+            </ul>
+        </ul>
+        <img src="login.png" alt="로그인" width="500">
+        <h2>2. Top 메뉴</h2>
+        <img src="detail1.png" alt="상세" width="80%">
+        <ol>
+            <li>공모주</li>
+                <ol>
+                    <li>상세 : 각 공모주에 대한 상세한 내용을 박스형태로 표현</li>
+                    <li>달력 : 공모주일정을 달력으로 표현</li>
+                    <li>기록 : 예상체결가를 구하기 위해서 </li>
+                </ol>
+            <li>설정</li>
+                <ul>
+                    <li>예상체결가공식, 사이트38 스크랩최종시각</li>
+                    <li>스케줄러(cron) 설정 시각</li>
+                </ul>
+            <li>사용자</li>
+            <ul>
+                <li>사용자정보 설정</li>
+            </ul>
+            <li>로그아웃</li>
+            <ul>
+                <li>종료시, 로그인 화면으로 이동</li>
+            </ul>
+        </ol>
+        <div class="warning">
+            <ul>
+                <li>공모주메뉴 즉 공모주-상세, 공모주-달력만 사용하면 됨.</li>
+                <li>종료시 로그아웃버튼 클릭, 일정시간 후 자동로그아웃 됨</li>
+                <li>공모주기록, 설정, 사용자 메뉴는 사용할 필요 없음</li>
+            </ul>
+        </div>
+        <h2>3. 공모주-달력</h2>
+        <img src="detail2.png" alt="상세2">
+        <ul>
+            <li>달력에서 공모주일정을 확인할 수 있음</li>
+            <li>달력의  <strong>회사명</strong>을 클릭하면 38커뮤니케이션이 제공하는 <strong>그 회사의 상세화면으로 이동</strong></li>
+            <li>이미지 저장을 클릭하면 현재 달력을 이미지 파일로 저장할 수 있음</li>
+        </ul>
+        <h2>4. 공모주-목록</h2>
+        <img src="list1.png" alt="리스트1" width="1000px">
+        <ul>
+            <li>각 공모주의 상세 내용을 박스형태로 보여줌</li>
+            <li>회사명 검색: 회사명의 글자 일부를 입력함으로써 해당 회사만 표시</li>
+            <li>주관증권사별로 검색</li>
+        </ul>
+        <h2>5. 동작방법</h2>
+        <ul>
+            <li>매일 정해진 시간(설정메뉴)에 38커뮤니케이션 사이트에서 공모주관련 데이터를 Scraping함</li>
+            <li>Scraping한 시각은 공모주-상세에서 확인가능</li>
+            <li>과거데이터는 삭제함 즉 현재가 10월이면 이전 월의 데이터는 사라짐.(공모가 끝난 데이터는 불필요한 데이터로 생각함)</li>
+        </ul>
+    </div>
+</body>
+</html>
