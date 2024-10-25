@@ -49,7 +49,7 @@ no_button = WebDriverWait(driver, 10).until(
 no_button.click()
 
 # page source를  no_click_after.html로 저장
-with open('no_click_after.html', 'w', encoding='utf-8') as f:
+with open('data/kis-아니오클릭후.html', 'w', encoding='utf-8') as f:
     f.write(driver.page_source)
 
 id_login_tab = WebDriverWait(driver, 10).until(
@@ -122,7 +122,7 @@ for window in all_windows:
 url = 'https://securities.koreainvestment.com/main/banking/inquiry/MyAsset.jsp'
 driver.get(url)
 # 페이지 소스를 asset_page.html로 저장
-with open('asset_page.html', 'w', encoding='utf-8') as f:
+with open('data/kis-asset_page.html', 'w', encoding='utf-8') as f:
     f.write(driver.page_source)
     
 try:
@@ -197,7 +197,7 @@ try:
         print('------------------------------------------------------------')
         print('result.csv 파일에 저장합니다')
         print('------------------------------------------------------------')            
-        df.to_csv('result.csv', index=False, encoding='utf-8-sig')
+        df.to_csv('data/kis-result.csv', index=False, encoding='utf-8-sig')
         # 페이지 업데이트를 위한 대기
         #time.sleep(10)  # 서버에서 데이터를 받아오는 시간을 충분히 줌 (명시적 대기를 권장)
         
