@@ -24,11 +24,8 @@ def set_middlewares(app: FastAPI):
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    
     # JWT 인증 미들웨어 등록
     app.add_middleware(JWTAuthMiddleware)
-
-
 
 def set_routes(app: FastAPI):
     ''' 라우팅 설정 '''
@@ -46,8 +43,8 @@ def set_static_files(app: FastAPI):
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     static_files_path = os.path.join(BASE_DIR, 'frontend', 'public')
     logger.info('------------------------------------------------')
-    logger.debug(f"BASE_DIR: {BASE_DIR}")
-    logger.debug(f"static_files_path: {static_files_path}")
+    logger.info(f"BASE_DIR: {BASE_DIR}")
+    logger.info(f"static_files_path: {static_files_path}")
     logger.info('------------------------------------------------')
     app.mount("/public", StaticFiles(directory=static_files_path), name="public")
     
@@ -61,10 +58,10 @@ def create_app() -> FastAPI:
     logger.info('------------------------------------------------')
     logger.info(f"{service_title} 서버 시작")
     logger.info('------------------------------------------------')
-    logger.info(f"API 문서: http://localhost:{config.SERVICE_PORT}/docs")
+    # logger.info(f"API 문서: http://localhost:{config.SERVICE_PORT}/docs")
     logger.info(config)
 
-    app = FastAPI(title=service_title, version="0.0.1")
+    app = FastAPI(title=service_title, version="0.0.1", docs_url=None, redoc_url=None)
     set_middlewares(app)
     set_routes(app)
     set_event_handlers(app)
