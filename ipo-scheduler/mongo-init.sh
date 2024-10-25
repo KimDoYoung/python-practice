@@ -34,8 +34,10 @@ fi
 
 echo "MongoDB 기동 완료. Database 확인 중..."
 
-# ipo-scheduler 데이터베이스 존재 여부 확인 후 Import 수행
-if ! mongo --quiet --eval 'db.getMongo().getDBNames().indexOf("ipo-scheduler") >= 0'; then
+# 명확한 존재 여부 확인을 위한 조건문
+db_check=$(mongo --quiet --eval 'db.getMongo().getDBNames().indexOf("ipo-scheduler") >= 0' | tail -n 1)
+
+if [ "$db_check" == "false" ]; then
     echo "ipo-scheduler 데이터베이스가 없으므로 데이터를 Import합니다."
     mongoimport --host localhost --db ipo-scheduler --collection Config --file /data/import/Config.json --jsonArray --mode=upsert || echo "Config import 실패"
     mongoimport --host localhost --db ipo-scheduler --collection SchedulerJob --file /data/import/SchedulerJob.json --jsonArray --mode=upsert || echo "SchedulerJob import 실패"
