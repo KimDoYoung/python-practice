@@ -31,7 +31,6 @@ services:
       - ./mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh  # 스크립트 파일 마운트                  
     networks:
       - ipo-network
-    command: bash /docker-entrypoint-initdb.d/mongo-init.sh 
     restart: always  # 서버 재시작 시 항상 컨테이너를 재시작
 
 networks:
