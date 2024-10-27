@@ -24,7 +24,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.core.util import saved_path_to_url
 from app.domain.diary.diary_model import Diary
-from app.domain.diary.diary_schema import DiaryRequest, DiaryListResponse, DiaryResponse
+from app.domain.diary.diary_schema import DiaryBase, DiaryDetailResponse, DiaryRequest, DiaryListResponse, DiaryResponse, DiaryUpdateRequest
 from app.domain.filenode.filenode_model import ApFile, ApNode, MatchFileVar
 from app.domain.filenode.filenode_service import ApNodeFileService
 from fastapi import File, UploadFile
@@ -157,7 +157,7 @@ class DiaryService:
         return diary_response
     
     # Read
-    async def get_diary(self, ymd: str) -> DiaryListResponse | None:
+    async def get_diary(self, ymd: str) -> DiaryDetailResponse | None:
         ''' diary 1개 조회, 달려있는 이미지 리스트도 함께 조회 '''
         result = await self.db.execute(select(Diary).filter(Diary.ymd == ymd))
         diary = result.scalar_one_or_none()  # 일치하는 첫 번째 결과를 가져옴
@@ -165,16 +165,22 @@ class DiaryService:
             return None
         fileService = ApNodeFileService(self.db)
         file_list = await fileService.get_file_by_match('dairy', ymd)
+        attachs = []
         if file_list:
-            image_paths = [f"{imgfile.saved_dir_name}/{imgfile.saved_file_name}" for imgfile in file_list]
-            diary.attachments = saved_path_to_url( ','.join(image_paths) )
-
-        if diary:
-            return DiaryListResponse.model_validate(diary)
-        return None
+            for imgfile in file_list:
+                url = f"{config.URL_BASE}/{imgfile.saved_dir_name}/{imgfile.saved_file_name}"
+                attachs.append({
+                    "node_id": imgfile.node_id,
+                    "org_file_name": imgfile.org_file_name,
+                    "file_size": imgfile.file_size,
+                    "url": url
+                })
+        found_diary = DiaryDetailResponse.model_validate(diary)
+        found_diary.attachments = attachs
+        return found_diary
 
     # Update
-    async def update_diary(self, ymd: str, diary_data: DiaryRequest) -> DiaryListResponse | None:
+    async def update_diary(self, ymd: str, diary_data: DiaryUpdateRequest) -> DiaryBase | None:
         result = await self.db.execute(select(Diary).filter(Diary.ymd == ymd))
         diary = result.scalar_one_or_none()
         if diary:
@@ -182,7 +188,7 @@ class DiaryService:
             diary.summary = diary_data.summary
             await self.db.commit()
             await self.db.refresh(diary)
-            return DiaryListResponse.model_validate(diary)
+            return DiaryBase.model_validate(diary.__dict__)
         return None
 
     # Delete
@@ -311,7 +317,22 @@ class DiaryService:
     async def get_diary_delete_attachment(self, ymd: str, node_id:str) -> dict:
         ''' 일지에 첨부된 파일 1개를 삭제 '''
         fileService = ApNodeFileService(self.db)
-        fileService.delete_node_by_id(node_id)
-        fileService.delete_file_by_node_id(node_id)
-        
-        return {"result": "success"}            
+        # match_file_var 에서 node_id로 조회한 후 삭제
+        match_file_var = await fileService.get_file_by_match('dairy', ymd)
+        if match_file_var:
+            await self.db.delete(match_file_var)
+            await self.db.commit()
+
+        # ApNode 에서 id로 조회한 후 삭제 
+        file = await fileService.get_file_by_node_id(node_id)
+        if file:
+            os.remove(f"{file.saved_dir_name}/{file.saved_file_name}")
+            await self.db.delete(file)
+            await self.db.commit()
+        # ApFile 에서 node_id로 조회한 후 삭제
+        node = await fileService.get_node_by_id(node_id)
+        if node:
+            await self.db.delete(node)
+            await self.db.commit()
+
+        return {"result": "success"}

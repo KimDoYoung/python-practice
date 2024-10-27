@@ -17,7 +17,7 @@
 """
 from fastapi import APIRouter, Depends, Form, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.domain.diary.diary_schema import DiaryRequest, DiaryListResponse, DiaryResponse
+from app.domain.diary.diary_schema import DiaryBase, DiaryDetailResponse, DiaryRequest, DiaryResponse, DiaryUpdateRequest
 from app.domain.diary.diary_service import DiaryService
 from fastapi import File, UploadFile
 from typing import List, Optional
@@ -46,7 +46,7 @@ async def create_diary(
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
 # Get diary by ymd
-@router.get("/diary/{ymd}", response_model=DiaryListResponse)
+@router.get("/diary/{ymd}", response_model=DiaryDetailResponse)
 async def get_diary(ymd: str, db: AsyncSession = Depends(get_session)):
     ''' diary 1개 조회, 달려있는 이미지 리스트도 함께 조회 '''
     service = DiaryService(db)
@@ -70,8 +70,8 @@ async def get_diaries(
     return await service.get_diaries(start_ymd, end_ymd, start_index, limit=limit, order=order, summary_only=summary_only)
 
 # Update diary
-@router.put("/diary/{ymd}", response_model=DiaryListResponse)
-async def update_diary(ymd: str, diary_data: DiaryRequest, db: AsyncSession = Depends(get_session)):
+@router.put("/diary/{ymd}", response_model=DiaryBase)
+async def update_diary(ymd: str, diary_data: DiaryUpdateRequest, db: AsyncSession = Depends(get_session)):
     service = DiaryService(db)
     updated_diary = await service.update_diary(ymd, diary_data)
     if not updated_diary:
