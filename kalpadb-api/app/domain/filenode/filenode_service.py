@@ -38,3 +38,33 @@ class ApNodeFileService:
         )
         result = await self.db.execute(stmt)
         return result.scalars().all()
+
+    async def get_file_by_node_id(self, node_id: str) -> ApFile:
+        ''' node_id로 파일 조회 '''
+        stmt = select(ApFile).where(ApFile.node_id == node_id)
+        result = await self.db.execute(stmt)
+        return result.scalar()
+    
+    async def get_node_by_id(self, node_id: str) -> ApNode:
+        ''' node_id로 노드 조회 '''
+        stmt = select(ApNode).where(ApNode.id == node_id)
+        result = await self.db.execute(stmt)
+        return result.scalar()
+    
+    async def delete_note_by_id(self, node_id: str):
+        ''' node_id로 노드 삭제 '''
+        stmt = select(ApNode).where(ApNode.id == node_id)
+        result = await self.db.execute(stmt)
+        node = result.scalar()
+        self.db.delete(node)
+        await self.db.commit()
+        return node
+    
+    async def delete_file_by_id(self, node_id: str):
+        ''' node_id로 파일 삭제 '''
+        stmt = select(ApFile).where(ApFile.node_id == node_id)
+        result = await self.db.execute(stmt)
+        file = result.scalar()
+        self.db.delete(file)
+        await self.db.commit()
+        return file

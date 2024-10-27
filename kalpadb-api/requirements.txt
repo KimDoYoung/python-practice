@@ -5,3 +5,4 @@ sqlalchemy
 python-dotenv
 databases
 aiomysql
+python-multipart

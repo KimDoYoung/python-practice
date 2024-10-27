@@ -1,16 +1,49 @@
-from fastapi import APIRouter, Depends, HTTPException
+# diary_routes.py
+"""
+모듈 설명: 
+    -  일기 관련 API 라우터
+주요 기능:
+    - 일기생성 : POST, /diary
+    - 일기 조회 : GET, /diary/{ymd}
+    - 일기 목록 조회 : GET, /diaries
+    - 일기 수정 : PUT, /diary/{ymd}
+    - 일기 삭제 : DELETE, /diary/{ymd}
+    - 일기 첨부파일 목록 조회 : GET, /diary/attachments/{ymd}
+    - 일기 첨부파일 삭제 : DELETE, /diary/attachments/{ymd}/{node_id}
+
+작성자: 김도영
+작성일: 2024-10-27
+버전: 1.0
+"""
+from fastapi import APIRouter, Depends, Form, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.domain.diary.diary_schema import DiaryRequest, DiaryListResponse
+from app.domain.diary.diary_schema import DiaryRequest, DiaryListResponse, DiaryResponse
 from app.domain.diary.diary_service import DiaryService
+from fastapi import File, UploadFile
+from typing import List, Optional
 from app.core.database import get_session
 
 router = APIRouter()
 
-# Create diary
-@router.post("/diary", response_model=DiaryListResponse)
-async def create_diary(diary_data: DiaryRequest, db: AsyncSession = Depends(get_session)):
+# 일기생성
+@router.post("/diary", response_model=DiaryResponse)
+async def create_diary(
+    ymd: str = Form(...),
+    content: Optional[str] = Form(None),
+    summary: Optional[str] = Form(None),
+    files: List[UploadFile] = File(None),  # 여러 파일을 받을 수 있도록 설정
+    db: AsyncSession = Depends(get_session)
+):
     service = DiaryService(db)
-    return await service.create_diary(diary_data)
+    try:
+        diary_response = await service.create_diary(DiaryRequest(ymd=ymd, content=content, summary=summary), files)
+        
+        if not diary_response:
+            raise HTTPException(status_code=500, detail="Failed to create diary entry.")
+        
+        return diary_response
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
 # Get diary by ymd
 @router.get("/diary/{ymd}", response_model=DiaryListResponse)
@@ -54,3 +87,17 @@ async def delete_diary(ymd: str, db: AsyncSession = Depends(get_session)):
     if not success:
         raise HTTPException(status_code=404, detail="Diary not found")
     return success
+
+# 일기에 첨부된 파일목록
+@router.get("/diary/attachments/{ymd}", response_model=dict)
+async def get_diary_attachments(ymd: str, db: AsyncSession = Depends(get_session)):
+    ''' 일지에 첨부된 파일 목록 조회 '''
+    service = DiaryService(db)
+    return await service.get_diary_attachments_urls(ymd)
+
+# 첨부파일 삭제
+@router.delete("/diary/attachments/{ymd}/{node_id}", response_model=dict)
+async def get_diary_delete_attachment(ymd: str, node_id : str,  db: AsyncSession = Depends(get_session)):
+    ''' 일지에 첨부된 파일 1개를 삭제 '''
+    service = DiaryService(db)
+    return await service.get_diary_delete_attachment(ymd, node_id)

@@ -28,6 +28,9 @@ class Settings:
         # DB 설정
         self.DATABASE_URL = os.getenv('DATABASE_URL', "")
 
+        # CONSTS
+        self.URL_BASE = os.getenv('URL_BASE', 'http://jskn.iptime.org:6789/uploaded')
+
         # 로그 설정
         self.LOG_LEVEL = os.getenv('LOG_LEVEL', 'DEBUG')
         self.LOG_FILE = os.getenv('LOG_FILE', 'c:/tmp/logs/kalpadbapi/kalpadb_api.log')

@@ -1,12 +1,35 @@
+# diary_service.py
+"""
+모듈 설명: 
+    - 일기 관련 비즈니스 로직 처리
+주요 기능:
+    - create_diary : 일기 생성
+    - get_diary : 일기 조회
+    - update_diary : 일기 수정
+    - delete_diary : 일기 삭제
+    - get_diaries : 일기 목록 조회
+    - get_diary_attachments_urls : 일기에 첨부된 파일 URL 목록 조회
+    - get_diary_delete_attachment : 일기에 첨부된 파일 1개 삭제
+
+작성자: 김도영
+작성일: 2024-10-27
+버전: 1.0
+"""
+import os
+import shutil
+from typing import List
+from uuid import uuid4
 from sqlalchemy import asc, desc, func, literal_column  
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.core.util import saved_path_to_url
 from app.domain.diary.diary_model import Diary
-from app.domain.diary.diary_schema import DiaryRequest, DiaryListResponse
-from app.domain.filenode.filenode_model import ApFile, MatchFileVar
+from app.domain.diary.diary_schema import DiaryRequest, DiaryListResponse, DiaryResponse
+from app.domain.filenode.filenode_model import ApFile, ApNode, MatchFileVar
 from app.domain.filenode.filenode_service import ApNodeFileService
+from fastapi import File, UploadFile
 from app.core.logger import get_logger
+from app.core.settings import config
 
 logger = get_logger(__name__)
 class DiaryService:
@@ -14,19 +37,128 @@ class DiaryService:
         self.db = db
 
     # Create
-    async def create_diary(self, diary_data: DiaryRequest) -> DiaryListResponse:
-        new_diary = Diary(
+    async def create_diary(self, diary_data: DiaryRequest, files: List[UploadFile] = File(None) ) -> DiaryResponse:
+        # Diary 저장 (이 부분은 트랜잭션에 포함하지 않음)
+        diary = Diary(
             ymd=diary_data.ymd,
             content=diary_data.content,
             summary=diary_data.summary
         )
-        self.db.add(new_diary)
+        self.db.add(diary)
         await self.db.commit()
-        await self.db.refresh(new_diary)
-        return DiaryListResponse.model_validate(new_diary)
 
+        # 나머지 작업을 트랜잭션으로 처리
+        async with self.db.begin() as transaction:
+            try:
+                # 2. ApNode 조회하여 이미지 저장할 Node가 있는지 확인
+                yyyymm = diary_data.ymd[:6]  # 'yyyymm' 형식 추출
+                node_name = yyyymm
+
+                parent_node_query = select(ApNode.id).where(
+                    (ApNode.node_type == 'D') & 
+                    (ApNode.name == '일기')
+                ).limit(1)
+
+                parent_node_result = await self.db.execute(parent_node_query)
+                parent_node_id = parent_node_result.scalar_one_or_none()
+
+                if not parent_node_id:
+                    raise ValueError("일기 부모 노드를 찾을 수 없습니다.")
+
+                # Node의 존재 여부 확인
+                node_query = select(ApNode.id).where(
+                    (ApNode.node_type == 'D') & 
+                    (ApNode.parent_id == parent_node_id) & 
+                    (ApNode.name == node_name)
+                )
+                node_result = await self.db.execute(node_query)
+                node_id = node_result.scalar_one_or_none()
+
+                # 3. Node가 없으면 새로 생성
+                # base_dir = f"/home/kdy987/uploaded/일기/"
+                base_dir = f"c:/tmp/일기/"
+                if not node_id:
+                    node_id = str(uuid4()).replace("-", "")
+                    new_node = ApNode(
+                        id=node_id,
+                        node_type='D',
+                        parent_id=parent_node_id,
+                        name=node_name,
+                        full_name=f"{base_dir}/{node_name}",
+                        owner_id='kdy987',
+                        group_auth=755,
+                        guest_auth=755,
+                        delete_yn='N'
+                    )
+                    self.db.add(new_node)
+                    await self.db.flush()  # 새로 생성된 노드 ID를 트랜잭션 내에서 사용할 수 있도록 확정
+
+                # 4. ApFile 저장 및 파일 물리적으로 저장
+                attachments = []
+                #base_dir = f"/home/kdy987/www/uploaded/{yyyymm}"
+                base_dir = f"c:/tmp/uploaded/{yyyymm}"
+                os.makedirs(base_dir, exist_ok=True)  # 해당 월 폴더 생성
+
+                for file in files:
+                    file_uuid = str(uuid4()).replace("-", "")
+                    saved_file_name = f"{file.filename}"
+                    file_location = os.path.join(base_dir, saved_file_name)
+                    
+                    # 물리적 파일 저장
+                    with open(file_location, "wb") as buffer:
+                        shutil.copyfileobj(file.file, buffer)
+                    
+                    url_base = config.URL_BASE 
+                    # 파일 URL 생성 및 추가
+                    file_url = f"{url_base}/{yyyymm}/{saved_file_name}"
+                    attachments.append(file_url)
+
+                    # ApFile DB 레코드 생성
+                    ap_file = ApFile(
+                        node_id=file_uuid,
+                        parent_node_id=node_id,
+                        saved_dir_name=base_dir,
+                        saved_file_name=saved_file_name,
+                        org_file_name=file.filename,
+                        file_size=os.path.getsize(file_location),
+                        content_type=file.content_type,
+                        hashcode=None,
+                        note=None,
+                        width=None,
+                        height=None
+                    )
+                    self.db.add(ap_file)
+
+                    # 5. MatchFileVar 저장
+                    match_file_var = MatchFileVar(
+                        tbl='dairy',
+                        id=diary_data.ymd,
+                        node_id=file_uuid
+                    )
+                    self.db.add(match_file_var)
+
+                # 트랜잭션 커밋
+                await self.db.commit()
+
+            except Exception as e:
+                # 오류가 발생하면 롤백
+                await transaction.rollback()
+                print(f"Error creating diary and related entries: {e}")
+                return None
+
+        # 최종 응답 생성
+        diary_response = DiaryResponse(
+            ymd=diary.ymd,
+            content=diary.content,
+            summary=diary.summary,
+            attachments=attachments
+        )
+        
+        return diary_response
+    
     # Read
     async def get_diary(self, ymd: str) -> DiaryListResponse | None:
+        ''' diary 1개 조회, 달려있는 이미지 리스트도 함께 조회 '''
         result = await self.db.execute(select(Diary).filter(Diary.ymd == ymd))
         diary = result.scalar_one_or_none()  # 일치하는 첫 번째 결과를 가져옴
         if not diary:
@@ -55,7 +187,7 @@ class DiaryService:
 
     # Delete
     async def delete_diary(self, ymd: str) -> bool:
-        ''' 일기 1개를 삭제 일기가 존재하지 않거나 삭제 실패시 false를, 삭제를 하면 true를 반환, 이미지 match_file_var도 삭제 '''
+        ''' 일기 1개를 삭제, 일기가 존재하지 않거나 삭제 실패 시 False를, 삭제를 완료하면 True를 반환 '''
         try:
             # Diary 삭제 대상 조회
             result = await self.db.execute(select(Diary).filter(Diary.ymd == ymd))
@@ -64,16 +196,33 @@ class DiaryService:
             if not diary:
                 return False  # Diary가 없으면 False 반환
 
-            # MatchFileVar 삭제 (MatchFileVar에 데이터가 있을 수도, 없을 수도 있음)
+            # MatchFileVar에서 해당 일기에 연결된 파일들 조회
             result = await self.db.execute(
-                select(MatchFileVar).filter(MatchFileVar.tbl == 'dairy', MatchFileVar.id == ymd)
+                select(MatchFileVar).filter(MatchFileVar.tbl == 'diary', MatchFileVar.id == ymd)
             )
             match_file_vars = result.scalars().all()
 
-            if match_file_vars:
-                # MatchFileVar 레코드 삭제
-                for match_file_var in match_file_vars:
-                    await self.db.delete(match_file_var)
+            # 각 MatchFileVar와 연결된 ApFile, ApNode 삭제
+            for match_file_var in match_file_vars:
+                # ApFile 조회 및 삭제
+                file_result = await self.db.execute(
+                    select(ApFile).filter(ApFile.parent_node_id == match_file_var.node_id)
+                )
+                ap_files = file_result.scalars().all()
+
+                for ap_file in ap_files:
+                    # ApNode 조회 및 삭제
+                    node_result = await self.db.execute(
+                        select(ApNode).filter(ApNode.parent_id == ap_file.parent_node_id)
+                    )
+                    ap_nodes = node_result.scalars().all()
+
+                    for ap_node in ap_nodes:
+                        await self.db.delete(ap_node)  # ApNode 삭제
+
+                    await self.db.delete(ap_file)  # ApFile 삭제
+
+                await self.db.delete(match_file_var)  # MatchFileVar 삭제
 
             # Diary 레코드 삭제
             await self.db.delete(diary)
@@ -91,7 +240,7 @@ class DiaryService:
     async def get_diaries(
         self, start_ymd: str, end_ymd: str, start_index: int, limit: int, order: str, summary_only: bool = False
     ) -> dict:
-        ''' Paging 이미지 포함 '''
+        ''' diary Paging 이미지 포함 '''
         # 정렬 순서 설정
         sort_order = asc(Diary.ymd) if order == 'asc' else desc(Diary.ymd)
         
@@ -149,3 +298,20 @@ class DiaryService:
             "last_index": last_index
         }
 
+    async def get_diary_attachments_urls(self, ymd: str) -> dict:
+        ''' 일지에 첨부된 파일의 url 목록 조회 '''
+        fileService = ApNodeFileService(self.db)
+        file_list = await fileService.get_file_by_match('dairy', ymd)
+        url_base = config.URL_BASE
+        if file_list:
+            urls = [f"{url_base}/{imgfile.saved_dir_name}/{imgfile.saved_file_name}" for imgfile in file_list]
+            return {"urls": urls}
+        return {"urls": []}
+
+    async def get_diary_delete_attachment(self, ymd: str, node_id:str) -> dict:
+        ''' 일지에 첨부된 파일 1개를 삭제 '''
+        fileService = ApNodeFileService(self.db)
+        fileService.delete_node_by_id(node_id)
+        fileService.delete_file_by_node_id(node_id)
+        
+        return {"result": "success"}            
