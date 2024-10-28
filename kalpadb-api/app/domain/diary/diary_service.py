@@ -19,7 +19,7 @@ import os
 import shutil
 from typing import List
 from uuid import uuid4
-from sqlalchemy import asc, desc, func, literal_column  
+from sqlalchemy import Boolean, asc, desc, func, literal_column  
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.core.util import saved_path_to_url
@@ -304,13 +304,24 @@ class DiaryService:
             "next_data_exists": next_data_exists,
             "last_index": last_index
         }
+    async def get_diary_parent_node_id(self) -> str:
+        parent_node_query = select(ApNode.id).where(
+            (ApNode.node_type == 'D') & 
+            (ApNode.name == '일기')
+        ).limit(1)
 
-    async def add_diary_attachments(self, files: List[UploadFile]) -> List[AttachFileInfo]:
+        parent_node_result = await self.db.execute(parent_node_query)
+        parent_node_id = parent_node_result.scalar_one_or_none() 
+        return parent_node_id
+            
+    async def add_diary_attachments(self, ymd:str, files: List[UploadFile]) -> Boolean:
         ''' 일지에 파일 첨부 '''
-        ymd = files[0].filename.split("_")[1][:8]  # 파일명에서 yyyymmdd 추출
         attachments = []
         async with self.db.begin() as transaction:
             try:
+                parent_node_id = await self.get_diary_parent_node_id()
+                if not parent_node_id:
+                    raise ValueError("일기 부모 노드를 찾을 수 없습니다.")                
                 for file in files:
                     file_uuid = str(uuid4()).replace("-", "")
                     saved_file_name = f"{file.filename}"
@@ -328,7 +339,7 @@ class DiaryService:
                     # ApFile DB 레코드 생성
                     ap_file = ApFile(
                         node_id=file_uuid,
-                        parent_node_id=None,
+                        parent_node_id=parent_node_id,
                         saved_dir_name=base_dir,
                         saved_file_name=saved_file_name,
                         org_file_name=file.filename,
@@ -348,11 +359,11 @@ class DiaryService:
                     )
                     self.db.add(match_file_var)
                 await self.db.commit()
-                return self.get_diary_attachments_urls(ymd)
+                return True
             except Exception as e:
                 await transaction.rollback()
                 logger.info(f"Error adding attachments to diary: {e}")
-                return None
+                return False
 
     async def get_diary_attachments_urls(self, ymd: str) -> List[AttachFileInfo]:
         ''' 일지에 첨부된 파일의 url 목록 조회 '''

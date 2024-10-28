@@ -91,10 +91,15 @@ async def delete_diary(ymd: str, db: AsyncSession = Depends(get_session)):
 
 # 일기에 첨부파일 추가
 @router.post("/diary/attachments/{ymd}", response_model=List[AttachFileInfo])
-async def add_diary_attachments(ymd, str, files: List[UploadFile] = File(None), db: AsyncSession = Depends(get_session)):
+async def add_diary_attachments(ymd: str, files: List[UploadFile] = File(None), db: AsyncSession = Depends(get_session)):
     ''' 일지에 파일들 첨부 '''
     service = DiaryService(db)
-    return await service.add_diary_attachments(files)
+    result =  await service.add_diary_attachments(ymd, files)
+    # 성공시 목록 
+    if result:
+        return await service.get_diary_attachments_urls(ymd)
+    else:
+        raise HTTPException(status_code=500, detail="Failed to add attachments")
 
 
 # 일기에 첨부된 파일목록 조회
