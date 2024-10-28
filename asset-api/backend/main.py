@@ -11,7 +11,7 @@ from backend.app.api.v1.endpoints.company_routes import router as company_router
 from backend.app.api.v1.endpoints.auth_routes import router as auth_router
 from backend.app.api.v1.endpoints.service.law_routes import router as law_router
 
-logger = get_logger(__name__)
+logger = get_logger()
 
 
 def set_middlewares(app: FastAPI):

@@ -20,7 +20,7 @@ from jinja2 import TemplateNotFound
 from backend.app.core.logger import get_logger
 from backend.app.core.template_engine import render_template
 
-logger = get_logger(__name__)
+logger = get_logger()
 
 def add_exception_handlers(app):
     """FastAPI 앱에 예외 핸들러를 등록하는 함수"""

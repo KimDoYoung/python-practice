@@ -8,7 +8,7 @@ from backend.app.core.logger import get_logger
 from backend.app.domain.ifi.ifi01.ifi01_company_api_schema import Ifi01CompanyApiResponse
 from backend.app.domain.sys.sys01.sys01_company_model import Sys01Company
 
-logger = get_logger(__name__)
+logger = get_logger()
 
 class Ifi01CompanyApiService:
     def __init__(self, db: AsyncSession):

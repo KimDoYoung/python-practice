@@ -12,7 +12,7 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 import os
 
-def get_logger(name):
+def get_logger(name=None):
     
     from backend.app.core.settings import config
     
@@ -20,7 +20,7 @@ def get_logger(name):
     logger.setLevel(config.LOG_LEVEL)
     LOG_FILE = config.LOG_FILE
 
-    if not logger.handlers:
+    if not logger.hasHandlers():
         # 로그 디렉토리가 없으면 생성
         log_dir = os.path.dirname(LOG_FILE)
         if not os.path.exists(log_dir):

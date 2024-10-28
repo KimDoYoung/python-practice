@@ -6,7 +6,7 @@ from backend.app.core.logger import get_logger
 from backend.app.core.database import get_session
 from backend.app.domain.service.law.law_schema import Law010_Request, Law011_Request
 from backend.app.domain.service.law.law_service import LawService
-logger = get_logger(__name__)
+logger = get_logger()
 
 router = APIRouter()
 

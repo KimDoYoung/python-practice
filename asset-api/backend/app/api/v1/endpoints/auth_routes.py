@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.app.domain.ifi.ifi01.ifi01_company_api_service import Ifi01CompanyApiService
 from backend.app.core.security import create_access_token, secret_key_encrypt, verify_access_token
 
-logger = get_logger(__name__)
+logger = get_logger()
 
 router = APIRouter()
 

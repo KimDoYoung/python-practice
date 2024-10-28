@@ -36,10 +36,13 @@ class JWTAuthMiddleware(BaseHTTPMiddleware):
         # 요청 경로 및 클라이언트 IP 확인
         path = request.url.path
         client_ip = request.client.host
+        logger.debug("------------------------------------------------------------")
+        logger.debug(f"Request from IP: {client_ip}, Path: {path}")
+        logger.debug("------------------------------------------------------------")
         
         # 로그 기록: 모든 /api 요청에 대해 IP와 경로 기록
-        if path.startswith("/api"):
-            logger.info(f"Request from IP: {client_ip}, Path: {path}")
+        # if path.startswith("/api"):
+        #     logger.info(f"Request from IP: {client_ip}, Path: {path}")
         
         # 토큰 검증을 하지 않을 경로 목록 (정적 파일, 렌더링되는 HTML 페이지 등)
         STATIC_PATHS = ["/public", "/favicon.ico"]

@@ -13,7 +13,7 @@ import os, re
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from backend.app.core.logger import get_logger
 
-logger = get_logger(__name__)
+logger = get_logger()
 
 # 프로젝트 루트 디렉토리를 기반으로 템플릿 디렉토리 설정
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))

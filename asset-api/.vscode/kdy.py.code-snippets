@@ -3,7 +3,7 @@
         "prefix": "my_logger",
         "body":  [
             "from backend.app.core.logger import get_logger",
-            "logger = get_logger(__name__)"
+            "logger = get_logger()"
         ],
     },
     "router file starter" : {

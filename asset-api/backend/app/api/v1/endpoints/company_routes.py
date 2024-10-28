@@ -26,7 +26,7 @@ from backend.app.domain.sys.sys01.code_service import CodeService
 from backend.app.domain.sys.sys01.sys01_company_schema import Sys09CodeResponse
 from backend.app.domain.sys.sys01.sys01_company_service import Sys01CompanyService
 
-logger = get_logger(__name__)
+logger = get_logger()
 
 router = APIRouter()
 
