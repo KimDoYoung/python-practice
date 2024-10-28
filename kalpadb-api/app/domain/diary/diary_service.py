@@ -26,6 +26,7 @@ from app.core.util import saved_path_to_url
 from app.domain.diary.diary_model import Diary
 from app.domain.diary.diary_schema import DiaryBase, DiaryDetailResponse, DiaryRequest, DiaryListResponse, DiaryResponse, DiaryUpdateRequest
 from app.domain.filenode.filenode_model import ApFile, ApNode, MatchFileVar
+from app.domain.filenode.filenode_schema import AttachFileInfo
 from app.domain.filenode.filenode_service import ApNodeFileService
 from fastapi import File, UploadFile
 from app.core.logger import get_logger
@@ -76,7 +77,7 @@ class DiaryService:
 
                 # 3. Node가 없으면 새로 생성
                 # base_dir = f"/home/kdy987/uploaded/일기/"
-                base_dir = f"c:/tmp/일기/"
+                base_dir = config.UPLOAD_DIR_BASE
                 if not node_id:
                     node_id = str(uuid4()).replace("-", "")
                     new_node = ApNode(
@@ -96,7 +97,7 @@ class DiaryService:
                 # 4. ApFile 저장 및 파일 물리적으로 저장
                 attachments = []
                 #base_dir = f"/home/kdy987/www/uploaded/{yyyymm}"
-                base_dir = f"c:/tmp/uploaded/{yyyymm}"
+                base_dir = f"{config.UPLOAD_DIR_BASE}/{yyyymm}"
                 os.makedirs(base_dir, exist_ok=True)  # 해당 월 폴더 생성
 
                 for file in files:
@@ -304,35 +305,105 @@ class DiaryService:
             "last_index": last_index
         }
 
-    async def get_diary_attachments_urls(self, ymd: str) -> dict:
+    async def add_diary_attachments(self, files: List[UploadFile]) -> List[AttachFileInfo]:
+        ''' 일지에 파일 첨부 '''
+        ymd = files[0].filename.split("_")[1][:8]  # 파일명에서 yyyymmdd 추출
+        attachments = []
+        async with self.db.begin() as transaction:
+            try:
+                for file in files:
+                    file_uuid = str(uuid4()).replace("-", "")
+                    saved_file_name = f"{file.filename}"
+                    yyyymm = ymd[:6]
+                    base_dir = f"{config.UPLOAD_DIR_BASE}/{yyyymm}"
+                    os.makedirs(base_dir, exist_ok=True)  # 해당 월 폴더 생성
+                    file_location = os.path.join(base_dir, saved_file_name)
+                    # 물리적 파일 저장
+                    with open(file_location, "wb") as buffer:
+                        shutil.copyfileobj(file.file, buffer)
+                    url_base = config.URL_BASE
+                    # 파일 URL 생성 및 추가
+                    file_url = f"{url_base}/{yyyymm}/{saved_file_name}"
+                    attachments.append(file_url)
+                    # ApFile DB 레코드 생성
+                    ap_file = ApFile(
+                        node_id=file_uuid,
+                        parent_node_id=None,
+                        saved_dir_name=base_dir,
+                        saved_file_name=saved_file_name,
+                        org_file_name=file.filename,
+                        file_size=os.path.getsize(file_location),
+                        content_type=file.content_type,
+                        hashcode=None,
+                        note=None,
+                        width=None,
+                        height=None
+                    )
+                    self.db.add(ap_file)
+                    # 5. MatchFileVar 저장
+                    match_file_var = MatchFileVar(
+                        tbl='dairy',
+                        id=ymd,
+                        node_id=file_uuid
+                    )
+                    self.db.add(match_file_var)
+                await self.db.commit()
+                return self.get_diary_attachments_urls(ymd)
+            except Exception as e:
+                await transaction.rollback()
+                logger.info(f"Error adding attachments to diary: {e}")
+                return None
+
+    async def get_diary_attachments_urls(self, ymd: str) -> List[AttachFileInfo]:
         ''' 일지에 첨부된 파일의 url 목록 조회 '''
         fileService = ApNodeFileService(self.db)
         file_list = await fileService.get_file_by_match('dairy', ymd)
         url_base = config.URL_BASE
-        if file_list:
-            urls = [f"{url_base}/{imgfile.saved_dir_name}/{imgfile.saved_file_name}" for imgfile in file_list]
-            return {"urls": urls}
-        return {"urls": []}
+        result_list = []
+        for file in file_list:
+            url = f"{url_base}/{file.saved_dir_name}/{file.saved_file_name}"
+            file_info = AttachFileInfo(
+                node_id=file.node_id,
+                file_name=file.org_file_name,
+                file_size=file.file_size,
+                url=url
+            )
+            result_list.append(file_info)
+        return result_list
+            
 
-    async def get_diary_delete_attachment(self, ymd: str, node_id:str) -> dict:
-        ''' 일지에 첨부된 파일 1개를 삭제 '''
+    async def get_diary_delete_attachment(self, ymd: str, node_id: str) -> dict:
+        """일지에 첨부된 파일 1개를 삭제"""
         fileService = ApNodeFileService(self.db)
-        # match_file_var 에서 node_id로 조회한 후 삭제
-        match_file_var = await fileService.get_file_by_match('dairy', ymd)
-        if match_file_var:
-            await self.db.delete(match_file_var)
-            await self.db.commit()
 
-        # ApNode 에서 id로 조회한 후 삭제 
-        file = await fileService.get_file_by_node_id(node_id)
-        if file:
-            os.remove(f"{file.saved_dir_name}/{file.saved_file_name}")
-            await self.db.delete(file)
-            await self.db.commit()
-        # ApFile 에서 node_id로 조회한 후 삭제
-        node = await fileService.get_node_by_id(node_id)
-        if node:
-            await self.db.delete(node)
-            await self.db.commit()
+        # 트랜잭션 블록 시작
+        async with self.db.begin() as transaction:
+            try:
+                # match_file_list에서 node_id로 조회한 후 삭제
+                match_file_list = await fileService.get_file_by_match('dairy', ymd)
+                for match_file in match_file_list:
+                    # node_id로 파일 정보 조회
+                    node_id = match_file.node_id
+                    file = await fileService.get_file_by_node_id(node_id)
+                    if file:
+                        # 실제 파일 삭제
+                        os.remove(f"{file.saved_dir_name}/{file.saved_file_name}")
+                        await self.db.delete(file)
+
+                    # ApFile에서 node_id로 조회한 후 삭제
+                    node = await fileService.get_node_by_id(node_id)
+                    if node:
+                        await self.db.delete(node)
+
+                    # match_file 삭제
+                    await self.db.delete(match_file)
+
+                # 트랜잭션이 완료되면 커밋
+                await transaction.commit()
+
+            except Exception as e:
+                # 예외가 발생하면 트랜잭션 롤백
+                await transaction.rollback()
+                raise e
 
         return {"result": "success"}

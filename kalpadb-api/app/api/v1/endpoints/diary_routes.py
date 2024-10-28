@@ -22,6 +22,7 @@ from app.domain.diary.diary_service import DiaryService
 from fastapi import File, UploadFile
 from typing import List, Optional
 from app.core.database import get_session
+from app.domain.filenode.filenode_schema import AttachFileInfo
 
 router = APIRouter()
 
@@ -88,8 +89,16 @@ async def delete_diary(ymd: str, db: AsyncSession = Depends(get_session)):
         raise HTTPException(status_code=404, detail="Diary not found")
     return success
 
-# 일기에 첨부된 파일목록
-@router.get("/diary/attachments/{ymd}", response_model=dict)
+# 일기에 첨부파일 추가
+@router.post("/diary/attachments/{ymd}", response_model=List[AttachFileInfo])
+async def add_diary_attachments(ymd, str, files: List[UploadFile] = File(None), db: AsyncSession = Depends(get_session)):
+    ''' 일지에 파일들 첨부 '''
+    service = DiaryService(db)
+    return await service.add_diary_attachments(files)
+
+
+# 일기에 첨부된 파일목록 조회
+@router.get("/diary/attachments/{ymd}", response_model=List[AttachFileInfo])
 async def get_diary_attachments(ymd: str, db: AsyncSession = Depends(get_session)):
     ''' 일지에 첨부된 파일 목록 조회 '''
     service = DiaryService(db)

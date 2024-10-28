@@ -23,7 +23,6 @@ logger = logging.getLogger(__name__)
 
 class Middleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        token = None
 
         # 요청 경로 및 클라이언트 IP 확인
         path = request.url.path
@@ -42,5 +41,3 @@ class Middleware(BaseHTTPMiddleware):
             return response
         else:
             raise HTTPException(status_code=401, detail="Unauthorized")
-        # 토큰 검증을 하지 않는 경로 처리
-        return await call_next(request)

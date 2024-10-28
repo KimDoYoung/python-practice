@@ -30,6 +30,7 @@ class Settings:
 
         # CONSTS
         self.URL_BASE = os.getenv('URL_BASE', 'http://jskn.iptime.org:6789/uploaded')
+        self.UPLOAD_DIR_BASE = os.getenv('UPLOAD_DIR_BASE', 'c:/tmp/uploads')
 
         # 로그 설정
         self.LOG_LEVEL = os.getenv('LOG_LEVEL', 'DEBUG')

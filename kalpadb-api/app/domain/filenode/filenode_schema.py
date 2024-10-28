@@ -67,3 +67,9 @@ class MatchFileIntResponse(MatchFileIntBase):
     model_config = {
         'from_attributes': True  # ORM 모드 활성화
     }
+    
+class AttachFileInfo(BaseModel):
+    node_id: str
+    file_name : str
+    file_size: int
+    url : str    
