@@ -76,7 +76,7 @@ async def custom_404_exception_handler(request: Request, exc: StarletteHTTPExcep
 
 async def create_error_response(request: Request, exc: Exception, errors=None) -> Union[JSONResponse, HTMLResponse]:
     """에러 응답 생성 함수"""
-    logger.error(f"xxx [500] xxx --> 서버동작 중 오류 발생: {exc}")
+    logger.error(f"xxx --> 서버동작 중 오류 발생: {exc}")
     context = {
         "request": request.url.path,
         "status_code": getattr(exc, "status_code", 500),

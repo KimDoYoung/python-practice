@@ -46,7 +46,7 @@ class JWTAuthMiddleware(BaseHTTPMiddleware):
         
         # 토큰 검증을 하지 않을 경로 목록 (정적 파일, 렌더링되는 HTML 페이지 등)
         STATIC_PATHS = ["/public", "/favicon.ico"]
-        NO_AUTH_PATHS = ["/main", "/page"]  # JWT 검증을 하지 않는 페이지 경로
+        NO_AUTH_PATHS = ["/main", "/page", "/template"]  # JWT 검증을 하지 않는 페이지 경로
         FREEPASS_IPS = ["192.168.1.100", "127.0.0.1"]  # 검증하지 않을 특정 IP 리스트
 
         # 정적 파일 및 토큰 검증이 필요 없는 경로 처리

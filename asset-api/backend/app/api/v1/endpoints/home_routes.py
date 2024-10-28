@@ -22,6 +22,7 @@ async def display_main(request: Request):
     ''' 메인 '''    
     logger.debug("***************Calling get_today() function for /main endpoint")
     today_str = get_today()
+    logger.debug(f">>> 페이지 요청받음: path:[{request.url.path}], client-IP: [{request.client.host}]")
     logger.debug(f"****************today_str in /main: {today_str}")
     context = { "request": request,  
                 "page_path": '/main',
