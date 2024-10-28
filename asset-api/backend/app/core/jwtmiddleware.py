@@ -27,7 +27,7 @@ from backend.app.core.security import verify_access_token
 import logging
 
 # 로거 설정
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 class JWTAuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
