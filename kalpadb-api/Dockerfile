@@ -16,4 +16,4 @@ COPY . .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # FastAPI 실행 (main.py에서 FastAPI 객체를 정의했을 때의 파일 경로)
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8088", "--log-level", "debug"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8088", "--log-level", "debug"]
