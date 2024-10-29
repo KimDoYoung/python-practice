@@ -8,6 +8,7 @@
 - fastapi로 restful api 서버를 만들려고 함.
 - mysql로 된 데이터베이스명 kalpadb가 존재함.
 - localhost나 알려진 IP로 접속시에만 서비스를 제공함
+- 기본포트를 8088로 함
 
 # 실행
 

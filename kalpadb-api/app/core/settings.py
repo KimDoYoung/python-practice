@@ -18,7 +18,7 @@ class Settings:
     def __init__(self):
         
         # PROFILE_NAME 환경변수를 읽어옴
-        self.PROFILE_NAME = os.getenv('Kalpadb_api_mode', 'local')
+        self.PROFILE_NAME = os.getenv('KALPADB_API_MODE', 'local')
         load_dotenv(dotenv_path=f'.env.{self.PROFILE_NAME}')
         
         # SERVICE설정
@@ -53,6 +53,8 @@ class Settings:
         s += f"DB_URL: {self.DATABASE_URL}\n"
         s += f"LOG_LEVEL: {self.LOG_LEVEL}\n"
         s += f"LOG_FILE: {self.LOG_FILE}\n"
+        s += f"URL_BASE: {self.URL_BASE}\n"
+        s += f"UPLOAD_DIR_BASE: {self.UPLOAD_DIR_BASE}\n"
         s += "------------------------------------------------\n"
         return s
 

@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    container_name: kalpadb-api
+    ports:
+      - "8088:8088"
+    networks:
+      - kalpadb-network
+    environment:
+      - KALPADB_API_MODE=real
+    volumes:
+      - ./backend:/backend
+      - ./frontend:/frontend
+      - /home/kdy987/logs/kalpadb-api:/home/kdy987/logs/kalpadb-api
+      - /etc/localtime:/etc/localtime:ro  # 호스트 시간대 설정 마운트      
+    restart: always  # 서버 재시작 시 항상 컨테이너를 재시작
+
+networks:
+  kalpadb-network:
