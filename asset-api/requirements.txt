@@ -8,3 +8,4 @@ passlib
 sqlalchemy
 jinja2
 asyncpg
+watchdog

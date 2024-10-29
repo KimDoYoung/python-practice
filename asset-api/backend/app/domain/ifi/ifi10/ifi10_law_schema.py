@@ -28,5 +28,5 @@ class Ifi10Law_Response(BaseModel):
     ifi10_deadline_id: Optional[Decimal]  # 기한ID(sch03_deadline_id)
 
     class Config:
-        orm_mode = True  # 반드시 orm_mode 활성화
+        #orm_mode = True  # 반드시 orm_mode 활성화
         from_attributes = True  # from_orm 사용을 위한 설정 추가

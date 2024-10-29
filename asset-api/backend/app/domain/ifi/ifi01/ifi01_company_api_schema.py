@@ -21,5 +21,5 @@ class Ifi01CompanyApiResponse(Ifi01CompanyApiBase):
     ifi01_app_secret_key: Optional[str] = None
 
     class Config:
-        orm_mode = True  # 반드시 orm_mode를 활성화해야 함
+        #orm_mode = True  # 반드시 orm_mode를 활성화해야 함
         from_attributes = True  # from_orm 사용을 위한 설정 추가

@@ -38,6 +38,8 @@ class Settings:
         self.JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'kfs-assetapi-zaq1@WSX')
         self.ACCESS_TOKEN_EXPIRE_HOURS = os.getenv('ACCESS_TOKEN_EXPIRE_HOURS', 24)   
 
+        self.FREE_PASS_IPS = os.getenv('FREE_PASS_IPS', 'free_pass_ips.json')   
+
         # 로그 설정
         self.LOG_LEVEL = os.getenv('LOG_LEVEL', 'DEBUG')
         self.LOG_FILE = os.getenv('LOG_FILE', 'c:/tmp/logs/assetapi/AssetApi_Mode.log')

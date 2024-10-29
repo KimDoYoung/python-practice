@@ -7,12 +7,16 @@
     - EXEMPT_IPS에 등록된 IP에서 오는 요청은 토큰 검증을 하지 않음
     - /api 경로에 대해서만 토큰 검증을 수행함
     - JWT 토큰이 없거나 검증에 실패하면 401 Unauthorized 에러 발생
+주의사항:
+    - watchdog을 이용해서 IP 차단 기능을 추가할 수 있음
+    - 특정 IP에서 오는 요청에 대해서는 토큰 검증을 하지 않도록 설정할 수 있음
     
-
 작성자: 김도영
 작성일: 2024-07-19
 버전: 1.0
 """
+import fnmatch
+import json
 from fastapi import HTTPException, Request
 from starlette.middleware.base import BaseHTTPMiddleware
 from backend.app.core.security import verify_access_token
@@ -24,12 +28,46 @@ from backend.app.core.security import verify_access_token
 from fastapi import HTTPException, Request
 from starlette.middleware.base import BaseHTTPMiddleware
 from backend.app.core.security import verify_access_token
+from watchdog.events import FileSystemEventHandler
+from watchdog.observers import Observer
+from backend.app.core.settings import config
 import logging
 
 # 로거 설정
 logger = logging.getLogger()
 
+class FreepassIPFileHandler(FileSystemEventHandler):
+    def __init__(self, middleware):
+        self.middleware = middleware
+
+    def on_modified(self, event):
+        if event.src_path == self.middleware.freepass_ips_file:
+            self.middleware.load_freepass_ips()
+            
 class JWTAuthMiddleware(BaseHTTPMiddleware):
+    def __init__(self, app):
+        super().__init__(app)
+        self.freepass_ips_file = config.FREE_PASS_IPS
+        self.freepass_ips = []
+        self.load_freepass_ips()
+
+        # 파일 변경 감시 설정
+        self.event_handler = FreepassIPFileHandler(self)
+        self.observer = Observer()
+        self.observer.schedule(self.event_handler, path=self.freepass_ips_file, recursive=False)
+        self.observer.start()
+
+    def load_freepass_ips(self):
+        """프리패스 IP 목록을 파일에서 읽어옵니다."""
+        try:
+            with open(self.freepass_ips_file, "r") as f:
+                data = json.load(f)
+                self.freepass_ips = data.get("freepass_ips", [])
+                logger.info("Freepass IPs reloaded.")
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            logger.error(f"Failed to load freepass IPs from {self.freepass_ips_file}: {e}")
+            self.freepass_ips = []
+                        
     async def dispatch(self, request: Request, call_next):
         token = None
 
@@ -55,8 +93,8 @@ class JWTAuthMiddleware(BaseHTTPMiddleware):
             return response
         
         # 특정 IP에서 오는 요청에 대해서는 토큰 검증을 하지 않음
-        if client_ip in FREEPASS_IPS:
-            logger.warning(f"Skipping JWT verification for IP(특정IP이므로 토근검증하지 않음): {client_ip}")
+        if any(fnmatch.fnmatch(client_ip, ip_pattern) for ip_pattern in self.freepass_ips):
+            logger.warning(f"Skipping JWT verification for IP(특정IP이므로 토큰 검증하지 않음): {client_ip}")
             response = await call_next(request)
             return response
         
@@ -81,3 +119,8 @@ class JWTAuthMiddleware(BaseHTTPMiddleware):
         
         # 토큰 검증을 하지 않는 경로 처리
         return await call_next(request)
+
+    def __del__(self):
+        """미들웨어 종료 시 감시 종료"""
+        self.observer.stop()
+        self.observer.join()

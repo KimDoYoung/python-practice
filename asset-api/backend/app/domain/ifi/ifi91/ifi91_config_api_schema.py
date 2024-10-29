@@ -23,4 +23,4 @@ class Ifi91ConfigApiResponse(Ifi91ConfigApiBase):
 
     class Config:
         from_attributes = True  # orm_mode 대신 사용됨
-        orm_mode = True
+        #orm_mode = True

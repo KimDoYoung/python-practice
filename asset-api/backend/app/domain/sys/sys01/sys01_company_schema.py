@@ -32,7 +32,7 @@ class Sys01CompanyOut(Sys01CompanyBase):
     sys01_company_id: int  # 회사ID (응답 시 포함되는 필드)
 
     class Config:
-        orm_mode = True  # ORM 모델에서 데이터를 불러오는데 사용
+        #orm_mode = True  # ORM 모델에서 데이터를 불러오는데 사용
         from_attributes = True  # ORM에서 데이터를 불러올 때 from_orm 설정 활성화
 
 
@@ -52,7 +52,7 @@ class Sys08CodeKindOut(Sys08CodeKindBase):
     sys08_code_kind_id: int  # 코드 종류 ID (응답 시 포함되는 필드)
 
     class Config:
-        orm_mode = True  # ORM 모델에서 데이터를 불러오는데 사용
+        #orm_mode = True  # ORM 모델에서 데이터를 불러오는데 사용
         from_attributes = True  # ORM에서 데이터를 불러올 때 from_orm 설정 활성화
 
 
@@ -75,5 +75,5 @@ class Sys09CodeResponse(Sys09CodeBase):
     sys09_code_id: int  # 코드 ID (응답 시 포함되는 필드)
 
     class Config:
-        orm_mode = True  # ORM 모델에서 데이터를 불러오는데 사용
+        #orm_mode = True  # ORM 모델에서 데이터를 불러오는데 사용
         from_attributes = True  # ORM에서 데이터를 불러올 때 from_orm 설정 활성화

@@ -19,5 +19,5 @@ class Ifi95ConfigFileResponse(Ifi95ConfigFileBase):
     ifi95_config_file_id: int
 
     class Config:
-        orm_mode = True  # 반드시 orm_mode를 활성화해야 함
+        #orm_mode = True  # 반드시 orm_mode를 활성화해야 함
         from_attributes = True  # from_orm 사용을 위한 설정 추가
