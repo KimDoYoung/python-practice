@@ -39,6 +39,9 @@ class Settings:
         self.ACCESS_TOKEN_EXPIRE_HOURS = os.getenv('ACCESS_TOKEN_EXPIRE_HOURS', 24)   
 
         self.FREE_PASS_IPS = os.getenv('FREE_PASS_IPS', 'free_pass_ips.json')   
+        # 파일 self.FREE_PASS_IP가 없으면 에러 발생
+        if not os.path.exists(self.FREE_PASS_IPS):
+            raise ValueError(f"FREE_PASS_IPS 파일이 존재하지 않습니다. {self.FREE_PASS_IPS}")
 
         # 로그 설정
         self.LOG_LEVEL = os.getenv('LOG_LEVEL', 'DEBUG')
