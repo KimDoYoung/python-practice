@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 from pydantic import BaseModel, Field
 
 class DiaryBase(BaseModel):
@@ -56,3 +56,12 @@ class DiaryListResponse(BaseModel):
         'from_attributes': True  # ORM 모드 활성화
     }
 
+# 페이징 처리를 위한 응답에 사용할 Pydantic 모델
+class DiaryPageModel(BaseModel):
+    data: List[DiaryResponse]  # 적절한 데이터 타입으로 대체하세요 (예: List[dict])
+    next_data_exists: bool
+    last_index: int
+    limit: int
+    start_ymd: Optional[str]  # 날짜 형식에 따라 Optional[str] 사용
+    end_ymd: Optional[str]
+    order: Optional[str]

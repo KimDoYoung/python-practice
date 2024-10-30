@@ -24,7 +24,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.core.util import saved_path_to_url
 from app.domain.diary.diary_model import Diary
-from app.domain.diary.diary_schema import DiaryBase, DiaryDetailResponse, DiaryRequest, DiaryListResponse, DiaryResponse, DiaryUpdateRequest
+from app.domain.diary.diary_schema import DiaryPageModel, DiaryBase, DiaryDetailResponse, DiaryRequest, DiaryListResponse, DiaryResponse, DiaryUpdateRequest
 from app.domain.filenode.filenode_model import ApFile, ApNode, MatchFileVar
 from app.domain.filenode.filenode_schema import AttachFileInfo
 from app.domain.filenode.filenode_service import ApNodeFileService
@@ -246,7 +246,7 @@ class DiaryService:
 
     async def get_diaries(
         self, start_ymd: str, end_ymd: str, start_index: int, limit: int, order: str, summary_only: bool = False
-    ) -> dict:
+    ) -> DiaryPageModel:
         ''' diary Paging 이미지 포함 '''
         # 정렬 순서 설정
         sort_order = asc(Diary.ymd) if order == 'asc' else desc(Diary.ymd)
@@ -298,16 +298,15 @@ class DiaryService:
                     attachments=attachments
                 )
                 data.append(diary_response)
-
-        return {
-            "data": data,
-            "next_data_exists": next_data_exists,
-            "last_index": last_index,
-            "limit" : limit,
-            "start_ymd": start_ymd,
-            "end_ymd": end_ymd,
-            "order": order
-        }
+        return DiaryPageModel(
+            data=data,
+            next_data_exists=next_data_exists,
+            last_index=last_index,
+            limit=limit,
+            start_ymd=start_ymd,
+            end_ymd=end_ymd,
+            order=order            
+        )
     async def get_diary_parent_node_id(self) -> str:
         parent_node_query = select(ApNode.id).where(
             (ApNode.node_type == 'D') & 

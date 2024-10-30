@@ -17,7 +17,7 @@
 """
 from fastapi import APIRouter, Depends, Form, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.domain.diary.diary_schema import DiaryBase, DiaryDetailResponse, DiaryRequest, DiaryResponse, DiaryUpdateRequest
+from app.domain.diary.diary_schema import DiaryBase, DiaryDetailResponse, DiaryPageModel, DiaryRequest, DiaryResponse, DiaryUpdateRequest
 from app.domain.diary.diary_service import DiaryService
 from fastapi import File, UploadFile
 from typing import List, Optional
@@ -57,7 +57,7 @@ async def get_diary(ymd: str, db: AsyncSession = Depends(get_session)):
     return diary   
 
 # 날짜 범위로 일기 목록 조회
-@router.get("/diaries", response_model=dict)
+@router.get("/diaries", response_model=DiaryPageModel)
 async def get_diaries(
     start_ymd: str = "19000101",
     end_ymd: str = "99991231",
