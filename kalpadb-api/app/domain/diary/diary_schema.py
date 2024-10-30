@@ -59,6 +59,7 @@ class DiaryListResponse(BaseModel):
 # 페이징 처리를 위한 응답에 사용할 Pydantic 모델
 class DiaryPageModel(BaseModel):
     data: List[DiaryResponse]  # 적절한 데이터 타입으로 대체하세요 (예: List[dict])
+    data_count : int
     next_data_exists: bool
     last_index: int
     limit: int

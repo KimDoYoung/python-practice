@@ -280,6 +280,7 @@ class DiaryService:
         next_data_exists = 'Y' if len(diaries) > limit else 'N'
         diaries = diaries[:limit]  # 실제 데이터는 limit만큼만 사용
         last_index = start_index + len(diaries)
+        data_count = len(diaries)
 
         # 데이터 처리
         if summary_only:
@@ -300,6 +301,7 @@ class DiaryService:
                 data.append(diary_response)
         return DiaryPageModel(
             data=data,
+            data_count=data_count,
             next_data_exists=next_data_exists,
             last_index=last_index,
             limit=limit,
