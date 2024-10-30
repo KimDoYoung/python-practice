@@ -302,7 +302,11 @@ class DiaryService:
         return {
             "data": data,
             "next_data_exists": next_data_exists,
-            "last_index": last_index
+            "last_index": last_index,
+            "limit" : limit,
+            "start_ymd": start_ymd,
+            "end_ymd": end_ymd,
+            "order": order
         }
     async def get_diary_parent_node_id(self) -> str:
         parent_node_query = select(ApNode.id).where(
