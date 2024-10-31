@@ -245,7 +245,10 @@ class DiaryService:
             return False
 
     async def get_diaries(
-        self, start_ymd: str, end_ymd: str, start_index: int, limit: int, order: str, summary_only: bool = False
+        self, start_ymd: str, end_ymd: str, 
+        start_index: int, limit: int, 
+        order: str, summary_only: bool = False,
+        search_text: str = ""
     ) -> DiaryPageModel:
         ''' diary Paging 이미지 포함 '''
         # 정렬 순서 설정
@@ -266,6 +269,7 @@ class DiaryService:
             .outerjoin(ApFile, MatchFileVar.node_id == ApFile.node_id)
             .where(Diary.ymd >= start_ymd)
             .where(Diary.ymd <= end_ymd)
+            .where(Diary.content.contains(search_text) | Diary.summary.contains(search_text))
             .group_by(Diary.ymd, Diary.summary, Diary.content)
             .order_by(sort_order)
             .offset(start_index)

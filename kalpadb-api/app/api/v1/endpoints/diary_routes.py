@@ -65,10 +65,11 @@ async def get_diaries(
     limit: int = 10,
     order: str = "desc",
     summary_only: bool = False,
+    search_text = "",
     db: AsyncSession = Depends(get_session)
 ):
     service = DiaryService(db)
-    return await service.get_diaries(start_ymd, end_ymd, start_index, limit=limit, order=order, summary_only=summary_only)
+    return await service.get_diaries(start_ymd, end_ymd, start_index, limit=limit, order=order, summary_only=summary_only, search_text=search_text)
 
 # Update diary
 @router.put("/diary/{ymd}", response_model=DiaryBase)

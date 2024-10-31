@@ -20,7 +20,7 @@
             "request": "launch",
             "module": "uvicorn",
             "args": [
-                "app.main:app",
+                "app.kalpadb-api-main:app",
                 "--reload",
                 "--port", 
                 "8088" // 원하는 포트 번호로 변경
