@@ -155,6 +155,8 @@ async def shutdown_event():
 
     # Telegram Bot 종료
     await stop_telegram_bot()
+    
+    # TODO Websocket manage 종료 처리 추가 필요    
 
     logger.info('---------------------------------')
     logger.info('Shutdown 프로세스 종료')
@@ -165,4 +167,4 @@ app = create_app()
 if __name__ == "__main__":
     import uvicorn
     logger.info("Lucy 자동주식매매 서버 시작")
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
