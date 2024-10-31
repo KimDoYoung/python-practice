@@ -23,7 +23,7 @@ class Settings:
         
         # SERVICE설정
         self.SERVICE_TITLE = os.getenv('SERVICE_TITLE', 'Kalpadb-Api')
-        self.SERVICE_PORT = os.getenv('SERVICE_PORT', 8088)
+        self.SERVICE_PORT = int(os.getenv('SERVICE_PORT', 8088))
         
         # DB 설정
         self.DATABASE_URL = os.getenv('DATABASE_URL', "")

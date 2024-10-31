@@ -1,3 +1,19 @@
+# kalpadb-api-main.py
+"""
+모듈 설명: 
+    - kalpadb API 서버의 메인 파일
+주요 기능:
+    - FastAPI 앱 생성
+    - 미들웨어 설정
+    - 라우팅 설정
+    - 이벤트 핸들러 설정
+    - 정적 파일 설정
+    - 예외 처리 설정
+    - 서버 시작
+작성자: 김도영
+작성일: 2024-10-31
+버전: 1.0
+"""
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.logger import get_logger
@@ -65,4 +81,4 @@ app = create_app()
 if __name__ == "__main__":
     import uvicorn
     service_port = config.SERVICE_PORT
-    uvicorn.run(app, host="0.0.0.0", port=service_port, reload=True)
+    uvicorn.run(app, host="0.0.0.0", port=service_port)

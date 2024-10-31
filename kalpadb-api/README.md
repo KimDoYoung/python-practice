@@ -14,7 +14,7 @@
 
 ```shell
 pip install -r requirements.txt
-export Kalpadb_api_mode=local
+export KALPADB_API_MODE=local
 uvicorn app.main:app --reload
 ```
 
