@@ -6,6 +6,7 @@
 {% block content %}
 <section id="calendar-area" class="container">
     <div id="headerCalendar" class="mt-5 text-center d-flex align-items-center">
+        
         <!-- <a href="#" id="prevYear" class="text-decoration-none border-icon"  title="prev year"><i class="bi bi-caret-left-fill"></i></a> -->
         <a href="#" id="prevMonth"  class="text-decoration-none  border-icon mx-2" title="prev month"><i class="bi bi-caret-left"></i></a>
         <h3 class="d-inline"><span id="currentYyyy"></span>년 <span id="currentMm"></span>월</h3>
@@ -19,6 +20,7 @@
         <a href="/page?path=ipo/history"class="text-decoration-none  border-icon me-2" title="과거데이터 기록">
             <i class="bi bi-clipboard-data"></i>
         </a>
+        <span class="badge bg-success mx-2" id="38-scrapping-time"></span>
     </div>
     <div id="mainCalendar" class="mt-2 mb-5"></div>
 </section>
@@ -70,7 +72,22 @@
                 e.stopPropagation();
                 console.log($(this).data('ymd'));
             });
-    }       
+    }
+    function formatDateString(isoString) {
+        // 문자열을 Date 객체로 변환
+        const date = new Date(isoString);
+
+        // 날짜와 시간을 각각 분리하여 형식화
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 1을 더합니다.
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+
+        // 원하는 형식으로 문자열을 구성
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    }           
     $( document ).ready(function() {
         console.log('calendar.... ');
 
@@ -118,6 +135,12 @@
             });
             $('#tempHeader').remove();
         });
+        getFetch('/api/v1/config/38-scrapping-time').then(data => {
+                console.log(data);
+                const scrappingTime = formatDateString(data.value);
+                $('#38-scrapping-time').text(scrappingTime);
+        });
+
         // 달력 호출 
         var date = new Date();
         var yyyy = date.getFullYear();

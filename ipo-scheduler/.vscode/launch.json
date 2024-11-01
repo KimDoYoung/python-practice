@@ -20,7 +20,7 @@
             "request": "launch",
             "module": "uvicorn",
             "args": [
-                "backend.main:app",
+                "backend.ipo-scheduler-main:app",
                 "--reload",
                 "--port",
                 "8881" // 원하는 포트 번호로 변경
