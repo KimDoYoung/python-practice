@@ -106,15 +106,6 @@ async def startup_event():
     scheduler_service =  get_scheduler_job_service()
     await scheduler_service.register_system_jobs()
 
-    # 자동매매 시작
-    # await start_danta_machine()
-    # Telegram Bot 시작
-    
-    # telegram_token, telegram_userid = await initialize_telegram_bot()
-    # if telegram_token is not None:
-    #     asyncio.create_task(start_telegram_bot())
-    # else:
-    #     logger.warning("TELEGRAM_BOT_TOKEN 이 존재하지 않음.")
 
     logger.info('---------------------------------')
     logger.info('Startup 프로세스 종료')
@@ -142,4 +133,4 @@ app = create_app()
 if __name__ == "__main__":
     import uvicorn
     logger.info("IPO-scheduler  서버 시작")
-    uvicorn.run(app, host="0.0.0.0", port=8881, reload=True)
+    uvicorn.run(app, host="0.0.0.0", port=8881)

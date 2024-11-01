@@ -1,14 +1,33 @@
 # IPO-scheduler
 
+## 개요
+
 - ipo_scheduler에서 불필요한 것들 제거, ipo관련된 것들만 남김
 - 포트를 8000 변경함
-- 데이타베이스명을 ipo-scheduer로 함.
+- mongodb의 데이타베이스명을 ipo-scheduer로 함.
 - export IPO_SCHEDULER_MODE=real 로 서버에서 설정
-- jskn의 몽고db는 docker로 실행됨
+- jskn의 몽고db는 docker로 실행됨 : /root/python-practice/ipo-scheduler
 
   ```shell
   docker run -d --name mongodb-container -p 27017:27017 -v /home/kdy987/fastapi/mongodb:/data/db mongo:4.4
   ```
+
+## 실행
+
+### JSKN에서 실행
+
+1. jskn접속
+2. root로 로그인
+3. cd /root/python-practice/ipo-scheduler 이동
+4. docker-compose up --build -d / docker-compose down
+5. mongodb volume : /home/kdy987/fastapi/kdydata
+    - .env.real
+    - docker-compose.yml
+
+### local에서 실행
+
+1. startup.sh
+2. shutdown.sh
 
 ## docker commands
 
@@ -45,8 +64,6 @@ docker logs ipo-scheduler
 # 메모리 확보
 docker builder prune --all
 ```
-
-
 
 ## 빌드
 
