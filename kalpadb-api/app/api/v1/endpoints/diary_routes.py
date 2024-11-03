@@ -32,7 +32,7 @@ async def create_diary(
     ymd: str = Form(...),
     content: Optional[str] = Form(None),
     summary: Optional[str] = Form(None),
-    files: List[UploadFile] = File(None),  # 여러 파일을 받을 수 있도록 설정
+    files: Optional[List[UploadFile]] = File(None),  # 여러 파일을 받을 수 있도록 설정, null 허용
     db: AsyncSession = Depends(get_session)
 ):
     service = DiaryService(db)

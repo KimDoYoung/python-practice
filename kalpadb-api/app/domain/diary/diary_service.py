@@ -45,12 +45,19 @@ class DiaryService:
             content=diary_data.content,
             summary=diary_data.summary
         )
-        self.db.add(diary)
-        await self.db.commit()
 
         # 나머지 작업을 트랜잭션으로 처리
         async with self.db.begin() as transaction:
             try:
+                self.db.add(diary)
+                await self.db.commit()
+                if files is None:
+                    return DiaryResponse(
+                        ymd=diary.ymd,
+                        content=diary.content,
+                        summary=diary.summary,
+                        attachments=[]
+                    )                
                 # 2. ApNode 조회하여 이미지 저장할 Node가 있는지 확인
                 yyyymm = diary_data.ymd[:6]  # 'yyyymm' 형식 추출
                 node_name = yyyymm
