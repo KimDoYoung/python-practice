@@ -8,6 +8,8 @@
 작성일: 2024-10-07
 버전: 1.0
 """
+from contextlib import asynccontextmanager
+from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import MetaData
@@ -27,6 +29,13 @@ async_session = sessionmaker(
 )
 
 # 세션 의존성 주입
-async def get_session():
+# async def get_session():
+#     async with async_session() as session:
+#         yield session
+
+
+@asynccontextmanager
+async def get_session() -> AsyncGenerator[AsyncSession, None]:
+    """비동기 세션을 생성하고 종료합니다."""
     async with async_session() as session:
         yield session

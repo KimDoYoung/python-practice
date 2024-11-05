@@ -1,4 +1,12 @@
 {
+    "import core" : {
+        "prefix": "my_session",
+        "body":  [
+            "from backend.app.core.database import get_session",
+            "async with get_session() as session:"
+        ],
+    },
+
     "logger" : {
         "prefix": "my_logger",
         "body":  [

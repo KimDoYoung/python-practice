@@ -11,7 +11,6 @@ from backend.app.api.v1.endpoints.company_routes import router as company_router
 from backend.app.api.v1.endpoints.auth_routes import router as auth_router
 from backend.app.api.v1.endpoints.service.law_routes import router as law_router
 from backend.app.core.scheduler import Scheduler
-from backend.app.core.database import get_session
 from backend.app.domain.scheduler.scheduler_job_service import get_scheduler_job_service
 
 logger = get_logger()
@@ -83,10 +82,8 @@ async def startup_event():
     scheduler.start()  # 스케줄러 시작
 
     # 데이터베이스 세션을 가져와서 스케줄러 서비스 생성
-    #async with async_session() as db_session:  # 세션 팩토리를 통해 세션을 생성
-    db = get_session()
-    scheduler_service = await get_scheduler_job_service(db)
-    await scheduler_service.register_system_jobs()    
+    scheduler_service = await get_scheduler_job_service()
+    await scheduler_service.register_system_jobs()        
 
 async def shutdown_event():
     ''' asset-api application 종료 event'''

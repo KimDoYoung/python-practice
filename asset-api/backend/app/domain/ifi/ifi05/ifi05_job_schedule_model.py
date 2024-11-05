@@ -12,6 +12,7 @@ class Ifi05JobSchedule(Base):
     ifi05_job_schedule_id = Column(Numeric, primary_key=True, nullable=False, comment="작업스케줄 관리ID(PK)")
     ifi05_job_schedule_nm = Column(String(100), nullable=True, comment="스케줄명")
     ifi05_run_type = Column(String(10), nullable=True, comment="구분(cron)")
+    ifi05_args = Column(String(50), nullable=True, comment="argument")
     ifi05_cron_str = Column(String(100), nullable=True, comment="cron 표현식")
     ifi05_description = Column(Text, nullable=True, comment="설명")
     ifi05_note = Column(Text, nullable=True, comment="비고")

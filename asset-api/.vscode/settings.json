@@ -51,7 +51,7 @@
         "**/env": true,
         "**/data": true,
         "**/tmp": true,
-        "**/*.md": true,
+        "**/*.md": false,
         "**/doc"  : true
     },
 

@@ -5,6 +5,7 @@ from typing import Optional
 class Ifi05JobScheduleBase(BaseModel):
     ifi05_job_schedule_nm: Optional[str] = Field(None, description="스케줄명")
     ifi05_run_type: Optional[str] = Field(None, description="구분 (예: cron)")
+    ifi05_args:Optional[str] = Field(None, description="argument")
     ifi05_cron_str: Optional[str] = Field(None, description="cron 표현식")
     ifi05_description: Optional[str] = Field(None, description="설명")
     ifi05_note: Optional[str] = Field(None, description="비고")

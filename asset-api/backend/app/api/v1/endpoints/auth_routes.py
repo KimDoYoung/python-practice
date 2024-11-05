@@ -40,8 +40,7 @@ async def test_token(auth_resp):
 async def generate_token(req: AuthRequest, db: AsyncSession = Depends(get_session)):
     ''' app key, secret key로 회사 정보 조회 후 token 발급, 토큰 검증 '''
     logger.debug(f"Auth request: APP_KEY: {req.app_key}\nAPP_SECRET_KEY: {req.app_secret_key}")
-    service = Ifi01CompanyApiService(db)
-    company = await service.get_company_by_app_key(req.app_key)
+    company = await Ifi01CompanyApiService.get_company_by_app_key(req.app_key)
     # 회사 정보가 없으면 404 에러
     if not company:
         raise HTTPException(status_code=404, detail="Company not found")
