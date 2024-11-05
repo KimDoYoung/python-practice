@@ -10,6 +10,9 @@ from backend.app.api.v1.endpoints.home_routes import router as home_router
 from backend.app.api.v1.endpoints.company_routes import router as company_router
 from backend.app.api.v1.endpoints.auth_routes import router as auth_router
 from backend.app.api.v1.endpoints.service.law_routes import router as law_router
+from backend.app.core.scheduler import Scheduler
+from backend.app.core.database import get_session
+from backend.app.domain.scheduler.scheduler_job_service import get_scheduler_job_service
 
 logger = get_logger()
 
@@ -37,7 +40,9 @@ def set_routes(app: FastAPI):
     
 def set_event_handlers(app: FastAPI):
     ''' 이벤트 핸들러 설정 '''
-    pass
+    app.add_event_handler("startup", startup_event)
+    app.add_event_handler("shutdown", shutdown_event)
+    
 def set_static_files(app: FastAPI):
     ''' 정적 파일 설정 '''
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -68,6 +73,28 @@ def create_app() -> FastAPI:
     set_static_files(app)
     set_exception_handlers(app)
     return app
+
+async def startup_event():
+    ''' asset-api startup 시작 event '''
+    logger.info('---------------------------------')
+    logger.info('Startup 프로세스 시작')
+    logger.info('---------------------------------')
+    scheduler = Scheduler.get_instance()
+    scheduler.start()  # 스케줄러 시작
+
+    # 데이터베이스 세션을 가져와서 스케줄러 서비스 생성
+    #async with async_session() as db_session:  # 세션 팩토리를 통해 세션을 생성
+    db = get_session()
+    scheduler_service = await get_scheduler_job_service(db)
+    await scheduler_service.register_system_jobs()    
+
+async def shutdown_event():
+    ''' asset-api application 종료 event'''
+    logger.info('---------------------------------')
+    logger.info('Shutdown 프로세스 시작')
+    logger.info('---------------------------------')
+    scheduler = Scheduler.get_instance()
+    scheduler.shutdown()    
 
 app = create_app()
 

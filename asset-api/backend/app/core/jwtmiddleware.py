@@ -31,10 +31,10 @@ from backend.app.core.security import verify_access_token
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 from backend.app.core.settings import config
-import logging
+from backend.app.core.logger import get_logger
 
 # 로거 설정
-logger = logging.getLogger()
+logger = get_logger()
 
 class FreepassIPFileHandler(FileSystemEventHandler):
     def __init__(self, middleware):
