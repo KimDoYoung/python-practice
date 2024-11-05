@@ -160,6 +160,7 @@ $( document ).ready(function() {
         console.log(data)
         postFetch(url, data).then(response => {
             console.log(response);
+            debugger;
             const html = makeHtmlWithTemplate('register-result-template', response);
             $('#display-area').html(html);
         }).catch(error=> {
