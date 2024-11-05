@@ -7,7 +7,8 @@
 # 백업 파일은 mongo-backup.sh 스크립트로 생성
 #-------------------------------------------------------
 # 백업 경로 설정
-BACKUP_DIR="/home/kdy987/fastapi/mongodb_backup/20241101/ipo-scheduler"
+# BACKUP_DIR="/home/kdy987/fastapi/mongodb_backup/20241101/ipo-scheduler"
+BACKUP_DIR="/data/backup/20241101/ipo-scheduler"
 
 # 복원 실행 (각 컬렉션 별로 복원)
 docker exec ipo-mongo mongorestore --db ipo-scheduler --collection Config "$BACKUP_DIR/Config.bson"

@@ -2,9 +2,11 @@
 
 ## 개요
 
-    제휴회사들에 api서비스, Asset-Erp와 별도로 데이터제공을 원하는 회사들에 데이터를 Restful API를 통해서 제공한다.
-    현재는 법률서비스만 제공
-    
+- 제휴회사들에 api서비스, Asset-Erp와 별도로 데이터제공을 원하는 회사들에 데이터를 Restful API를 통해서 제공한다.
+- 법률서비스 제공
+- scheduling
+- [DART](https://opendart.fss.or.kr/intro/main.do) 정보 scrapping
+  
 ## 기술 스택
 
 - backend
@@ -83,3 +85,11 @@ CREATE TABLE IF NOT EXISTS ifi01_company  (
     PRIMARY KEY(company_id, service_id)
 );
 ```
+
+## DART관련정보
+
+- id/pw :  <assetkfs@gmail.com> / zXX1XXXX
+- [지분증권](https://opendart.fss.or.kr/guide/detail.do?apiGrpCd=DS006&apiId=2020054)
+- 테이블들
+  - ifi05 : 스케줄테이블
+  
