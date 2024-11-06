@@ -5,9 +5,7 @@
 <div>
     <input type="hidden" id="param_ifi01_company_api_id" value="{{ifi01_company_api_id}}">
 </div>
-<div id="result-area">
-
-</div>
+<div id="result-area"></div>
 {% raw %}
 <!--handlebar scripts-->
 <script id="issue-template" type="text/x-handlebars-template">
@@ -80,15 +78,13 @@
 {% raw %}
 <script>
 $( document ).ready(function() {
+    debugger;
     const ifi01_company_api_id = $('#param_ifi01_company_api_id').val();
 
     function initialize(){
         const url = `/api/v1/company/info/${ifi01_company_api_id}`;
         getFetch(url).then(data => {
             console.log(data); 
-            // data.start_ymd = data.start_ymd.substring(0, 4)+'-'+data.start_ymd.substring(4, 6)+'-'+data.start_ymd.substring(6, 8);
-            // data.end_ymd = data.end_ymd.substring(0, 4)+'-'+data.end_ymd.substring(4, 6)+'-'+data.end_ymd.substring(6, 8);
-
             const html = makeHtmlWithTemplate('issue-template', data);
             $('#result-area').html(html);
         });
@@ -102,9 +98,13 @@ $( document ).ready(function() {
         copyToClipboard(text, "APP KEY & SECRET KEY 복사 완료");
     });
     //키재발급
-    $("#result-area").on("click", "#btnReRegister", function() {
+    $("#result-area").on("click", "#btnReRegister", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
         //APP KEY & SECRET KEY 재발급
-        const ifi01_company_api_id = $('#ifi01_company_api_id').val();
+        // const ifi01_company_api_id = $('#ifi01_company_api_id').val();
+        const ifi01_company_api_id = $('#param_ifi01_company_api_id').val();
+        
         const url = `/api/v1/company/re-register/${ifi01_company_api_id}`;
         const ifi01_company_id = $('#ifi01_company_id').val();
         const ifi01_service_cd = $('#ifi01_service_cd').val();

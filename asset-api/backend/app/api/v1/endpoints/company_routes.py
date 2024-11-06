@@ -76,7 +76,7 @@ async def register_company(company: Ifi01CompanyApiCreate):
 
     return Ifi01CompanyApiResponse(
         **new_company.__dict__,
-        ifi01_app_key=app_key,
+#        ifi01_app_key=app_key,
         ifi01_app_secret_key=app_secret_key,
         sys01_company_nm=details["company_name"],
         ifi01_service_nm=details["service_name"]
@@ -104,7 +104,7 @@ async def re_register_company(company_api_id: int, company: Ifi01CompanyApiCreat
 
     return Ifi01CompanyApiResponse(
         **updated_company.__dict__,
-        ifi01_app_key=app_key,
+#        ifi01_app_key=app_key,
         ifi01_app_secret_key=app_secret_key,
         sys01_company_nm=details["company_name"],
         ifi01_service_nm=details["service_name"]

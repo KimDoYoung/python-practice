@@ -151,6 +151,7 @@ $( document ).ready(function() {
     //form의 submit 이벤트를 처리한다.
     $('form').submit(function(e){
         e.preventDefault();
+        e.stopPropagation();
         var ifi01_company_id = $('#ifi01_company_id').val();
         var ifi01_service_cd = $('#ifi01_service_cd').val();
         var ifi01_start_date = $('#ifi01_start_date').val();
