@@ -1,0 +1,87 @@
+{% extends 'common/base.html' %}
+{% block style %}
+{% endblock %}
+{% block content %}
+<div>
+    <h1>scheduler</h1>
+    <div id="result-area"></div>
+    <div>
+        <a href="page?path=/scheduler/insert" class="btn btn-primary">추가</a>
+    </div>
+</div>
+{% raw %}
+<!--handlebar scripts-->
+<script id="ifi05_list_template" type="text/x-handlebars-template">
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <!-- <th scope="col">작업스케줄 관리ID</th> -->
+          <th scope="col">스케줄명</th>
+          <th scope="col">동작</th>
+          <th scope="col">Args</th>
+          <th scope="col">Cron표현</th>
+          <th scope="col">설명</th>
+          <th scope="col">비고</th>
+          <th scope="col">동작</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each list}}
+        <tr>
+          <th scope="row">{{inc @index}}</th>
+          <!-- <td>{{ifi05_job_schedule_id}}</td> -->
+          <td>{{ifi05_job_schedule_nm}}</td>
+          <td>{{ifi05_run_type}}</td>
+          <td>{{ifi05_args}}</td>
+          <td>{{ifi05_cron_str}}</td>
+          <td>{{ifi05_description}}</td>
+          <td>{{ifi05_note}}</td>
+          <td>
+            <a href="page?path=/scheduler/update&ifi05_job_schedule_id={{ifi05_job_schedule_id}}" class="btn btn-primary"><i class="bi bi-pencil-square"></i></a>
+            <a href="#none" data-id="{{ifi05_job_schedule_id}}" class="btnDelete btn btn-danger"><i class="bi bi-x-square"></i></a>
+          </td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </script>
+  
+{% endraw %}
+{% endblock %}
+{% block script %}
+{% raw %}
+<script>
+$( document ).ready(function() {
+    function initialize(){
+        const url = '/api/v1/scheduler/list';
+        getFetch(url).then(data => {
+            console.log(data); 
+
+            const html = makeHtmlWithTemplate('ifi05_list_template', {list:data});
+            $('#result-area').html(html);
+        }).catch(error=> {
+            console.error(error.message); 
+            showAlertError(error);
+        });
+    }
+    $('#result-area').on('click', '.btnDelete', function(){
+        const id = $(this).data('id');
+        const url = '/api/v1/scheduler/delete/'+id;
+        if(!confirm('삭제하시겠습니까?')){
+            return;
+        }
+        deleteFetch(url).then(data => {
+            console.log(data); 
+            initialize();
+        }).catch(error=> {
+            console.error(error.message); 
+            showAlertError(error);
+        });
+    });
+    console.log( "ready!")
+    initialize();
+});
+</script>
+{% endraw %}
+{% endblock %}

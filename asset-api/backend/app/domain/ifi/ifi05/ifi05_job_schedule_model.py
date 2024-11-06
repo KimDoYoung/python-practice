@@ -1,4 +1,12 @@
-# models.py
+# ifi05_job_schedule_model.py
+"""
+모듈 설명: 
+    -  ifi05_job_schedule 테이블 모델 정의
+
+작성자: 김도영
+작성일: 2024-11-06
+버전: 1.0
+"""
 from sqlalchemy import Column, Numeric, String, Text
 from sqlalchemy.ext.declarative import declarative_base
 

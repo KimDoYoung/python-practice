@@ -22,13 +22,15 @@
       "args": [
         "backend.main:app",
         "--reload",
+        "--reload-dir", 
+        "backend/",        
         "--port",
         "8008" // 원하는 포트 번호로 변경
       ],
       "jinja": true,
       "justMyCode": true,
-      // "console": "integratedTerminal"
-      "console": "externalTerminal"
+      "console": "integratedTerminal"
+    //   "console": "externalTerminal"
       //"python": "c:\\Users\\deHong\\Python312\\python"
     }
   ]

@@ -15,9 +15,7 @@ class Ifi05JobScheduleBase(BaseModel):
 
 class Ifi05JobScheduleCreate(Ifi05JobScheduleBase):
     """새로운 작업 스케줄을 만들기 위한 필수 필드"""
-    ifi05_job_schedule_nm: str = Field(..., description="스케줄명 (필수)")
-    ifi05_run_type: str = Field(..., description="구분 (예: cron, 필수)")
-    ifi05_cron_str: str = Field(..., description="cron 표현식 (필수)")
+    pass
 
 class Ifi05JobScheduleUpdate(Ifi05JobScheduleBase):
     """작업 스케줄을 업데이트할 때 선택적으로 업데이트할 필드"""

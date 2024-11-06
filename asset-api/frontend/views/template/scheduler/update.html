@@ -1,0 +1,105 @@
+{% extends 'common/base.html' %}
+{% block style %}
+{% endblock %}
+{% block content %}
+<h1>Schedule 수정</h1>
+<input type="hidden" id="param-ifi05_job_schedule_id" name="ifi05_job_schedule_id" value="{{ifi05_job_schedule_id}}">
+<div id="result-area">
+</div>
+{% raw %}
+<!--handlebar scripts-->
+<script id="ifi05_form_template" type="text/x-handlebars-template">
+    <form id="ifi05-form">
+        <div class="mb-3">
+          <label for="ifi05_job_schedule_id" class="form-label">작업스케줄 관리ID</label>
+          <input type="number" class="form-control" id="ifi05_job_schedule_id" name="ifi05_job_schedule_id" value="{{ifi05_job_schedule_id}}" readonly>
+        </div>
+        <div class="mb-3">
+          <label for="ifi05_job_schedule_nm" class="form-label">스케줄명</label>
+          <input type="text" class="form-control" id="ifi05_job_schedule_nm" name="ifi05_job_schedule_nm" value="{{ifi05_job_schedule_nm}}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">구분</label>
+            <div class="d-flex align-items-center">
+              <div class="form-check me-3">
+                {{#test "ifi05_run_type == 'cron'"}}
+                <input type="radio" class="form-check-input" id="run_type_cron" name="ifi05_run_type" value="cron" checked>
+                {{else}}
+                <input type="radio" class="form-check-input" id="run_type_cron" name="ifi05_run_type" value="cron" >
+                {{/test}}
+
+                <label for="run_type_cron" class="form-check-label">주기(cron)</label>
+              </div>
+              <div class="form-check">
+                {{#test "ifi05_run_type == 'date'"}}
+                <input type="radio" class="form-check-input" id="run_type_date" name="ifi05_run_type" value="date" checked>
+                {{else}}
+                <input type="radio" class="form-check-input" id="run_type_date" name="ifi05_run_type" value="date">
+                {{/test}}
+                <label for="run_type_date" class="form-check-label">특정일시(date)</label>
+              </div>
+            </div>
+        </div>
+        <div class="mb-3">
+          <label for="ifi05_args" class="form-label">Argument</label>
+          <input type="text" class="form-control" id="ifi05_args" name="ifi05_args" value="{{ifi05_args}}">
+        </div>
+        <div class="mb-3">
+          <label for="ifi05_cron_str" class="form-label">Cron 표현식</label>
+          <input type="text" class="form-control" id="ifi05_cron_str" name="ifi05_cron_str" value="{{ifi05_cron_str}}">
+        </div>
+        <div class="mb-3">
+          <label for="ifi05_description" class="form-label">설명</label>
+          <textarea class="form-control" id="ifi05_description" name="ifi05_description">{{ifi05_description}}</textarea>
+        </div>
+        <div class="mb-3">
+          <label for="ifi05_note" class="form-label">비고</label>
+          <textarea class="form-control" id="ifi05_note" name="ifi05_note">{{ifi05_note}}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+  </script>
+  
+{% endraw %}
+{% endblock %}
+{% block script %}
+{% raw %}
+<script>
+$( document ).ready(function() {
+    function initialize(){
+        const url = '/api/v1/scheduler/get/' + $('#param-ifi05_job_schedule_id').val();
+        getFetch(url).then(data => {
+            console.log(data); 
+            const html = makeHtmlWithTemplate('ifi05_form_template', data);
+            $('#result-area').html(html);
+        }).catch(error => {
+            console.error('Error:', error);
+            showAlertError(error)
+        });
+    }
+    $('#result-area').on('submit', '#ifi05-form', function(e){
+        e.preventDefault();
+        const url = '/api/v1/scheduler/update';
+        const data = {
+            ifi05_job_schedule_id: $('#ifi05_job_schedule_id').val(),
+            ifi05_job_schedule_nm: $('#ifi05_job_schedule_nm').val(),
+            ifi05_run_type: $('input[name="ifi05_run_type"]:checked').val(),
+            ifi05_args: $('#ifi05_args').val(),
+            ifi05_cron_str: $('#ifi05_cron_str').val(),
+            ifi05_description: $('#ifi05_description').val(),
+            ifi05_note: $('#ifi05_note').val()
+        };
+        putFetch(url, data).then(data => {
+            console.log(data);
+            alert('수정되었습니다');
+            location.href = '/page?path=/scheduler/list';
+        }).catch(error => {
+            console.error('Error:', error);
+            showAlertError(error)
+        });
+    });
+    initialize();
+});
+</script>
+{% endraw %}
+{% endblock %}
