@@ -93,7 +93,8 @@ async def shutdown_event():
     logger.info('Shutdown 프로세스 시작')
     logger.info('---------------------------------')
     scheduler = Scheduler.get_instance()
-    scheduler.shutdown()    
+    scheduler.stop() # 스케줄러 중지
+    scheduler.shutdown() # 스케줄러 종료
 
 app = create_app()
 

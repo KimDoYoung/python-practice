@@ -4,7 +4,7 @@
 
 - 제휴회사들에 api서비스, Asset-Erp와 별도로 데이터제공을 원하는 회사들에 데이터를 Restful API를 통해서 제공한다.
 - 법률서비스 제공
-- scheduling
+- Scheduling : cron 기능을 제공
 - [DART](https://opendart.fss.or.kr/intro/main.do) 정보 scrapping
   
 ## 기술 스택
@@ -84,6 +84,55 @@ CREATE TABLE IF NOT EXISTS ifi01_company  (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- 레코드 생성 일자
     PRIMARY KEY(company_id, service_id)
 );
+```
+
+## Scheduling
+
+- 개요
+Scheduler 객체(BackgroundScheduler)는 싱글레톤으로 실제적인으로 cron과 같은 역활을 한다.
+Scheduler를 통제하기 위한 서비스 객체로서 SchedulerJobService가 있다.
+asset-api를 처음 시작되면 Scheduler객체가 생성되고, SchedulerJobService가 ifi05Db에 기록된 데이터를 읽으면서 Scheduler에 각 job을 등록한다.
+추후 UI를 통해서 추가,수정,삭제될때 마다 Reload를 해주어야 Scheduler에 반영된다.
+
+```python
+#  app 시작시 
+    scheduler = Scheduler.get_instance()
+    scheduler.start()  # 스케줄러 시작
+
+    # 데이터베이스 세션을 가져와서 스케줄러 서비스 생성
+    scheduler_service = await get_scheduler_job_service()
+    await scheduler_service.register_system_jobs()   
+```
+
+- route : scheduler_routes
+
+```mermaid
+graph LR
+A(Scheduler) --> B(SchedulerJobService) <--(등록,수정,Reload)--> C(Ifi05Service)-->D(DB ifi05_job_schedule)
+```
+
+```sql
+CREATE TABLE public.ifi05_job_schedule (
+ ifi05_job_schedule_id numeric NOT NULL, -- 작업스케줄 관리ID(PK)
+ ifi05_job_schedule_nm varchar(100) NULL, -- 스케줄명
+ ifi05_run_type varchar(10) NULL, -- 구분(cron)
+ ifi05_args varchar(50) NULL, -- 아규먼트
+ ifi05_cron_str varchar(100) NULL, -- cron 표현식
+ ifi05_description text NULL, -- 설명
+ ifi05_note text NULL, -- 비고
+ CONSTRAINT ifi05_job_schedule_pkey PRIMARY KEY (ifi05_job_schedule_id)
+);
+COMMENT ON TABLE public.ifi05_job_schedule IS '작업스케줄 관리';
+****
+-- Column comments
+
+COMMENT ON COLUMN public.ifi05_job_schedule.ifi05_job_schedule_id IS '작업스케줄 관리ID(PK)';
+COMMENT ON COLUMN public.ifi05_job_schedule.ifi05_job_schedule_nm IS '스케줄명';
+COMMENT ON COLUMN public.ifi05_job_schedule.ifi05_run_type IS '구분(cron)';
+COMMENT ON COLUMN public.ifi05_job_schedule.ifi05_args IS '아규먼트';
+COMMENT ON COLUMN public.ifi05_job_schedule.ifi05_cron_str IS 'cron 표현식';
+COMMENT ON COLUMN public.ifi05_job_schedule.ifi05_description IS '설명';
+COMMENT ON COLUMN public.ifi05_job_schedule.ifi05_note IS '비고';
 ```
 
 ## DART관련정보

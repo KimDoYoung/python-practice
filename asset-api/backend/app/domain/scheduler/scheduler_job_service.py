@@ -1,4 +1,14 @@
 # scheduler_job_service.py
+"""
+모듈 설명: 
+    -   설명을 넣으시오
+주요 기능:
+    -   기능을 넣으시오
+
+작성자: 김도영
+작성일: 2024-11-07
+버전: 1.0
+"""
 import asyncio
 from backend.app.core.scheduler import Scheduler
 from sqlalchemy import select
@@ -40,7 +50,9 @@ class SchedulerJobService:
             # job_mapping에 job_nm이 존재하는지 확인
             job_function = job_mapping[job_nm]
         except KeyError:
-            logger.error(f"Failed to add job {job_nm}: Job function '{job_nm}' not found in job_mapping")
+            logger.error("------------------------- Error -------------------------")
+            logger.error(f"스케줄 JOB 매핑실패(프로세스가 없음): Failed to add job {job_nm}: Job function '{job_nm}' not found in job_mapping")
+            logger.error("---------------------------------------------------------")
             return  # 함수가 없을 경우 조기 종료        
         scheduler = self.scheduler.get_instance()
         if job_record.ifi05_run_type == 'cron' and job_record.ifi05_cron_str:
@@ -55,7 +67,9 @@ class SchedulerJobService:
                 scheduler.add_cron_job(func=self.run_async_job, cron=job_cron, job_id=job_id, args=(job_function, job_args), max_instances=2)                
                 logger.info(f"Job '{job_nm}' added with cron '{job_id}'")
             except Exception as e:
-                logger.error(f"Failed to add job {job_record.ifi05_job_schedule_nm}: {e}", exc_info=True)
+                logger.error("------------------------- Error -------------------------")
+                logger.error(f"스케줄 JOB 등록 실패: Failed to add job {job_record.ifi05_job_schedule_nm}: {e}", exc_info=True)
+                logger.error("---------------------------------------------------------")
 
 # 의존성 주입을 통해 scheduler와 db_session을 설정합니다.
 async def get_scheduler_job_service() -> SchedulerJobService:

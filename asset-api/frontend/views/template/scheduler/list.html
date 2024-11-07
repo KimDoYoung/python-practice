@@ -7,6 +7,7 @@
     <div id="result-area"></div>
     <div>
         <a href="page?path=/scheduler/insert" class="btn btn-primary">추가</a>
+        <button id="btn-reload" class="btn btn-success" title="스케줄 프로세스 재 등록">Reload</button>
     </div>
 </div>
 {% raw %}
@@ -21,6 +22,7 @@
           <th scope="col">동작</th>
           <th scope="col">Args</th>
           <th scope="col">Cron표현</th>
+          <th scope="col">다음실행시각</th>
           <th scope="col">설명</th>
           <th scope="col">비고</th>
           <th scope="col">동작</th>
@@ -35,6 +37,12 @@
           <td>{{ifi05_run_type}}</td>
           <td>{{ifi05_args}}</td>
           <td>{{ifi05_cron_str}}</td>
+          {{#if next_run_time}}
+            <td>{{next_run_time}}</td>
+          {{else}}
+          <!-- <td class="text-center"><i class="bi bi-x-lg text-danger"></i></td> -->
+          <td class="text-center text-danger" title="등록되지 않음">Not Working</td>
+         {{/if}}
           <td>{{ifi05_description}}</td>
           <td>{{ifi05_note}}</td>
           <td>
@@ -53,6 +61,7 @@
 {% raw %}
 <script>
 $( document ).ready(function() {
+    //초기화 : 목록
     function initialize(){
         const url = '/api/v1/scheduler/list';
         getFetch(url).then(data => {
@@ -65,6 +74,18 @@ $( document ).ready(function() {
             showAlertError(error);
         });
     }
+    //reload 버튼
+    $('#btn-reload').on('click', function(){
+        const url = '/api/v1/scheduler/reload';
+        getFetch(url).then(data => {
+            console.log(data); 
+            initialize();
+        }).catch(error=> {
+            console.error(error.message); 
+            showAlertError(error);
+        });
+    });
+    //삭제버튼
     $('#result-area').on('click', '.btnDelete', function(){
         const id = $(this).data('id');
         const url = '/api/v1/scheduler/delete/'+id;

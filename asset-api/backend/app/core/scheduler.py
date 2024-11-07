@@ -54,11 +54,28 @@ class Scheduler:
     def get_jobs(self) -> List[Dict[str, Any]]:
         return self.scheduler.get_jobs()
     
+    def find_job(self, job_id: str):
+        try:
+            job = self.scheduler.get_job(job_id)
+            return job
+        except Exception as e:
+            return {"error": str(e)}
+        
     def remove_job(self, job_id: str):
         try:
             self.scheduler.remove_job(job_id)
             return {"message": "Job removed successfully"}
         except Exception as e:
+            return {"error": str(e)}
+
+    def remove_all_jobs(self):
+        try:
+            jobs = self.scheduler.get_jobs()
+            for job in jobs:
+                self.scheduler.remove_job(job.id)
+            return {"message": "All jobs removed successfully"}
+        except Exception as e:
+            logger.error(f"Error removing all jobs: {e}", exc_info=True)
             return {"error": str(e)}
 
     def shutdown(self):
