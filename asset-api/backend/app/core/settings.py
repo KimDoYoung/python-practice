@@ -54,6 +54,8 @@ class Settings:
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)
     
+        #BASH
+        self.WHICH_BASH = os.getenv('WHICH_BASH', '/bin/bash')
     def __str__(self):
         ''' 서비스 설정 정보를 문자열로 반환 '''
         s = "-------------------------------------------------\n"
@@ -64,6 +66,10 @@ class Settings:
         s += f"DB_URL: {self.DB_URL}\n"
         s += f"LOG_LEVEL: {self.LOG_LEVEL}\n"
         s += f"LOG_FILE: {self.LOG_FILE}\n"
+        #s += f"JWT_SECRET_KEY: {self.JWT_SECRET_KEY}\n"
+        s += f"ACCESS_TOKEN_EXPIRE_HOURS: {self.ACCESS_TOKEN_EXPIRE_HOURS}\n"
+        s += f"FREE_PASS_IPS: {self.FREE_PASS_IPS}\n"
+        s += f"WHICH_BASH: {self.WHICH_BASH}\n"
         s += "------------------------------------------------\n"
         return s
 

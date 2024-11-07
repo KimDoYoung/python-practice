@@ -9,12 +9,14 @@
 작성일: 2024-11-05
 버전: 1.0
 """# Define your scheduled tasks
+from backend.app.background.jobs.job_shell import run_bash_shell
 from backend.app.background.jobs.job_test import test_sync, test_async
 
 # Create a dictionary to map task names to functions
 job_mapping = {
     "test_sync": test_sync,
     "test_async": test_async,
+    "run_bash_shell" : run_bash_shell,
 #    "scrap_judal": scrap_judal,
     # "site38_work" : site38_work_main,
     # "site38_work" : site38_work,

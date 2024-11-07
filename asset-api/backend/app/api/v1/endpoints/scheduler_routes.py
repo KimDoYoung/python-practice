@@ -29,6 +29,7 @@ async def reload_schedule():
     scheduler.remove_all_jobs()
     scheduler_service = await get_scheduler_job_service()
     await scheduler_service.register_system_jobs()
+    logger.info("reload_schedule success")
     return {"message": "success"}
 
 @router.get("/get/{id}", response_model=Ifi05JobScheduleResponse)

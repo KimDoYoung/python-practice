@@ -3,11 +3,14 @@
 {% endblock %}
 {% block content %}
 <div>
-    <h1>scheduler</h1>
+    <h1>Scheduler</h1>
     <div id="result-area"></div>
     <div>
         <a href="page?path=/scheduler/insert" class="btn btn-primary">추가</a>
-        <button id="btn-reload" class="btn btn-success" title="스케줄 프로세스 재 등록">Reload</button>
+        <button id="btn-reload" class="btn btn-success" title="스케줄 프로세스 재 등록">스케줄 Reload</button>
+    </div>
+    <div>
+        <p class="fst-italic text-secondary mt-3">스케줄정보가 Db에서  추가,삭제,수정되는 경우 스케줄Reload를 통해서 Scheduler프로세스에 반영됩니다.</p>
     </div>
 </div>
 {% raw %}
@@ -80,6 +83,7 @@ $( document ).ready(function() {
         getFetch(url).then(data => {
             console.log(data); 
             initialize();
+            showAlertMessage('스케줄이 모두 재 등록되었습니다.');
         }).catch(error=> {
             console.error(error.message); 
             showAlertError(error);
@@ -95,6 +99,7 @@ $( document ).ready(function() {
         deleteFetch(url).then(data => {
             console.log(data); 
             initialize();
+            showAlertMessage('스케줄이 모두 재 등록되었습니다.');
         }).catch(error=> {
             console.error(error.message); 
             showAlertError(error);

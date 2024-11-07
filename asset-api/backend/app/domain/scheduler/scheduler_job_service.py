@@ -23,6 +23,15 @@ class SchedulerJobService:
     def __init__(self, scheduler: Scheduler):
         # self.db_session = db_session
         self.scheduler = scheduler
+        # 이벤트 루프를 명확히 초기화
+        try:
+            self.loop = asyncio.get_event_loop()
+            if self.loop.is_closed():  # 이벤트 루프가 종료된 경우 새로운 루프 생성
+                self.loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(self.loop)
+        except RuntimeError:
+            self.loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(self.loop)        
 
     async def get_jobs_from_db(self):
         """DB에서 스케줄 정보를 가져옵니다."""
@@ -35,6 +44,9 @@ class SchedulerJobService:
         return await coro
 
     def run_async_job(self, coro, *args, **kwargs):
+        if not hasattr(self, 'loop') or self.loop.is_closed():
+                    self.loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(self.loop)        
         asyncio.run_coroutine_threadsafe(self.run_async_task(coro(*args, **kwargs)), self.loop)          
 
     async def register_system_jobs(self):
@@ -72,6 +84,15 @@ class SchedulerJobService:
                 logger.error("---------------------------------------------------------")
 
 # 의존성 주입을 통해 scheduler와 db_session을 설정합니다.
+# async def get_scheduler_job_service() -> SchedulerJobService:
+#     scheduler = Scheduler.get_instance()
+#     return SchedulerJobService(scheduler=scheduler)
+
+_scheduler_job_service_instance = None  # 모듈 전역에서 인스턴스를 저장할 변수
+
 async def get_scheduler_job_service() -> SchedulerJobService:
-    scheduler = Scheduler.get_instance()
-    return SchedulerJobService(scheduler=scheduler)
+    global _scheduler_job_service_instance
+    if _scheduler_job_service_instance is None:
+        scheduler = Scheduler.get_instance()
+        _scheduler_job_service_instance = SchedulerJobService(scheduler=scheduler)
+    return _scheduler_job_service_instance

@@ -1,0 +1,42 @@
+{% extends 'common/base.html' %}
+{% block style %}
+{% endblock %}
+{% block content %}
+<h1>Settings</h1>
+<div id="result-area">
+
+</div>
+{% raw %}
+<!--handlebar scripts-->
+<script id="settings_template" type="text/x-handlebars-template">
+    <table class="table table-border" style="width:100%; border-collapse: collapse;">
+        {{#each config}}
+        <tr>
+            <th style="padding: 8px; text-align: left;">{{@key}}</th>
+            <td style="padding: 8px;">{{this}}</td>
+        </tr>
+        {{/each}}
+        <tr>
+            <th style="padding: 8px; text-align: left;">Free Pass IPs</th>
+            <td style="padding: 8px; white-space: pre-wrap;">{{text2Html free_pass_ips_content}}</td>
+        </tr>
+    </table>
+</script>
+{% endraw %}
+{% endblock %}
+{% block script %}
+{% raw %}
+<script>
+$( document ).ready(function() {
+    console.log( "ready!")
+    getFetch('/settings').then(data => {
+        console.log(data); 
+        const html = makeHtmlWithTemplate('settings_template', data);
+        $('#result-area').html(html);
+    }).catch(error=> {
+        console.error(error.message); 
+    });
+});
+</script>
+{% endraw %}
+{% endblock %}
