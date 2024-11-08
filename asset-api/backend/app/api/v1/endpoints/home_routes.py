@@ -5,6 +5,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from backend.app.core.template_engine import render_template
 from backend.app.core.logger import get_logger
 from backend.app.utils.misc_util import get_today
+from backend.app.core.settings import config
 
 logger = get_logger()
 
@@ -82,3 +83,13 @@ async def handlebar_template(request: Request, path: str = Query(..., descriptio
     }
     return JSONResponse(content=data)
 
+@router.get("/settings", response_class=JSONResponse)
+async def settings():
+    ''' 설정 정보 조회 info dict에 config정보를 담어서 리턴 '''
+    info = {}
+    info['config'] = config.__dict__
+    # config.FREE_PASS_IPS을 읽어서 파일 내용을 리턴
+    with open(config.FREE_PASS_IPS, 'r') as f:
+        info['free_pass_ips_content'] = f.read()
+        
+    return JSONResponse(content=info)

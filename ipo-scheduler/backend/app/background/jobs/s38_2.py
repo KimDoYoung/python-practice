@@ -70,7 +70,12 @@ def get_ipo_list(url:str):
     table = soup.find('table', {'summary': '공모주 청약일정'})
 
     table_str = str(table)
-    df = pd.read_html(StringIO(table_str))[0]
+    with open('table.html', 'w', encoding='utf-8') as file:
+        file.write(table_str)
+    try:
+        df = pd.read_html(StringIO(table_str))[0]
+    except Exception as e:
+        print("테이블을 dataframe으로 바꿀때 에러:", e) 
 
     #print(df)
     data_list = []

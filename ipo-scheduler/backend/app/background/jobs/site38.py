@@ -72,6 +72,7 @@ async def site38_work(title):
 async def main(arg):
     try:
         url = config.DB_URL
+        logger.info(f"DB url : {url}")
         await MongoDb.initialize(url)
         await site38_work(arg)
     except Exception as e:

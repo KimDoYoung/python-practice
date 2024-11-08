@@ -425,3 +425,7 @@ Handlebars.registerHelper('truncate', function(text, length) {
     }
     return text;
 });
+
+Handlebars.registerHelper('text2Html', function(text) {
+    return new Handlebars.SafeString(text.replace(/\n/g, '<br>'));
+});

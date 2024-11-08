@@ -1,4 +1,5 @@
 # schemas.py
+from datetime import datetime
 from pydantic import BaseModel, Field
 from typing import Optional
 
@@ -24,3 +25,7 @@ class Ifi05JobScheduleUpdate(Ifi05JobScheduleBase):
 class Ifi05JobScheduleResponse(Ifi05JobScheduleBase):
     """응답 스키마, id 포함"""
     ifi05_job_schedule_id: int = Field(..., description="작업스케줄 관리ID (PK)")
+    next_run_time: Optional[str] = Field(None, description="다음 실행 시간")
+
+
+    
