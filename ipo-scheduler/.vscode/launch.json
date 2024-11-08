@@ -12,6 +12,7 @@
             "console": "integratedTerminal",
             "cwd" : "${fileDirname}",
             "justMyCode": false,
+
             // "env": {"PYTHONPATH": "${workspaceFolder}"}       
         },
         {

@@ -211,6 +211,7 @@ class DbConfig(Document):
     - ipo collection을 모두 지운다.
     - ipo_scrap_38 collection에서 Ipo collection으로 데이터를 옮긴다.
     - 옮기면서 **판정정보**를 채운다.
+    - Debugging:  export PYTHONPATH=/c/Users/deHong/Documents/kdy/python-practice/ipo-scheduler 후 site38.py debugging
 
 ### 호출
 

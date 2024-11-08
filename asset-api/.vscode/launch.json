@@ -11,8 +11,8 @@
       "program": "${file}",
       "console": "integratedTerminal",
       "cwd": "${fileDirname}",
-      "justMyCode": false
-      // "env": {"PYTHONPATH": "${workspaceFolder}"}
+      "justMyCode": false,
+      "env": {"PYTHONPATH": "${workspaceFolder}"}
     },
     {
       "name": "웹AssetApi",
