@@ -1,7 +1,11 @@
-import io,os,re,sys
+import io
+import os
+import re
+import sys
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 import pandas as pd
+import requests
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -20,9 +24,9 @@ def install_chrome_driver():
 # 209.79.65.132	8080	United States	
 # 178.254.143.82	6666	Serbia	
 
-    proxy_ip = "209.79.65.132"
-    proxy_port = "8080"
-    # proxy = f"http://{proxy_ip}:{proxy_port}"
+    proxy_ip = "178.254.143.82"
+    proxy_port = "6666"
+    proxy = f"http://{proxy_ip}:{proxy_port}"
 
     # Chrome 옵션 설정
     chrome_options = Options()
@@ -48,7 +52,7 @@ def get_hrefs(url):
     #     anchors = span.find_all('a')
     #     for anchor in anchors:
     #         print(anchor['href'], anchor.text)    
-    ol = soup.find('ol', id='torrents')
+    ol = soup.find('ol', id='searchs')
 
     data = []
     for li in ol.find_all('li', class_='list-entry'):
@@ -57,7 +61,6 @@ def get_hrefs(url):
         row.append(href)
         data.append(row)
 
-    print(f"{url} : 갯수: ", len(data))
 
     # # 최대 열 수 찾기
     # max_columns = max(len(row) for row in data)
@@ -80,20 +83,12 @@ def get_hrefs(url):
     df = df.drop('type', axis=1)
     
     print(df['leech'].dtype)
-    print("------------------------------------------------")
-    print(df[['leech', 'seed', 'name']])
-    print("------------------------------------------------")
+
     # 공백 제거
     df['leech'] = df['leech'].str.strip()
+    # 특정 패턴의 문자열을 대체
     df['leech'] = df['leech'].apply(lambda x: re.sub(r'[^0-9]', '', x) if isinstance(x, str) else x)
     df['leech'] = pd.to_numeric(df['leech'], errors='coerce')
-
-    df['seed'] = df['seed'].str.strip()
-    df['seed'] = df['seed'].apply(lambda x: re.sub(r'[^0-9]', '', x) if isinstance(x, str) else x)
-    df['seed'] = pd.to_numeric(df['seed'], errors='coerce')
-
-
-
     # print(df['leech'].dtype)
     # print(df[['leech', 'name']])
 
@@ -101,32 +96,52 @@ def get_hrefs(url):
     #print(df[['leech', 'name']])
     # NaN 값을 포함하는 행 제거
     #df = df.dropna(subset=['leech'])    
-    # df = df[(df['leech'] >= 100) | (df['seed'] >= 100)]
-    df = df[ (df['leech'] + df['seed']) >= 100]
+    df = df[df['leech'] >= 100]
     # print(df[['leech', 'name']])
     # print(df['href'].to_list())
     # href_array = df['href'].to_list()
     return df
 
 def main():
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    
+    sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding='utf-8')
+
     driver = install_chrome_driver()
-    load_dotenv()
+    df = pd.read_csv('search.csv')
+    # uploaded 컬럼을 날짜 형식으로 변환
+    df['uploaded'] = pd.to_datetime(df['uploaded'], format='%Y-%m-%d')
 
-    # 환경 변수 사용
-    baseUrl = os.getenv('P_URL')
+    # uploaded 기준으로 내림차순 정렬
+    df_sorted = df.sort_values(by='uploaded', ascending=False)    
+    # hrefs = df['href'].to_list()
+    # #print(hrefs)
+    # magnet_anchors = []
+    file_path = 'search.html'
 
-    df_all = pd.DataFrame()
-    for i in range(3, 10):
-        url = f"{baseUrl}/search.php?q=user:Cristie65:{i}"
-        new_df = get_hrefs(url)
-        df_all = pd.concat([df_all, new_df], ignore_index=True)
-
-    df_all['href'] = baseUrl +  df_all['href']
-
-    df_all.to_csv('torrent.csv', index=False)
-    print("torrent.csv saved")
-    print("Done!")    
+    # 파일을 생성하고 덮어쓰기 모드로 열기 (처음 작성할 때 사용)
+    with open(file_path, 'w', encoding='utf-8') as file:
+        file.write('<html>\n')    
+        for index, row in df_sorted.iterrows():
+        #for href in hrefs:
+            href = row['href']
+            driver.get(href)
+            # WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "html")))
+            element = WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.ID, 'description_container'))
+            )
+            soup =  BeautifulSoup(driver.page_source, 'html.parser')
+            # print(soup.prettify())
+            div_desc = soup.find('div', id='description_container')
+            if div_desc:
+                label = div_desc.find('label', id='d')
+                if label:
+                    anchors = label.find_all('a')
+                    file.write(f"<div style='background-color: #cae8b0;'><p>${index} : {row['name']} : {row['size']} : {row['uploaded']}</p>{anchors[1]}</div>\n")
+                    print("------------------")
+                    print(f"-->{anchors[1]}")
+            # break
+        file.write('</html>\n')
+        file.close()
 
 if __name__ == "__main__":
     main()

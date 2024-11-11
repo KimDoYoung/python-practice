@@ -43,11 +43,6 @@ def get_hrefs(url):
     #soup.prettify()
     spans = soup.find_all('span', class_='list-item item-name item-title')
 
-    # 각 span 안에 있는 anchor 태그 추출 및 출력
-    # for span in spans:
-    #     anchors = span.find_all('a')
-    #     for anchor in anchors:
-    #         print(anchor['href'], anchor.text)    
     ol = soup.find('ol', id='torrents')
 
     data = []
@@ -92,23 +87,16 @@ def get_hrefs(url):
     df['seed'] = df['seed'].apply(lambda x: re.sub(r'[^0-9]', '', x) if isinstance(x, str) else x)
     df['seed'] = pd.to_numeric(df['seed'], errors='coerce')
 
-
-
-    # print(df['leech'].dtype)
-    # print(df[['leech', 'name']])
-
-    # 'leech' 열을 정수로 변환. 변환할 수 없는 값은 NaN으로 처리
-    #print(df[['leech', 'name']])
-    # NaN 값을 포함하는 행 제거
-    #df = df.dropna(subset=['leech'])    
-    # df = df[(df['leech'] >= 100) | (df['seed'] >= 100)]
-    df = df[ (df['leech'] + df['seed']) >= 100]
-    # print(df[['leech', 'name']])
-    # print(df['href'].to_list())
-    # href_array = df['href'].to_list()
     return df
 
 def main():
+    if len(sys.argv) != 2:
+        print("Usage: python q1.py <search_query>")
+        return
+    # argument로 전달된 검색어
+    search_query = sys.argv[1]
+    print(f"Search query: {search_query}")        
+
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
     driver = install_chrome_driver()
     load_dotenv()
@@ -117,15 +105,14 @@ def main():
     baseUrl = os.getenv('P_URL')
 
     df_all = pd.DataFrame()
-    for i in range(3, 10):
-        url = f"{baseUrl}/search.php?q=user:Cristie65:{i}"
-        new_df = get_hrefs(url)
-        df_all = pd.concat([df_all, new_df], ignore_index=True)
+    url = f"{baseUrl}/search.php?q={search_query}"
+    new_df = get_hrefs(url)
+    df_all = pd.concat([df_all, new_df], ignore_index=True)
 
     df_all['href'] = baseUrl +  df_all['href']
 
-    df_all.to_csv('torrent.csv', index=False)
-    print("torrent.csv saved")
+    df_all.to_csv('search.csv', index=False)
+    print("search.csv saved")
     print("Done!")    
 
 if __name__ == "__main__":
