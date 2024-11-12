@@ -147,7 +147,7 @@ async def main():
                     ifi21_status_msg=str(e),
                     ifi21_response="",
                     ifi21_search1=corp_code,
-                    ifi21_search2=""
+                    ifi21_search2=None
                 )
                 db_session.add(new_record)
                 await db_session.commit()
