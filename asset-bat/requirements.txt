@@ -2,3 +2,4 @@ python-dotenv
 asyncpg
 sqlalchemy[asyncio]
 aiohttp
+pydantic
