@@ -4,9 +4,9 @@ from datetime import datetime, timedelta
 from pydantic import ValidationError
 from sqlalchemy import func, select, text
 from common.database import Database
-from common.domain.ifi21_api_data_model import Ifi21ApiData
-from gosi_list_schema import GosiListParam, GosiListResponse
-from jibun_stock_schema import JibunStockParam, JibunStockResponse
+from common.domain.model.ifi21_api_data_model import Ifi21ApiData
+from common.domain.schema.gosi_list_schema import GosiListParam, GosiListResponse
+from common.domain.schema.jibun_stock_schema import JibunStockParam, JibunStockResponse
 from common.settings import config
 from urllib.parse import urlencode
 import aiohttp

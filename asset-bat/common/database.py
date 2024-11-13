@@ -14,7 +14,7 @@ from contextlib import asynccontextmanager
 from typing import AsyncGenerator, Any, List
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import MetaData
+from sqlalchemy import MetaData, text
 from common.settings import config
 
 # 데이터베이스 URL 설정
@@ -51,8 +51,14 @@ class Database:
     async def fetch(self, query: str, *args: Any) -> List[Any]:
         """데이터 조회 쿼리 실행 (SELECT)"""
         async with self.get_connection() as connection:
-            result = await connection.execute(query, *args)
-            return result.fetchall()
+            try:
+                result = await connection.execute(text(query), *args)
+                return result.scalars().all()
+            except Exception as e:
+                print(f"데이터 조회 오류: {e}")
+            # result = await connection.execute(query, *args)
+            # return result.fetchall()
+            # return result.scalars().all()
 
     async def execute(self, query: str, *args: Any) -> None:
         """데이터 조작 쿼리 실행 (INSERT, UPDATE, DELETE)"""
