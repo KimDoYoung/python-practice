@@ -1,4 +1,5 @@
 import asyncio
+from datetime import datetime, timezone
 import json
 from pydantic import ValidationError
 from selenium import webdriver
@@ -104,7 +105,9 @@ async def process_search_results(driver, corp_name, corp_cd, corp_cls):
 
     # 검색 결과가 없는 경우 종료
     if total_count == 0:
+        print("********************************************************")
         print(f"검색 결과가 없습니다 (회사명: {corp_name})")
+        print("********************************************************")
         return
 
     # 맨 마지막 페이지부터 시작해 역순으로 순회
@@ -129,6 +132,8 @@ async def process_search_results(driver, corp_name, corp_cd, corp_cls):
                 link_element = row.find_element(By.CSS_SELECTOR, "td.first a")
                 link_element.click()  # 팝업창 열기
 
+                # 새 창이 열릴 때까지 대기 (기존 창보다 handles가 1개 더 많아질 때까지)
+                WebDriverWait(driver, 10).until(lambda driver: len(driver.window_handles) > 1)
                 # 팝업창에서 데이터 추출
                 driver.switch_to.window(driver.window_handles[-1])  # 새 창으로 전환
 
@@ -136,12 +141,17 @@ async def process_search_results(driver, corp_name, corp_cd, corp_cls):
                 # WebDriverWait(driver, 10).until(
                 #     lambda d: d.execute_script("return document.readyState") == "complete"
                 # )
+                # try:
+                #     WebDriverWait(driver, 10).until(
+                #         EC.presence_of_element_located((By.TAG_NAME, "body"))
+                #     )
+                # except Exception as e:
                 await asyncio.sleep(5)  # 대기 시간 추가
-                
-                
+
                 # 페이지 소스를 저장
-                with open(f"{data_folder}/popup_page_source_{corp_name}_{page_index}.html", "w", encoding="utf-8") as file:
-                    file.write(driver.page_source)                             
+                if DEBUG:
+                    with open(f"{data_folder}/popup_page_source_{corp_name}_{page_index}.html", "w", encoding="utf-8") as file:
+                        file.write(driver.page_source)                             
                 
                 # 각 요소를 get_text_or_none 함수로 추출
                 iss_corp_code = get_text_or_none(driver, "//th[text()='발행기관코드']/following-sibling::td")
@@ -181,9 +191,17 @@ async def process_search_results(driver, corp_name, corp_cd, corp_cls):
                 }
 
                 # 회사 약어명과 일치하는지 체크 일치하면 찾는 것이라고 판단한다. 
-                if corp_data["ifi20_iss_corp_snm"] == corp_name and corp_cls in corp_data["ifi20_market_type"]:
+                check = False
+                if total_count == 1: 
+                    if corp_cls in corp_data["ifi20_market_type"]:
+                        check = True
+                else:
+                    if corp_data["ifi20_iss_corp_snm"] == corp_name and corp_cls in corp_data["ifi20_market_type"]:
+                        check = True
+                    
+                if check:
                     found = True
-                    await save_to_ifi20(corp_cd, corp_data)  # 추출한 데이터 저장
+                    await save_to_ifi20(corp_name, corp_cd, corp_data)  # 추출한 데이터 저장
                     if main_window != driver.current_window_handle: # 팝업창이 열려있으면 닫기
                         driver.close()
                         driver.switch_to.window(driver.window_handles[0])                    
@@ -250,7 +268,7 @@ async def perform_scraping(corp_names: List[str]):
 
 # 스크래핑 데이터 DB 저장
 
-async def save_to_ifi20(corp_cd: str, data: dict):
+async def save_to_ifi20(corp_name:str, corp_cd: str, data: dict):
     '''결과 데이터를 ifi20_dart_corp 테이블에 update한다'''
     async with database.get_connection() as session:
         
@@ -274,17 +292,49 @@ async def save_to_ifi20(corp_cd: str, data: dict):
             # 작업일시 필드 업데이트
             existing_record.ifi20_work_date = func.now()
             
-            print(f"기존 레코드 업데이트 완료: {corp_cd}")
+            print(f"기존 레코드 업데이트 완료: {corp_name} : DART코드 {corp_cd}")
 
             # 데이터베이스 커밋 및 오류 처리
             try:
                 await session.commit()
-                print(f"데이터 저장 성공: {data}")
+                print(f"KRX발행기관정보로 ifi20 데이터 UPDATE  성공: {data}")
             except Exception as e:
                 await session.rollback()
-                print(f"데이터 저장 오류: {e}")
+                print(f"KRX발행기관정보로 ifi20 데이터 UPDATE 오류: {e}")
         else: # 존재하지 않으면 무시한다. 즉 ifi20에 corp_code가 없으면 무시한다.
-            pass
+            print(f"ifi20에 {corp_name} DART코드:{corp_cd} 가 존재하지 않습니다. 추가합니다")
+            result = await session.execute(select(func.f_create_batchseq()))
+            ifi20_dart_corp_id = result.scalar()  # 함수에서 반환된 ID 값            
+            # ifi20 테이블에 레코드 추가
+            new_record = IFI20DartCorp(
+                ifi20_dart_corp_id= ifi20_dart_corp_id,
+                ifi20_dart_corp_cd=corp_cd,
+                ifi20_dart_corp_nm=corp_name,
+                ifi20_iss_corp_cd=data["ifi20_iss_corp_cd"],
+                ifi20_iss_corp_nm=data["ifi20_iss_corp_nm"],
+                ifi20_iss_corp_snm=data["ifi20_iss_corp_snm"],
+                ifi20_iss_corp_enm=data["ifi20_iss_corp_enm"],
+                ifi20_corp_reg_no=data["ifi20_corp_reg_no"],
+                ifi20_biz_reg_no=data["ifi20_biz_reg_no"],
+                ifi20_addr=data["ifi20_addr"],
+                ifi20_eaddr=data["ifi20_eaddr"],
+                ifi20_ceo=data["ifi20_ceo"],
+                ifi20_tel=data["ifi20_tel"],
+                ifi20_homepage=data["ifi20_homepage"],
+                ifi20_market_type=data["ifi20_market_type"],
+                ifi20_list_yn=data["ifi20_list_yn"],
+                ifi20_industry_class=data["ifi20_industry_class"],
+                ifi20_industry_item=data["ifi20_industry_item"],
+                ifi20_work_date=datetime.now(timezone.utc)
+            )
+            session.add(new_record)
+            # 데이터베이스 커밋 및 오류 처리
+            try:
+                await session.commit()
+                print(f"ifi20에 데이터없음 KRX발행기관에서 ifi20 데이터 INSERT 성공: {data}")
+            except Exception as e:
+                await session.rollback()
+                print(f"ifi20에 데이터없음 KRX발행기관에서 ifi20 데이터 INSERT 오류: {e}")
 
 # 메인 실행 함수
 async def main():
@@ -296,8 +346,14 @@ async def main():
         with open(f"{data_folder}/corp_names.dat", "w", encoding="utf-8") as file:
             for corp_name in corp_names:
                 file.write(corp_name + "\n")        
-
+    # corp_names=["키움제10호기업인수목적|01877126|기타"]
     await perform_scraping(corp_names)
 
 if __name__ == "__main__":
+    print("--------------------------------------------------")
+    print("KRX에서 발행기관조회 ifi20채우기 시작: " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    print("--------------------------------------------------")
     asyncio.run(main())
+    print("--------------------------------------------------")
+    print("KRX에서 발행기관조회 ifi20채우기 종료: " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    print("--------------------------------------------------")
