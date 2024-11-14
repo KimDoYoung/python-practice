@@ -32,6 +32,10 @@ class Settings:
         self.DART_API_KEY = os.getenv('DART_API_KEY', '')
         
         self.DATA_FOLDER = os.getenv('DATA_FOLDER', 'data')
+        
+        # local일때는 DEBUG 모드로 설정
+        if self.PROFILE_NAME == 'local':
+            self.DEBUG = True
 
     def __str__(self):
         ''' 서비스 설정 정보를 문자열로 반환 '''
