@@ -16,7 +16,7 @@ echo "Log File: $log_file"
 
 if [[ "$OS_TYPE" == "Linux" || "$OS_TYPE" == "Darwin" ]]; then
     # 가상 환경 활성화 (Linux/macOS)
-    export ASSET_BAT_MODE="real"
+    export AssetBat_Mode="real"
     export PYTHONPATH="$PROJECT_ROOT:$PYTHONPATH"
     source $PROJECT_ROOT/env/bin/activate
 

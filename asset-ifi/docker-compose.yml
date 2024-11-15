@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  asset_api:
+    build:
+      context: ./asset-api
+    container_name: asset-api
+    ports:
+      - "8000:8000"
+    networks:
+      - asset-network
+    environment:
+      - AssetApi_Mode=real
+    volumes:
+      - ./asset-api/backend:/backend
+      - ./asset-api/frontend:/frontend
+      - /root/logs/asset-api:/root/logs/asset-api
+      - /etc/localtime:/etc/localtime:ro
+    restart: always
+
+  asset_bat:
+    build:
+      context: ./asset-bat
+    container_name: asset-bat
+    networks:
+      - asset-network
+    environment:
+      - AssetBat_Mode=real
+    volumes:
+      - /root/logs/asset-bat:/root/logs/asset-bat
+      - /etc/localtime:/etc/localtime:ro
+    restart: always
+
+networks:
+  asset-network:
+    driver: bridge

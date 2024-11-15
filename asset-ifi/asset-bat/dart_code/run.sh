@@ -18,7 +18,7 @@ echo "Log File: $log_file"
 
 if [[ "$OS_TYPE" == "Linux" || "$OS_TYPE" == "Darwin" ]]; then
     
-    export ASSET_BAT_MODE="real"
+    export AssetBat_Mode="real"
     
     # 가상 환경 활성화 (Linux/macOS)
     source "$PROJECT_ROOT/env/bin/activate"
@@ -33,7 +33,7 @@ if [[ "$OS_TYPE" == "Linux" || "$OS_TYPE" == "Darwin" ]]; then
     deactivate
 
 elif [[ "$OS_TYPE" == "MINGW"* || "$OS_TYPE" == "CYGWIN"* ]]; then
-    export ASSET_BAT_MODE="local"
+    export AssetBat_Mode="local"
     
     # 가상 환경 활성화 (Windows)
     source "$PROJECT_ROOT/env/Scripts/activate"

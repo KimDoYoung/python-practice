@@ -4,7 +4,7 @@
     - .env.{PROFILE_NAME} 파일을 로드하여 설정값을 가져옴
     - PROFILE_NAME 의 local과 real 2가지 모드를 지원
     - local 모드일 경우 .env.local 파일을 로드, real 모드일 경우 .env.real 파일을 로드
-    - PROFILE_NAME 은 환경변수 ASSET_BAT_MODE 로 설정
+    - PROFILE_NAME 은 환경변수 AssetBat_Mode 로 설정
 
 ※주의: Config 라는 이름으로 다른 파일에서 사용하기로 함. 
         - config = Settings()
@@ -18,7 +18,7 @@ class Settings:
     def __init__(self):
         
         # PROFILE_NAME 환경변수를 읽어옴
-        self.PROFILE_NAME = os.getenv('ASSET_BAT_MODE', 'local')
+        self.PROFILE_NAME = os.getenv('AssetBat_Mode', 'local')
         load_dotenv(dotenv_path=f'.env.{self.PROFILE_NAME}')
         
         # DB 설정
