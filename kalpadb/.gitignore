@@ -1,0 +1,7 @@
+env/
+.env
+.env.*
+data/
+files/
+.*.lock
+*pid.txt
