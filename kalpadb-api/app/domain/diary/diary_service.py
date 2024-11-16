@@ -176,7 +176,8 @@ class DiaryService:
         attachs = []
         if file_list:
             for imgfile in file_list:
-                url = f"{config.URL_BASE}/{imgfile.saved_dir_name}/{imgfile.saved_file_name}"
+                saved_dir_name = imgfile.saved_dir_name.replace('/home/kdy987/www/uploaded/','')
+                url = f"{config.URL_BASE}/{saved_dir_name}/{imgfile.saved_file_name}"
                 attachs.append({
                     "node_id": imgfile.node_id,
                     "org_file_name": imgfile.org_file_name,

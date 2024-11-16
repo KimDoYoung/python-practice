@@ -31,4 +31,4 @@
 13. login-scrap : LS증권, KIS증권 로그인해서 scrapping
 14. asset-api : asset erp 용 법률정보 서비스를 위한 fastapi restful api
 15. ipo-scheduler :  lucy에서 ipo 달력과 상세를 떼어내어서 jskn에서 서비스 
-16. kalpadb: hdd 쭉 순회하면서 파일명을 kalpadb hdd에 넣는다.
+16. kalpadb-util: hdd 쭉 순회하면서 파일명을 kalpadb hdd에 넣는다.
