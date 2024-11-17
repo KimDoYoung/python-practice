@@ -39,7 +39,7 @@ class DiaryService:
 
     # Create
     async def create_diary(self, diary_data: DiaryRequest, files: List[UploadFile] = File(None) ) -> DiaryResponse:
-        # Diary 저장 (이 부분은 트랜잭션에 포함하지 않음)
+        ''' 일기 생성 이미지 첨부 없이 추가 가능'''
         diary = Diary(
             ymd=diary_data.ymd,
             content=diary_data.content,
@@ -176,7 +176,8 @@ class DiaryService:
         attachs = []
         if file_list:
             for imgfile in file_list:
-                url = f"{config.URL_BASE}/{imgfile.saved_dir_name}/{imgfile.saved_file_name}"
+                saved_dir_name = imgfile.saved_dir_name.replace('/home/kdy987/www/uploaded/','')
+                url = f"{config.URL_BASE}/{saved_dir_name}/{imgfile.saved_file_name}"
                 attachs.append({
                     "node_id": imgfile.node_id,
                     "org_file_name": imgfile.org_file_name,
@@ -189,6 +190,7 @@ class DiaryService:
 
     # Update
     async def update_diary(self, ymd: str, diary_data: DiaryUpdateRequest) -> DiaryBase | None:
+        ''' diary 1개 수정, 수정된 diary를 반환, diary가 존재하지 않으면 None 반환 '''
         result = await self.db.execute(select(Diary).filter(Diary.ymd == ymd))
         diary = result.scalar_one_or_none()
         if diary:

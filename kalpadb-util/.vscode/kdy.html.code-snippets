@@ -1,0 +1,76 @@
+{
+    "fetch Handlebar template" :{
+        "prefix" : "myFetchHandlebarTemplate",
+        "body": [
+            "const template = await fetch_handlebar_and_compile('range.html')",
+            "postFetch(url, data)",
+            "    .then(data => {",
+            "        console.log(data.t1441OutBlock1);",
+            "        const html = template({list: data.t1441OutBlock1});",
+            "        $('#list-area').html(html);",
+            "    })",
+            "    .catch(error => {",
+            "        $('#list-area').html(error.message);",
+            "    });",
+            ],
+    },
+    "event on some element" : {
+        "prefix": "myEventOnInElevment",
+        "body":  [
+            "$(${1: container element}).on(\"click\", \"${2: element}\", function() {",
+                "alert(\"두 번째 버튼을 클릭했습니다.\");",
+            "});"
+            ],
+    },
+    "fetchData 전형적인것" : {
+        "prefix": "myGetFetch",
+        "body" :[
+            "getFetch('${1: url}')",
+            "  .then(data => {\n console.log(data); \n})",
+            "  .catch(error=> {\n console.error(error.message); \n});"
+        ]
+    },
+    "post fetch 전형적인 것" : {
+        "prefix": "mypostFetch",
+        "body" :[
+            "const url = '${1: url}';",
+            "const data = { abc : 'abc', def : 'def'};",
+            "postFetch(url, data).then(data => {",
+            "\tconsole.log(data);",
+            "}).catch(error=> {",
+            "\tconsole.error(error.message);",
+            "});",
+
+        ]
+    },
+    "html페이지" : {
+        "prefix" : "myhtml",
+        "body" :[
+            "{% extends 'common/base.html' %}",
+            "{% block style %}",
+            "{% endblock %}",
+            "{% block content %}",
+                "<div class=\"row\">",
+                    "<div class=\"col\">",
+                        "<h1>Test1</h1>",
+                    "</div>",
+                    "<div class=\"col\">",
+                        "<h1>Test2</h1>",
+                    "</div>",
+                "</div>",
+            "{% raw %}",
+            "<!--handlebar scripts-->",
+            "{% endraw %}",
+            "{% endblock %}",
+            "{% block script %}",
+            "{% raw %}",
+            "<script>",
+            "$( document ).ready(function() {",
+            "console.log( \"ready!\")",
+                "});",
+            "</script>",
+            "{% endraw %}",
+            "{% endblock %}",            
+        ]
+    }
+}
