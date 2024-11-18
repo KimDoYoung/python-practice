@@ -4,7 +4,8 @@ import pymysql
 import datetime
 from dotenv import load_dotenv
 
-from kalpadb_utils import generate_srch_key
+from common.utils import generate_srch_key
+
 
 # .env 파일 로드
 load_dotenv()

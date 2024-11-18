@@ -390,7 +390,8 @@ class DiaryService:
         url_base = config.URL_BASE
         result_list = []
         for file in file_list:
-            url = f"{url_base}/{file.saved_dir_name}/{file.saved_file_name}"
+            saved_dir_name = file.saved_dir_name.replace('/home/kdy987/www/uploaded/','')
+            url = f"{url_base}/{saved_dir_name}/{file.saved_file_name}"
             file_info = AttachFileInfo(
                 node_id=file.node_id,
                 file_name=file.org_file_name,
