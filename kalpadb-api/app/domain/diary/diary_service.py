@@ -350,6 +350,7 @@ class DiaryService:
                     # 물리적 파일 저장
                     with open(file_location, "wb") as buffer:
                         shutil.copyfileobj(file.file, buffer)
+                        logger.debug(f"{file_location} 파일이 성공적으로 저장되었습니다.")
                     url_base = config.URL_BASE
                     # 파일 URL 생성 및 추가
                     file_url = f"{url_base}/{yyyymm}/{saved_file_name}"
@@ -377,6 +378,7 @@ class DiaryService:
                     )
                     self.db.add(match_file_var)
                 await self.db.commit()
+                logger.info('첨부파일 추가 성공적으로 수행되었습니다.' + file_location)
                 return True
             except Exception as e:
                 await transaction.rollback()
