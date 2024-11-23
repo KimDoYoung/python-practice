@@ -29,7 +29,7 @@ class ApNodeFileService:
 
     # match_file_var로 매칭된 파일 조회
     async def get_file_by_match(self, tbl: str, id: str) -> list[ApFile]:
-        ''' match_file_var로 매칭된 파일 조회 '''
+        ''' match_file_var에서 id 즉 일기 같은 경우 ymd 매칭된 파일들 모두 조회 '''
         stmt = (
             select(ApFile)
             .join(MatchFileVar, ApFile.node_id == MatchFileVar.node_id)
@@ -38,6 +38,18 @@ class ApNodeFileService:
         )
         result = await self.db.execute(stmt)
         return result.scalars().all()
+
+    async def get_file_in_match_by_id_and_node_id(self, tbl: str, id: str, node_id: str) -> ApFile:
+        ''' match_file_var에서 id와 node_id로 1개 조회 '''
+        stmt = (
+            select(ApFile)
+            .join(MatchFileVar, ApFile.node_id == MatchFileVar.node_id)
+            .where(MatchFileVar.tbl == tbl)
+            .where(MatchFileVar.id == id)
+            .where(MatchFileVar.node_id == node_id)
+        )
+        result = await self.db.execute(stmt)
+        return result.scalars().first()
 
     async def get_file_by_node_id(self, node_id: str) -> ApFile:
         ''' node_id로 파일 조회 '''

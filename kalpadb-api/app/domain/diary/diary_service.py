@@ -412,23 +412,22 @@ class DiaryService:
         async with self.db.begin() as transaction:
             try:
                 # match_file_list에서 node_id로 조회한 후 삭제
-                match_file_list = await fileService.get_file_by_match('dairy', ymd)
-                for match_file in match_file_list:
-                    # node_id로 파일 정보 조회
-                    node_id = match_file.node_id
-                    file = await fileService.get_file_by_node_id(node_id)
-                    if file:
-                        # 실제 파일 삭제
-                        os.remove(f"{file.saved_dir_name}/{file.saved_file_name}")
-                        await self.db.delete(file)
+                match_file = await fileService.get_file_in_match_by_id_and_node_id('dairy', ymd, node_id)
+                # node_id로 파일 정보 조회
+                node_id = match_file.node_id
+                file = await fileService.get_file_by_node_id(node_id)
+                if file:
+                    # 실제 파일 삭제
+                    os.remove(f"{file.saved_dir_name}/{file.saved_file_name}")
+                    await self.db.delete(file)
 
-                    # ApFile에서 node_id로 조회한 후 삭제
-                    node = await fileService.get_node_by_id(node_id)
-                    if node:
-                        await self.db.delete(node)
+                # ApFile에서 node_id로 조회한 후 삭제
+                node = await fileService.get_node_by_id(node_id)
+                if node:
+                    await self.db.delete(node)
 
-                    # match_file 삭제
-                    await self.db.delete(match_file)
+                # match_file 삭제
+                await self.db.delete(match_file)
 
                 # 트랜잭션이 완료되면 커밋
                 await transaction.commit()
