@@ -5,7 +5,7 @@ FROM python:3.9-slim
 WORKDIR /app
 
 # 필요 파일 복사
-COPY requirements.txt /app/
+COPY ../requirements.txt /app/
 COPY ap_file_wh.py /app/
 
 # Python 종속성 설치
