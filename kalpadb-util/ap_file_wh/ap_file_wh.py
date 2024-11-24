@@ -39,7 +39,7 @@ def main():
         select_query = """
             SELECT node_id, saved_dir_name, saved_file_name
             FROM ap_file
-            WHERE content_type LIKE 'image%' AND ifnull(width, -1) < 0 order by upload_dt desc limit 10;
+            WHERE content_type LIKE 'image%' AND ifnull(width, -1) < 0 order by upload_dt desc ;
         """
         cursor.execute(select_query)
         rows = cursor.fetchall()
