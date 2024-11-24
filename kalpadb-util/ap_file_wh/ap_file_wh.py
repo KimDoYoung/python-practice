@@ -56,10 +56,10 @@ def main():
                 print(f"파일이 존재하지 않음: {node_id} :  {file_path}")
                 update_query = """
                     UPDATE ap_file
-                    SET note = 'no file', width = -1, height = -1
+                    SET note = 'not exists', width = -1, height = -1
                     WHERE node_id = %s;
                 """
-                cursor.execute(update_query, (width, height, node_id))
+                cursor.execute(update_query, (node_id))
                 continue
 
             # 이미지 크기 가져오기
