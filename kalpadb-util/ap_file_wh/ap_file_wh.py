@@ -39,7 +39,7 @@ def main():
         select_query = """
             SELECT node_id, saved_dir_name, saved_file_name
             FROM ap_file
-            WHERE content_type LIKE 'image%' AND width IS NULL  order by upload_dt desc limit 10;
+            WHERE content_type LIKE 'image%' AND ifnull(width, -1) < 0 order by upload_dt desc limit 10;
         """
         cursor.execute(select_query)
         rows = cursor.fetchall()
@@ -54,6 +54,12 @@ def main():
             print(f"파일 경로: {file_path} node_id={node_id} width, height를 구하는 중입니다.")
             if not os.path.exists(file_path):
                 print(f"파일이 존재하지 않음: {node_id} :  {file_path}")
+                update_query = """
+                    UPDATE ap_file
+                    SET note = 'no file', width = -1, height = -1
+                    WHERE node_id = %s;
+                """
+                cursor.execute(update_query, (width, height, node_id))
                 continue
 
             # 이미지 크기 가져오기
