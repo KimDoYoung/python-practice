@@ -11,6 +11,5 @@ COPY ap_file_wh.py /app/
 # Python 종속성 설치
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 기본 실행 명령
-CMD ["python", "ap_file_wh.py"]
+
 

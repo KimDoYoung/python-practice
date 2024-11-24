@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: ap_file_wh_container
     env_file: 
-      - ../.env  # ../.env 파일에서 환경 변수 로드
+      - ./ap_file_wh/.env  # ../.env 파일에서 환경 변수 로드
     volumes:
       - /home/kdy987/www/uploaded:/home/kdy987/www/uploaded  # 로컬 파일 시스템 연결
-    command: python ap_file_wh.py
+    command: python /app/ap_file_wh.py  # 컨테이너 내부 경로 기준
