@@ -18,6 +18,15 @@ export KALPADB_API_MODE=local
 uvicorn app.main:app --reload
 ```
 
+# JSKN에 배포
+
+1. kalpadb-api폴더로 이동
+2. .env.real 확인
+3. docker-compose up --build -d
+4. docker ps kalpadb-api
+5. docker logs kalpadb-api
+6. 브라우저에서 http://...:8088/docs
+
 ## Diary
 
 - List

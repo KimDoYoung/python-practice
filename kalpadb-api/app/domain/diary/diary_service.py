@@ -350,6 +350,7 @@ class DiaryService:
                     # 물리적 파일 저장
                     with open(file_location, "wb") as buffer:
                         shutil.copyfileobj(file.file, buffer)
+                        logger.debug(f"{file_location} 파일이 성공적으로 저장되었습니다.")
                     url_base = config.URL_BASE
                     # 파일 URL 생성 및 추가
                     file_url = f"{url_base}/{yyyymm}/{saved_file_name}"
@@ -377,6 +378,7 @@ class DiaryService:
                     )
                     self.db.add(match_file_var)
                 await self.db.commit()
+                logger.info('첨부파일 추가 성공적으로 수행되었습니다.' + file_location)
                 return True
             except Exception as e:
                 await transaction.rollback()
@@ -390,7 +392,8 @@ class DiaryService:
         url_base = config.URL_BASE
         result_list = []
         for file in file_list:
-            url = f"{url_base}/{file.saved_dir_name}/{file.saved_file_name}"
+            saved_dir_name = file.saved_dir_name.replace('/home/kdy987/www/uploaded/','')
+            url = f"{url_base}/{saved_dir_name}/{file.saved_file_name}"
             file_info = AttachFileInfo(
                 node_id=file.node_id,
                 file_name=file.org_file_name,
@@ -409,23 +412,22 @@ class DiaryService:
         async with self.db.begin() as transaction:
             try:
                 # match_file_list에서 node_id로 조회한 후 삭제
-                match_file_list = await fileService.get_file_by_match('dairy', ymd)
-                for match_file in match_file_list:
-                    # node_id로 파일 정보 조회
-                    node_id = match_file.node_id
-                    file = await fileService.get_file_by_node_id(node_id)
-                    if file:
-                        # 실제 파일 삭제
-                        os.remove(f"{file.saved_dir_name}/{file.saved_file_name}")
-                        await self.db.delete(file)
+                match_file = await fileService.get_file_in_match_by_id_and_node_id('dairy', ymd, node_id)
+                # node_id로 파일 정보 조회
+                node_id = match_file.node_id
+                file = await fileService.get_file_by_node_id(node_id)
+                if file:
+                    # 실제 파일 삭제
+                    os.remove(f"{file.saved_dir_name}/{file.saved_file_name}")
+                    await self.db.delete(file)
 
-                    # ApFile에서 node_id로 조회한 후 삭제
-                    node = await fileService.get_node_by_id(node_id)
-                    if node:
-                        await self.db.delete(node)
+                # ApFile에서 node_id로 조회한 후 삭제
+                node = await fileService.get_node_by_id(node_id)
+                if node:
+                    await self.db.delete(node)
 
-                    # match_file 삭제
-                    await self.db.delete(match_file)
+                # match_file 삭제
+                await self.db.delete(match_file)
 
                 # 트랜잭션이 완료되면 커밋
                 await transaction.commit()
