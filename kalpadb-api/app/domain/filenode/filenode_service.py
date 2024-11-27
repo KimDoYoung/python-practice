@@ -80,3 +80,14 @@ class ApNodeFileService:
         self.db.delete(file)
         await self.db.commit()
         return file
+    
+    async def set_note(self, node_id: str, note: str) -> ApFile:
+        ''' 노트 수정 '''
+        stmt = select(ApFile).where(ApFile.node_id == node_id)
+        result = await self.db.execute(stmt)
+        node = result.scalar()
+        if node is None:
+            return None
+        node.note = note
+        await self.db.commit()
+        return node

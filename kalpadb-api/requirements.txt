@@ -6,3 +6,5 @@ python-dotenv
 databases
 aiomysql
 python-multipart
+pillow
+aiofiles

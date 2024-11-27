@@ -33,6 +33,8 @@ class Attachment(BaseModel):
     org_file_name: str
     file_size : int
     url : str
+    width: Optional[int]
+    height: Optional[int]
     model_config = {
         'from_attributes': True  # ORM 모드 활성화
     }
@@ -66,3 +68,4 @@ class DiaryPageModel(BaseModel):
     start_ymd: Optional[str]  # 날짜 형식에 따라 Optional[str] 사용
     end_ymd: Optional[str]
     order: Optional[str]
+    
