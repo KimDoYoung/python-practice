@@ -1,5 +1,10 @@
 # kalpadb - utils
 
+## 배포 및 설ㅊ.
+
+1. docker를 사용한다.
+2. 
+
 ## hdd
 
 - 2T HDD의 파일정보를 hdd table에 넣는다.
@@ -12,3 +17,5 @@
 3. saved_dir_name과 saved_file_name을 조합해서 물리적 파일명을 구한 후
 4. 이미지 파일에서 width와 height를 구한다.
 5. ap_file 테이블의 컬럼 width와 height를 update한다.
+6. hash_code를 구해서 테이블 컬럼 hashcode를 채운다.
+
