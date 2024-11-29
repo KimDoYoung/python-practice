@@ -2,6 +2,8 @@ from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
 
+from app.domain.filenode.filenode_schema import AttachFileInfo
+
 class JangbiRequest(BaseModel):
     ymd: str = Field(..., max_length=8, description="구입일")
     item: str = Field(..., max_length=100, description="품목")
@@ -19,6 +21,23 @@ class JangbiResponse(BaseModel):
     spec: Optional[str]
     lvl: str
     modify_dt: datetime
+    attachments : Optional[list[AttachFileInfo]] = None
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        'from_attributes': True  # ORM 모드 활성화
+    }
+
+class JangbiListParam(BaseModel):
+    start_ymd: str = '19700101'
+    end_ymd: str = '99991231'
+    search_text : str | None = None
+    lvl : str | None = None
+    order_direction : str = 'desc'
+    start_idx : int = 0
+    limit : int = 10
+
+class JangbiListResponse(BaseModel):
+    list: list[JangbiResponse]
+    item_count : int
+    next_data_exists: bool
+    next_index: int

@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from app.domain.filenode.filenode_model import ApNode, ApFile, MatchFileVar
+from app.domain.filenode.filenode_model import ApNode, ApFile, MatchFileInt, MatchFileVar
 
 class ApNodeFileService:
     def __init__(self, db: AsyncSession):
@@ -38,6 +38,19 @@ class ApNodeFileService:
         )
         result = await self.db.execute(stmt)
         return result.scalars().all()
+    
+    # match_file_int로  매칭된 파일 조회
+    async def get_file_by_match_int(self, tbl: str, id: int) -> list[ApFile]:
+        ''' match_file_int id 즉 장비  '''
+        stmt = (
+            select(ApFile)
+            .join(MatchFileInt, ApFile.node_id == MatchFileInt.node_id)
+            .where(MatchFileInt.tbl == tbl)
+            .where(MatchFileInt.id == id)
+        )
+        result = await self.db.execute(stmt)
+        return result.scalars().all()    
+
 
     async def get_file_in_match_by_id_and_node_id(self, tbl: str, id: str, node_id: str) -> ApFile:
         ''' match_file_var에서 id와 node_id로 1개 조회 '''

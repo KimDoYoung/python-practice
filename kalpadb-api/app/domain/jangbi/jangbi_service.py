@@ -1,10 +1,15 @@
+from sqlalchemy import and_, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from typing import List, Optional
+from typing import Optional
 
-from jangbi_model import Jangbi
-from jangbi_schema import JangbiRequest
+from app.domain.filenode.filenode_service import ApNodeFileService
+from app.domain.jangbi.jangbi_model import Jangbi
+from app.domain.jangbi.jangbi_schema import JangbiListParam, JangbiListResponse, JangbiRequest, JangbiResponse
+from app.core.settings import config
+from app.core.logger import get_logger
 
+logger = get_logger(__name__)
 class JangbiService:
     def __init__(self, db: AsyncSession):
         self.db = db
@@ -48,17 +53,30 @@ class JangbiService:
         return new_jangbi
 
 
-    async def get_jangbi_by_id(self, jangbi_id: int) -> Optional[Jangbi]:
+    async def get_jangbi_by_id(self, jangbi_id: int) -> JangbiResponse:
         query = select(Jangbi).where(Jangbi.id == jangbi_id)
         result = await self.db.execute(query)
         jangbi = result.scalar_one_or_none()
-        return jangbi
-
-    async def list_jangbis(self) -> List[Jangbi]:
-        query = select(Jangbi)
-        result = await self.db.execute(query)
-        return result.scalars().all()
-
+        if not jangbi:
+            return None
+        fileService = ApNodeFileService(self.db)
+        file_list = await fileService.get_file_by_match_int('jangbi', jangbi.id)
+        attachs = []
+        if file_list:
+            for imgfile in file_list:
+                saved_dir_name = imgfile.saved_dir_name.replace('/home/kdy987/www/uploaded/','')
+                url = f"{config.URL_BASE}/{saved_dir_name}/{imgfile.saved_file_name}"
+                attachs.append({
+                    "node_id": imgfile.node_id,
+                    "file_name": imgfile.org_file_name,
+                    "file_size": imgfile.file_size,
+                    "url": url,
+                    "width" : imgfile.width,
+                    "height" : imgfile.height
+                })
+        found_diary = JangbiResponse.model_validate(jangbi)
+        found_diary.attachments = attachs
+        return found_diary
 
     async def delete_jangbi(self, jangbi_id: int) -> bool:
         jangbi = await self.get_jangbi_by_id(jangbi_id)
@@ -68,3 +86,32 @@ class JangbiService:
         await self.db.delete(jangbi)
         await self.db.commit()
         return True
+
+    async def jangbi_list(self, param: JangbiListParam) -> JangbiListResponse:
+        ''' 리스트 구하기 '''
+        query = select(Jangbi).where(
+            and_(
+                Jangbi.ymd.between(param.start_ymd, param.end_ymd),
+                func.concat(Jangbi.item, Jangbi.spec).like(f'%{param.search_text}%') if param.search_text else True,
+                Jangbi.lvl == param.lvl if param.lvl else True
+            )
+        ).order_by(
+            Jangbi.ymd.desc() if param.order_direction == 'desc' else Jangbi.ymd.asc()
+        ).limit(param.limit + 1).offset(param.start_idx)
+        
+        result = await self.db.execute(query)
+        jangbi_list = result.scalars().all()
+        
+        # Check if there is next data
+        next_data_exists = len(jangbi_list) > param.limit
+        if next_data_exists:
+            jangbi_list = jangbi_list[:-1]  # Remove the extra item used for checking next data
+        
+        response_list = [JangbiListResponse.model_validate(jangbi) for jangbi in jangbi_list]
+        
+        return JangbiListResponse(
+            list=response_list,
+            item_count=len(response_list),
+            next_data_exists=next_data_exists,
+            next_index=param.start_idx + len(response_list)
+        )
