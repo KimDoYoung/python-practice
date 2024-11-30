@@ -8,9 +8,11 @@
 작성일: 2024-11-28
 버전: 1.0
 """
-from fastapi import APIRouter, Depends, HTTPException
+from typing import List
+from fastapi import APIRouter, Depends, HTTPException, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_session
+from app.domain.filenode.filenode_schema import AttachFileInfo
 from app.domain.jangbi.jangbi_schema import JangbiListParam, JangbiListResponse, JangbiResponse, JangbiUpsertRequest
 from app.domain.jangbi.jangbi_service import JangbiService
 
@@ -65,4 +67,16 @@ async def delete_jangbi(jangbi_id: int, db: AsyncSession = Depends(get_session))
     jangbi_response = await service.delete_jangbi(jangbi_id)
     if not jangbi_response:
         raise HTTPException(status_code=404, detail="Jangbi not found.")
-    return jangbi_response    
+    return jangbi_response
+
+@router.post("/jangbi/attach/{jangbi_id}", response_model=List[AttachFileInfo])
+async def attach_files_jangbi(jangbi_id: int, files: List[UploadFile], db: AsyncSession = Depends(get_session)):
+    ''' 장비 삭제 '''
+    service = JangbiService(db)
+    result = await service.add_jangbi_attachments(jangbi_id, files)
+    # 성공시 목록 
+    if result:
+        return await service.get_jangbi_attachments_urls(jangbi_id)
+    else:
+        raise HTTPException(status_code=500, detail="Failed to add attachments")
+

@@ -1,5 +1,10 @@
+from datetime import datetime
 import hashlib
 from PIL import Image
+
+def todayYmd() -> str:
+    ''' 오늘 날짜를 YYYYMMDD 형식으로 반환 '''
+    return datetime.now().strftime("%Y%m%d")
 
 def saved_path_to_url(files_str) -> list[str]:
     ''' 

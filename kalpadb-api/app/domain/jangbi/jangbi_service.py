@@ -1,7 +1,15 @@
-from sqlalchemy import and_, func
+import os
+import shutil
+from typing import List
+from uuid import uuid4
+from fastapi import UploadFile
+from sqlalchemy import Boolean, and_, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
+from app.core.util import get_file_hash, get_image_dimensions, todayYmd
+from app.domain.filenode.filenode_model import ApFile, ApNode, MatchFileInt
+from app.domain.filenode.filenode_schema import AttachFileInfo
 from app.domain.filenode.filenode_service import ApNodeFileService
 from app.domain.jangbi.jangbi_model import Jangbi
 from app.domain.jangbi.jangbi_schema import JangbiListParam, JangbiListResponse, JangbiResponse, JangbiUpsertRequest
@@ -12,6 +20,24 @@ logger = get_logger(__name__)
 class JangbiService:
     def __init__(self, db: AsyncSession):
         self.db = db
+
+
+    async def get_1(self, jangbi_id: int) -> Jangbi:
+        query = select(Jangbi).where(Jangbi.id == jangbi_id)
+        result = await self.db.execute(query)
+        jangbi = result.scalar_one_or_none()
+        return jangbi
+    
+    async def get_jangbi_parent_node_id(self) -> str:
+        ''' 장비 부모 노드 ID 조회 '''
+        parent_node_query = select(ApNode.id).where(
+            (ApNode.node_type == 'D') & 
+            (ApNode.name == '장비')
+        ).limit(1)
+
+        parent_node_result = await self.db.execute(parent_node_query)
+        parent_node_id = parent_node_result.scalar_one_or_none() 
+        return parent_node_id    
 
     async def upsert_jangbi(self, request: JangbiUpsertRequest) -> JangbiResponse:
         """
@@ -53,11 +79,6 @@ class JangbiService:
         new_jangbi_response = JangbiResponse.model_validate(new_jangbi)
         return new_jangbi_response
 
-    async def get_1(self, jangbi_id: int) -> Jangbi:
-        query = select(Jangbi).where(Jangbi.id == jangbi_id)
-        result = await self.db.execute(query)
-        jangbi = result.scalar_one_or_none()
-        return jangbi
 
     async def get_jangbi_by_id(self, jangbi_id: int) -> JangbiResponse:
         jangbi = await self.get_1(jangbi_id)
@@ -119,3 +140,81 @@ class JangbiService:
             next_data_exists=next_data_exists,
             next_index=param.start_idx + len(response_list)
         )
+    #--------------------------------------------
+    async def add_diary_attachments(self, jangbi_id:int, files: List[UploadFile]) -> Boolean:
+        ''' 일지에 파일 첨부 '''
+        attachments = []
+        async with self.db.begin() as transaction:
+            try:
+                parent_node_id = await self.get_jangbi_parent_node_id()
+                if not parent_node_id:
+                    raise ValueError("장비 부모 노드를 찾을 수 없습니다.")                
+                for file in files:
+                    file_uuid = str(uuid4()).replace("-", "")
+                    saved_file_name = f"{file.filename}"
+                    yyyymm = todayYmd()[:6]
+                    base_dir = f"{config.UPLOAD_DIR_BASE}/{yyyymm}"
+                    os.makedirs(base_dir, exist_ok=True)  # 해당 월 폴더 생성
+                    file_location = os.path.join(base_dir, saved_file_name)
+
+                    # 물리적 파일 저장
+                    with open(file_location, "wb") as buffer:
+                        shutil.copyfileobj(file.file, buffer)
+                        logger.debug(f"{file_location} 파일이 성공적으로 저장되었습니다.")
+
+                    width, height = get_image_dimensions(file_location)
+                    hash_code = get_file_hash(file_location)
+
+                    url_base = config.URL_BASE
+                    # 파일 URL 생성 및 추가
+                    file_url = f"{url_base}/{yyyymm}/{saved_file_name}"
+                    attachments.append(file_url)
+                    # ApFile DB 레코드 생성
+                    ap_file = ApFile(
+                        node_id=file_uuid,
+                        parent_node_id=parent_node_id,
+                        saved_dir_name=base_dir,
+                        saved_file_name=saved_file_name,
+                        org_file_name=file.filename,
+                        file_size=os.path.getsize(file_location),
+                        content_type=file.content_type,
+                        hashcode=hash_code,
+                        note=None,
+                        width=width,
+                        height=height
+                    )
+                    self.db.add(ap_file)
+                    # 5. MatchFileVar 저장
+                    match_file_int = MatchFileInt(
+                        tbl='jangbi',
+                        id=jangbi_id,
+                        node_id=file_uuid
+                    )
+                    self.db.add(match_file_int)
+                await self.db.commit()
+                logger.info('첨부파일 추가 성공적으로 수행되었습니다.' + file_location)
+                return True
+            except Exception as e:
+                await transaction.rollback()
+                logger.info(f"Error adding attachments to diary: {e}")
+                return False
+
+    async def get_diary_attachments_urls(self, jangbi_id: int) -> List[AttachFileInfo]:
+        ''' 장비에 첨부된 파일의 url 목록 조회 '''
+        fileService = ApNodeFileService(self.db)
+        file_list = await fileService.get_file_by_match_int('jangbi', jangbi_id)
+        url_base = config.URL_BASE
+        result_list = []
+        for file in file_list:
+            saved_dir_name = file.saved_dir_name.replace('/home/kdy987/www/uploaded/','')
+            url = f"{url_base}/{saved_dir_name}/{file.saved_file_name}"
+            file_info = AttachFileInfo(
+                node_id=file.node_id,
+                file_name=file.org_file_name,
+                file_size=file.file_size,
+                url=url,
+                width=file.width,
+                height=file.height
+            )
+            result_list.append(file_info)
+        return result_list

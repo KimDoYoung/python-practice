@@ -1,3 +1,4 @@
+import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.domain.filenode.filenode_model import ApNode, ApFile, MatchFileInt, MatchFileVar
@@ -5,6 +6,10 @@ from app.domain.filenode.filenode_model import ApNode, ApFile, MatchFileInt, Mat
 class ApNodeFileService:
     def __init__(self, db: AsyncSession):
         self.db = db
+    
+    def getUuid(self):
+        """UUID를 생성하고 대시(-)를 제거한 문자열을 반환합니다."""
+        return uuid.uuid4().hex  # 대시를 제거하려면 .hex 사용
 
     # 파일 및 노드 생성
     async def create_ap_node_and_file(self, ap_node_data, ap_file_data):
@@ -65,19 +70,19 @@ class ApNodeFileService:
         return result.scalars().first()
 
     async def get_file_by_node_id(self, node_id: str) -> ApFile:
-        ''' node_id로 파일 조회 '''
+        ''' node_id로 ap_file 1레코드  조회 '''
         stmt = select(ApFile).where(ApFile.node_id == node_id)
         result = await self.db.execute(stmt)
         return result.scalar()
     
     async def get_node_by_id(self, node_id: str) -> ApNode:
-        ''' node_id로 노드 조회 '''
+        ''' node_id로 ap_node  조회 '''
         stmt = select(ApNode).where(ApNode.id == node_id)
         result = await self.db.execute(stmt)
         return result.scalar()
     
     async def delete_note_by_id(self, node_id: str):
-        ''' node_id로 노드 삭제 '''
+        ''' node_id로 ap_node 1레코드  삭제 '''
         stmt = select(ApNode).where(ApNode.id == node_id)
         result = await self.db.execute(stmt)
         node = result.scalar()
@@ -86,7 +91,7 @@ class ApNodeFileService:
         return node
     
     async def delete_file_by_id(self, node_id: str):
-        ''' node_id로 파일 삭제 '''
+        ''' node_id로  ap_file record 1개 삭제 '''
         stmt = select(ApFile).where(ApFile.node_id == node_id)
         result = await self.db.execute(stmt)
         file = result.scalar()
@@ -95,7 +100,7 @@ class ApNodeFileService:
         return file
     
     async def set_note(self, node_id: str, note: str) -> ApFile:
-        ''' 노트 수정 '''
+        ''' ap_file의  note (comment) 수정 '''
         stmt = select(ApFile).where(ApFile.node_id == node_id)
         result = await self.db.execute(stmt)
         node = result.scalar()
