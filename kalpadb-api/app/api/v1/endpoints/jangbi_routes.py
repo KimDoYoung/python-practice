@@ -80,3 +80,9 @@ async def attach_files_jangbi(jangbi_id: int, files: List[UploadFile], db: Async
     else:
         raise HTTPException(status_code=500, detail="Failed to add attachments")
 
+# 첨부파일 삭제
+@router.delete("/jangbi/attachments/{jangbi_id}/{node_id}", response_model=dict)
+async def delete_attachment(jangbi_id: str, node_id : str,  db: AsyncSession = Depends(get_session)):
+    ''' 장비에 첨부된 파일 1개를 삭제 '''
+    service = JangbiService(db)
+    return await service.delete_attachment(jangbi_id, node_id)

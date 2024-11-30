@@ -219,7 +219,7 @@ class JangbiService:
             result_list.append(file_info)
         return result_list
 
-    async def get_jangbi_delete_attachment(self, jangbi_id: int, node_id: str) -> dict:
+    async def delete_attachment(self, jangbi_id: int, node_id: str) -> dict:
         """ 장비에 첨부된 파일 1개를 삭제"""
         fileService = ApNodeFileService(self.db)
 
