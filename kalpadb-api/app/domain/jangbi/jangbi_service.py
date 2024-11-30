@@ -1,11 +1,10 @@
 from sqlalchemy import and_, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from typing import Optional
 
 from app.domain.filenode.filenode_service import ApNodeFileService
 from app.domain.jangbi.jangbi_model import Jangbi
-from app.domain.jangbi.jangbi_schema import JangbiListParam, JangbiListResponse, JangbiRequest, JangbiResponse
+from app.domain.jangbi.jangbi_schema import JangbiListParam, JangbiListResponse, JangbiResponse, JangbiUpsertRequest
 from app.core.settings import config
 from app.core.logger import get_logger
 
@@ -14,7 +13,7 @@ class JangbiService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def upsert_jangbi(self, jangbi_id: Optional[int], request: JangbiRequest) -> Jangbi:
+    async def upsert_jangbi(self, request: JangbiUpsertRequest) -> JangbiResponse:
         """
         데이터가 존재하면 업데이트, 존재하지 않으면 새로 삽입한다.
         
@@ -22,6 +21,7 @@ class JangbiService:
         :param request: JangbiRequest 데이터
         :return: 생성되거나 업데이트된 Jangbi 객체
         """
+        jangbi_id = request.id
         if jangbi_id:
             # 기존 데이터 확인
             existing_jangbi = await self.get_jangbi_by_id(jangbi_id)
@@ -50,13 +50,17 @@ class JangbiService:
         self.db.add(new_jangbi)
         await self.db.commit()
         await self.db.refresh(new_jangbi)
-        return new_jangbi
+        new_jangbi_response = JangbiResponse.model_validate(new_jangbi)
+        return new_jangbi_response
 
-
-    async def get_jangbi_by_id(self, jangbi_id: int) -> JangbiResponse:
+    async def get_1(self, jangbi_id: int) -> Jangbi:
         query = select(Jangbi).where(Jangbi.id == jangbi_id)
         result = await self.db.execute(query)
         jangbi = result.scalar_one_or_none()
+        return jangbi
+
+    async def get_jangbi_by_id(self, jangbi_id: int) -> JangbiResponse:
+        jangbi = await self.get_1(jangbi_id)
         if not jangbi:
             return None
         fileService = ApNodeFileService(self.db)
@@ -78,14 +82,14 @@ class JangbiService:
         found_diary.attachments = attachs
         return found_diary
 
-    async def delete_jangbi(self, jangbi_id: int) -> bool:
-        jangbi = await self.get_jangbi_by_id(jangbi_id)
+    async def delete_jangbi(self, jangbi_id: int) -> JangbiResponse:
+        jangbi = await self.get_1(jangbi_id)
         if not jangbi:
-            return False
-
+            return None
+        jangbi_response = JangbiResponse.model_validate(jangbi)
         await self.db.delete(jangbi)
         await self.db.commit()
-        return True
+        return jangbi_response
 
     async def jangbi_list(self, param: JangbiListParam) -> JangbiListResponse:
         ''' 리스트 구하기 '''

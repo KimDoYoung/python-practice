@@ -4,6 +4,15 @@ from datetime import datetime
 
 from app.domain.filenode.filenode_schema import AttachFileInfo
 
+class JangbiUpsertRequest(BaseModel):
+    id : Optional[int] = None
+    ymd: str
+    item: str
+    location: Optional[str] = None
+    cost: Optional[int] = None
+    spec: Optional[str] = None
+    lvl: Optional[str] = '2'
+
 class JangbiRequest(BaseModel):
     ymd: str = Field(..., max_length=8, description="구입일")
     item: str = Field(..., max_length=100, description="품목")

@@ -8,10 +8,10 @@
 작성일: 2024-11-28
 버전: 1.0
 """
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_session
-from app.domain.jangbi.jangbi_schema import JangbiListParam, JangbiListResponse, JangbiResponse
+from app.domain.jangbi.jangbi_schema import JangbiListParam, JangbiListResponse, JangbiResponse, JangbiUpsertRequest
 from app.domain.jangbi.jangbi_service import JangbiService
 
 router = APIRouter()
@@ -49,10 +49,20 @@ async def get_jangbi(
     service = JangbiService(db)
     return await service.get_jangbi_by_id(jangbi_id)
 
-
 @router.post("/jangbi", response_model=JangbiResponse)
-async def upsert_diary(
-    db: AsyncSession = Depends(get_session)
-):
+async def upsert_jangbi( request: JangbiUpsertRequest, db: AsyncSession = Depends(get_session)):
     ''' 장비 생성 또는 수정 '''
-    pass
+    service = JangbiService(db)
+    jangbi_response = await service.upsert_jangbi(request)
+    if not jangbi_response:
+        raise HTTPException(status_code=500, detail="Failed to create jangbi entry.")
+    return jangbi_response
+
+@router.delete("/jangbi/{jangbi_id}", response_model=JangbiResponse)
+async def delete_jangbi(jangbi_id: int, db: AsyncSession = Depends(get_session)):
+    ''' 장비 삭제 '''
+    service = JangbiService(db)
+    jangbi_response = await service.delete_jangbi(jangbi_id)
+    if not jangbi_response:
+        raise HTTPException(status_code=404, detail="Jangbi not found.")
+    return jangbi_response    
