@@ -141,8 +141,8 @@ class JangbiService:
             next_index=param.start_idx + len(response_list)
         )
     #--------------------------------------------
-    async def add_diary_attachments(self, jangbi_id:int, files: List[UploadFile]) -> Boolean:
-        ''' 일지에 파일 첨부 '''
+    async def add_jangbi_attachments(self, jangbi_id:int, files: List[UploadFile]) -> Boolean:
+        ''' 장비에 파일 첨부 '''
         attachments = []
         async with self.db.begin() as transaction:
             try:
@@ -199,7 +199,7 @@ class JangbiService:
                 logger.info(f"Error adding attachments to diary: {e}")
                 return False
 
-    async def get_diary_attachments_urls(self, jangbi_id: int) -> List[AttachFileInfo]:
+    async def get_jangbi_attachments_urls(self, jangbi_id: int) -> List[AttachFileInfo]:
         ''' 장비에 첨부된 파일의 url 목록 조회 '''
         fileService = ApNodeFileService(self.db)
         file_list = await fileService.get_file_by_match_int('jangbi', jangbi_id)
@@ -218,3 +218,38 @@ class JangbiService:
             )
             result_list.append(file_info)
         return result_list
+
+    async def get_jangbi_delete_attachment(self, jangbi_id: int, node_id: str) -> dict:
+        """ 장비에 첨부된 파일 1개를 삭제"""
+        fileService = ApNodeFileService(self.db)
+
+        # 트랜잭션 블록 시작
+        async with self.db.begin() as transaction:
+            try:
+                # match_file_list에서 node_id로 조회한 후 삭제
+                match_file = await fileService.get_file_by_match_int('jangbi', jangbi_id, node_id)
+                # node_id로 파일 정보 조회
+                node_id = match_file.node_id
+                file = await fileService.get_file_by_node_id(node_id)
+                if file:
+                    # 실제 파일 삭제
+                    os.remove(f"{file.saved_dir_name}/{file.saved_file_name}")
+                    await self.db.delete(file)
+
+                # ApFile에서 node_id로 조회한 후 삭제
+                node = await fileService.get_node_by_id(node_id)
+                if node:
+                    await self.db.delete(node)
+
+                # match_file 삭제
+                await self.db.delete(match_file)
+
+                # 트랜잭션이 완료되면 커밋
+                await transaction.commit()
+
+            except Exception as e:
+                # 예외가 발생하면 트랜잭션 롤백
+                await transaction.rollback()
+                raise e
+
+        return {"result": "success"}

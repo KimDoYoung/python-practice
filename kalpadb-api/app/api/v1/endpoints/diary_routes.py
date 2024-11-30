@@ -139,7 +139,7 @@ async def get_diary_delete_attachment(ymd: str, node_id : str,  db: AsyncSession
 
 # 첨부파일 이미지에 노트 기입
 @router.put("/diary/attachments/note", response_model=dict)
-async def get_diary_delete_attachment(note_data : FileNoteData,  db: AsyncSession = Depends(get_session)):
+async def write_note_on_file(note_data : FileNoteData,  db: AsyncSession = Depends(get_session)):
     ''' 일지에 첨부된 파일 1개에 노트(코멘트)를 기입 '''
     service = DiaryService(db)
     ap_file =  await service.set_diary_attachment_note(note_data)

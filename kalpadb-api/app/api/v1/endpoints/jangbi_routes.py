@@ -71,7 +71,7 @@ async def delete_jangbi(jangbi_id: int, db: AsyncSession = Depends(get_session))
 
 @router.post("/jangbi/attach/{jangbi_id}", response_model=List[AttachFileInfo])
 async def attach_files_jangbi(jangbi_id: int, files: List[UploadFile], db: AsyncSession = Depends(get_session)):
-    ''' 장비 삭제 '''
+    ''' 장비 첨부파일 추가 '''
     service = JangbiService(db)
     result = await service.add_jangbi_attachments(jangbi_id, files)
     # 성공시 목록 
