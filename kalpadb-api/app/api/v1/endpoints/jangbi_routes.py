@@ -41,6 +41,13 @@ async def get_jangbi_list(
     return await service.jangbi_list(param)
 
 @router.get("/jangbi/{jangbi_id}", response_model=JangbiResponse)
+async def get_jangbi(
+    jangbi_id: int,
+    db: AsyncSession = Depends(get_session)
+):
+    ''' 장비 1개 조회 첨부파일 포함 '''
+    service = JangbiService(db)
+    return await service.get_jangbi_by_id(jangbi_id)
 
 
 @router.post("/jangbi", response_model=JangbiResponse)

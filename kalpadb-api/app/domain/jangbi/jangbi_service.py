@@ -107,7 +107,7 @@ class JangbiService:
         if next_data_exists:
             jangbi_list = jangbi_list[:-1]  # Remove the extra item used for checking next data
         
-        response_list = [JangbiListResponse.model_validate(jangbi) for jangbi in jangbi_list]
+        response_list = [JangbiResponse.model_validate(jangbi) for jangbi in jangbi_list]
         
         return JangbiListResponse(
             list=response_list,
