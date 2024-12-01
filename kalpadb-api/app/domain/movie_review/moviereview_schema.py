@@ -19,3 +19,20 @@ class MovieReviewResponse(MovieReviewRequest):
     model_config = {
         'from_attributes': True  # ORM 모드 활성화
     }
+
+
+class MovieReviewListResponse(BaseModel):
+    list: list[MovieReviewResponse]
+    item_count : int
+    next_data_exists: bool
+    next_index: int
+
+class MovieReviewSearchRequest(BaseModel):
+    search_text: Optional[str] = None
+    nara: Optional[str] = None
+    year: Optional[str] = None
+    lvl: Optional[str] = None
+    start_ymd: Optional[str] = None
+    end_ymd: int = 0
+    start_index: int = 0
+    limit: int  = 10

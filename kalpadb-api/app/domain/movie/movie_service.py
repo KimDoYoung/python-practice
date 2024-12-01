@@ -22,14 +22,14 @@ class MovieService:
         """검색 조건과 페이징을 기반으로 영화 목록 조회"""
         query = select(Movie).where(
             and_(
-                Movie.gubun == "M",
-                Movie.title1title2.like(f"%{request.search_text}%"),
+                (Movie.gubun == request.gubun if request.gubun else True),
+                (Movie.title1title2.like(f"%{request.search_text}%") if request.search_text else True),
                 (Movie.nara == request.nara if request.nara else True),
                 (Movie.category == request.category if request.category else True),
                 (Movie.gamdok == request.gamdok if request.gamdok else True),
                 (Movie.make_year == request.make_year if request.make_year else True),
             )
-        ).order_by(Movie.title1).limit(request.limit + 1).offset(request.start_index)
+        ).order_by(Movie.id).limit(request.limit + 1).offset(request.start_index)
 
         # 데이터 조회
         result = await self.db.execute(query)

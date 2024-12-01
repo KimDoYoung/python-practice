@@ -1,10 +1,11 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy import delete
+from sqlalchemy import and_, delete
 
-from app.models.movie_review_model import MovieReview
-from app.schemas.movie_review_schema import MovieReviewRequest, MovieReviewResponse
+from app.domain.movie_review import MovieReview
+from app.domain.movie_review import MovieReviewRequest, MovieReviewResponse
+from app.domain.movie_review.moviereview_schema import MovieReviewListResponse, MovieReviewSearchRequest
 
 class MovieReviewService:
     def __init__(self, db: AsyncSession):
@@ -18,11 +19,37 @@ class MovieReviewService:
             raise NoResultFound(f"MovieReview with ID {review_id} not found")
         return MovieReviewResponse.from_orm(review)
 
-    async def get_movie_reviews(self) -> list[MovieReviewResponse]:
-        """모든 리뷰 조회"""
-        result = await self.db.execute(select(MovieReview))
+    async def get_movie_reviews(self, request: MovieReviewSearchRequest) -> MovieReviewListResponse:
+        """
+        검색 조건과 페이징을 기반으로 영화 리뷰 목록 조회
+        """
+        # limit + 1로 데이터 조회
+        query = select(MovieReview).where(
+            and_(
+                (MovieReview.title.like(f"%{request.search_text}%") if request.search_text else True),
+                (MovieReview.nara == request.nara if request.nara else True),
+                (MovieReview.year == request.year if request.year else True),
+                (MovieReview.lvl == request.lvl if request.lvl else True),
+                (MovieReview.ymd.between(request.start_ymd, request.end_ymd) if request.start_ymd and request.end_ymd else True),
+            )
+        ).order_by(MovieReview.ymd.desc()).limit(request.limit + 1).offset(request.start_index)
+
+        # 데이터 조회
+        result = await self.db.execute(query)
         reviews = result.scalars().all()
-        return [MovieReviewResponse.from_orm(review) for review in reviews]
+
+        # 다음 데이터 존재 여부 확인
+        next_data_exists = len(reviews) > request.limit
+
+        # 실제 반환할 데이터 (limit에 맞춰 자르기)
+        reviews_to_return = reviews[:request.limit]
+
+        return MovieReviewListResponse(
+            list=[MovieReviewResponse.from_orm(review) for review in reviews_to_return],
+            item_count=len(reviews_to_return) + (1 if next_data_exists else 0),
+            next_data_exists=next_data_exists,
+            next_index=request.start_index + len(reviews_to_return),
+        )
 
     async def create_movie_review(self, review_data: MovieReviewRequest) -> MovieReviewResponse:
         """리뷰 생성"""

@@ -24,6 +24,7 @@ from app.core.middleware import Middleware
 from app.api.v1.endpoints.diary_routes import router as diary_router
 from app.api.v1.endpoints.jangbi_routes import router as jangbi_router
 from app.api.v1.endpoints.extutil_routes import router as extutil_router
+from app.api.v1.endpoints.movie_routes import router as movie_router
 
 logger = get_logger(__name__)
 
@@ -49,6 +50,7 @@ def set_routes(app: FastAPI):
     app.include_router(diary_router, prefix="/api/v1", tags=["diary"])
     app.include_router(jangbi_router, prefix="/api/v1", tags=["jangbi"])
     app.include_router(extutil_router, prefix="/api/v1", tags=["extutil"])
+    app.include_router(movie_router, prefix="/api/v1", tags=["movie"])
     
 def set_event_handlers(app: FastAPI):
     ''' 이벤트 핸들러 설정 '''

@@ -35,10 +35,11 @@ class MovieListResponse(BaseModel):
     next_index: int
 
 class MovieSearchRequest(BaseModel):
-    search_text: str
+    gubun: Optional[str] = None
+    search_text: Optional[str] = None
     nara: Optional[str] = None
     category: Optional[str] = None
     gamdok: Optional[str] = None
     make_year: Optional[str] = None
-    start_index: int
-    limit: int
+    start_index: int = 0
+    limit: int  = 10
