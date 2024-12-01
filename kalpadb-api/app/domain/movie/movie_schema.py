@@ -15,10 +15,30 @@ class MovieRequest(BaseModel):
     dvd_id: Optional[str] = None
     title1num: Optional[str] = None
     title1title2: Optional[str] = None
+    
+    model_config = {
+        'from_attributes': True  # ORM 모드 활성화
+    }
 
 # 응답 데이터 스키마
 class MovieResponse(MovieRequest):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        'from_attributes': True  # ORM 모드 활성화
+    }
+
+class MovieListResponse(BaseModel):
+    list: list[MovieResponse]
+    item_count : int
+    next_data_exists: bool
+    next_index: int
+
+class MovieSearchRequest(BaseModel):
+    search_text: str
+    nara: Optional[str] = None
+    category: Optional[str] = None
+    gamdok: Optional[str] = None
+    make_year: Optional[str] = None
+    start_index: int
+    limit: int

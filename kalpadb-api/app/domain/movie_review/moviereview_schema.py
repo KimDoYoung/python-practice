@@ -16,5 +16,6 @@ class MovieReviewRequest(BaseModel):
 class MovieReviewResponse(MovieReviewRequest):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        'from_attributes': True  # ORM 모드 활성화
+    }
