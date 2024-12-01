@@ -1,10 +1,13 @@
 fastapi
 uvicorn
 sqlalchemy
-# mysql-connector-python
 python-dotenv
 databases
 aiomysql
 python-multipart
 pillow
 aiofiles
+httpx 
+beautifulsoup4
+selenium
+webdriver-manager
