@@ -33,6 +33,7 @@ class MovieReviewSearchRequest(BaseModel):
     year: Optional[str] = None
     lvl: Optional[str] = None
     start_ymd: Optional[str] = None
-    end_ymd: int = 0
+    end_ymd: Optional[str] = None
     start_index: int = 0
     limit: int  = 10
+    include_content: bool = False

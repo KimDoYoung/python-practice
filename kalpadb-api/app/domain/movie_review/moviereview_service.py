@@ -3,8 +3,8 @@ from sqlalchemy.future import select
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy import and_, delete
 
-from app.domain.movie_review import MovieReview
-from app.domain.movie_review import MovieReviewRequest, MovieReviewResponse
+from app.domain.movie_review.moviereview_model import MovieReview
+from app.domain.movie_review.moviereview_schema import MovieReviewRequest, MovieReviewResponse
 from app.domain.movie_review.moviereview_schema import MovieReviewListResponse, MovieReviewSearchRequest
 
 class MovieReviewService:
@@ -17,14 +17,26 @@ class MovieReviewService:
         review = result.scalar_one_or_none()
         if not review:
             raise NoResultFound(f"MovieReview with ID {review_id} not found")
-        return MovieReviewResponse.from_orm(review)
+        return MovieReviewResponse.model_validate(review)
 
     async def get_movie_reviews(self, request: MovieReviewSearchRequest) -> MovieReviewListResponse:
         """
         검색 조건과 페이징을 기반으로 영화 리뷰 목록 조회
         """
-        # limit + 1로 데이터 조회
-        query = select(MovieReview).where(
+        selected_fields = [
+            MovieReview.id,
+            MovieReview.title,
+            MovieReview.nara,
+            MovieReview.year,
+            MovieReview.lvl,
+            MovieReview.ymd,
+        ]
+
+        # content 필드 포함 여부
+        if request.include_content:
+            selected_fields.append(MovieReview.content)
+            
+        query = select(*selected_fields).where(
             and_(
                 (MovieReview.title.like(f"%{request.search_text}%") if request.search_text else True),
                 (MovieReview.nara == request.nara if request.nara else True),
@@ -45,7 +57,7 @@ class MovieReviewService:
         reviews_to_return = reviews[:request.limit]
 
         return MovieReviewListResponse(
-            list=[MovieReviewResponse.from_orm(review) for review in reviews_to_return],
+            list=[MovieReviewResponse.model_validate(review) for review in reviews_to_return],
             item_count=len(reviews_to_return) + (1 if next_data_exists else 0),
             next_data_exists=next_data_exists,
             next_index=request.start_index + len(reviews_to_return),
