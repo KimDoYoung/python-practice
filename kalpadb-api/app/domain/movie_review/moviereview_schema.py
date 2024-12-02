@@ -12,6 +12,16 @@ class MovieReviewRequest(BaseModel):
     content: Optional[str] = None
     lastmodify_dt: Optional[datetime] = None
 
+class MovieReviewUpsertRequest(BaseModel):
+    id : Optional[int] = None
+    title: str
+    nara: Optional[str] = None
+    year: Optional[str] = None
+    lvl: Optional[int] = None
+    ymd: Optional[str] = None
+    content: Optional[str] = None
+
+
 # 응답 데이터 스키마
 class MovieReviewResponse(MovieReviewRequest):
     id: int

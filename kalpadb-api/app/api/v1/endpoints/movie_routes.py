@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_session
 from app.domain.movie.movie_schema import MovieListResponse, MovieSearchRequest
 from app.domain.movie.movie_service import MovieService
-from app.domain.movie_review.moviereview_schema import MovieReviewListResponse, MovieReviewSearchRequest
+from app.domain.movie_review.moviereview_schema import MovieReviewListResponse, MovieReviewResponse, MovieReviewSearchRequest, MovieReviewUpsertRequest
 from app.domain.movie_review.moviereview_service import MovieReviewService
 
 
@@ -61,3 +61,18 @@ async def get_movie_review(
     )
     service = MovieReviewService(db)
     return await service.get_movie_reviews(request)
+
+@router.post("/movie_review", response_model=MovieReviewResponse)
+async def upsert_movie_review(
+    request: MovieReviewUpsertRequest,
+    db: AsyncSession = Depends(get_session)
+):
+    """영화감상 생성 또는 수정"""
+    service = MovieReviewService(db)
+    return await service.upsert_movie_review(request)
+
+@router.delete("/movie_review/{movie_id}", response_model=MovieReviewResponse)
+async def delete_movie_review(movie_id:int, db: AsyncSession = Depends(get_session)):
+    """영화감상 삭제 """
+    service = MovieReviewService(db)
+    return await service.delete_movie_review(movie_id)

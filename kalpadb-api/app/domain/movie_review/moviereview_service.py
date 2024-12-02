@@ -69,13 +69,21 @@ class MovieReviewService:
             next_index=request.start_index + len(reviews),
         )
 
+    async def upsert_movie_review(self,  review_data: MovieReviewRequest) -> MovieReviewResponse:
+        """ movie_review_id가 존재하면 update아니면 insert 리뷰 생성"""
+        movie_review_id = review_data.id
+        if movie_review_id:
+            return await self.update_movie_review(movie_review_id, review_data)
+        else:
+            return await self.create_movie_review(review_data)        
+
     async def create_movie_review(self, review_data: MovieReviewRequest) -> MovieReviewResponse:
         """리뷰 생성"""
-        review = MovieReview(**review_data.dict())
+        review = MovieReview(**review_data.model_dump())
         self.db.add(review)
         await self.db.commit()
         await self.db.refresh(review)
-        return MovieReviewResponse.from_orm(review)
+        return MovieReviewResponse.model_validate(review)
 
     async def update_movie_review(self, review_id: int, review_data: MovieReviewRequest) -> MovieReviewResponse:
         """리뷰 수정"""
@@ -84,19 +92,24 @@ class MovieReviewService:
         if not review:
             raise NoResultFound(f"MovieReview with ID {review_id} not found")
         
-        for key, value in review_data.dict(exclude_unset=True).items():
+        for key, value in review_data.model_dump(exclude_unset=True).items():
             setattr(review, key, value)
         self.db.add(review)
         await self.db.commit()
         await self.db.refresh(review)
-        return MovieReviewResponse.from_orm(review)
+        return MovieReviewResponse.model_validate(review)
 
-    async def delete_movie_review(self, review_id: int) -> None:
+    async def delete_movie_review(self, review_id: int) -> MovieReviewResponse:
         """리뷰 삭제"""
         result = await self.db.execute(select(MovieReview).where(MovieReview.id == review_id))
         review = result.scalar_one_or_none()
         if not review:
             raise NoResultFound(f"MovieReview with ID {review_id} not found")
         
+        deleted_movie_review = MovieReviewResponse.model_validate(review)
+
         await self.db.execute(delete(MovieReview).where(MovieReview.id == review_id))
         await self.db.commit()
+
+        return deleted_movie_review
+    
