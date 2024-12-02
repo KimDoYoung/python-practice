@@ -23,6 +23,7 @@ class MovieReviewService:
         """
         검색 조건과 페이징을 기반으로 영화 리뷰 목록 조회
         """
+        # 동적으로 필드를 선택
         selected_fields = [
             MovieReview.id,
             MovieReview.title,
@@ -35,7 +36,8 @@ class MovieReviewService:
         # content 필드 포함 여부
         if request.include_content:
             selected_fields.append(MovieReview.content)
-            
+
+        # 쿼리 작성
         query = select(*selected_fields).where(
             and_(
                 (MovieReview.title.like(f"%{request.search_text}%") if request.search_text else True),
@@ -46,21 +48,25 @@ class MovieReviewService:
             )
         ).order_by(MovieReview.ymd.desc()).limit(request.limit + 1).offset(request.start_index)
 
-        # 데이터 조회
+        # 데이터 실행 및 변환
         result = await self.db.execute(query)
-        reviews = result.scalars().all()
+        rows = result.all()
 
-        # 다음 데이터 존재 여부 확인
-        next_data_exists = len(reviews) > request.limit
+        # 컬럼 이름 추출
+        column_names = [field.key for field in selected_fields]
 
-        # 실제 반환할 데이터 (limit에 맞춰 자르기)
-        reviews_to_return = reviews[:request.limit]
+        # 데이터 변환
+        reviews = []
+        for row in rows:
+            review_data = dict(zip(column_names, row))
+            reviews.append(MovieReviewResponse(**review_data))
 
+        # 응답 반환
         return MovieReviewListResponse(
-            list=[MovieReviewResponse.model_validate(review) for review in reviews_to_return],
-            item_count=len(reviews_to_return) + (1 if next_data_exists else 0),
-            next_data_exists=next_data_exists,
-            next_index=request.start_index + len(reviews_to_return),
+            list=reviews,
+            item_count=len(reviews),
+            next_data_exists=len(rows) > request.limit,
+            next_index=request.start_index + len(reviews),
         )
 
     async def create_movie_review(self, review_data: MovieReviewRequest) -> MovieReviewResponse:
