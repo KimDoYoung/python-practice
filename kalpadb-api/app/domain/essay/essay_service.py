@@ -3,8 +3,8 @@ from sqlalchemy.future import select
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy import delete
 
-from app.models.essay_model import Essay
-from app.schemas.essay_schema import EssayRequest, EssayResponse
+from app.domain.essay.essay_model import Essay
+from app.domain.essay.essay_schema import EssayRequest, EssayResponse, EssayUpsertRequest
 
 class EssayService:
     def __init__(self, db: AsyncSession):
@@ -24,13 +24,21 @@ class EssayService:
         essays = result.scalars().all()
         return [EssayResponse.from_orm(essay) for essay in essays]
 
+
+    async def upsert_essay(self, request: EssayUpsertRequest) -> EssayResponse:
+        """에세이 생성 또는 수정"""
+        if request.id:
+            return await self.update_essay(request.id, EssayRequest(title=request.title, content=request.content))
+        return await self.create_essay(EssayRequest(title=request.title, content=request.content))
+
+
     async def create_essay(self, essay_data: EssayRequest) -> EssayResponse:
         """에세이 생성"""
-        essay = Essay(**essay_data.dict())
+        essay = Essay(**essay_data.model_dump())
         self.db.add(essay)
         await self.db.commit()
         await self.db.refresh(essay)
-        return EssayResponse.from_orm(essay)
+        return EssayResponse.model_validate(essay)
 
     async def update_essay(self, essay_id: int, essay_data: EssayRequest) -> EssayResponse:
         """에세이 수정"""
@@ -39,12 +47,12 @@ class EssayService:
         if not essay:
             raise NoResultFound(f"Essay with ID {essay_id} not found")
         
-        for key, value in essay_data.dict(exclude_unset=True).items():
+        for key, value in essay_data.model_dump(exclude_unset=True).items():
             setattr(essay, key, value)
         self.db.add(essay)
         await self.db.commit()
         await self.db.refresh(essay)
-        return EssayResponse.from_orm(essay)
+        return EssayResponse.model_validate(essay)
 
     async def delete_essay(self, essay_id: int) -> None:
         """에세이 삭제"""

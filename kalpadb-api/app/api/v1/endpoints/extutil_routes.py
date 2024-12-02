@@ -69,6 +69,7 @@ def get_hanja_list(query: str):
 
 @router.post("/extract/words", summary="텍스트에서 단어 추출")
 def extract_korean_words(request: TextRequest)->List[str]:
+    ''' 텍스트를 받아서 그 중에서 명사만 추출하여 반환합니다. '''
     list = extract_nouns(request.text)
     list.sort()
     return list

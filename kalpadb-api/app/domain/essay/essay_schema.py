@@ -13,5 +13,10 @@ class EssayResponse(EssayRequest):
     create_dt: datetime
     lastmodify_dt: Optional[datetime] = None
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        'from_attributes': True  # ORM 모드 활성화
+    }
+class EssayUpsertRequest(BaseModel):
+    id: Optional[int] = None
+    title: str
+    content: Optional[str] = None
