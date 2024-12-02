@@ -1,10 +1,14 @@
 
+from typing import List
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from fastapi import APIRouter, HTTPException
 from bs4 import BeautifulSoup
+
+from app.core.util import extract_nouns
+from app.domain.extutil.extutil_schema import TextRequest
 
 router = APIRouter()
 
@@ -61,3 +65,10 @@ def get_hanja_list(query: str):
     finally:
         # WebDriver 종료
         driver.quit()
+
+
+@router.post("/extract/words", summary="텍스트에서 단어 추출")
+def extract_korean_words(request: TextRequest)->List[str]:
+    list = extract_nouns(request.text)
+    list.sort()
+    return list
