@@ -1,6 +1,10 @@
 from typing import Optional
 from pydantic import BaseModel
 
+class GroupItemResponse(BaseModel):
+    title: str
+    count: int
+
 # 요청 데이터 스키마
 class HDDRequest(BaseModel):
     id: int
@@ -20,5 +24,6 @@ class HDDRequest(BaseModel):
 
 # 응답 데이터 스키마
 class HDDResponse(HDDRequest):
-    class Config:
-        orm_mode = True
+    model_config = {
+        'from_attributes': True  # ORM 모드 활성화
+    }

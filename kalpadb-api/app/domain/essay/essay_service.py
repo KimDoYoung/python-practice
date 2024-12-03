@@ -54,12 +54,13 @@ class EssayService:
         await self.db.refresh(essay)
         return EssayResponse.model_validate(essay)
 
-    async def delete_essay(self, essay_id: int) -> None:
+    async def delete_essay(self, essay_id: int) -> EssayResponse:
         """에세이 삭제"""
         result = await self.db.execute(select(Essay).where(Essay.id == essay_id))
         essay = result.scalar_one_or_none()
         if not essay:
             raise NoResultFound(f"Essay with ID {essay_id} not found")
-        
+        deleted_essay = EssayResponse.model_validate(essay)
         await self.db.execute(delete(Essay).where(Essay.id == essay_id))
         await self.db.commit()
+        return deleted_essay
