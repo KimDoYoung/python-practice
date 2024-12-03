@@ -1,11 +1,10 @@
 from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy.exc import NoResultFound
-from sqlalchemy import delete, func
+from sqlalchemy import and_, func
 
 from app.domain.hdd.hdd_model import HDD
-from app.domain.hdd.hdd_schema import GroupItemResponse, HDDRequest, HDDResponse
+from app.domain.hdd.hdd_schema import GroupItemResponse, HDDChildRequest, HDDResponse, HDDSearchRequest, HDDSearchResponse
 
 class HDDService:
     def __init__(self, db: AsyncSession):
@@ -30,69 +29,68 @@ class HDDService:
             GroupItemResponse(title=row.title, count=row.count) for row in rows
         ]
 
-        return response_data        
+        return response_data 
 
-    async def hdd_list(self, volumn_name: str, directory_only: bool) -> List[HDDResponse]:
-        """ volumn_name에 해당하는 HDD 리스트 조회, directory_only=True일 경우 디렉토리만 조회 """
-        query = select(HDD).where(HDD.volumn_name == volumn_name)
-        if directory_only:
-            query = query.where(HDD.gubun == 'D')
+    async def hdd_child_list(self, childreq: HDDChildRequest) -> List[HDDResponse]:
+        """ volumn_name, pid, gubun에 해당하는 HDD 리스트 조회 """
+        
+        query = select(HDD).where(HDD.volumn_name == childreq.volumn_name)
+
+        if childreq.pid == 0:
+            query = query.where(HDD.pid == None)
+        else:
+            query = query.where(HDD.pid == childreq.pid)
+
+        if childreq.gubun != 'A':
+            query = query.where(HDD.gubun == childreq.gubun)
 
         # 비동기로 쿼리 실행
         results = await self.db.execute(query)
         rows = results.scalars().all()
-
-        for row in rows:
-            print(row)  # row의 구조를 확인합니다.
-            print(type(row))  # 반환값의 타입을 확인합니다.
         
         # Pydantic 모델로 매핑 후 반환
         response_data = [HDDResponse.model_validate(row) for row in rows]
-
         return response_data
-        
-    async def get_hdd(self, hdd_id: int) -> HDDResponse:
-        """특정 ID로 HDD 조회"""
-        result = await self.db.execute(select(HDD).where(HDD.id == hdd_id))
-        hdd = result.scalar_one_or_none()
-        if not hdd:
-            raise NoResultFound(f"HDD with ID {hdd_id} not found")
-        return HDDResponse.from_orm(hdd)
 
-    async def get_hdds(self) -> list[HDDResponse]:
-        """모든 HDD 조회"""
-        result = await self.db.execute(select(HDD))
-        hdds = result.scalars().all()
-        return [HDDResponse.from_orm(hdd) for hdd in hdds]
+    async def search_hdd(self, request: HDDSearchRequest) -> HDDSearchResponse:
+        """
+        HDD 테이블에서 조건에 따라 데이터를 조회하고 응답 객체를 반환합니다.
 
-    async def create_hdd(self, hdd_data: HDDRequest) -> HDDResponse:
-        """HDD 데이터 생성"""
-        hdd = HDD(**hdd_data.dict())
-        self.db.add(hdd)
-        await self.db.commit()
-        await self.db.refresh(hdd)
-        return HDDResponse.from_orm(hdd)
+        Args:
+            request (HDDSearchRequest): 검색 조건을 포함한 요청 객체
 
-    async def update_hdd(self, hdd_id: int, hdd_data: HDDRequest) -> HDDResponse:
-        """HDD 데이터 수정"""
-        result = await self.db.execute(select(HDD).where(HDD.id == hdd_id))
-        hdd = result.scalar_one_or_none()
-        if not hdd:
-            raise NoResultFound(f"HDD with ID {hdd_id} not found")
-        
-        for key, value in hdd_data.dict(exclude_unset=True).items():
-            setattr(hdd, key, value)
-        self.db.add(hdd)
-        await self.db.commit()
-        await self.db.refresh(hdd)
-        return HDDResponse.from_orm(hdd)
+        Returns:
+            HDDSearchResponse: 조회된 결과 및 메타데이터를 포함한 응답 객체
+        """
+        # 동적 where 조건 생성
+        conditions = []
+        if request.search_text:
+            conditions.append(func.concat(HDD.path, HDD.name).like(f"%{request.search_text}%"))
+        if request.gubun and request.gubun != 'A':  # 'A'는 조건에서 제외
+            conditions.append(HDD.gubun == request.gubun)
 
-    async def delete_hdd(self, hdd_id: int) -> None:
-        """HDD 데이터 삭제"""
-        result = await self.db.execute(select(HDD).where(HDD.id == hdd_id))
-        hdd = result.scalar_one_or_none()
-        if not hdd:
-            raise NoResultFound(f"HDD with ID {hdd_id} not found")
-        
-        await self.db.execute(delete(HDD).where(HDD.id == hdd_id))
-        await self.db.commit()
+        # SQLAlchemy 쿼리 작성
+        query = (
+            select(HDD)
+            .where(and_(*conditions))
+            .order_by(HDD.volumn_name, HDD.path)
+            .offset(request.start_index)
+            .limit(request.limit + 1)  # limit + 1로 추가 데이터 여부 확인
+        )
+
+        # 쿼리 실행
+        result = await self.db.execute(query)
+        rows = result.scalars().all()
+
+        # 데이터 변환
+        data = [HDDResponse.model_validate(row) for row in rows[: request.limit]]  # 실제 데이터 제한
+        next_data_exists = len(rows) > request.limit  # 추가 데이터 존재 여부 확인
+
+        # 응답 객체 생성
+        return HDDSearchResponse(
+            list=data,
+            data_count=len(data),
+            next_data_exists=next_data_exists,
+            last_index=request.start_index + len(data),
+            limit=request.limit,
+        )
