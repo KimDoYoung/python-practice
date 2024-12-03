@@ -1,7 +1,10 @@
-from typing import Optional
+from typing import List, Optional
 from pydantic import BaseModel
 from datetime import datetime
 
+class TodoCreateRequest(BaseModel):
+    todos: List[str]
+    
 # 요청 데이터 스키마
 class TodoRequest(BaseModel):
     content: str
@@ -13,5 +16,6 @@ class TodoResponse(TodoRequest):
     input_dt: datetime
     done_dt: Optional[datetime] = None
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        'from_attributes': True  # ORM 모드 활성화
+    }

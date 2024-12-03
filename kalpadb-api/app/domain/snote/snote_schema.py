@@ -12,5 +12,6 @@ class SNoteResponse(SNoteRequest):
     id: int
     create_dt: datetime
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        'from_attributes': True  # ORM 모드 활성화
+    }
