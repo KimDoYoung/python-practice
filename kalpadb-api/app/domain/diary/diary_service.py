@@ -22,11 +22,11 @@ from uuid import uuid4
 from sqlalchemy import Boolean, asc, desc, func, literal_column  
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from app.core.util import saved_path_to_url
+from app.core.util import get_file_hash, get_image_dimensions, saved_path_to_url
 from app.domain.diary.diary_model import Diary
 from app.domain.diary.diary_schema import DiaryPageModel, DiaryBase, DiaryDetailResponse, DiaryRequest, DiaryListResponse, DiaryResponse, DiaryUpdateRequest
 from app.domain.filenode.filenode_model import ApFile, ApNode, MatchFileVar
-from app.domain.filenode.filenode_schema import AttachFileInfo
+from app.domain.filenode.filenode_schema import AttachFileInfo, FileNoteData
 from app.domain.filenode.filenode_service import ApNodeFileService
 from fastapi import File, UploadFile
 from app.core.logger import get_logger
@@ -37,6 +37,27 @@ class DiaryService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
+    async def upsert_diary(self, diary_data: DiaryRequest) -> DiaryResponse:
+        ''' 일기 생성 이미지 첨부 없이 추가 가능'''
+        result = await self.db.execute(select(Diary).filter(Diary.ymd == diary_data.ymd))
+        diary = result.scalar_one_or_none()  # 일치하는 첫 번째 결과를 가져옴
+        if not diary:            
+            diary = Diary(
+                ymd=diary_data.ymd,
+                content=diary_data.content,
+                summary=diary_data.summary
+            )
+            self.db.add(diary)
+        else:
+            diary.content = diary_data.content
+            diary.summary = diary_data.summary
+        await self.db.commit()
+        await self.db.refresh(diary)
+        return DiaryResponse(
+            ymd=diary.ymd,
+            content=diary.content,
+            summary=diary.summary
+        )
     # Create
     async def create_diary(self, diary_data: DiaryRequest, files: List[UploadFile] = File(None) ) -> DiaryResponse:
         ''' 일기 생성 이미지 첨부 없이 추가 가능'''
@@ -115,7 +136,10 @@ class DiaryService:
                     # 물리적 파일 저장
                     with open(file_location, "wb") as buffer:
                         shutil.copyfileobj(file.file, buffer)
-                    
+
+                    width, height = get_image_dimensions(file_location)
+                    hash_code = get_file_hash(file_location)
+
                     url_base = config.URL_BASE 
                     # 파일 URL 생성 및 추가
                     file_url = f"{url_base}/{yyyymm}/{saved_file_name}"
@@ -130,10 +154,10 @@ class DiaryService:
                         org_file_name=file.filename,
                         file_size=os.path.getsize(file_location),
                         content_type=file.content_type,
-                        hashcode=None,
+                        hashcode=hash_code,
                         note=None,
-                        width=None,
-                        height=None
+                        width=width,
+                        height=height
                     )
                     self.db.add(ap_file)
 
@@ -182,7 +206,9 @@ class DiaryService:
                     "node_id": imgfile.node_id,
                     "org_file_name": imgfile.org_file_name,
                     "file_size": imgfile.file_size,
-                    "url": url
+                    "url": url,
+                    "width" : imgfile.width,
+                    "height" : imgfile.height
                 })
         found_diary = DiaryDetailResponse.model_validate(diary)
         found_diary.attachments = attachs
@@ -322,7 +348,9 @@ class DiaryService:
             end_ymd=end_ymd,
             order=order            
         )
+    
     async def get_diary_parent_node_id(self) -> str:
+        ''' 일기 부모 노드 ID 조회 '''
         parent_node_query = select(ApNode.id).where(
             (ApNode.node_type == 'D') & 
             (ApNode.name == '일기')
@@ -331,7 +359,7 @@ class DiaryService:
         parent_node_result = await self.db.execute(parent_node_query)
         parent_node_id = parent_node_result.scalar_one_or_none() 
         return parent_node_id
-            
+
     async def add_diary_attachments(self, ymd:str, files: List[UploadFile]) -> Boolean:
         ''' 일지에 파일 첨부 '''
         attachments = []
@@ -347,10 +375,15 @@ class DiaryService:
                     base_dir = f"{config.UPLOAD_DIR_BASE}/{yyyymm}"
                     os.makedirs(base_dir, exist_ok=True)  # 해당 월 폴더 생성
                     file_location = os.path.join(base_dir, saved_file_name)
+
                     # 물리적 파일 저장
                     with open(file_location, "wb") as buffer:
                         shutil.copyfileobj(file.file, buffer)
                         logger.debug(f"{file_location} 파일이 성공적으로 저장되었습니다.")
+
+                    width, height = get_image_dimensions(file_location)
+                    hash_code = get_file_hash(file_location)
+
                     url_base = config.URL_BASE
                     # 파일 URL 생성 및 추가
                     file_url = f"{url_base}/{yyyymm}/{saved_file_name}"
@@ -364,10 +397,10 @@ class DiaryService:
                         org_file_name=file.filename,
                         file_size=os.path.getsize(file_location),
                         content_type=file.content_type,
-                        hashcode=None,
+                        hashcode=hash_code,
                         note=None,
-                        width=None,
-                        height=None
+                        width=width,
+                        height=height
                     )
                     self.db.add(ap_file)
                     # 5. MatchFileVar 저장
@@ -398,7 +431,9 @@ class DiaryService:
                 node_id=file.node_id,
                 file_name=file.org_file_name,
                 file_size=file.file_size,
-                url=url
+                url=url,
+                width=file.width,
+                height=file.height
             )
             result_list.append(file_info)
         return result_list
@@ -438,3 +473,8 @@ class DiaryService:
                 raise e
 
         return {"result": "success"}
+    
+    async def set_diary_attachment_note(self, note_data: FileNoteData) -> ApFile:
+        fileService = ApNodeFileService(self.db)
+        return await fileService.set_note(note_data.node_id, note_data.note)
+

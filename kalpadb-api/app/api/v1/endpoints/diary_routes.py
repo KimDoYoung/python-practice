@@ -22,9 +22,28 @@ from app.domain.diary.diary_service import DiaryService
 from fastapi import File, UploadFile
 from typing import List, Optional
 from app.core.database import get_session
-from app.domain.filenode.filenode_schema import AttachFileInfo
+from app.domain.filenode.filenode_schema import AttachFileInfo, FileNoteData
 
 router = APIRouter()
+
+@router.post("/diary/upsert", response_model=DiaryResponse)
+async def upsert_diary(
+    ymd: str = Form(...),
+    content: Optional[str] = Form(None),
+    summary: Optional[str] = Form(None),
+    db: AsyncSession = Depends(get_session)
+):
+    ''' 일기 생성 또는 수정 '''
+    service = DiaryService(db)
+    try:
+        diary_response = await service.upsert_diary(DiaryRequest(ymd=ymd, content=content, summary=summary))
+        
+        if not diary_response:
+            raise HTTPException(status_code=500, detail="Failed to create diary entry.")
+        
+        return diary_response
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
 # 일기생성
 @router.post("/diary", response_model=DiaryResponse)
@@ -68,6 +87,7 @@ async def get_diaries(
     search_text = "",
     db: AsyncSession = Depends(get_session)
 ):
+    '''날짜와 검색어로 일기 목록 조회'''
     service = DiaryService(db)
     return await service.get_diaries(start_ymd, end_ymd, start_index, limit=limit, order=order, summary_only=summary_only, search_text=search_text)
 
@@ -116,3 +136,13 @@ async def get_diary_delete_attachment(ymd: str, node_id : str,  db: AsyncSession
     ''' 일지에 첨부된 파일 1개를 삭제 '''
     service = DiaryService(db)
     return await service.get_diary_delete_attachment(ymd, node_id)
+
+# 첨부파일 이미지에 노트 기입
+@router.put("/diary/attachments/note", response_model=dict)
+async def write_note_on_file(note_data : FileNoteData,  db: AsyncSession = Depends(get_session)):
+    ''' 일지에 첨부된 파일 1개에 노트(코멘트)를 기입 '''
+    service = DiaryService(db)
+    ap_file =  await service.set_diary_attachment_note(note_data)
+    if not ap_file:
+        raise HTTPException(status_code=404, detail="File not found")
+    return {"node_id" : ap_file.node_id, "file_name" : ap_file.org_file_name, "note" : ap_file.note}

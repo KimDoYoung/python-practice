@@ -27,6 +27,12 @@ uvicorn app.main:app --reload
 5. docker logs kalpadb-api
 6. 브라우저에서 http://...:8088/docs
 
+## 특이점 (docker설치시 필요)
+
+1. **한글형태소(KoNLPy)** 분석때문에 jdk1.8 이 설치되어 있어야 한다.
+    - $JAVA_HOME 확인
+2. **네이버에서 한자찾기** 때문에selenium이 설치되어 있어야 한다.
+
 ## Diary
 
 - List

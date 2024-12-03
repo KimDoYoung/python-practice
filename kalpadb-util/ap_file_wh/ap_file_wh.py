@@ -1,3 +1,4 @@
+import hashlib
 import os
 import pymysql
 from PIL import Image
@@ -11,6 +12,12 @@ DB_CONFIG = {
     'database': os.getenv('DB_NAME'),
     'charset': os.getenv('DB_CHARSET', 'utf8mb4')  # 기본 문자셋 utf8mb4
 }
+def get_file_hash(image_path):
+    hash_algo = hashlib.sha256()
+    with open(image_path, 'rb') as f:
+        while chunk := f.read(8192):
+            hash_algo.update(chunk)
+    return hash_algo.hexdigest()
 
 def get_image_dimensions(file_path):
     """
@@ -68,13 +75,16 @@ def main():
                 print(f"이미지 크기 확인 실패: {file_path}")
                 continue
 
+            # hash code를 가져온다.
+            hash_code = get_file_hash(file_path)
+            print(f"hash_code: {hash_code}")
             # 업데이트 쿼리 실행
             update_query = """
                 UPDATE ap_file
-                SET width = %s, height = %s
+                SET width = %s, height = %s, hashcode = %s
                 WHERE node_id = %s;
             """
-            cursor.execute(update_query, (width, height, node_id))
+            cursor.execute(update_query, (width, height, hash_code, node_id))
             print(f"업데이트 완료: node_id={node_id}, width={width}, height={height}")
 
         # 트랜잭션 커밋

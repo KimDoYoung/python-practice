@@ -72,4 +72,10 @@ class AttachFileInfo(BaseModel):
     node_id: str
     file_name : str
     file_size: int
-    url : str    
+    url : str 
+    width: Optional[int]
+    height: Optional[int]   
+
+class FileNoteData(BaseModel):
+    node_id: str
+    note: str
