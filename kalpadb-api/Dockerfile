@@ -8,7 +8,7 @@ FROM python:3.12-slim
 RUN apt-get update && apt-get install -y \
     wget \
     unzip \
-    openjdk-8-jdk \
+    default-jdk \
     libnss3 \
     libgconf-2-4 \
     xvfb \
@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # 환경 변수 설정
-ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 ENV PATH="$JAVA_HOME/bin:$PATH"
 
 # Python 패키지 설치
@@ -33,7 +33,6 @@ COPY . .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Selenium용 WebDriver 설치 (ChromeDriver 예시)
-# ChromeDriver 버전은 Chrome 브라우저와 호환되는 버전을 설치해야 합니다.
 RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
     && dpkg -i google-chrome-stable_current_amd64.deb || apt-get -f install -y \
     && rm google-chrome-stable_current_amd64.deb
