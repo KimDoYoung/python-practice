@@ -28,7 +28,7 @@ async def get_todos(db: AsyncSession = Depends(get_session)):
     return await service.get_todos()
 
 @router.put("/todo/{id}", response_model=List[TodoResponse])
-async def get_todos(db: AsyncSession = Depends(get_session)):
+async def get_todos(id:int, db: AsyncSession = Depends(get_session)):
     ''' 해야 할 일 완료처리 및 리스트 '''
     service = TodoService(db)
     b = await service.set_todo_done(id)
