@@ -28,6 +28,7 @@ from app.api.v1.endpoints.movie_routes import router as movie_router
 from app.api.v1.endpoints.essay_routes import router as essay_router
 from app.api.v1.endpoints.hdd_routes import router as hdd_router
 from app.api.v1.endpoints.todo_routes import router as todo_router
+from app.api.v1.endpoints.snote_routes import router as snote_router
 
 logger = get_logger(__name__)
 
@@ -57,6 +58,7 @@ def set_routes(app: FastAPI):
     app.include_router(essay_router, prefix="/api/v1", tags=["essay"])
     app.include_router(hdd_router, prefix="/api/v1", tags=["hdd"])
     app.include_router(todo_router, prefix="/api/v1", tags=["todo"])
+    app.include_router(snote_router, prefix="/api/v1", tags=["snote"])
     
 def set_event_handlers(app: FastAPI):
     ''' 이벤트 핸들러 설정 '''
