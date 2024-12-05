@@ -9,7 +9,6 @@ class SnoteCreateRequest(BaseModel):
     
 # 요청 데이터 스키마
 class SNoteRequest(BaseModel):
-    hint: Optional[str] = None
     title: Optional[str] = None
     note: Optional[str] = None
 

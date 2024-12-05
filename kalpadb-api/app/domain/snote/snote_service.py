@@ -6,6 +6,7 @@ from sqlalchemy import delete
 from app.domain.snote.snote_model import SNote
 from app.domain.snote.snote_schema import SNoteRequest, SNoteResponse, SnoteListRequest, SnoteListResponse
 
+
 class SNoteService:
     def __init__(self, db: AsyncSession):
         self.db = db
@@ -25,14 +26,14 @@ class SNoteService:
         start_index = req.start_index
         limit = req.limit
 
-        stmt = select(SNote)
+        stmt = select(SNote.id, SNote.title,  SNote.create_dt)
         if search_text:
             stmt = stmt.where(SNote.title.like(f"%{search_text}%"))
+        stmt = stmt.order_by(SNote.create_dt.desc())    
         stmt = stmt.offset(start_index).limit(limit + 1)  # limit + 1로 조회하여 다음 페이지 여부 확인  
-
-        # 실행
-        result = await self.db.execute(stmt)
-        rows = result.scalars().all()
+        print(str(stmt))
+        rows = await self.db.execute(stmt)
+        rows = rows.fetchall()  
 
         # 데이터 처리
         snote_list = [SNoteResponse.model_validate(row) for row in rows[:limit]]

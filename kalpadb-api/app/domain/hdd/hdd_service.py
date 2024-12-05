@@ -43,7 +43,7 @@ class HDDService:
 
         if childreq.gubun != 'A':
             query = query.where(HDD.gubun == childreq.gubun)
-
+        query = query.order_by(HDD.gubun, HDD.id)
         # 비동기로 쿼리 실행
         results = await self.db.execute(query)
         rows = results.scalars().all()
