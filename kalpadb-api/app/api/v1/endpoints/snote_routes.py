@@ -1,4 +1,3 @@
-import hashlib
 import random
 from fastapi import APIRouter, Depends
 
@@ -11,9 +10,9 @@ from app.domain.snote.snote_service import SNoteService
 router = APIRouter()
 
 DEFAULT_HINT_PW = [
-    {"hint": "딸의 생년월일", "password": "970226"},
+    {"hint": "js의 생년월일", "password": "970226"},
     {"hint": "회사명군번느낌표", "password": "kalpa9732!"},
-    {"hint": "산소는", "password": "ansrud"},
+    {"hint": "할아버지산소", "password": "ansrud"},
     {"hint": "어머니의 고향", "password": "dorn"},
     {"hint": "출근방법은", "password": "Ekfmddl"},
 ]
@@ -48,9 +47,9 @@ async def get_random_hint():
     # 랜덤 힌트와 비밀번호 선택
     selected = random.choice(DEFAULT_HINT_PW)
     # 비밀번호를 SHA256으로 해싱
-    hashed_password = hashlib.sha256(selected["password"].encode()).hexdigest()
+    password = selected["password"]
     # 결과 반환
-    response = SnoteHintResponse(hint=selected["hint"], password=hashed_password)
+    response = SnoteHintResponse(hint=selected["hint"], password=password)
     
     return response
 
