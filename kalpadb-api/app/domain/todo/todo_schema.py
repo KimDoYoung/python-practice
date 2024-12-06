@@ -15,7 +15,3 @@ class TodoResponse(TodoRequest):
     id: int
     input_dt: datetime
     done_dt: Optional[datetime] = None
-
-    model_config = {
-        'from_attributes': True  # ORM 모드 활성화
-    }
