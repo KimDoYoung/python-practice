@@ -1,4 +1,6 @@
+import os
 import uuid
+from PIL import Image
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.domain.filenode.filenode_model import ApNode, ApFile, MatchFileInt, MatchFileVar
@@ -10,6 +12,18 @@ class ApNodeFileService:
     def getUuid(self):
         """UUID를 생성하고 대시(-)를 제거한 문자열을 반환합니다."""
         return uuid.uuid4().hex  # 대시를 제거하려면 .hex 사용
+
+    async def rotate_image(self, file_id: int, degree: int) -> bool:
+        ''' file_id에 해당하는 이미지 degree만큰 회전 '''
+        ap_file = self.get_file_by_node_id(file_id)
+        if ap_file is None:
+            raise ValueError("해당 ID에 해당하는 파일이 없습니다.")
+        image_path = os.path.join(ap_file.saved_dir_name, ap_file.saved_file_name)
+        image = Image.open(image_path)
+        clock_degree = -1 * degree
+        rotated_image = image.rotate(clock_degree, expand=True)
+        rotated_image.save(image_path)
+        return True
 
     # 파일 및 노드 생성
     async def create_ap_node_and_file(self, ap_node_data, ap_file_data):
