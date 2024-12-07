@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 from pydantic import BaseModel
 from datetime import datetime
 
@@ -20,3 +20,16 @@ class EssayUpsertRequest(BaseModel):
     id: Optional[int] = None
     title: str
     content: Optional[str] = None
+
+class EssayListRequest(BaseModel):
+    ''' 에세이 리스트 조회 요청 '''
+    search_text: Optional[str] = None
+    start_index: int = 0
+    limit: int = 10
+
+class EssayListResponse(BaseModel):
+    ''' 에세이 리스트 조회 응답 '''
+    essays: List[EssayResponse]
+    exists_next: bool
+    last_index: int
+    data_count: int

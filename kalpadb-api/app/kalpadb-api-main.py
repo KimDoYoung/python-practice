@@ -30,6 +30,7 @@ from app.api.v1.endpoints.hdd_routes import router as hdd_router
 from app.api.v1.endpoints.todo_routes import router as todo_router
 from app.api.v1.endpoints.snote_routes import router as snote_router
 from app.api.v1.endpoints.calendar_routes import router as calendar_router
+from app.api.v1.endpoints.filenode_routes import router as filenode_router
 
 logger = get_logger(__name__)
 
@@ -61,6 +62,7 @@ def set_routes(app: FastAPI):
     app.include_router(todo_router, prefix="/api/v1", tags=["todo"])
     app.include_router(snote_router, prefix="/api/v1", tags=["snote"])
     app.include_router(calendar_router, prefix="/api/v1", tags=["calendar"])
+    app.include_router(filenode_router, prefix="/api/v1", tags=["filenode"])
     
 def set_event_handlers(app: FastAPI):
     ''' 이벤트 핸들러 설정 '''

@@ -1,5 +1,18 @@
+# extutil_routes.py
+"""
+모듈 설명: 
+    -  외부 유틸리티 기능을 제공하는 API 엔드포인트를 정의합니다.
+주요 기능:
+    -  /hanja : 네이버 한자 사전에서 한자 리스트를 가져오는 기능
+    -  /extract/words : 텍스트를 받아서 명사만 추출하는 기능
+    -  /sol2lun/{ymd_list} : 양력->음력으로 변환하는 기능
 
+작성자: 김도영
+작성일: 2024-12-07
+버전: 1.0
+"""
 from typing import List
+from korean_lunar_calendar import KoreanLunarCalendar
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -73,3 +86,24 @@ def extract_korean_words(request: TextRequest)->List[str]:
     list = extract_nouns(request.text)
     list.sort()
     return list
+
+def solYmd2lunYmd(solYmd):
+    calendar = KoreanLunarCalendar()
+    y = int(solYmd[:4])
+    M = int(solYmd[4:6])
+    d = int(solYmd[6:])
+
+    calendar.setSolarDate(y, M, d)
+
+    # Lunar Date (ISO Format)
+
+    return calendar.LunarIsoFormat().replace('-', '') # 20201208
+
+@router.get("/sol2lun/{ymd_list}", summary="양력->음력으로 변환", response_model=List[str])
+def sol2lun(ymd_list: str)->List[str]:
+    ''' 양력 날짜를 음력으로 변환하여 반환합니다. ymd_list ymd|ymd... 형식 '''
+    ymd_array = ymd_list.split('|')
+    lunYmdArray = []
+    for solYmd in ymd_array:
+        lunYmdArray.append(solYmd2lunYmd(solYmd))
+    return lunYmdArray

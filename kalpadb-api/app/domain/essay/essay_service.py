@@ -4,7 +4,7 @@ from sqlalchemy.exc import NoResultFound
 from sqlalchemy import delete, func
 
 from app.domain.essay.essay_model import Essay
-from app.domain.essay.essay_schema import EssayRequest, EssayResponse, EssayUpsertRequest
+from app.domain.essay.essay_schema import EssayListRequest, EssayListResponse, EssayRequest, EssayResponse, EssayUpsertRequest
 
 class EssayService:
     def __init__(self, db: AsyncSession):
@@ -16,24 +16,37 @@ class EssayService:
         essay = result.scalar_one_or_none()
         if not essay:
             raise NoResultFound(f"Essay with ID {essay_id} not found")
-        return EssayResponse.from_orm(essay)
+        return EssayResponse.model_validate(essay)
 
-    async def get_essays(self) -> list[EssayResponse]:
+    async def get_essays(self, request: EssayListRequest) -> EssayListResponse:
         """모든 에세이 조회 (최신 정렬)"""
         # GREATEST(create_dt, COALESCE(lastmodify_dt, create_dt))를 적용한 정렬 추가
-        stmt = select(Essay).order_by(
+        stmt = select(Essay)
+        if request.search_text:
+            stmt = stmt.where(Essay.title.contains(request.search_text) | Essay.content.contains(request.search_text))
+        stmt = stmt.order_by(
             func.greatest(
                 Essay.create_dt,
                 func.coalesce(Essay.lastmodify_dt, Essay.create_dt)
             ).desc()
         )
+        stmt = stmt.offset(request.start_index).limit(request.limit)
         
         # 쿼리 실행
         result = await self.db.execute(stmt)
         essays = result.scalars().all()
-        
+        # 현재 페이지 결과와 exists_next 판별
+        exists_next = len(essays) > request.limit
+        if exists_next:
+            essays = essays[:-1]  # limit 초과분 제거        
+
         # ORM 모델을 Pydantic 응답 모델로 변환
-        return [EssayResponse.model_validate(essay) for essay in essays]
+        return EssayListResponse(
+            essays=[EssayResponse.model_validate(essay) for essay in essays],
+            exists_next=exists_next,
+            last_index=request.start_index + len(essays) - 1,
+            data_count=len(essays)
+        )    
 
     async def upsert_essay(self, request: EssayUpsertRequest) -> EssayResponse:
         """에세이 생성 또는 수정"""
