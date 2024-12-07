@@ -25,7 +25,15 @@ async def delete_essay(id:int, db: AsyncSession = Depends(get_session)):
     return await service.delete_essay(id)
 
 @router.get("/essays", response_model=EssayListResponse, summary="에세이 Page 조회")
-async def get_essays(request: EssayListRequest, db: AsyncSession = Depends(get_session)):
+async def get_essays(search_text:str=None, 
+                    limit: int=10,
+                    start_index: int=0,
+                    title_only: bool=False,
+                    db: AsyncSession = Depends(get_session)):
     ''' 에세이 1 page 조회 '''
     service = EssayService(db)
+    request = EssayListRequest(search_text=search_text, 
+                            limit=limit, 
+                            start_index=start_index, 
+                            title_only=title_only)
     return await service.get_essays(request)

@@ -19,12 +19,16 @@ class EssayService:
         return EssayResponse.model_validate(essay)
 
     async def get_essays(self, request: EssayListRequest) -> EssayListResponse:
-        """모든 에세이 조회 (최신 정렬)"""
-        # GREATEST(create_dt, COALESCE(lastmodify_dt, create_dt))를 적용한 정렬 추가
-        stmt = select(Essay)
+        """ 에세이 1페이지 조회 (최신 정렬)"""
+        if request.title_only:
+            stmt = select(Essay.id, Essay.title, Essay.create_dt, Essay.lastmodify_dt)
+        else:
+            stmt = select(Essay)
+
         if request.search_text:
             stmt = stmt.where(Essay.title.contains(request.search_text) | Essay.content.contains(request.search_text))
         stmt = stmt.order_by(
+            # GREATEST(create_dt, COALESCE(lastmodify_dt, create_dt))를 적용한 정렬 추가
             func.greatest(
                 Essay.create_dt,
                 func.coalesce(Essay.lastmodify_dt, Essay.create_dt)
@@ -34,7 +38,21 @@ class EssayService:
         
         # 쿼리 실행
         result = await self.db.execute(stmt)
-        essays = result.scalars().all()
+        # 결과 처리
+        if request.title_only:
+            essays = [
+                {
+                    "id": row.id,
+                    "title": row.title,
+                    "content": None,  # content는 title_only이므로 None
+                    "create_dt": row.create_dt,
+                    "lastmodify_dt": row.lastmodify_dt,
+                }
+                for row in result.all()
+            ]
+        else:
+            essays = result.scalars().all()        
+
         # 현재 페이지 결과와 exists_next 판별
         exists_next = len(essays) > request.limit
         if exists_next:
@@ -42,7 +60,10 @@ class EssayService:
 
         # ORM 모델을 Pydantic 응답 모델로 변환
         return EssayListResponse(
-            essays=[EssayResponse.model_validate(essay) for essay in essays],
+            essays=[
+                EssayResponse.model_validate(essay) if not request.title_only else EssayResponse(**essay)
+                for essay in essays
+            ],
             exists_next=exists_next,
             last_index=request.start_index + len(essays) - 1,
             data_count=len(essays)

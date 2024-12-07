@@ -26,6 +26,7 @@ class EssayListRequest(BaseModel):
     search_text: Optional[str] = None
     start_index: int = 0
     limit: int = 10
+    title_only: Optional[bool] = False
 
 class EssayListResponse(BaseModel):
     ''' 에세이 리스트 조회 응답 '''
