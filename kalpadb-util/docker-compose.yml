@@ -1,13 +1,11 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  ap_file_wh:
-    build:
-      context: ./ap_file_wh  # Dockerfile 위치
-      dockerfile: Dockerfile
-    container_name: ap_file_wh_container
-    env_file: 
-      - ./ap_file_wh/.env  # ../.env 파일에서 환경 변수 로드
+  kalpadb-util:
+    build: .
+    container_name: kalpadb-util
+    stdin_open: true
+    tty: true
     volumes:
       - /home/kdy987/www/uploaded:/home/kdy987/www/uploaded  # 로컬 파일 시스템 연결
-    command: python /app/ap_file_wh.py  # 컨테이너 내부 경로 기준
+    working_dir: /app

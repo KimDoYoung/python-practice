@@ -26,3 +26,20 @@ docker-compose ps
 docker-compose down
 docker-compose up --build -d
 ```
+
+## make_thumb.py
+
+1. 개요: ap_file의 column thumb_path를 채운다.
+2. 다음과 같은 sql을 수행
+
+```sql
+    select saved_dir_name, saved_file_name 
+    from ap_file
+    where thumb_path is null
+    and content_type like 'image%'
+```
+
+3. thumb_base_dir은  /home/kdy/uploaded/thumbs이다
+4. thumb_base_dir하위에 이미지파일의 생성일자중 yyyymm을 가지고 하위폴더를 만들어 그 폴더에 생성한다.
+5. 이미지 width가 300px보다 크면 width를 300으로 맞추고, 이미지의 width x height 원래 비율에 맞게끔 height를 설정한다.
+6. thumb 이미지는 모두 png형식으로 한다.
