@@ -5,7 +5,19 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "현재파일",
+            "name": "godata_holiday",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "cwd" : "${fileDirname}",
+            "justMyCode": false,
+            "args" : ["2024", "12"]
+
+            // "env": {"PYTHONPATH": "${workspaceFolder}"}       
+        },
+        {
+            "name": "HDD",
             "type": "debugpy",
             "request": "launch",
             "program": "${file}",

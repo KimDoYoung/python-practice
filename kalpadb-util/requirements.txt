@@ -1,3 +1,5 @@
 pymysql
 python-dotenv
 pillow
+python-dateutil
+requests
