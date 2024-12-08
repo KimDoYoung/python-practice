@@ -1,5 +1,18 @@
 # kalpadb - utils
 
+## 개요
+
+kalpadb를 유지보수하기 위한 몇가지 유틸리티 프로그램을 만들고 이를 서버에 docker에 배포해서 실행하도록 함.
+
+## 실행방법
+
+- run_util.sh을 통해서 docker container안의 python 단위 프로그램을 실행한다.
+
+```shell
+./run_util.sh make_thumb 
+./run_util.sh hdd f 영화1
+```
+
 ## hdd
 
 - 2T HDD의 파일정보를 hdd table에 넣는다.
