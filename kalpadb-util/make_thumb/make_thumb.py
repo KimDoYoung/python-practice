@@ -18,7 +18,7 @@ DB_CONFIG = {
 }
 
 # 썸네일 저장 기본 경로
-THUMB_BASE_DIR = "/home/kdy/uploaded/thumbs"
+THUMB_BASE_DIR = "/home/kdy987/www/uploaded/thumbs"
 
 
 # 썸네일 생성 함수
@@ -33,7 +33,7 @@ def create_thumbnail(input_path, output_path, max_width=300):
                 scale = max_width / width
                 new_width = max_width
                 new_height = int(height * scale)
-                img = img.resize((new_width, new_height), Image.ANTIALIAS)
+                img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
 
             # PNG로 저장
             img.save(output_path, format="PNG")
