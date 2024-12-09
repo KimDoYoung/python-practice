@@ -17,7 +17,7 @@ class SNoteService:
         snote = result.scalar_one_or_none()
         if not snote:
             raise NoResultFound(f"SNote with ID {snote_id} not found")
-        return SNoteResponse.from_orm(snote)
+        return SNoteResponse.model_validate(snote)
 
     async def get_snotes(self, req:SnoteListRequest ) -> list[SNoteResponse]:
         """모든 노트 조회"""
@@ -31,7 +31,7 @@ class SNoteService:
             stmt = stmt.where(SNote.title.like(f"%{search_text}%"))
         stmt = stmt.order_by(SNote.create_dt.desc())    
         stmt = stmt.offset(start_index).limit(limit + 1)  # limit + 1로 조회하여 다음 페이지 여부 확인  
-        print(str(stmt))
+        # print(str(stmt))
         rows = await self.db.execute(stmt)
         rows = rows.fetchall()  
 
