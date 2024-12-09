@@ -10,17 +10,14 @@ from app.domain.calendar.calendar_service import CalendarService
 
 router = APIRouter()
 
-@router.post("/calendar", response_model=dict)
+@router.post("/calendar", response_model=CalendarResponse)
 async def insert_calendars(
     req: CalendarRequest,
     db: AsyncSession = Depends(get_session)
 ):
     ''' 일정 목록 생성 '''
     service = CalendarService(db)
-    b = await service.create_calendar(req)
-    if b:
-        return {"result": "success"}
-    return {"result": "fail"}
+    return  await service.create_calendar(req)
 
 @router.get("/calendar/{yyyymm}", response_model=List[CalendarResponse])
 async def get_calendars(yyyymm: str, db: AsyncSession = Depends(get_session)):
