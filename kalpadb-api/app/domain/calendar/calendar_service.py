@@ -11,7 +11,7 @@ class CalendarService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def create_Calendar(self, request: CalendarRequest) -> CalendarResponse:
+    async def create_calendar(self, request: CalendarRequest) -> CalendarResponse:
         ''' 일정 생성 '''
         new_Calendar = Calendar(
             gubun=request.gubun,
