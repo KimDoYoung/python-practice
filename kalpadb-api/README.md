@@ -52,3 +52,7 @@ where A.ymd between '20240101' and '20241231'
 group by A.ymd, A.summary, A.content
 order by A.ymd
 ```
+
+##
+- TODO:  movies search_text 넣기
+- 

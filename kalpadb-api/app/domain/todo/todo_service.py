@@ -20,7 +20,7 @@ class TodoService:
 
         result = await self.db.execute(query)
         todos =  result.scalars().all()
-        return [TodoResponse.model_validate(todo) for todo in todos]
+        return [TodoResponse.model_validate(todo.__dict__) for todo in todos]
 
     async def create_todo(self, req: TodoCreateRequest) -> bool:
         """해야할 일 생성"""

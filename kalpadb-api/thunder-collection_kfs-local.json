@@ -1,0 +1,257 @@
+{
+    "clientName": "Thunder Client",
+    "collectionName": "kfs-local",
+    "collectionId": "75439999-833e-4a0d-a2f8-0edabb5824d5",
+    "dateExported": "2024-12-10T09:01:18.333Z",
+    "version": "1.2",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "f83614e2-455a-414c-a578-d15dd12bdc79",
+            "colId": "75439999-833e-4a0d-a2f8-0edabb5824d5",
+            "containerId": "",
+            "name": "diaries",
+            "url": "/diaries",
+            "method": "GET",
+            "sortNum": 10000,
+            "created": "2024-12-10T07:58:11.271Z",
+            "modified": "2024-12-10T08:54:24.180Z",
+            "headers": []
+        },
+        {
+            "_id": "7eaf27dc-ee80-4ec6-b080-ed8fb67d88df",
+            "colId": "75439999-833e-4a0d-a2f8-0edabb5824d5",
+            "containerId": "",
+            "name": "essays",
+            "url": "/essays?title_only=true",
+            "method": "GET",
+            "sortNum": 30000,
+            "created": "2024-12-10T08:11:50.464Z",
+            "modified": "2024-12-10T08:54:29.955Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "title_only",
+                    "value": "true",
+                    "isPath": false
+                }
+            ]
+        },
+        {
+            "_id": "aa4e9f39-c09d-45d9-9e20-be19e0589570",
+            "colId": "75439999-833e-4a0d-a2f8-0edabb5824d5",
+            "containerId": "",
+            "name": "jangbies",
+            "url": "/jangbies?start_ymd=19700101&end_ymd=99991231&order_direction=desc&start_idx=0&limit=10",
+            "method": "GET",
+            "sortNum": 40000,
+            "created": "2024-12-10T08:13:42.926Z",
+            "modified": "2024-12-10T08:54:36.729Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "start_ymd",
+                    "value": "19700101",
+                    "isPath": false
+                },
+                {
+                    "name": "end_ymd",
+                    "value": "99991231",
+                    "isPath": false
+                },
+                {
+                    "name": "order_direction",
+                    "value": "desc",
+                    "isPath": false
+                },
+                {
+                    "name": "start_idx",
+                    "value": "0",
+                    "isPath": false
+                },
+                {
+                    "name": "limit",
+                    "value": "10",
+                    "isPath": false
+                }
+            ]
+        },
+        {
+            "_id": "f0179711-970d-45f2-80df-2bd86a812f80",
+            "colId": "75439999-833e-4a0d-a2f8-0edabb5824d5",
+            "containerId": "",
+            "name": "movies",
+            "url": "/movies?start_index=0&limit=10",
+            "method": "GET",
+            "sortNum": 50000,
+            "created": "2024-12-10T08:39:01.105Z",
+            "modified": "2024-12-10T08:54:42.349Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "start_index",
+                    "value": "0",
+                    "isPath": false
+                },
+                {
+                    "name": "limit",
+                    "value": "10",
+                    "isPath": false
+                }
+            ]
+        },
+        {
+            "_id": "55c4fb82-69d9-44d1-87bd-55f591abcd91",
+            "colId": "75439999-833e-4a0d-a2f8-0edabb5824d5",
+            "containerId": "",
+            "name": "movie_review",
+            "url": "/movie_reviews?start_index=0&limit=10&include_content=false",
+            "method": "GET",
+            "sortNum": 60000,
+            "created": "2024-12-10T08:46:13.705Z",
+            "modified": "2024-12-10T08:54:48.299Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "start_index",
+                    "value": "0",
+                    "isPath": false
+                },
+                {
+                    "name": "limit",
+                    "value": "10",
+                    "isPath": false
+                },
+                {
+                    "name": "include_content",
+                    "value": "false",
+                    "isPath": false
+                }
+            ]
+        },
+        {
+            "_id": "71becd39-3f50-4ba3-aec3-996655936d10",
+            "colId": "75439999-833e-4a0d-a2f8-0edabb5824d5",
+            "containerId": "",
+            "name": "hdd-volumn-list",
+            "url": "/hdd/volumn-list",
+            "method": "GET",
+            "sortNum": 70000,
+            "created": "2024-12-10T08:47:41.103Z",
+            "modified": "2024-12-10T08:54:54.241Z",
+            "headers": []
+        },
+        {
+            "_id": "36faa07b-fcfa-478f-beaf-504f8bcdddf4",
+            "colId": "75439999-833e-4a0d-a2f8-0edabb5824d5",
+            "containerId": "",
+            "name": "hdd-search",
+            "url": "/hdd/search?gubun=A&start_index=0&limit=10&search_text=전쟁",
+            "method": "GET",
+            "sortNum": 80000,
+            "created": "2024-12-10T08:48:32.868Z",
+            "modified": "2024-12-10T08:55:01.395Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "gubun",
+                    "value": "A",
+                    "isPath": false
+                },
+                {
+                    "name": "start_index",
+                    "value": "0",
+                    "isPath": false
+                },
+                {
+                    "name": "limit",
+                    "value": "10",
+                    "isPath": false
+                },
+                {
+                    "name": "search_text",
+                    "value": "전쟁",
+                    "isPath": false
+                }
+            ]
+        },
+        {
+            "_id": "8721d548-7f8f-49f2-9681-70dfbac3cdce",
+            "colId": "75439999-833e-4a0d-a2f8-0edabb5824d5",
+            "containerId": "",
+            "name": "hdd_child",
+            "url": "/hdd/child/2T-1/2066/A",
+            "method": "GET",
+            "sortNum": 90000,
+            "created": "2024-12-10T08:50:41.772Z",
+            "modified": "2024-12-10T08:55:09.285Z",
+            "headers": []
+        },
+        {
+            "_id": "5b801ca0-3508-4380-80ed-05e3ec36e534",
+            "colId": "75439999-833e-4a0d-a2f8-0edabb5824d5",
+            "containerId": "",
+            "name": "todo",
+            "url": "/todo",
+            "method": "GET",
+            "sortNum": 100000,
+            "created": "2024-12-10T08:56:05.127Z",
+            "modified": "2024-12-10T08:56:14.647Z",
+            "headers": []
+        },
+        {
+            "_id": "597b4669-b4d7-490b-820e-f87f8bb98185",
+            "colId": "75439999-833e-4a0d-a2f8-0edabb5824d5",
+            "containerId": "",
+            "name": "snote",
+            "url": "/snote?start_index=0&limit=10",
+            "method": "GET",
+            "sortNum": 110000,
+            "created": "2024-12-10T08:56:48.941Z",
+            "modified": "2024-12-10T08:57:06.013Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "start_index",
+                    "value": "0",
+                    "isPath": false
+                },
+                {
+                    "name": "limit",
+                    "value": "10",
+                    "isPath": false
+                }
+            ]
+        },
+        {
+            "_id": "a6b4892d-5308-4814-9150-3857977aee60",
+            "colId": "75439999-833e-4a0d-a2f8-0edabb5824d5",
+            "containerId": "",
+            "name": "snote-random-hint",
+            "url": "/snote/get-random-hint",
+            "method": "GET",
+            "sortNum": 120000,
+            "created": "2024-12-10T08:58:04.653Z",
+            "modified": "2024-12-10T08:58:10.010Z",
+            "headers": []
+        },
+        {
+            "_id": "4eeb6e85-1e66-492c-9840-def449598504",
+            "colId": "75439999-833e-4a0d-a2f8-0edabb5824d5",
+            "containerId": "",
+            "name": "calender-yyyymm",
+            "url": "/calendar/202412",
+            "method": "GET",
+            "sortNum": 130000,
+            "created": "2024-12-10T08:59:43.653Z",
+            "modified": "2024-12-10T08:59:49.039Z",
+            "headers": []
+        }
+    ],
+    "settings": {
+        "options": {
+            "baseUrl": "http://localhost:8088/api/v1"
+        }
+    },
+    "ref": "LLZVh7crMHh9LR9pEnvekGM9rwKbOGF9e4E0VxQUmfmxABl2Zo84T42C10lvQmvF_a3HCi18wGXkZq77teEiwA"
+}
