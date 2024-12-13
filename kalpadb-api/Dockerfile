@@ -51,4 +51,7 @@ COPY . .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # FastAPI 실행
-CMD ["xvfb-run", "--server-args=-screen 0 1024x768x24", "uvicorn", "app.kalpadb-api-main:app", "--host", "0.0.0.0", "--port", "8088", "--log-level", "debug"]
+#CMD ["xvfb-run", "--server-args=-screen 0 1024x768x24", "uvicorn", "app.kalpadb-api-main:app", "--host", "0.0.0.0", "--port", "8088", "--log-level", "debug"]
+ENTRYPOINT ["xvfb-run", "--server-args=-screen 0 1024x768x24", "uvicorn"]
+CMD ["app.kalpadb-api-main:app", "--host", "0.0.0.0", "--port", "8088", "--log-level", "debug"]
+
