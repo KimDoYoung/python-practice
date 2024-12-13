@@ -45,6 +45,7 @@ class MovieService:
             list=[MovieResponse.model_validate(movie) for movie in movies_to_return],
             item_count=len(movies_to_return) + (1 if next_data_exists else 0),
             next_data_exists=next_data_exists,
+            start_index=request.start_index,
             next_index=request.start_index + len(movies_to_return),
         )
 

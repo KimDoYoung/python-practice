@@ -91,6 +91,7 @@ class HDDService:
             list=data,
             data_count=len(data),
             next_data_exists=next_data_exists,
+            start_index=request.start_index,
             last_index=request.start_index + len(data),
             limit=request.limit,
         )

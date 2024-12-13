@@ -68,6 +68,7 @@ class MovieReviewService:
             list=reviews,
             item_count=len(reviews),
             next_data_exists=next_data_exists,
+            start_index=request.start_index,
             next_index=request.start_index + len(reviews),
         )
 

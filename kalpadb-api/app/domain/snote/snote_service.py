@@ -45,6 +45,7 @@ class SNoteService:
             snote_list=snote_list,
             next_exist=next_exist,
             limit=limit,
+            start_index = start_index,
             last_index=start_index + len(snote_list) - 1
         )
 

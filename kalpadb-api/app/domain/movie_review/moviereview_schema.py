@@ -35,6 +35,7 @@ class MovieReviewListResponse(BaseModel):
     list: list[MovieReviewResponse]
     item_count : int
     next_data_exists: bool
+    start_index: int
     next_index: int
 
 class MovieReviewSearchRequest(BaseModel):

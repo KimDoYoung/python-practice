@@ -342,6 +342,7 @@ class DiaryService:
             data=data,
             data_count=data_count,
             next_data_exists=next_data_exists,
+            start_index=start_index,
             last_index=last_index,
             limit=limit,
             start_ymd=start_ymd,

@@ -57,6 +57,7 @@ class HDDSearchResponse(BaseModel):
     list: List[HDDResponse]
     data_count: int
     next_data_exists: bool
+    start_index:int
     last_index: int
     limit: int
 

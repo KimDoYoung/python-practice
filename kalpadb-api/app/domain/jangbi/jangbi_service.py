@@ -138,6 +138,7 @@ class JangbiService:
             list=response_list,
             item_count=len(response_list),
             next_data_exists=next_data_exists,
+            start_index = param.start_idx,
             next_index=param.start_idx + len(response_list)
         )
     #--------------------------------------------

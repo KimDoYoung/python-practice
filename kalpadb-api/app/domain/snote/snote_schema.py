@@ -30,6 +30,7 @@ class SnoteListResponse(BaseModel):
     snote_list: list[SNoteResponse]
     next_exist: bool
     limit: int
+    start_index: int
     last_index: int
     
         

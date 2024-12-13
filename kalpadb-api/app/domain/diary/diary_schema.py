@@ -63,6 +63,7 @@ class DiaryPageModel(BaseModel):
     data: List[DiaryResponse]  # 적절한 데이터 타입으로 대체하세요 (예: List[dict])
     data_count : int
     next_data_exists: bool
+    start_index: int
     last_index: int
     limit: int
     start_ymd: Optional[str]  # 날짜 형식에 따라 Optional[str] 사용
