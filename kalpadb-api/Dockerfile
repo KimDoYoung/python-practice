@@ -9,11 +9,18 @@ RUN apt-get update && apt-get install -y \
     libgconf-2-4 \
     xvfb \
     gnupg \
-    xauth \  # xauth 추가
-    libx11-xcb1 libxcomposite1 libxi6 libxrandr2 libxdamage1 libxtst6 \
-    libnss3 libasound2 libatk-bridge2.0-0 libcups2 \
-    --no-install-recommends \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    xauth \
+    libx11-xcb1 \
+    libxcomposite1 \
+    libxi6 \
+    libxrandr2 \
+    libxdamage1 \
+    libxtst6 \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libcups2 \
+    --no-install-recommends && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Chrome 설치
 RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
