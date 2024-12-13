@@ -1,6 +1,3 @@
-# ----------------------------------------------------
-# Dockerfile for kalpadb-api with Selenium and JDK 1.8
-# ----------------------------------------------------
 FROM python:3.12-slim
 
 # 필수 패키지 업데이트 및 설치
@@ -12,12 +9,10 @@ RUN apt-get update && apt-get install -y \
     libgconf-2-4 \
     xvfb \
     gnupg \
+    libx11-xcb1 libxcomposite1 libxi6 libxrandr2 libxdamage1 libxtst6 \
+    libnss3 libasound2 libatk-bridge2.0-0 libcups2 \
     --no-install-recommends \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# 환경 변수 설정
-ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
-ENV PATH="$JAVA_HOME/bin:$PATH"
 
 # Chrome 설치
 RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
@@ -25,9 +20,11 @@ RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd6
     && apt-get install -y ./google-chrome-stable_current_amd64.deb \
     && rm google-chrome-stable_current_amd64.deb
 
-# ChromeDriver 설치 (Chrome 버전과 일치)
-RUN CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+') \
+# ChromeDriver 설치
+RUN CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | cut -d '.' -f 1) \
+    && echo "Detected Chrome version: $CHROME_VERSION" \
     && CHROME_DRIVER_VERSION=$(wget -qO- "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION") \
+    && echo "Detected ChromeDriver version: $CHROME_DRIVER_VERSION" \
     && wget -q "https://chromedriver.storage.googleapis.com/$CHROME_DRIVER_VERSION/chromedriver_linux64.zip" \
     && unzip chromedriver_linux64.zip -d /usr/local/bin/ \
     && rm chromedriver_linux64.zip \
@@ -50,5 +47,5 @@ COPY . .
 # 의존성 패키지 설치
 RUN pip install --no-cache-dir -r requirements.txt
 
-# FastAPI 실행 (main.py에서 FastAPI 객체를 정의했을 때의 파일 경로)
+# FastAPI 실행
 CMD ["xvfb-run", "--server-args=-screen 0 1024x768x24", "uvicorn", "app.kalpadb-api-main:app", "--host", "0.0.0.0", "--port", "8088", "--log-level", "debug"]
