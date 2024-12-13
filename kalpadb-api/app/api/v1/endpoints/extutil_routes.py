@@ -15,13 +15,19 @@ from typing import List
 from korean_lunar_calendar import KoreanLunarCalendar
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from fastapi import APIRouter, HTTPException
 from bs4 import BeautifulSoup
 
 from app.core.util import extract_nouns
-from app.domain.extutil.extutil_schema import TextRequest
+from app.domain.extutil.extutil_schema import SolarLunarResponse, TextRequest
+from app.core.logger import get_logger
+
+logger = get_logger(__name__)
 
 router = APIRouter()
 
@@ -49,7 +55,10 @@ def get_hanja_list(query: str):
     try:
         # URL 로드
         driver.get(url)
-        driver.implicitly_wait(3)  # 동적 로딩 대기
+        # 특정 요소가 로드될 때까지 기다림 (최대 10초)
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "searchPage_entry"))
+        )
 
         # 페이지 소스 가져오기
         page_source = driver.page_source
@@ -72,9 +81,6 @@ def get_hanja_list(query: str):
 
         return {"query": query, "hanja_list": hanja_list}
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
-
     finally:
         # WebDriver 종료
         driver.quit()
@@ -96,14 +102,17 @@ def solYmd2lunYmd(solYmd):
     calendar.setSolarDate(y, M, d)
 
     # Lunar Date (ISO Format)
+    lunarDate = calendar.LunarIsoFormat().replace('-', '') # 20201208
+    logger.debug(f"solYmd2lunYmd: {solYmd} -> {lunarDate}")
+    return lunarDate
 
-    return calendar.LunarIsoFormat().replace('-', '') # 20201208
-
-@router.get("/sol2lun/{ymd_list}", summary="양력->음력으로 변환", response_model=List[str])
+@router.get("/sol2lun/{ymd_list}", summary="양력->음력으로 변환", response_model=List[SolarLunarResponse])
 def sol2lun(ymd_list: str)->List[str]:
     ''' 양력 날짜를 음력으로 변환하여 반환합니다. ymd_list ymd|ymd... 형식 '''
     ymd_array = ymd_list.split('|')
     lunYmdArray = []
     for solYmd in ymd_array:
-        lunYmdArray.append(solYmd2lunYmd(solYmd))
+        lunYmd = solYmd2lunYmd(solYmd)
+        sol_lun_response = SolarLunarResponse(solYmd=solYmd, lunYmd=lunYmd)
+        lunYmdArray.append(sol_lun_response)
     return lunYmdArray
