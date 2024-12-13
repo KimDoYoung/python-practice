@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     libgconf-2-4 \
     xvfb \
     gnupg \
+    xauth \  # xauth 추가
     libx11-xcb1 libxcomposite1 libxi6 libxrandr2 libxdamage1 libxtst6 \
     libnss3 libasound2 libatk-bridge2.0-0 libcups2 \
     --no-install-recommends \
@@ -20,16 +21,9 @@ RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd6
     && apt-get install -y ./google-chrome-stable_current_amd64.deb \
     && rm google-chrome-stable_current_amd64.deb
 
-# ChromeDriver 버전 디버깅
-RUN CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | cut -d '.' -f 1) \
-    && echo "Detected Chrome version: $CHROME_VERSION" \
-    && CHROME_DRIVER_VERSION=$(wget -qO- "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION") \
-    && echo "Detected ChromeDriver version: $CHROME_DRIVER_VERSION" \
-    && wget -q "https://chromedriver.storage.googleapis.com/$CHROME_DRIVER_VERSION/chromedriver_linux64.zip" \
-    && unzip chromedriver_linux64.zip -d /usr/local/bin/ \
-    && rm chromedriver_linux64.zip \
-    && chmod +x /usr/local/bin/chromedriver || echo "Fallback: Using pre-defined version" \
-    && wget -q "https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip" \
+# ChromeDriver 설치
+RUN CHROME_DRIVER_VERSION=$(wget -qO- https://chromedriver.storage.googleapis.com/LATEST_RELEASE) \
+    && wget -q https://chromedriver.storage.googleapis.com/$CHROME_DRIVER_VERSION/chromedriver_linux64.zip \
     && unzip chromedriver_linux64.zip -d /usr/local/bin/ \
     && rm chromedriver_linux64.zip \
     && chmod +x /usr/local/bin/chromedriver
