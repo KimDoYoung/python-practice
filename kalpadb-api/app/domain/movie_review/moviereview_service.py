@@ -60,12 +60,14 @@ class MovieReviewService:
         for row in rows:
             review_data = dict(zip(column_names, row))
             reviews.append(MovieReviewResponse(**review_data))
-
+            
+        next_data_exists = 'Y' if len(rows) > request.limit else 'N'
+        reviews = reviews[:request.limit]
         # 응답 반환
         return MovieReviewListResponse(
             list=reviews,
             item_count=len(reviews),
-            next_data_exists=len(rows) > request.limit,
+            next_data_exists=next_data_exists,
             next_index=request.start_index + len(reviews),
         )
 
