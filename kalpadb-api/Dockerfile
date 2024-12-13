@@ -52,6 +52,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # FastAPI 실행
 #CMD ["xvfb-run", "--server-args=-screen 0 1024x768x24", "uvicorn", "app.kalpadb-api-main:app", "--host", "0.0.0.0", "--port", "8088", "--log-level", "debug"]
-ENTRYPOINT ["xvfb-run", "--server-args=-screen 0 1024x768x24", "uvicorn"]
-CMD ["app.kalpadb-api-main:app", "--host", "0.0.0.0", "--port", "8088", "--log-level", "debug"]
+# ENTRYPOINT ["xvfb-run", "--server-args=-screen 0 1024x768x24", "uvicorn"]
+# CMD ["app.kalpadb-api-main:app", "--host", "0.0.0.0", "--port", "8088", "--log-level", "debug"]
 
+# start.sh 스크립트 복사 및 권한 설정
+COPY start.sh /kalpadb-api/start_uvicorn.sh
+RUN chmod +x /kalpadb-api/start_uvicorn.sh
+# FastAPI 실행
+CMD ["/kalpadb-api/start_uvicorn.sh"]
