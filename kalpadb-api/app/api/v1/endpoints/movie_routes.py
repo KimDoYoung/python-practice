@@ -71,6 +71,12 @@ async def upsert_movie_review(
     service = MovieReviewService(db)
     return await service.upsert_movie_review(request)
 
+@router.get("/movie_review/{movie_id}", response_model=MovieReviewResponse)
+async def get_movie_review_by_id(movie_id:int, db: AsyncSession = Depends(get_session)):
+    """영화감상 상세(1개) 조회"""
+    service = MovieReviewService(db)
+    return await service.get_movie_review(movie_id)
+
 @router.delete("/movie_review/{movie_id}", response_model=MovieReviewResponse)
 async def delete_movie_review(movie_id:int, db: AsyncSession = Depends(get_session)):
     """영화감상 삭제 """
