@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.exc import NoResultFound
@@ -6,6 +7,7 @@ from sqlalchemy import and_, delete
 from app.domain.movie_review.moviereview_model import MovieReview
 from app.domain.movie_review.moviereview_schema import MovieReviewRequest, MovieReviewResponse
 from app.domain.movie_review.moviereview_schema import MovieReviewListResponse, MovieReviewSearchRequest
+
 
 class MovieReviewService:
     def __init__(self, db: AsyncSession):
@@ -82,7 +84,11 @@ class MovieReviewService:
 
     async def create_movie_review(self, review_data: MovieReviewRequest) -> MovieReviewResponse:
         """리뷰 생성"""
-        review = MovieReview(**review_data.model_dump())
+        id_extract_data = review_data.model_dump(exclude_unset=True)
+        id_extract_data.pop('id', None)
+        id_extract_data['lastmodify_dt'] = datetime.now()
+
+        review = MovieReview(**id_extract_data)
         self.db.add(review)
         await self.db.commit()
         await self.db.refresh(review)
