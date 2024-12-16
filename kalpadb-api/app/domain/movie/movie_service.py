@@ -10,12 +10,32 @@ class MovieService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def get_movie(self, movie_id: int) -> MovieResponse:
+    async def update_movie(self, id: int, req: MovieRequest) -> MovieResponse:
+        ''' 영화dvd 정보수정'''
+        result = await self.db.execute(select(Movie).where(Movie.id == id))
+        movie = result.scalar_one_or_none()
+        if movie is None:
+            raise ValueError(f"Movie with ID {id} not found") 
+        movie.gubun = req.gubun
+        movie.title1 = req.title1
+        movie.title2 = req.title2
+        movie.title3 = req.title3
+        movie.category = req.category
+        movie.gamdok = req.gamdok
+        movie.make_year = req.make_year
+        movie.nara = req.nara
+        
+        await self.db.commit()
+        await self.db.refresh(movie)
+        return MovieResponse.model_validate(movie)
+        
+        
+    async def get_movie(self, id: str) -> MovieResponse:
         """특정 ID로 영화 정보 조회"""
-        result = await self.db.execute(select(Movie).where(Movie.id == movie_id))
+        result = await self.db.execute(select(Movie).where(Movie.id == id))
         movie = result.scalar_one_or_none()
         if not movie:
-            raise NoResultFound(f"Movie with ID {movie_id} not found")
+            raise NoResultFound(f"Movie with ID {id} not found")
         return MovieResponse.model_validate(movie)
 
     async def get_movies(self, request: MovieSearchRequest) -> MovieListResponse:

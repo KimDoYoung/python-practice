@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_session
-from app.domain.movie.movie_schema import MovieListResponse, MovieSearchRequest
+from app.domain.movie.movie_schema import MovieListResponse, MovieRequest, MovieResponse, MovieSearchRequest
 from app.domain.movie.movie_service import MovieService
 from app.domain.movie_review.moviereview_schema import MovieReviewListResponse, MovieReviewResponse, MovieReviewSearchRequest, MovieReviewUpsertRequest
 from app.domain.movie_review.moviereview_service import MovieReviewService
@@ -33,6 +33,19 @@ async def get_movies(
     )
     service = MovieService(db)
     return await service.get_movies(request)
+
+@router.get("/movies/{id}", summary="특정 ID로 영화DVD 정보 조회", response_model=MovieResponse)
+async def update_movie(id:int,  db: AsyncSession = Depends(get_session)):
+    """특정 ID로 영화 정보 조회"""
+    service = MovieService(db)
+    return await service.get_movie(id)
+
+
+@router.post("/movies/{id}", summary="영화DVD정보를 수정",response_model=MovieResponse)
+async def update_movie(id:int, req: MovieRequest,  db: AsyncSession = Depends(get_session)):
+    """영화 생성 또는 수정"""
+    service = MovieService(db)
+    return await service.update_movie(id, req)
 
 @router.get("/movie_reviews", response_model=MovieReviewListResponse)
 async def get_movie_review(
