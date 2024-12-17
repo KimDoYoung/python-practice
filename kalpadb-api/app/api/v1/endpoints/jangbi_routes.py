@@ -13,7 +13,7 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_session
 from app.domain.filenode.filenode_schema import AttachFileInfo
-from app.domain.jangbi.jangbi_schema import JangbiListParam, JangbiResponse, JangbiUpsertRequest
+from app.domain.jangbi.jangbi_schema import JangbiListParam, JangbiListResponse, JangbiResponse, JangbiUpsertRequest
 from app.domain.jangbi.jangbi_service import JangbiService
 
 router = APIRouter()
