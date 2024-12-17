@@ -323,7 +323,8 @@ class DiaryService:
 
         # 데이터 처리
         if summary_only:
-            data = [{"ymd": diary.ymd, "summary": diary.summary} for diary in diaries]
+            attachments = saved_path_to_url(diary.files)
+            data = [{"ymd": diary.ymd, "summary": diary.summary, "attachments": attachments} for diary in diaries]
         else:
             data = []
             for diary in diaries:

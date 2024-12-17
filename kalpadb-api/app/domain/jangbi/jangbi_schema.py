@@ -50,3 +50,4 @@ class JangbiListResponse(BaseModel):
     item_count : int
     next_data_exists: bool
     next_index: int
+    start_index: int
