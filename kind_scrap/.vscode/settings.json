@@ -1,0 +1,43 @@
+{
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false,
+    "terminal.integrated.defaultProfile.windows": "Git Bash",
+    "editor.codeActionsOnSave": {
+        "source.fixAll.markdownlint" : "always"
+    },
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/.pytest_cache": true,
+    },
+    "python.analysis.extraPaths": [
+        "./backend/app/core"
+    ],
+    "python.testing.pytestArgs": [
+        "backend"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "python.envFile":   "${workspaceFolder}/.env.local",
+
+    "tailwindCSS.includeLanguages": {
+        "html": "html",
+        "javascript": "javascript",
+        "css": "css"
+    },
+    "editor.quickSuggestions": {
+        "strings": true
+    },
+    "css.validate": false ,
+    "editor.inlineSuggest.enabled": true,
+    "python.terminal.activateEnvironment": false,
+    "search.exclude": { //찾기에서 배제할 폴더들
+        "**/.git": true,
+        "**/env": true,
+        "**/data": true,
+        "**/tmp": true,
+        "**/*.md": true,
+    },
+
+
+}
