@@ -6,6 +6,24 @@ from dotenv import load_dotenv
 
 from common.utils import generate_srch_key
 
+class PidCache:
+    def __init__(self):
+        self.cache = {}
+
+    def add(self, key, value):
+        self.cache[key] = value
+
+    def get(self, key):
+        return self.cache.get(key)
+
+    def clear(self):
+        self.cache.clear()
+
+    def removeById(self, value):
+        keys_to_remove = [key for key, val in self.cache.items() if val == value]
+        for key in keys_to_remove:
+            del self.cache[key]
+
 
 # .env 파일 로드
 load_dotenv()
@@ -33,9 +51,11 @@ def insert_to_db(cursor, data):
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
     cursor.execute(query, data)
+    # print(f"data : {data}")
 
 def scan_directory(root_path, volume_name):
     """디렉터리를 순회하며 데이터를 DB에 삽입"""
+    pidCache = PidCache()
     connection = pymysql.connect(**DB_CONFIG)
     cursor = connection.cursor()
 
@@ -48,6 +68,10 @@ def scan_directory(root_path, volume_name):
             # 부모 디렉터리 이름
             parent_dir_name = os.path.basename(os.path.dirname(current_path))
 
+            if '$RECYCLE.BIN' in current_path or 'System Volume Information' in current_path:
+                continue
+
+            parent_pid = pidCache.get(os.path.basename(current_path))
             # 디렉터리 처리
             for dir_name in dirs:
                 full_path = os.path.join(current_path, dir_name)
@@ -57,13 +81,13 @@ def scan_directory(root_path, volume_name):
                     
                 path = full_path[len(root_path):].replace('\\','/')  # 디스크명 제거
                 last_modified = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-                
                 data = (
                     current_id, volume_name, 'D', path, None, dir_name, parent_dir_name, None, None, None, None, last_modified, parent_pid, parent_pid
                 )
+                pidCache.add(dir_name, current_id)
                 insert_to_db(cursor, data)
-                parent_pid = current_id  # 현재 디렉터리 ID를 부모로 설정
                 current_id += 1  # ID 증가
+            
 
             # 파일 처리
             for file_name in files:
@@ -81,6 +105,7 @@ def scan_directory(root_path, volume_name):
                 )
                 insert_to_db(cursor, data)
                 current_id += 1  # ID 증가
+            pidCache.removeById(parent_pid) # 부모 폴더 ID 삭제
 
         # 변경사항 저장
         connection.commit()

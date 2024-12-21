@@ -24,7 +24,7 @@
             "console": "integratedTerminal",
             "cwd" : "${fileDirname}",
             "justMyCode": false,
-            "args" : ["F", "영화29"]
+            "args" : ["G", "영화30"]
 
             // "env": {"PYTHONPATH": "${workspaceFolder}"}       
         },
