@@ -10,7 +10,7 @@
 - localhost나 알려진 IP로 접속시에만 서비스를 제공함
 - 기본포트를 8088로 함
 
-# 실행
+## 실행
 
 ```shell
 pip install -r requirements.txt
@@ -18,7 +18,7 @@ export KALPADB_API_MODE=local
 uvicorn app.main:app --reload
 ```
 
-# JSKN에 배포
+## JSKN에 배포
 
 1. kalpadb-api폴더로 이동
 2. .env.real 확인
@@ -72,7 +72,4 @@ movieCd=2024A442
 &key=xxx
 ```
 
-##
-
-- TODO:  movies search_text 넣기
 -
