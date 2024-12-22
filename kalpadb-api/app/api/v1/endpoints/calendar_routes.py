@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import APIRouter, Depends
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -22,6 +23,15 @@ async def insert_calendars(
 async def get_calendars(yyyymm: str, db: AsyncSession = Depends(get_session)):
     ''' 일정 목록 조회 '''
     service = CalendarService(db)
-    return await service.get_1month_calendars(yyyymm)
+    response =  await service.get_1month_calendars(yyyymm)
+
+    # 몇개의 날짜에 대해서 음력 날짜를 구해야 함
+    extutil_service = extutil_service.ExtUtilService(db)
+
+    sol_array = yyyymm+"01"|yyyymm+"07"|yyyymm+"15"|yyyymm+"25"
+    sol_array = sol_array + "|" + extutil_service.last_yyyymmdd(yyyymm)
+
+    sol_lun_array = extutil_service.sol2lun_array(response)
+
 
 

@@ -21,7 +21,7 @@ class CalendarBase(BaseModel):
             raise ValueError("gubun must be one of 'H', 'E', 'Y', 'M'")
         return value
 
-# gubun H: Holiday, E: Event, Y: PeriadYear, M: PeriadMonth
+# gubun H: Holiday, E: Event, Y: PeriadYear, M: PeriadMonth, L: Lunar
 
 
 class CalendarRequest(CalendarBase):

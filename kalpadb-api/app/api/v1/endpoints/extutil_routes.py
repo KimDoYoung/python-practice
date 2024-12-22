@@ -28,10 +28,15 @@ from fastapi import APIRouter, HTTPException
 from bs4 import BeautifulSoup
 import requests as http_requests
 
+from app.core.database import get_session
 from app.core.util import extract_nouns
 from app.domain.extutil.extutil_schema import SolarLunarResponse, TextRequest
 from app.core.logger import get_logger
+from app.domain.extutil.extutil_service import ExtUtilService
 from app.domain.extutil.kofic.kofic_schema import KoficDetailResponse, KoficErrorResponse, KoficSearchResponse
+from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import Depends
+
 
 logger = get_logger(__name__)
 
@@ -113,14 +118,11 @@ def solYmd2lunYmd(solYmd):
     return lunarDate
 
 @router.get("/sol2lun/{ymd_list}", summary="양력->음력으로 변환", response_model=List[SolarLunarResponse])
-def sol2lun(ymd_list: str)->List[str]:
+def sol2lun(ymd_list: str, db: AsyncSession = Depends(get_session))->List[str]:
     ''' 양력 날짜를 음력으로 변환하여 반환합니다. ymd_list ymd|ymd... 형식 '''
     ymd_array = ymd_list.split('|')
-    lunYmdArray = []
-    for solYmd in ymd_array:
-        lunYmd = solYmd2lunYmd(solYmd)
-        sol_lun_response = SolarLunarResponse(solYmd=solYmd, lunYmd=lunYmd)
-        lunYmdArray.append(sol_lun_response)
+    extutil_service = ExtUtilService(db)
+    lunYmdArray = extutil_service.sol2lun_array(ymd_array)
     return lunYmdArray
 
 @router.get("/kofic/movie/search", summary="영화진흥위원회(KOFIC)에서 제목으로영화리스트 찾기", response_model=Union[KoficSearchResponse, KoficErrorResponse])
@@ -172,7 +174,7 @@ def kofic_movie_detail(movieCd: str):
         response.raise_for_status()
         data = response.json()
         # 데이터 예쁘게 출력
-        print(json.dumps(data, indent=4, ensure_ascii=False))
+        logger.debug(json.dumps(data, indent=4, ensure_ascii=False))
         # 정상 응답 처리
         try:
             result = KoficDetailResponse(**data)
