@@ -6,13 +6,17 @@
     -  /hanja : 네이버 한자 사전에서 한자 리스트를 가져오는 기능
     -  /extract/words : 텍스트를 받아서 명사만 추출하는 기능
     -  /sol2lun/{ymd_list} : 양력->음력으로 변환하는 기능
+    
 
 작성자: 김도영
 작성일: 2024-12-07
 버전: 1.0
 """
-from typing import List
+import json
+import os
+from typing import List, Union
 from korean_lunar_calendar import KoreanLunarCalendar
+from pydantic import ValidationError
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
@@ -22,10 +26,12 @@ from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from fastapi import APIRouter, HTTPException
 from bs4 import BeautifulSoup
+import requests as http_requests
 
 from app.core.util import extract_nouns
 from app.domain.extutil.extutil_schema import SolarLunarResponse, TextRequest
 from app.core.logger import get_logger
+from app.domain.extutil.kofic.kofic_schema import KoficDetailResponse, KoficErrorResponse, KoficSearchResponse
 
 logger = get_logger(__name__)
 
@@ -116,3 +122,68 @@ def sol2lun(ymd_list: str)->List[str]:
         sol_lun_response = SolarLunarResponse(solYmd=solYmd, lunYmd=lunYmd)
         lunYmdArray.append(sol_lun_response)
     return lunYmdArray
+
+@router.get("/kofic/movie/search", summary="영화진흥위원회(KOFIC)에서 제목으로영화리스트 찾기", response_model=Union[KoficSearchResponse, KoficErrorResponse])
+def kofic_movie_search(query: str, year: str = '') -> KoficSearchResponse:
+    ''' 영화진흥위원회(KOFIC)에서 주어진 검색어로 영화를 찾아 반환합니다. '''
+    url = f"https://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieList.json"
+# &movieNm=%ED%86%A0%ED%83%88
+# &curPage=1
+# &itemPerPage=100 
+# &prdtStartYear=2021   
+    KOFIC_API_KEY = os.getenv("KOFIC_API_KEY")
+    url += f"?key={KOFIC_API_KEY}"
+    if year:
+        url += f"&movieNm={query}&prdtStartYear={year}"
+    else:
+        url += f"&movieNm={query}"
+    url += "&curPage=1&itemPerPage=100"
+    try:
+        # API 호출
+        response = http_requests.get(url)
+        response.raise_for_status()
+        data = response.json()
+        print(json.dumps(data, indent=4, ensure_ascii=False))
+        # 정상 응답 처리
+        try:
+            result = KoficSearchResponse(**data)
+            return result
+        except ValidationError as e:
+            # 오류 응답 처리
+            error_response = KoficErrorResponse(**data)
+            return error_response
+    except http_requests.RequestException as e:
+        # HTTP 요청 실패 시 FastAPI 예외로 변환
+        raise HTTPException(status_code=500, detail=f"API 요청 실패: {e}")
+    except ValidationError as e:
+        # 데이터 파싱 실패 시 FastAPI 예외로 변환
+        raise HTTPException(status_code=400, detail=f"데이터 파싱 오류: {e}")
+
+@router.get("/kofic/movie/detail/{movieCd}", summary="영화진흥위원회(KOFIC)에서 영화 상세정보 찾기", response_model=Union[KoficDetailResponse, KoficErrorResponse])
+def kofic_movie_detail(movieCd: str):
+    ''' 영화진흥위원회(KOFIC)에서 주어진 영화코드로 영화 상세정보를 찾아 반환합니다. '''
+    url = f"http://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieInfo.json"
+    KOFIC_API_KEY = os.getenv("KOFIC_API_KEY")
+    url += f"?key={KOFIC_API_KEY}"
+    url += f"&movieCd={movieCd}"
+    try:
+        # API 호출
+        response = http_requests.get(url)
+        response.raise_for_status()
+        data = response.json()
+        # 데이터 예쁘게 출력
+        print(json.dumps(data, indent=4, ensure_ascii=False))
+        # 정상 응답 처리
+        try:
+            result = KoficDetailResponse(**data)
+            return result
+        except ValidationError as e:
+            # 오류 응답 처리
+            error_response = KoficErrorResponse(**data)
+            return error_response
+    except http_requests.RequestException as e:
+        # HTTP 요청 실패 시 FastAPI 예외로 변환
+        raise HTTPException(status_code=500, detail=f"API 요청 실패: {e}")
+    except ValidationError as e:
+        # 데이터 파싱 실패 시 FastAPI 예외로 변환
+        raise HTTPException(status_code=400, detail=f"데이터 파싱 오류: {e}")

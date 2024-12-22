@@ -53,6 +53,26 @@ group by A.ymd, A.summary, A.content
 order by A.ymd
 ```
 
+## 영화진흥회(KOFIC) 에서 영화목록찾기
+
+-제목으로 영화찾기
+
+```text
+https://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieList.json?key=xxx
+&movieNm=%ED%86%A0%ED%83%88
+&curPage=1
+&itemPerPage=100
+```
+
+- 상세정보
+
+```text
+http://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieInfo.json?
+movieCd=2024A442
+&key=xxx
+```
+
 ##
+
 - TODO:  movies search_text 넣기
-- 
+-
