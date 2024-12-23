@@ -18,7 +18,7 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 # 소스 코드 복사
-COPY kind_scrapy.py .
+COPY kindscrap.py .
 
 # tmp와 data 폴더 생성
 RUN mkdir -p tmp data
