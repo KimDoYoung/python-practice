@@ -38,7 +38,8 @@ def create_sqlite_db(frdate, todate):
     # 날짜 형식 변환 및 DB 이름 지정
     frdate = frdate.replace("-", "")
     todate = todate.replace("-", "")
-    db_name = f"kindscrap_{frdate}_{todate}.sqlite3"
+    os.makedirs("data", exist_ok=True)
+    db_name = f"data/kindscrap_{frdate}_{todate}.sqlite3"
 
     # 데이터베이스 연결
     conn = sqlite3.connect(db_name)
