@@ -23,7 +23,7 @@ def create_sqlite_db(frdate, todate):
     """
     # 테이블 생성 SQL
     create_table_sql = """
-    CREATE TABLE IF NOT EXISTS kind_gosi (
+    CREATE TABLE IF NOT EXISTS kind_ca (
         cd TEXT PRIMARY KEY,
         title TEXT,
         company_name TEXT,
@@ -31,8 +31,8 @@ def create_sqlite_db(frdate, todate):
         chechulin TEXT,
         uploader TEXT,
         stkcode TEXT,
-        content TEXT,
-        insert_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        insert_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        content TEXT
     )
     """
     # 날짜 형식 변환 및 DB 이름 지정
@@ -42,7 +42,7 @@ def create_sqlite_db(frdate, todate):
 
     # 데이터베이스 연결
     conn = sqlite3.connect(db_name)
-
+ 
     # 테이블 생성
     try:
         conn.execute(create_table_sql)
@@ -57,12 +57,12 @@ def create_sqlite_db(frdate, todate):
 
 def is_exists_in_table(conn, cd):
     """
-    주어진 cd 값이 kind_gosi 테이블에 존재하는지 확인
+    주어진 cd 값이 kind_ca 테이블에 존재하는지 확인
     :param conn: SQLite 연결 객체
     :param cd: 확인할 cd 값
     :return: 이미 존재하면 True, 아니면 False
     """
-    query = "SELECT 1 FROM kind_gosi WHERE cd = ? LIMIT 1"
+    query = "SELECT 1 FROM kind_ca WHERE cd = ? LIMIT 1"
     cursor = conn.cursor()
     cursor.execute(query, (cd,))
     result = cursor.fetchone()
@@ -70,14 +70,14 @@ def is_exists_in_table(conn, cd):
 
 def insert_to_table(conn, dict_data, content):
     """
-    kind_gosi 테이블에 데이터를 삽입
+    kind_ca 테이블에 데이터를 삽입
     :param conn: SQLite 연결 객체
     :param data: 딕셔너리 형태의 데이터
                 {"key": key, "title": title, "cd": cd, "company_name": company_name, "date_time": date_time, "chechulin": chechulin, "uploader": uploader, "stkcode": stkcode}
     """
     # SQL 삽입 명령
     insert_sql = """
-    INSERT OR IGNORE INTO kind_gosi (cd, title, company_name, date_time, chechulin, uploader, stkcode, content)
+    INSERT OR IGNORE INTO kind_ca (cd, title, company_name, date_time, chechulin, uploader, stkcode, content)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     """
     
@@ -144,7 +144,7 @@ def getGoSiList(frDate, toDate, pageIndex):
     data = {
     "method": "searchDetailsSub",
     "currentPageSize": 100,
-    "pageIndex": 1,
+    "pageIndex": pageIndex,
     "orderMode": 1,
     "orderStat": "D",
     "forward": "details_sub",
@@ -204,12 +204,6 @@ def getGoSiList(frDate, toDate, pageIndex):
     now = datetime.now()
     timestamp = now.strftime("%Y%m%d_%H%M%S")
 
-    # 파일 이름 생성
-    file_name = f"tmp/list_page{pageIndex}_{timestamp}.html"
-
-    # 파일에 저장
-    with open(file_name, "w", encoding="utf-8") as file:
-        file.write(response.text)
     # 요청 결과 확인
     if response.status_code != 200:
         print(f"요청 실패! 상태 코드: {response.status_code}")
@@ -233,7 +227,8 @@ def getGoSiList(frDate, toDate, pageIndex):
         # <a href="#viewer"> 태그에서 title과 cd 추출
         a_tag = tr.find("a", href="#viewer")
         if a_tag:
-            title = a_tag.get("title", "").strip()
+            td_tag = a_tag.find_parent("td")
+            title = td_tag.get_text(strip=True)
             onclick_value = a_tag.get("onclick", "")
 
             # onclick에서 '20241220000050' 형식의 cd 값 추출
@@ -268,6 +263,14 @@ def getGoSiList(frDate, toDate, pageIndex):
         match = re.search(r"/\s*(\d+)", info_div.get_text())
         total_page_count = int(match.group(1)) if match else 0
 
+    # 파일 이름 생성
+    file_name = f"tmp/list_page_{pageIndex}_{timestamp}.html"
+
+    # 파일에 저장
+    with open(file_name, "w", encoding="utf-8") as file:
+        for item in result_list:
+            s = ", ".join(f"{key}={value}" for key, value in item.items())
+            file.write(s+"\n")
     # 최종 결과 반환
     return {
         "total_count": total_count,
@@ -380,7 +383,7 @@ def fetch_iframe_content(conn, dict_data): # key, cd, title
 
         # Step 5: 파일로 저장
         os.makedirs("data", exist_ok=True)
-        file_path = f"data/{key}.html"
+        file_path = f"data/{key}_{cd}.html"
         comment = f"<!-- title: {title} -->\n"
         comment = comment + f"<!-- company info: {company_info} -->\n"
         iframe_content = comment + iframe_content
@@ -411,9 +414,9 @@ def main(frdate, todate, page_index):
 
             # fetchDetail 호출
             for item in data["list"]:
-                # fetchDetailWithSession(item["key"], item["cd"])
-                # fetch_iframe_content(item["key"], item["cd"], item["title"])
-                fetch_iframe_content(conn, item)
+                # 이미 테이블에 존재하는지 확인 없는 경우만 상세 페이지를 가져와서 db에 넣는다.
+                if not is_exists_in_table(conn, item["cd"]):
+                    fetch_iframe_content(conn, item)
 
             page_index += 1
             if page_index > data["total_page_count"]:
@@ -427,10 +430,8 @@ def main(frdate, todate, page_index):
     else:
         data = getGoSiList(frdate, todate, int(page_index))
 
-        # fetchDetail 호출
-        for item in data["list"]:
-            # fetchDetailWithSession(item["key"], item["cd"])
-            # fetch_iframe_content(item["key"], item["cd"], item["title"])
+        # 이미 테이블에 존재하는지 확인 없는 경우만 상세 페이지를 가져와서 db에 넣는다.
+        if not is_exists_in_table(conn, item["cd"]):
             fetch_iframe_content(conn, item)
 
         result_file_name = f"tmp/list_result_{page_index}_{timestamp}.txt"
