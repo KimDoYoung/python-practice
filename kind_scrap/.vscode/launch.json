@@ -6,7 +6,7 @@
         "console":"externalTerminal",
         "cwd" : "${fileDirname}",
         "env": {"PYTHONPATH": "${workspaceFolder}"},
-        "args": ["2024-11-20", "2024-12-20","all"]
+        "args": ["2024-12-14", "2024-12-14","1"]
     },
 
     ]

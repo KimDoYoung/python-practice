@@ -431,8 +431,9 @@ def main(frdate, todate, page_index):
         data = getGoSiList(frdate, todate, int(page_index))
 
         # 이미 테이블에 존재하는지 확인 없는 경우만 상세 페이지를 가져와서 db에 넣는다.
-        if not is_exists_in_table(conn, item["cd"]):
-            fetch_iframe_content(conn, item)
+        for item in data["list"]:
+            if not is_exists_in_table(conn, item["cd"]):
+                fetch_iframe_content(conn, item)
 
         result_file_name = f"tmp/list_result_{page_index}_{timestamp}.txt"
         os.makedirs("tmp", exist_ok=True)
@@ -446,6 +447,7 @@ def main(frdate, todate, page_index):
 
 if __name__ == "__main__":
     import sys
+    driver = None  # driver 선언 (예외 처리 대비)
     if len(sys.argv) != 4:
         print("사용법: python kindscrap.py <frdate> <todate> <page_index>")
         print("\texample 1페이지: python kindscrap.py 2024-11-20 2024-12-20 1")
@@ -453,6 +455,12 @@ if __name__ == "__main__":
     else:
         frdate, todate, page_index = sys.argv[1], sys.argv[2], sys.argv[3]
         try:
+            # stdout을 파일로 리디렉션
+            os.makedirs("tmp", exist_ok=True)
+            log_file_name = f"tmp/kind_scrap_{frdate}_{todate}_{page_index}.log"
+            log_file = open(log_file_name, "w", encoding="utf-8")
+            sys.stdout = log_file
+            
             print("--------------------------------------------------")
             print("Kind Scrap Start")
             print("--------------------------------------------------")
@@ -461,6 +469,10 @@ if __name__ == "__main__":
             if driver:
                 driver.quit()    
                 print("Closing WebDriver")
-                print("--------------------------------------------------")
-                print("Kind Scrap End")
-                print("--------------------------------------------------")
+            # stdout 복원 및 파일 닫기
+            print("--------------------------------------------------")
+            print("Kind Scrap End")
+            print("--------------------------------------------------")
+            sys.stdout = sys.__stdout__
+            log_file.close()
+                    
