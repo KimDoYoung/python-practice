@@ -4,13 +4,17 @@ FROM python:3.12.2-slim
 # 작업 디렉토리 설정
 WORKDIR /app
 
-# 필수 시스템 패키지 설치 (Chrome 설치)
+# 필수 시스템 패키지 설치
 RUN apt-get update && apt-get install -y \
     wget \
     unzip \
     curl \
-    chromium \
+    gnupg \
     --no-install-recommends && \
+    # Google Chrome 설치
+    wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
+    echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list && \
+    apt-get update && apt-get install -y google-chrome-stable && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Python 패키지 설치
