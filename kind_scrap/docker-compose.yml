@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  kindscrap:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./tmp:/app/tmp  # tmp 폴더를 로컬과 컨테이너에서 공유
+      - ./data:/app/data  # data 폴더를 로컬과 컨테이너에서 공유
+    environment:
+      - PYTHONUNBUFFERED=1  # 실시간 로그 출력을 위해 버퍼링 비활성화
+    container_name: kindscrap_app
