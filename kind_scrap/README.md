@@ -15,8 +15,17 @@ python kind_scrap.py 2024-12-13 2024-12-13 1
 python kind_scrap.py 2024-12-15 2024-12-23 all 
 ```
 
+- page_index는 all 또는 page_index 번호임
+
 ## 생성파일들
 
 - scrapping결과는 data폴더하위에 각각의 cd로 생성됨
-- scrap되는 데이터는 kindscrp_<start day>_<end day>.sqlite3 파일에 sqlite3 database로  저장됨
+- scrap되는 데이터는 data 폴더 하위에 kindscrp_<start day>_<end day>.sqlite3 파일에 sqlite3 database로  저장됨
 - tmp에 각 페이지의 공시 목록이 저장됨
+
+## docker에 올려서 사용가능
+
+```shell
+- docker-compose up --build -d
+- ./run_kindscrap.sh <start day> <end day> <page_index>
+```
