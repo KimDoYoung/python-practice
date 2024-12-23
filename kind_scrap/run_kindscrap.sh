@@ -15,4 +15,4 @@ if [ -z "$start_day" ] || [ -z "$end_day" ] || [ -z "$page_index" ]; then
 fi
 
 # Docker 컨테이너 실행 명령
-docker exec -it kindscrap_app python kindscrap.py.py "$start_day" "$end_day" "$page_index"
+docker exec -it kindscrap_app python kindscrap.py "$start_day" "$end_day" "$page_index"
