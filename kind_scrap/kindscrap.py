@@ -31,8 +31,9 @@ def create_sqlite_db(frdate, todate):
         chechulin TEXT,
         uploader TEXT,
         stkcode TEXT,
-        insert_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        content TEXT
+        content TEXT,
+        textonly TEXT,
+        insert_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """
     # 날짜 형식 변환 및 DB 이름 지정
@@ -69,7 +70,7 @@ def is_exists_in_table(conn, cd):
     result = cursor.fetchone()
     return result is not None
 
-def insert_to_table(conn, dict_data, content):
+def insert_to_table(conn, dict_data, content, textonly):
     """
     kind_ca 테이블에 데이터를 삽입
     :param conn: SQLite 연결 객체
@@ -78,8 +79,8 @@ def insert_to_table(conn, dict_data, content):
     """
     # SQL 삽입 명령
     insert_sql = """
-    INSERT OR IGNORE INTO kind_ca (cd, title, company_name, date_time, chechulin, uploader, stkcode, content)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT OR IGNORE INTO kind_ca (cd, title, company_name, date_time, chechulin, uploader, stkcode, content,textonly)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     """
     
     try:
@@ -93,7 +94,9 @@ def insert_to_table(conn, dict_data, content):
             dict_data["chechulin"],
             dict_data["uploader"],  # 딕셔너리에서 uploader 직접 사용
             dict_data["stkcode"],    # 딕셔너리에서 stkcode 직접 사용
-            content
+            content,
+            textonly
+            
         ))
         conn.commit()
         print(f"Inserted: {dict_data['cd']}")
@@ -388,11 +391,14 @@ def fetch_iframe_content(conn, dict_data): # key, cd, title
         comment = f"<!-- title: {title} -->\n"
         comment = comment + f"<!-- company info: {company_info} -->\n"
         iframe_content = comment + iframe_content
-        with open(file_path, "w", encoding="utf-8") as file:
-            file.write(iframe_content)
+        
+        # with open(file_path, "w", encoding="utf-8") as file:
+        #     file.write(iframe_content)
+        textonly = BeautifulSoup(iframe_content, 'html.parser').get_text(strip=True)
+        cleaned_text = " ".join(textonly.split())
             
         if not is_exists_in_table(conn, cd):
-            insert_to_table(conn, dict_data, iframe_content)
+            insert_to_table(conn, dict_data, iframe_content, cleaned_text)
         print(f"SUCCESS-{key}-{cd}: iframe 내용이 {file_path}에 저장되었습니다.")
     except Exception as e:
         print(f"FAIL-{key}-{cd}: iframe 내용을 가져오는 중 오류 발생 - {e}")
