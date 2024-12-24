@@ -27,7 +27,7 @@ uvicorn main:app --reload
 arduino
 코드 복사
 ├── backend/
-│   ├── app/
+│   ├── app/    
 │   ├── models/
 │   ├── tests/
 ├── frontend/

@@ -482,4 +482,3 @@ if __name__ == "__main__":
             print("--------------------------------------------------")
             sys.stdout = sys.__stdout__
             log_file.close()
-                    
