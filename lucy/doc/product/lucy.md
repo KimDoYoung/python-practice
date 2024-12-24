@@ -6,6 +6,8 @@ OMS(주문관리시스템)을 추구하면서 개발되었으며 개발코드명
 AssetERP에 추가되는 형식으로 프로젝트가 계획되었으므로 공식적인 명칭은 갖고 있지 않습니다.
 이하 **Lucy**라는 명칭을 사용합니다.
 
+※ 본 문서는 2024.12에 작성 됨
+
 ## 1.2 프로젝트이 기간과 투입인원
 
 기간 : 2024.3.1 ~ 2024.12.31
@@ -75,6 +77,7 @@ Lucy는 아래와 같은 기술적 특징을 갖고 있습니다.
    2. [38커뮤니케이션](https://www.38.co.kr/) 사이트 scrapping IPO정보 취득
 5. [JWT](https://ko.wikipedia.org/wiki/JSON_%EC%9B%B9_%ED%86%A0%ED%81%B0) 인증
 6. 웹소켓 : 체결정보를 서버로부터 수신하기 위하여 사용됨
+7. 자체적인 스케줄러를 갖고 있슴
 
 ## 2.1 백엔드 기술 (Backend)
 
@@ -119,8 +122,92 @@ Lucy는 아래와 같은 기술적 특징을 갖고 있습니다.
       - Lucy에서는 권한에 따른 기능 제한은 없습니다.
 
 2. Router 모듈들
-   1. 
+   1.
 3. Db Service 모듈들
 4. Api Service 모듈
 5. Websocket 모듈들
 6. Scheduler
+
+### 디렉토리 구조
+
+- Lucy는 backend와 frontend를 모두 가지고 있습니다.
+- backend는 backend폴더에, frontend는 frontend 폴더 하위에 존재합니다.
+- backend의 특징
+  - backend는 Restful api 서버와 같이 동작합니다
+  - page url에 대해서 jinja2를 이용하여 페이지를 rendering해서 html을 보내줍니다.
+  - backend 디렉토리 구조
+
+```text
+|-- backend
+|   |-- app
+|   |   |-- api
+|   |   |   `-- v1
+|   |   |       `-- endpoints
+|   |   |-- background
+|   |   |   `-- jobs
+|   |   |-- core
+|   |   |   `-- exception
+|   |   |-- domains
+|   |   |   |-- ipo
+|   |   |   |-- judal
+|   |   |   |-- stc
+|   |   |   |   |-- kis
+|   |   |   |   |   `-- model
+|   |   |   |   `-- ls
+|   |   |   |       `-- model
+|   |   |   |-- system
+|   |   |   `-- user
+|   |   |-- managers
+|   |   `-- utils
+```
+
+- backend 각 폴더의 설명
+  - app/api/v1/endposts : router들 즉 Restful api 서버와 같이 url,method에 대한 서비스제공
+  - app/api/background : 스케줄러가 호출하는 프로그램들
+  - app/api/core : middleware, logger, exception등
+  - app/api/domain : router가 사용하는 service 및 model 들 (DTO)
+  - app/api/managers : websocket manager들
+  
+- frontend의 특징
+  - template 엔진으로 handlebar를 사용
+  - javascript 자체의 fetch함수를 사용
+  - bootstrap5 css library의 사용
+  - jquery 사용
+  
+- frontend 디렉토리 구조
+
+```text
+`-- frontend
+    |-- public
+    |   |-- css
+    |   |-- images
+    |   `-- js
+    |       `-- kis
+    `-- views
+        |-- common
+        |-- handlebar
+        |   |-- kis
+        |   |-- ls
+        |   `-- mystock
+        `-- template
+            |-- config
+            |-- danta
+            |-- ipo
+            |-- judal
+            |-- kis
+            |-- ls
+            |-- mystock
+            |-- scheduler
+            `-- user
+```
+
+- frontend 각 폴더의 설명
+  - public : static 파일들 즉 javascript, css, image 들 보관
+  - views/common : nav.html등 공통 화면
+  - handlebar : client에서 data와 함께 rendering 되어야할 handlebar script들
+  - templates : server side에서 rendering되어야 할 페이지들
+
+- 기타 폴더들
+  - doc : 관련 문서들
+  - data: 산출되는 data들
+  - data/judal : judal사이트에서 scrapping한 파일들을 날짜별로 보관
