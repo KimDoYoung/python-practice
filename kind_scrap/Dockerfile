@@ -23,7 +23,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # 소스 코드 복사
 COPY kindscrap.py .
-
+COPY fill_textonly.py .
 # tmp와 data 폴더 생성
 RUN mkdir -p tmp data
 

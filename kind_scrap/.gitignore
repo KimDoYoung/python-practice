@@ -1,3 +1,4 @@
 *.html
 list_*.txt
 *.sqlite3  
+kind*.txt
