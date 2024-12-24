@@ -6,6 +6,9 @@
     -  /hanja : 네이버 한자 사전에서 한자 리스트를 가져오는 기능
     -  /extract/words : 텍스트를 받아서 명사만 추출하는 기능
     -  /sol2lun/{ymd_list} : 양력->음력으로 변환하는 기능
+    -  /kofic/movie/search : 영화진흥위원회(KOFIC)에서 영화 검색하는 기능
+    -  /kofic/movie/detail/{movieCd} : 영화진흥위원회(KOFIC)에서 영화 상세정보 검색하는 기능
+    -  /emoji/search/{keyword} : 이모지 사이트에서 이모지 검색하는 기능
     
 
 작성자: 김도영
@@ -14,7 +17,7 @@
 """
 import json
 import os
-from typing import List, Union
+from typing import Dict, List, Union
 from korean_lunar_calendar import KoreanLunarCalendar
 from pydantic import ValidationError
 from selenium import webdriver
@@ -36,6 +39,8 @@ from app.domain.extutil.extutil_service import ExtUtilService
 from app.domain.extutil.kofic.kofic_schema import KoficDetailResponse, KoficErrorResponse, KoficSearchResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends
+
+from app.domain.extutil.scrap_service import ScrapService
 
 
 logger = get_logger(__name__)
@@ -189,3 +194,11 @@ def kofic_movie_detail(movieCd: str):
     except ValidationError as e:
         # 데이터 파싱 실패 시 FastAPI 예외로 변환
         raise HTTPException(status_code=400, detail=f"데이터 파싱 오류: {e}")
+
+
+@router.get("/emoji/search/{keyword}", summary="이모지site에서 이모지 찾기", response_model=Dict[str, str])
+def emoji_search(keyword: str):
+    service = ScrapService()
+    result = service.fetch_emojis_with_labels(keyword)
+    logger.debug(result)
+    return result
