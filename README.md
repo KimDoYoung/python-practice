@@ -17,18 +17,20 @@
 5. merian : 키보드 관리
    1. 기술스택
       1. FastAPI
-      2. SQLAlchemy : async 
-      3. jinja2, handlebar 
-      4. Postgresql 
+      2. SQLAlchemy : async
+      3. jinja2, handlebar
+      4. Postgresql
       5. tailwindcss
 6. joanna : RESTful방식의 주식매매 연습
 7. sofia : Web app - 이미지보기
 8. pytest-test : pytest로 mock 연습
 9. lucy : 자동단타머신
-10. stock-api : multi user, multi account 주식거래 
+10. stock-api : multi user, multi account 주식거래
 11. movie_review : kalpadb의 movie_review의 내요을 html로 뽑아냄
 12. kalpadb-api : kalpadb mariadb를 위한 fastapi restful api service
 13. login-scrap : LS증권, KIS증권 로그인해서 scrapping
 14. asset-api : asset erp 용 법률정보 서비스를 위한 fastapi restful api
-15. ipo-scheduler :  lucy에서 ipo 달력과 상세를 떼어내어서 jskn에서 서비스 
+15. ipo-scheduler :  lucy에서 ipo 달력과 상세를 떼어내어서 jskn에서 서비스
 16. kalpadb-util: hdd 쭉 순회하면서 파일명을 kalpadb hdd에 넣는다.
+17. srt_trans : 영화 영어 srt파일을 한글로 변환하는 유틸리티
+18. kind_scrap : kind site에서 공시정보 scrapping
