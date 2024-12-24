@@ -96,7 +96,8 @@ def get_hanja_list(query: str):
                     hanja_list.append(anchor.text.strip())
 
         return {"query": query, "hanja_list": hanja_list}
-
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
     finally:
         # WebDriver 종료
         driver.quit()

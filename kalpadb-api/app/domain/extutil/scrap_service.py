@@ -25,7 +25,7 @@ class ScrapService:
             emojis_wrapper = soup.find('div', class_='EmojisList_emojis-list-wrapper__A8gKQ')
             if not emojis_wrapper:
                 logger.error("이모지 리스트를 포함한 적합한 div를 찾을 수 없습니다.")
-                return []
+                return {}
 
             # aria-label을 가진 a 태그 검색
             emoji_dict = {}
