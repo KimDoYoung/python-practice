@@ -119,6 +119,7 @@ Lucy는 아래와 같은 기술적 특징을 갖고 있습니다.
       - Lucy에서는 권한에 따른 기능 제한은 없습니다.
 
 2. Router 모듈들
+   1. 
 3. Db Service 모듈들
 4. Api Service 모듈
 5. Websocket 모듈들
