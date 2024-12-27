@@ -1,4 +1,4 @@
-/data
-/tmp
+data/
+tmp/
 *.sqlite3
 *.log
