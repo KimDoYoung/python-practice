@@ -50,20 +50,23 @@ class JangbiService:
         jangbi_id = request.id
         if jangbi_id:
             # 기존 데이터 확인
-            existing_jangbi = await self.get_jangbi_by_id(jangbi_id)
-            if existing_jangbi:
-                # 업데이트 수행
-                existing_jangbi.ymd = request.ymd
-                existing_jangbi.item = request.item
-                existing_jangbi.location = request.location
-                existing_jangbi.cost = request.cost
-                existing_jangbi.spec = request.spec
-                existing_jangbi.lvl = request.lvl
+            existing_jangbi = await self.db.get(Jangbi, jangbi_id)  # ORM 객체 가져오기
+            if not existing_jangbi:
+                raise ValueError(f"ID {jangbi_id}에 해당하는 장비를 찾을 수 없습니다.")
 
-                await self.db.commit()
-                await self.db.refresh(existing_jangbi)
-                return existing_jangbi
+            # ORM 객체 필드 업데이트
+            existing_jangbi.ymd = request.ymd
+            existing_jangbi.item = request.item
+            existing_jangbi.location = request.location
+            existing_jangbi.cost = request.cost
+            existing_jangbi.spec = request.spec
+            existing_jangbi.lvl = request.lvl
+            existing_jangbi.modify_dt = func.now()
 
+            # 데이터베이스 커밋 및 동기화
+            await self.db.commit()
+            await self.db.refresh(existing_jangbi)
+            return JangbiResponse.model_validate(existing_jangbi)
         # 존재하지 않으면 새로 생성
         new_jangbi = Jangbi(
             ymd=request.ymd,
