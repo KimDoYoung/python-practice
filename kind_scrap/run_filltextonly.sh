@@ -8,9 +8,10 @@ sqlite3_db_file_name=$1
 
 # 인자 확인
 if [ -z "$sqlite3_db_file_name" ] ; then
-  echo "Usage: $0 <sqlite3_db_file_name>"
-  echo "\texample: $0 kindscrap_20241214_20241214.sqlite3"
-  exit 1
+    echo "Usage: $0 <sqlite3_db_file_name>"
+    echo "인자로 받은 sqlitedb의 kind_ca테이블에 textonly 필드추가 및 채우기"  
+    echo "example: $0 kindscrap_20241214_20241214.sqlite3"
+    exit 1
 fi
 
 # Docker 컨테이너 실행 명령
