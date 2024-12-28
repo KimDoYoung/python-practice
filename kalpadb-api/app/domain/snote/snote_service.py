@@ -64,7 +64,10 @@ class SNoteService:
         if not snote:
             raise NoResultFound(f"SNote with ID {snote_id} not found")
         
-        snote.update(snote_data.model_dump())
+        # Pydantic 모델 데이터를 SQLAlchemy 객체에 할당
+        for key, value in snote_data.model_dump().items():
+            setattr(snote, key, value)
+
         await self.db.commit()
         await self.db.refresh(snote)
         return SNoteResponse.model_validate(snote)
