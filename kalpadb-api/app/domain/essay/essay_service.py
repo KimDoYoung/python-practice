@@ -34,7 +34,7 @@ class EssayService:
                 func.coalesce(Essay.lastmodify_dt, Essay.create_dt)
             ).desc()
         )
-        stmt = stmt.offset(request.start_index).limit(request.limit)
+        stmt = stmt.offset(request.start_index).limit(request.limit+1)
         
         # 쿼리 실행
         result = await self.db.execute(stmt)
@@ -60,13 +60,15 @@ class EssayService:
 
         # ORM 모델을 Pydantic 응답 모델로 변환
         return EssayListResponse(
-            essays=[
+            list=[
                 EssayResponse.model_validate(essay) if not request.title_only else EssayResponse(**essay)
                 for essay in essays
             ],
             exists_next=exists_next,
             last_index=request.start_index + len(essays) - 1,
-            data_count=len(essays)
+            data_count=len(essays),
+            page_size=request.limit,
+            start_index = request.start_index
         )    
 
     async def upsert_essay(self, request: EssayUpsertRequest) -> EssayResponse:
