@@ -306,7 +306,7 @@ config = Config()
 ```
 
 - 각 서비스는 KIS에서 제공하는 문서에 따른 서비스를 호출하기 위해 header와 params또는 data를 설정한 후 send_request를  호츨하는 것으로 구현했습니다.
-- 아래는 stk_code를 인자로 하는 현재가를 구하는  함수의 예 입니다.
+- 아래는 stk_code를 인자로 하는 [현재가를 구하는  함수](https://apiportal.koreainvestment.com/apiservice/apiservice-domestic-stock-quotations2#L_07802512-4f49-4486-91b4-1050b6f5dc9d)의 예 입니다.
 
 ```python
     async def current_cost(self, stk_code:str) -> InquirePrice_Response:
@@ -329,8 +329,17 @@ config = Config()
         except ValidationError as e:
             raise HTTPException(status_code=500, detail=f"받은 json 파싱 오류: {e}")    
 ```
-- 사용방법
-  - 
 
-- api의 추가방법
+- 사용방법
+
+  ```python
+    kis_api = await StockApiManager().kis_api()
+    cost = await kis_api.get_current_price(stk_code) 
+  ```
+
+### 3.5 LS 증권 api
+
+- LS증권의 제공되는 API를 사용하기 위해서 KIS와 유사하게 LsStockApi class가 작성되었습니다.
+- KIS와 유사한 방식으로 작성되었습니다.
+- 파일명 : ls_stock_api.py
 -
