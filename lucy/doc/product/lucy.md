@@ -244,8 +244,9 @@ Lucy는 아래와 같은 기술적 특징을 갖고 있습니다.
 - 유효시간은 config에서 설정된 값에 의해서 제한됩니다
 - config는 .env_{profile}에 저장된 값을 사용합니다.
 - profile은 환경변수에 LUCY_MODE에 설정된 값입니다.
-    즉 set LUCY_MODE=real이면 .env_real 파일을 읽어서 환경변수를 설정합니다.
-- config는 프로젝트 전반에 걸쳐서 사용되는 상수값을 가지고 있습니다.
+    즉 set LUCY_MODE=real이면 .env_real 파일을 읽어서 각 변수의 값을 설정합니다.
+- config는 프로젝트 전반에 걸쳐서 사용됩니다.
+- git repository에 .env_{profile}은 배포되어서는 안되며, .gitignore에 설정되어 있습니다.
 
 ```python
 class Config:
@@ -260,4 +261,76 @@ config = Config()
 
 ### 3.3 각 증권사와의 인증
 
-- KIS 및 LS 증권사는 개인 사용자에게는 24시간의
+- RESTful api를 사용하기 위해서는 [KIS](https://apiportal.koreainvestment.com/intro), [LS](https://openapi.ls-sec.co.kr/intro) 각 증권사에 1)**계좌가 존재**해야 하고 2)**사용자 등록**을 해야하고 3)**Key를 발급**받아야 합니다
+- KIS 및 LS 증권사는 개인 사용자에게는 24시간, 법인 사용자에게는 1달의 유효기간을 갖는 키를 발급합니다.
+- 두 증권사 모두 유사한 방식으로 인증을 처리합니다.
+
+  ```text
+    1. APP_KEY와 APP_SECRET_KEY 2개의 키를 발급함.
+    2. 두 개의 키를 header에 넣어서 token발급 서비스를 요청하면 access token을 발급해 줌
+    3. 이후 토큰의 유효시간 내에서 token을 header의 authorization에 넣고 기타 서비스를 호출
+  ```
+
+- Lucy에서는 mongo DB에 APP_KEY와 APP_SECRET_KEY를 저장하여 사용합니다.
+- 발급받은 ACCESS_TOKEN 역시 mongo db에 저장하여 사용하며 만료 시간 초과시 다시 발급받고 다시 저장하는 방식으로 동작합니다.
+
+### 3.4 KIS 증권 api
+
+- KIS 증권과의 api를 위해서 KisStockApi class 작성하여 사용합니다.
+- 파일명 : kis_stock_api.py
+- [KIS에서 제공하는 RestfulAPI](https://apiportal.koreainvestment.com/apiservice/oauth2#L_5c87ba63-740a-4166-93ac-803510bb9c02)의 각 서비스를 호출합니다.
+- 많은 method가 있지만 동일한 구조를 갖고 있습니다.
+- KisStockApi의 주요 메소드
+  - set_access_token_from_kis : 동기(sync)방식으로 ACCESS_TOKEN을 발급받고 몽고 DB에 저장함
+  - send_request : 기타 함수(class method)에서 이 메소드를 호출하여 KIS에 서비스를 요청함.
+    - KIS는 GET, POST 2개의 method(http)만을 제공함
+
+```python
+    async def send_request(self, title, method, url, headers, params=None, data=None):
+        try:
+            async with aiohttp.ClientSession() as session:
+                if method == 'GET':
+                    async with session.get(url, headers=headers, params=params) as response:
+                        response.raise_for_status()
+                        return await response.json()
+                elif method == 'POST':
+                    async with session.post(url, headers=headers, data=data) as response:
+                        response.raise_for_status()
+                        return await response.json()
+        except aiohttp.ClientError as e:
+            logger.error(f"HTTP 오류 ({title}): {e}")
+            raise KisApiException(status_code=500, detail=f"HTTP 오류 ({title}): {e}")                    
+        except json.JSONDecodeError as e:
+            logger.error(f"Response is not in JSON format.{title}")
+            raise InvalidResponseException(f"응답 내용이 JSON형식이 아닙니다 ({title})")
+```
+
+- 각 서비스는 KIS에서 제공하는 문서에 따른 서비스를 호출하기 위해 header와 params또는 data를 설정한 후 send_request를  호츨하는 것으로 구현했습니다.
+- 아래는 stk_code를 인자로 하는 현재가를 구하는  함수의 예 입니다.
+
+```python
+    async def current_cost(self, stk_code:str) -> InquirePrice_Response:
+        ''' 현재가 조회 '''
+        url = self.BASE_URL +  '/uapi/domestic-stock/v1/quotations/inquire-price' 
+        headers = {"Content-Type":"application/json", 
+                "authorization": f"Bearer {self.ACCESS_TOKEN}",
+                "appKey":self.APP_KEY,
+                "appSecret":self.APP_SECRET,
+                "tr_id":"FHKST01010100"}
+        params = {
+            "fid_cond_mrkt_div_code":"J",
+            "fid_input_iscd":stk_code,
+        }
+        json_response = await self.send_request('현재가 조회', 'GET', url, headers, params=params)
+        self.check_access_token(json_response)
+        logger.debug(f"현재가: {stk_code} : {json_response['output']['stck_prpr']}")
+        try:
+            return InquirePrice_Response(**json_response)
+        except ValidationError as e:
+            raise HTTPException(status_code=500, detail=f"받은 json 파싱 오류: {e}")    
+```
+- 사용방법
+  - 
+
+- api의 추가방법
+-
