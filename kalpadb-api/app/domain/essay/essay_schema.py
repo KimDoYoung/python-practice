@@ -30,7 +30,9 @@ class EssayListRequest(BaseModel):
 
 class EssayListResponse(BaseModel):
     ''' 에세이 리스트 조회 응답 '''
-    essays: List[EssayResponse]
+    list: List[EssayResponse]
     exists_next: bool
     last_index: int
     data_count: int
+    page_size : int
+    start_index: int
