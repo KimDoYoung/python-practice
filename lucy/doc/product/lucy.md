@@ -388,3 +388,11 @@ classDiagram
      (참고: 실시간 가격정보는 계속 데이터가 전송되어져 오고, 체결정보는 체결시에만 데이터가 옴)
   5. 증권사에서 체결정보가 전송되었을 때 StockWsManager는 자신에게 알려진 client로 체결정보를 전송함.
 
+
+- core에 있는 것들
+- scheduler
+- frontend logic
+- menu구성
+- 화면캡쳐
+
+  
