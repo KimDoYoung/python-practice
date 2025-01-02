@@ -276,6 +276,21 @@ config = Config()
 
 ### 3.4 KIS 증권 api
 
+- 부모 클래스 StockApi로 부터 상속받습니다. 즉 StockApi의 자식 클래스입니다.
+
+```mermaid
+classDiagram
+    StockApi <|-- KisStockApi
+    StockApi <|-- LsStockApi
+    StockApi : +user_id
+    StockApi : +acctno
+    StockApi : +user_service
+    StockApi : initialize()
+    StockApi : get_access_token_time()
+    LsStockApi : send_request()
+    KisStockApi : send_request()
+```
+
 - KIS 증권과의 api를 위해서 KisStockApi class 작성하여 사용합니다.
 - 파일명 : kis_stock_api.py
 - [KIS에서 제공하는 RestfulAPI](https://apiportal.koreainvestment.com/apiservice/oauth2#L_5c87ba63-740a-4166-93ac-803510bb9c02)의 각 서비스를 호출합니다.
@@ -339,7 +354,37 @@ config = Config()
 
 ### 3.5 LS 증권 api
 
+- 부모 클래스 StockApi로 부터 상속받습니다. 즉 StockApi의 자식 클래스입니다.
 - LS증권의 제공되는 API를 사용하기 위해서 KIS와 유사하게 LsStockApi class가 작성되었습니다.
 - KIS와 유사한 방식으로 작성되었습니다.
 - 파일명 : ls_stock_api.py
--
+- [LS에서 제공하는 RestfulAPI](https://openapi.ls-sec.co.kr/apiservice?group_id=ffd2def7-a118-40f7-a0ab-cd4c6a538a90&api_id=33bd887a-6652-4209-88cd-5324bc7c5e36)의 각 서비스를 호출합니다.
+- LS에서 제공하는 서비스를 구현한 다수의  method가 있지만 동일한 구조를 갖고 있습니다.
+- KisStockApi의 주요 메소드
+  - set_access_token_from_kis : 동기(sync)방식으로 ACCESS_TOKEN을 발급받고 몽고 DB에 저장함
+  - send_request : 기타 함수(class method)에서 이 메소드를 호출하여 KIS에 서비스를 요청함.
+    - KIS는 GET, POST 2개의 method(http)만을 제공함
+
+### 3.6 StockApiManager
+
+- Lucy(OMS시스템)은 **여러명의 사용자가 다수의 증권사에 주문을 내고 체결통보를 받는다** 는 조건으로 설계되었습니다.
+- 즉 다수의 사용자, 각 사용자별로 다수의 증권사 계정을 관리하여야 합니다.
+- 이런 관리를 담당하는 것이 StockApiManager입니다.
+- 로그인 된 사용자 계정에 대해서 요청된 서비스가 KIS 서비스인지, LS 서비스인지 판별하여 해당하는 StockApi 객체를 반환해 주는 역활을 합니다.
+- 싱글레톤으로 구현되어 있습니다.
+
+### WebSocket Managers
+
+- KIS, LS 증권사들은 실시간 데이터를 Websocket을 사용하여 제공하고 있습니다.
+- 증권사들이 실시간으로 데이터를 제공하는 것에는 stkcode에 대한 실시간 가격정보와 체결정보가 있습니다.
+- 실시간 가격정보는 Lucy에서 사용하지 않으며 **체결정보만**을 사용합니다.
+- Lucy에서는 사용자별로 증권사의  websocket의 client로서 동작하는 **StockWsManager** 가 있습니다.
+- Lucy에서는 사용자 즉 접속한 Browser의 서버로서 동작하는 **ClientWsManager** 가 있습니다.
+- 동작순서
+  1. 사용자가 웹소켓 endpoint /ws에 접속
+  2. ClientWsManager 생성
+  3. 증권사별 StockWsManager의 생성 이때 2.에서 생성된 ClientWsManager를 인자로 넘겨 줌
+  4. 3.에서 생성된 StockWsManager는 증권사로부터 계속 실시간 데이터를 기다리고 있음
+     (참고: 실시간 가격정보는 계속 데이터가 전송되어져 오고, 체결정보는 체결시에만 데이터가 옴)
+  5. 증권사에서 체결정보가 전송되었을 때 StockWsManager는 자신에게 알려진 client로 체결정보를 전송함.
+
