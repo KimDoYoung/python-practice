@@ -1,4 +1,19 @@
 
+# home_routes.py
+"""
+모듈 설명: 
+    - /main, /page, /template, /login, /logout, /login 엔드포인트를 정의한다.
+    - /main: 메인 페이지
+    - /page: path에 해당하는 페이지를 가져와서 보낸다.
+    - /template: path에 해당하는 html에서 body추출해서 jinja2처리한 JSON을 리턴
+    - /login: 로그인 페이지
+    - /logout: 로그아웃 페이지
+    - /login: 로그인 프로세스
+
+작성자: 김도영
+작성일: 2025-01-03
+버전: 1.0
+"""
 from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse

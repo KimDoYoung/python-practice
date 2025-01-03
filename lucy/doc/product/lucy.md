@@ -373,7 +373,7 @@ classDiagram
 - 로그인 된 사용자 계정에 대해서 요청된 서비스가 KIS 서비스인지, LS 서비스인지 판별하여 해당하는 StockApi 객체를 반환해 주는 역활을 합니다.
 - 싱글레톤으로 구현되어 있습니다.
 
-### WebSocket Managers
+### 3.7 WebSocket Managers
 
 - KIS, LS 증권사들은 실시간 데이터를 Websocket을 사용하여 제공하고 있습니다.
 - 증권사들이 실시간으로 데이터를 제공하는 것에는 stkcode에 대한 실시간 가격정보와 체결정보가 있습니다.
@@ -388,11 +388,193 @@ classDiagram
      (참고: 실시간 가격정보는 계속 데이터가 전송되어져 오고, 체결정보는 체결시에만 데이터가 옴)
   5. 증권사에서 체결정보가 전송되었을 때 StockWsManager는 자신에게 알려진 client로 체결정보를 전송함.
 
+### 3.8 Core 모듈들
 
-- core에 있는 것들
-- scheduler
-- frontend logic
-- menu구성
-- 화면캡쳐
-
+- Lucy(fastApi 서버)를 구성하는 모듈들 입니다.
+- 목록(backend/app/core)
+  1. config : .env<profile>에서 상수값들을 loading해서 사용가능하게 함.
+  2. exception_handler : request에 대한 예외처리를 담담함.
+  3. jwtmiddleware : reqeust에 대한 인증처리 jwt를 사용
+  4. logger : 로깅처리 config에 설정된 파일에 로그를 남기며 profile이 local일 경우에는 console에도 로그를 남김
+  5. mongodb : 몽고db의 초기화와 close담담
+  6. scheduelr : cron 작업을 관리
   
+### 3.9 Scheduler
+
+- Lucy는 현재 4개의 작업을 cron동작으로 작업하도록 하고 있습니다.
+- **SchedulerJobService** 클래스와  **Scheduler** 클래스가 주요 클래스입니다.
+- Scheduler는 Apscheduler의 BackgroundScheduler을 사용합니다.
+- SchedulerJobService가  Scheduler클래스를 가지고 있으며 실제적으로 job등록등의 기능을 수행합니다.
+- 비동기작업이 아닙니다. 즉 scheduler에 의해서 구동되는 프로그램이 동작하고 있는 동안은 fastapi의 서비스가 지연됩니다.
+- 작업목록은 DB에  보관되며 Lucy가 기동될 때 Scheduler에 등록됩니다.
+- SchedulerJobService의  가장 주요한 method는 **register_system_jobs**입니다.
+  1. DB에서 등록된 job 데이터를 loading한다.
+  2. jobmapper와 연결된 job을 Scheduler클래스에 등록한다.
+
+- 작업목록
+
+1. site38_work : 커뮤니케이션38 스크래핑 (공모주 정보)
+2. holiday_godata : 휴일정보
+3. fil_ls_stk_info :  LS stk_info 정보 채우기
+4. judal_fetch : [Judal사이트](https://www.judal.co.kr/)에서 정보를 스크래핑
+
+### 4.0 frontend framework
+
+- template 엔진으로 handlebar를 사용했습니다.
+- css framework로 bootstrap5를 사용했습니다.
+- jQuery를 사용했습니다.
+- page 이동의 router는 home_router입니다
+- home_router는 다음과 같은 endpoint를 갖고 있습니다.
+      - /main: 메인 페이지
+      - /page: path에 해당하는 페이지를 가져와서 보낸다.
+      - /template: path에 해당하는 html에서 body추출해서 jinja2처리한 JSON을 리턴
+      - /login: 로그인 페이지
+      - /logout: 로그아웃 페이지
+      - /login: 로그인 프로세스
+
+- 페이지 rendering
+  - /page url에 path를 인자로 주어서 page를 이동하니다.
+  - 예를 들어 /page?path=/ipo/ipo-card 일 경우 /frontend/views/template하위의 폴더 ipo의 ipo-card.html 을 jinja2로 rendeing해서 보여주게 됩니다.
+
+  ```html
+    <li><a class="nav-link" href="/page?path=ipo/ipo-card">공모주-상세</a></li>  
+  ```
+
+    1. base folder : /frontend/views/template
+    2. base folder + path 값에 해당하는 html페이지를 찾음
+    3. 최종 ipo-card.html을 jinja2의 소스로 사용
+    4. jinja2 로 rendering된 html을 리턴해 줌. 이때 rendering에 사용되는 값들은 아래와 같습니니다
+
+```python
+    context = {
+        "request": request, 
+        "today" : today,
+        "page_path": path, 
+        "user_id": current_user["user_id"], 
+        "user_name": current_user["user_name"],
+        "stk_code" : stk_code
+    }
+    # id = ipo_calendar 와 같은 형식이고 이를 분리한다.
+    template_path = path.lstrip('/') 
+    template_page = f"template/{template_path}.html"
+    logger.debug(f"template_page 호출됨: {template_page}")
+    return render_template(template_page, context)    
+```
+
+- template rendering
+
+  - template란 handlebar의 template를 의미합니다.
+  - 상기 기술한 /page url에서 rendering되는 페이지는 실제적인 데이터를 갖고 있지 않습니다.
+  - 단, document 가 준비되면 필요한 데이터를 가져오는 구조로 되어 있습니다.
+    1. 화면에 보여줄 데이터를 가져온다.
+    2. handlerbar를 이용해서 rendering.한다.
+
+```javascript
+    function display_mystocks() {
+        fetch("/api/v1/mystock")
+        .then(response => response.json())
+        .then(data => {
+            $("#list-area").empty();
+            //2. 가져온 데이터는 handlerbar를 이용해서 rendering한다.
+            var template = Handlebars.compile($("#mystock_list_template").html());
+            $("#list-area").html(template({list: data}));
+        })
+        .catch(error => {
+            console.log(error);
+        });
+    }
+    $(document).ready(function() {
+        ....
+        display_mystocks(); //1. 화면에 보여줄 데이터를 가져온다.
+    });
+```
+
+- /template url
+  - 상기 기술한 기본적인 페이지 rendering외에 /template url로 handlebar의 소스 script를  가져와서 사용 할 수 있습니다.
+  - handlebar 소스 script가 너무 복잡할 경우, 페이지에 너무 많은 handlerbar 소스 script가 존재할 경우, 여러 곳에서 사용하는 handlerbar 소스 script일 경우 유용합니다.
+
+### 4.1 frontend 주요 javascript 모듈
+
+- billboard_candle_chart.js : naver에서 제공하는 open source [billboard](https://naver.github.io/billboard.js/release/latest/doc/)를 사용하여 candle 챠트를 그리는 모듈
+- calendar-utiliity.js : 달력을 그리고 해당하는 날짜의 ipo정보를 표시
+- common.js : 프로젝트 전반에 걸쳐서 사용되는 javascript utility함수들 모음
+- fetch-util.js : Lucy에서는 javascript자체의 fetch함수를 사용하며 그 fetch함수를 베이스로 만든 유틸리티 함수들
+- handlebar-helpers.js : handlebar 헬퍼함수 모음
+- ipo_helper : IPO용 handlebar 헬퍼함수 모음
+- lucy_main.js : lucy에서 공통으로 사용되는 화면과 관련된 javascript함수들
+  - 매수/매도 canvas 함수
+  - alert 함수
+  - 회사정보 canvas 함수
+
+  ```javascript
+    window.showBuySellCanvas = showBuySellCanvas;
+    window.showToastError = showToastError;
+    window.showCompanyCanvas = showCompanyCanvas;
+    window.showAlertError = showAlertError;
+  ```  
+
+  - lucy_websocket.js : 서버 (lucy backend)로부터 받는 websocket 데이터를 위한 함수들
+  - tab-manager: tab ui를 위한 함수
+
+### 4.2 데이터 베이스
+
+- Lucy는 [몽고데이터베이스](https://www.mongodb.com/ko-kr)를 사용합니다.
+- 몽고DB를 async 방식으로 사용하기 위해서 [beanie](https://beanie-odm.dev/)사용
+- DB명 : stockdb
+- Collections 과 대응하는 schema
+  - Config (config_model) : 설정정보를 저장
+  - EventDays (eventdays_model) : GODATA에서 open api를 통해서 가져온 휴일정보
+  - Ipo (ipo_model) : ipo 일정정보 및 상세 정보등 커뮤니케이션38사이트에서 얻은 ipo관련 정보
+  - IpoHistory (ipo_history_model) : 상장된 ipo일정에 대해서 예상체결가를 산정하기 위한 정보
+  - SchedulerJob (schduler_job_model) : 스케줄러에 등록될 job 정보
+  - Users (user_model) : 사용자의 계좌정보등
+
+## 4. 사용자 화면 설명
+
+### 4.1 개요
+
+사용자 화면은 처음 기획과는 달리 법인사용자가 아닌 개인 사용자로 작성되었으며, 매수/매도 주문, 체결통보외에 IPO관련 메뉴를 갖고 있으며, 미완성기능으로 단타머신의 기능이 있습니다.
+또한, KIS,LS의 여러 api를 호출하여 데이터를 가져와서 보여주는 기능이 있습니다.
+그러나 제공되는 데이터의 2차 가공 및 의미있는 판단을 내리는 기능은 없습니다.
+
+또한 단타머신은 자동으로 매수/매도의 기능을 수행하고 telegram을 통해서 사용자에게 information을 주도록 기획했으나 실효성의 문제(즉 자동으로 수행시 손실이 클 수 있음)와
+시간상의 문제로 개발 중에 프로젝트가 되게 되었습니다.
+
+### 4.2 메뉴 구성 및 설명
+
+- 공모주
+  - 공모주 - 상세 : 공모주 내용 표시
+  - 공무주 - 달력 : 달력 상에 공모주 일정 (청약일,환불일,상장일) 표시
+  - 공모주 - 기록 : 지난 공모주와 상장일 최고액 표시 및 예상체결가 공식 산출
+- 종목찾기
+  - My Stock : 주식 종목을 보유/관심/단타로 구분하여 표시, 10초마다 현재가를 갱신
+  - 주달검색  : 주달사이트에서 scrapping한 데이터로 검색
+  - 외국인 매매조목 : 외국인 매매 중 상위 종목 표시
+  - 증권사-투자의견 : 증권사의 투자의견를 회원사별 괴리율 별로 표시
+  - KIS-관심종목 : KIS(한국투자증권)의 HTS를 통해서 추가한 관심그룹과 속한 종목 표시
+  - KIS-조건식 : KIS의 HTS를 통해서 등록한 조건식의 조회 및 조건식을 수행한 결과 표시
+  - KIS-상위종목 : KIS의 시간외호가잔량과 호가잔량을 조회
+  - LS-상위종목 : LS증권사의 등락률,거래량 등으로 금일/전일의 상위종목 조회
+- 단타머신 : 단타머신 관리페이지
+- 한국투자증권
+  - KIS 계좌 : 등록된 한국투자증권 계좌의 상태 및 보유 종목에 대한 금액정보 표시
+  - 일별주문체결 : 일자로 체결된 정보 조회
+- LS증권
+  - LS계좌 : 등록된 계좌의 상태와 보유 종목에 대한 금액정보 표시
+  - 거래내역 : 일자로 거래내역 및 체결정보 조회
+
+- 나의 주식정보 : 주식종목을 보유/관심/단타로 분류하여 현재가를 표시, 10초마다 가격정보를 실제 가격으로 조회
+- 설정 및 스케줄 : 설정 및 Scheduler 정보 표시 및 수정
+- 사용자 정보 : 사용자의 기본정보와 계좌정보를 표시 수정
+
+### 4.3 화면 캡쳐 및 설명
+
+- 로그인 및 메인화면
+![로그인](./login_main.png)
+
+  - id/pw 로그인시 /login url호출 jwt token을 발급받음.
+  - fulldown 메뉴를 사용
+  - login사용자 표시
+
+
+-
