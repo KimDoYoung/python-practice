@@ -20,7 +20,7 @@
     - /inquire-daily-price/{stk_code}/{div_code} : 기본시세-주식현재가 일자별
     - /inquire-time-itemchartprice/{stk_code}/{hour1} : 기본시세-주식당일분봉조회
     - /inquire-price2/{stk_code} : 주식현재가 시세2
-    - /invest-opinion/{stk_code}/{startYmd}/{endYmd} : 국내주식 종목투자의견
+    - /invest-opinion/{stk_code}/{startYmd}/{endYmd} : 국내주식-종목투자의견
     - /invest-opbysec/{iscd}/{startYmd}/{endYmd} : 국내주식 증권사별 투자의견
 
 
