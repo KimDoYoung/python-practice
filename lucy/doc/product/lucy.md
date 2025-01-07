@@ -747,6 +747,112 @@ classDiagram
 ### 5.1 배포 전략
 
 - 배포는 기본적으로 docker를 사용하여 linux에서 운영하는 것을 전제로 수립되었습니다.
+  - 배포 서버에서는 docker가 설치되어 있어야 함.
 - mongodb가 linux에 이미 설정되어 있지 않다는 가정하에 docker-compose가 작성되었습니다.
 - Docker파일은 scrapping에 필요한 설정도 포함되어 있습니다.
 
+### 5.2 docker-compose
+
+```yml
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    container_name: lucy-backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongo
+    networks:
+      - lucy-network
+    environment:
+      - LUCY_MODE=real
+    volumes:
+      - ./backend:/backend
+      - ./frontend:/frontend
+      - /home/kdy987/fastapi/lucy/log:/log
+      - /home/kdy987/fastapi/lucy/data:/data
+      - /home/kdy987/fastapi/lucy/files:/files
+      - /etc/localtime:/etc/localtime:ro  # 호스트 시간대 설정 마운트      
+    restart: always  # 서버 재시작 시 항상 컨테이너를 재시작
+
+  mongo:
+    image: mongo:4.4
+    container_name: lucy-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - /home/kdy987/fastapi/mongodb:/data/db
+      - /root/fastapi-data/kdydata:/data/import
+      - /etc/localtime:/etc/localtime:ro  # 호스트 시간대 설정 마운트            
+    networks:
+      - lucy-network
+    command: >
+      bash -c "
+      mongod --bind_ip_all &
+      sleep 5 &&
+      if ! mongo stockdb --eval 'db.Config.findOne()'; then
+        mongoimport --host localhost --db stockdb --collection Config --file /data/import/stockdb.Config.json --jsonArray &&
+        mongoimport --host localhost --db stockdb --collection SchedulerJob --file /data/import/stockdb.SchedulerJob.json --jsonArray &&
+        mongoimport --host localhost --db stockdb --collection Users --file /data/import/stockdb.Users.json --jsonArray
+      fi &&
+      tail -f /dev/null
+      "
+    restart: always  # 서버 재시작 시 항상 컨테이너를 재시작  
+volumes:
+  mongo_data:
+
+networks:
+  lucy-network:
+
+```
+
+    - 몽고db의 port는 기본포트를 사용합니다.
+    - 포트는 변경가능합니다. 기존 포트와 충돌 확인이 필요합니다.
+    - volumes에 의해 host machine에 log, data, files를 위한 폴더가 존재해야 합니다
+    - mongodb의 초기화에 3개의 collection이 이미  json으로 만들어져서 loading되어야 합니다.
+
+### 5.3 Dockerfile
+
+  ```text
+  FROM python:3.12-slim
+
+# 필요한 패키지 설치
+RUN apt-get update && apt-get install -y \
+    wget \
+    unzip \
+    curl \
+    gnupg2 \
+    --no-install-recommends
+
+# Google Chrome 설치
+RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
+    echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list && \
+    apt-get update && apt-get install -y google-chrome-stable
+
+# ChromeDriver 설치
+RUN CHROME_DRIVER_VERSION=`curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE` && \
+    wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/$CHROME_DRIVER_VERSION/chromedriver_linux64.zip && \
+    unzip /tmp/chromedriver.zip -d /usr/local/bin/ && \
+    rm /tmp/chromedriver.zip
+
+RUN pip install --upgrade pip
+
+# 작업 디렉토리 설정
+WORKDIR /
+
+# 필요한 라이브러리 설치를 위해 requirements.txt 파일을 복사
+COPY . .
+
+# 의존성 패키지 설치
+RUN pip install --no-cache-dir -r requirements.txt
+
+
+# FastAPI 실행 (main.py에서 FastAPI 객체를 정의했을 때의 파일 경로)
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000", "--log-level", "debug"]
+
+  ```
+
+- python:3.12-slim  베이스 docker입니다.
+- scrapping을 위한 driver를 설치합니다
